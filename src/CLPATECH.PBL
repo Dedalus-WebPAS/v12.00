@@ -1,0 +1,26 @@
+.------------------------------------------------------------
+. Clear PATECHFD file fields
+.------------------------------------------------------------
+. Mods:
+. V11.04.00 01/02/2024 Bella Turco     TSK 0919569
+.           Created common clear
+.------------------------------------------------------------
+.**********************************************************************
+.  Clear MBS Explosion Data
+.**********************************************************************
+CLPATECH  MOVE      SP70,PTECCTYP
+          MOVE      SP70,PTECATYP
+          MOVE      SP70,PTECMBSC
+          MOVE      SP70,DPTECUNI
+          MOVE      ZERO,PTECUNIQ
+          MOVE      SP70,PTECEMCH
+          MOVE      SP70,PTECOPPC
+          MOVE      ZERO,PTEC1MCF
+          MOVE      ZERO,PTEC2MCF
+          MOVE      ZERO,PTEC3MCF
+          MOVE      SP70,PTECHFND
+          MOVE      SP70,PTECHGRP
+          MOVE      SP70,PTECQNTY
+          MOVE      SP70,PTECSPAR
+.
+          RETURN

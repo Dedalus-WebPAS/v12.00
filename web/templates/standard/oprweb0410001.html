@@ -1,0 +1,74 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src=../js/TableSort.js></script>
+<script type="text/javascript">
+function UpdatePreference(KEY) {
+  doctcode=KEY.substr(0,6).replace(/ /g,"+");
+  prefcode=KEY.substr(6,9).replace(/ /g,"+");
+  hospcode=KEY.substr(15,3).replace(/ /g,"+");
+ 
+  LinkUrl="oprweb04.pbl?reportno=10&template=3" + 
+          "&doctcode=" + doctcode +
+          "&oprdh001=" + prefcode +
+          "&hospcode=" + hospcode;
+  DFrameLink(LinkUrl,100,150,800,400);
+}
+function AddPreference(doctcode) {
+  doctcode=doctcode.replace(/ /g,"+");
+  LinkUrl="oprweb04.pbl?reportno=10&template=2&doctcode="+doctcode;
+  DFrameLink(LinkUrl,100,150,500,200);
+}
+//----------------------------------------------------------------------------
+// Create New Table Object
+// Border, Cellspacing, Cellpadding, Width, Align, Heading Height, Row Height
+//----------------------------------------------------------------------------
+// Add Columns in Order Required
+// Heading,Type,Display Column,Sort Column, Align, Icon, Link Column
+// Columns Available
+//  0 - HTML Link  
+//  1 - ID  
+//  2 - Name 
+//---------------------------------------------------------------------------
+function InitTable(TableView) {
+f = document.ListForm;
+switch (TableView) {
+case 0: {
+ t = new Table(1,0,2,"100%","center",25,25);
+ t.addColumn("Code","String",1,1,"left","EditIcon.gif","0",80)
+ t.addColumn("Description","String",2,2,"left","","",100)
+ if (f.ibcnmhos.value == "1") {
+   t.addColumn("Hospital","String",3,3,"left","","",100)
+ } 
+ AddTableRows()
+ TableOutput(1,1);    // Order Column,Asc Dsc
+ break; }
+ }
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);InitTable(0);">
+<div id=HeadingSection>
+<form name=ListForm method="get" style="margin:0">
+<input type=hidden name=ibcnmhos id=ibcnmhos 
+  value="%STANDARD.01.025.000.043.1.1">
+<table cellspacing=0 border=0 cellpadding=0 width=100% bgcolor=#cccccc>
+<tr><td>
+&nbsp;Operating Preferences for <b>%OPRWEB04.10.002</b></td>
+<td align=right>
+<input type=button class="button" value="Add"
+ onclick='AddPreference("%OPRWEB04.10.003");'>
+</td></tr>
+</table>
+</form>
+</div>
+
+<div id=TableLocation></div>
+
+<script type="text/javascript">
+function AddTableRows() {
+%OPRWEB04.10.104
+}
+</script>

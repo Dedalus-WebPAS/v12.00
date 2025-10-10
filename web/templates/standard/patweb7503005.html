@@ -1,0 +1,112 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="CrossBrowser" content="true">
+<meta name="HelpFileName"    content="NoContextSet.html">
+<script type="text/javascript">
+function OccGroup() {
+  f = document.futureAction;
+  if (isWhitespace(f.factcode.value)) {return;}
+
+  var serverURL = "../cgi-bin/comweb81.pbl?reportno=69" +
+                  "&valdtype=" + f.factcode.value.replace(/ /g,"+");
+  var returnValue = RSExecute(serverURL);
+  if (returnValue.status!=0) {
+    return;
+  }
+
+  ReturnValue=returnValue.return_value.split("|");
+    for (var i =0 ; i < f.factocgr.length; i++) {
+     if (trim(f.factocgr.options[i].value.substr(0,3))==
+         trim(ReturnValue[0])) {
+         f.factocgr.selectedIndex=i } };
+}
+
+</script>
+%START.OF.PAGE
+<body onload="PageLoad(event);">
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon"
+ src="../images/ExitIcon.gif" onclick="DFrameExit();">
+Add Future Action - Visit Number %PATWEB75.03.081
+</span>
+<form name=futureAction action=patweb75.pbl method=post
+     onsubmit='return validateMandatory(this);' style="margin:0">
+    <input type=hidden name=reportno value="3">
+    <input type=hidden name=updttype value="A">
+    <input type=hidden name=nextpage value="0">
+    <input type=hidden name=urnumber value="%PATWEB75.03.003">
+    <input type=hidden name=admissno value="%PATWEB75.03.081">
+    <input type=hidden name=invoicen value="%PATWEB75.03.130">
+    <input type=hidden name=factinvn value="%PATWEB75.03.130">
+    <input type=hidden name=dummy id=dummy value="">
+    <input type=hidden name=dummy1 id=dummy1 value="">
+
+<table align=center width=95% border=0>
+<tr><td class=DataLabel>Future Action Date </td>
+    <td><input type=text name=factdate size=12
+         title='Future Action Date' class='FutureDate Mandatory'>
+        <img src=../images/DateTimeStamp.gif class=Icon
+         date=futureAction.factdate>
+        <img src=../images/DateLookup.gif class=Icon
+         date=futureAction.factdate></td></tr>
+
+<tr><td class=DataLabel>Future Action Type </td>
+    <td><select name=factcode onchange="OccGroup();" class="Mandatory";
+        title="Action Type">
+        <option></option>
+        %STANDARD.01.021.FA
+        </select>
+    </td></tr>
+
+<tr><td class=DataLabel>
+    <script type="text/javascript">HFDescription()</script>
+    <td><input type=text size=6 maxlength=6 name=facthfnd id=facthfnd
+         title=""  value="%PATWEB75.03.112"
+         onblur="validateCode(16,futureAction.facthfnd,d_facthfnd);">
+        <input type=text size=25 maxlength=30 name=d_facthfnd class=Readonly
+         id=d_facthfnd readonly notab value="%PATWEB75.03.111.1">
+        <img src=../images/SearchIcon.gif border=0 hspace=0 align=absmiddle
+         class=Icon
+         onclick="HealthFundSearchFrame(facthfnd,d_facthfnd,dummy,dummy1);">
+        <img src="../images/erase.gif" align=absmiddle class=Icon
+         onclick="clrDoc(facthfnd,d_facthfnd);">
+    </td></tr>
+
+<tr><td class=DataLabel>Occupational Group</td>
+    <td><select name=factocgr title="Occupational Group">
+        <option></option>
+        %STANDARD.01.012.2
+        </select></td></tr>
+
+<tr><td class=DataLabel>Invoice Number </td>
+    <td><input type=text class=Readonly readonly notab 
+         name=invoicen title="Invoice Number"
+         tabindex=-1 size=10 value="%PATWEB75.03.130" >
+    </td></tr>
+
+<tr><td class=DataLabel>Comment</td>
+    <td><input type=text name=factcomm size=50 maxlength="60">
+    </td></tr>
+
+<tr><td class=DataLabel>Date Action Completed</td>
+    <td><input type=text name=fadtcomp size=12 title="Date Action Completed">
+        <img src=../images/DateTimeStamp.gif class=Icon
+         date=futureAction.fadtcomp>
+        <img src=../images/DateLookup.gif class=Icon
+         date=futureAction.fadtcomp></td></tr>
+
+<tr><td class=DataLabel>&nbsp;</td>
+    <td class=DataField>&nbsp;
+    </td></tr>
+
+<tr><td colspan=2 align=center><br>
+   <input type=submit value=Add class="button">
+    <input type=button value=Cancel class="button" onclick="DFrameExit();">
+    </td></tr>
+
+</table>
+</form>
+
+<script type="text/javascript">
+  document.futureAction.facthfnd.title=HealthFundDescription;
+</script>

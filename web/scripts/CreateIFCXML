@@ -1,0 +1,103 @@
+#!/usr/bin/php
+<?php
+// Version : V11.05.00
+/******************************************************************************
+ *  Creates an IFC .xml file (for EpiSoft) in the spool dir (TBSPOOL)
+ * 
+ *  Arguments:
+ *    Arg 1 - pipe-delimited file with data values to be loaded into output XML
+ *    Arg 2 - Informed Financial Consent (IFC) full file path (PDF)
+ *
+ *  Example pipe-delimited (Arg 1) file contents:
+ *    HEAVIC| Z879879| 4646330|00000000000202309081|10|250.00|CLA
+ *
+ *  Modifications:
+ *
+ *  27/02/2024  V11.04.02  Don Nguyen       TSK 0917199
+ *                         Changed the location of the log file to use current
+ *                         web /tmp directory and added more validation for the
+ *                         number of parameters passed into this script.
+ *  15/01/2024  V11.04.01  Don Nguyen       TSK 0917199
+ *                         Updated script for new pipe-delimited data format
+ *  14/11/2023  V11.03.00  Don Nguyen       TSK 0917199      
+ *                         Created script
+ ******************************************************************************/
+
+  // Create log file in the current web /tmp directory: ../webroot/../tmp/
+
+  $logfile = './CreateIFCXML_'.date("Ymd").'.log';  // CreateIFCXML_yyyymmdd.log
+  $log = "\n[".date("Y-m-d")." ".date("H:i:s")."]\n";
+  $errormsg = "";
+
+  if ($argc != 3) {
+    $errormsg = "Invalid number of script arguments (".($argc-1).")!";
+    $log .= $errormsg;
+
+    echo $errormsg;
+    echo "\n\nUsage: \n\n   $argv[0] data_file.tmp IFC_file.pdf\n\n";
+
+    // Append to log file
+    file_put_contents($logfile, $log.PHP_EOL, FILE_APPEND);
+    exit(1);
+  }
+
+  $spooldir = getenv("TBSPOOL",true) ? : null;  // use env variable "TBSPOOL"
+  if ($spooldir === null) {
+    $errormsg = "Environment variable 'TBSPOOL' not defined!\n";
+    $log .= $errormsg;
+
+    // Append to log file
+    file_put_contents($logfile, $log.PHP_EOL, FILE_APPEND);
+    exit(1);
+  }
+
+  $inputf = $argv[1];  // pipe-delimited file with data values
+  $ifcpdf = $argv[2];  // IFC (PDF) full file path
+
+  // Log the creation of XML file and the input (IFC) file name ...
+  $log .= "Creating IFC XML...\n";
+  $log .= "IFC input file (PDF): $ifcpdf";
+
+  // Append to log file
+  file_put_contents($logfile, $log.PHP_EOL, FILE_APPEND);
+
+  // Initialise the XML object (template) ...
+
+  $xmlstr = <<<XML
+<?xml version='1.0'?>
+<IFCExtract xmlns:xsd='http://www.w3.org/2001/XMLSchema' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>
+  <HospitalCode></HospitalCode>
+  <PatientMRN></PatientMRN>
+  <VisitNumber></VisitNumber>
+  <EpisoftID></EpisoftID>
+  <TotalELosCost></TotalELosCost>
+  <CorrespondenceID></CorrespondenceID>
+  <Document></Document>
+  <ClaimType></ClaimType>
+</IFCExtract>
+XML;
+
+  // Load data values into XML Document ...
+  $fields = explode("|",file_get_contents($inputf));
+
+  $xmldoc=simplexml_load_string($xmlstr) or exit(1);
+
+  $xmldoc->HospitalCode = trim($fields[0]);
+  $xmldoc->PatientMRN = $fields[1];
+  $xmldoc->VisitNumber = $fields[2];
+  $xmldoc->EpisoftID = trim($fields[3]);
+  $xmldoc->CorrespondenceID = trim($fields[4]);
+  $xmldoc->TotalELosCost = trim($fields[5]);
+  $xmldoc->ClaimType = trim($fields[6]);
+  $xmldoc->Document = base64_encode(file_get_contents($ifcpdf));
+
+  // Save the output XML file ...
+  //   Filename: "<SpoolDir>/IFC_<HospitcalCode>_<VisitNumber>.xml"
+  $outfile = $spooldir."/IFC_".trim($fields[0])."_".trim($fields[2]).".xml";
+  $xmldoc->asXML($outfile);
+
+  $log = "Output file (XML) saved successfully to: $outfile";
+  file_put_contents($logfile, $log.PHP_EOL, FILE_APPEND);
+
+  exit(0);
+?>

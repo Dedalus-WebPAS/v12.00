@@ -1,0 +1,23 @@
+. *----------------------------------------------------------------------
+. * Include Name  :   CLPMSELI.PBL
+. *
+. * Function      :   Clear Items recorded on Eligibility Check
+. *
+. * V11.04.00 21/05/2024  J.Tan          TSK 0942917
+. *                       Created Include
+. *----------------------------------------------------------------------
+.-----------------------------------------------------------
+.         Clear fields
+.-----------------------------------------------------------
+CLPMSELI  MOVE      SP70,PMEIVISN       * Visit Number
+          MOVE      SP70,PMEIRTYP       * Record Type
+          MOVE      SP70,PMEICNTR       * Counter
+          MOVE      SP70,PMEIITMN       * Theatre Fee Code/MBS or Misc.Code
+          MOVE      ZERO,PMEISERV       * No of Items
+          MOVE      "0",PMEIGSTE        * Keyin GST fields
+          MOVE      "0",PMEIGSTA        * GST Payable 1=Yes, 0=No
+          MOVE      SP70,PMEIGSTC       * GST Code
+          MOVE      SP70,PMEIKEYI       * Keyin Amount
+          MOVE      ZERO,PMEIAMNT       * Keyin amount Item
+          PACK      PMEISPAR,SP70,SP70  * Spare Variable
+          RETURN

@@ -1,0 +1,91 @@
+#!/usr/bin/php
+<?php
+// Version : V11.05.00
+/******************************************************************************
+ *              ePayment (EpiSoft) XML parser
+ * 
+ *  Loads an EpiSoft ePayment file (XML) and outputs a pipe-delimted file
+ *
+ *  Arguments:
+ *    Arg 1 - Input file (XML)
+ *    Arg 2 - Output file (pipe-delimited):
+ *              Episoft ID|UR|Admission Number|Amount|DepositReceipt|Reference
+ *
+ *  Modifications:
+ *
+ *  04/03/2024  V11.04.02  Don Nguyen       TSK 0917199
+ *                         Added log file functionality for local /tmp directory
+ *  15/01/2024  V11.04.01  Don Nguyen       TSK 0917199
+ *                         Updated for new input file format
+ *  15/11/2023  V11.03.00  Don Nguyen       TSK 0917199
+ *                         Created script
+ ******************************************************************************/
+  $logfile = './epaymxml_log_'.date("Ymd").'.log';  // CreateIFCXML_yyyymmdd.log
+
+  $log = "\n[".date("Y-m-d")." ".date("H:i:s")."]";
+  file_put_contents($logfile, $log.PHP_EOL, FILE_APPEND);
+
+  $log = "Reading file: " . $argv[1];
+  file_put_contents($logfile, $log.PHP_EOL, FILE_APPEND);
+
+  $xml = simplexml_load_file($argv[1]);
+  if ($xml === false) exit(1);
+
+  $log = "File read successfully";
+  file_put_contents($logfile, $log.PHP_EOL, FILE_APPEND);
+
+  $log = "Opening temp (output) file: " . $argv[2] . ".txt";
+  file_put_contents($logfile, $log.PHP_EOL, FILE_APPEND);
+
+  $outputFile = fopen($argv[2].".txt","w");
+
+  $log = "Temp file opened successfully";
+  file_put_contents($logfile, $log.PHP_EOL, FILE_APPEND);
+
+  /*
+  vPaymentExtract:
+  ===============
+
+  <vPaymentExtract xmlns:xsd=http://www.w3.org/2001/XMLSchema xmlns:xsi=http://www.w3.org/2001/XMLSchema-instance>
+     <AdmissionID>2408</AdmissionID>
+     <HospitalID>012</HospitalID>
+     <HospitalName>ABC Hospital</HospitalName>
+     <HospitalPASCode>0035351A</HospitalPASCode>
+     <EpisodeID>200300</EpisodeID>
+     <MRN>9988777</MRN>
+     <EstimateVersion>1</EstimateVersion>
+     <DepositData>012|9988777|200300|26595817088|436.00|EPIS||045|Main Account|PHI|IPD|MSA|</DepositData>
+  </vPaymentExtract>
+  */
+
+  fwrite($outputFile,$xml->AdmissionID."|");
+  fwrite($outputFile,$xml->HospitalPASCode."|");
+  fwrite($outputFile,$xml->MRN."|");
+  fwrite($outputFile,$xml->EpisodeID."|");
+
+
+  // Process DepositData...
+
+  /*
+  DepositData:
+  ===========
+
+     HospitalID|MRN|EpisodeID|DepositReceipt|Amount|CashDrawer|CashDrawerPassword|FinancialSystemID|ChequeAccount|UserID|Register|Payment Category
+
+     012|9988777|200300|26595817088|436.00|EPIS||045|Main Account|PHI|IPD|MSA
+  */
+
+  $deposit_data = explode("|",$xml->DepositData);
+  fwrite($outputFile,$deposit_data[4]."|");  // "436.00" (Amount)
+  fwrite($outputFile,$deposit_data[3]."|");  // "26595817088" (DepositReceipt)
+  fwrite($outputFile,$deposit_data[9]);      // "PHI" (UserID)
+
+  $log = "Data written to temp file: \n" . file_get_contents($argv[2].".txt");
+  file_put_contents($logfile, $log.PHP_EOL, FILE_APPEND);
+
+  fclose($outputFile);
+
+  $log = "Finished.";
+  file_put_contents($logfile, $log.PHP_EOL, FILE_APPEND);
+
+?>

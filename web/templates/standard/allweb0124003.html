@@ -1,0 +1,48 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/allweb01.js"></script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);">
+
+<span class=DFrameTitleBar>
+  <img align="right" class="MenuIcon" src="../images/ExitIcon.gif" 
+   alt="Exit" onclick="DFrameExitRefresh();">
+   Service Subtype Codes
+</span>
+
+<form name=UpdateForm method="post" action="allweb01.pbl" style="margin:0">
+<input type=hidden name=reportno id=reportno value="24">
+<input type=hidden name=template id=template value="003">
+<input type=hidden name=updttype id=updttype value="D">
+<input type=hidden name=deptcode id=deptcode value="%ALLWEB01.24.003">
+
+<table align=center border=0>
+  <tr><td>&nbsp;</td></tr>
+  <tr>
+    <td align=right>
+      Subtype &nbsp; &nbsp;
+    </td>
+    <td align=left>
+      <input type=text name=d_contdesc id=d_contdesc
+       value="%ALLWEB01.24.004.1" readonly>
+      <input type=hidden name=contcode id=contcode 
+       value="%ALLWEB01.24.004.0">
+    </td>
+  </tr>
+  <tr><td>&nbsp;</td></tr>
+  <tr>
+    <td align=right>
+      <input type=submit class=button value="Delete"
+       name=btnDelete id=btnDelete> 
+    </td>
+    <td align=left>
+      <input type=button class=button value="Cancel"
+       name=btnCancel id=btnCancel
+       onclick="DFrameCloseRefresh();">
+    </td>
+  </tr>
+</table>
+</form>

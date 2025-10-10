@@ -1,0 +1,304 @@
+<meta name="TemplateVersion" content="V12.00.01">
+<meta name="TemplateHome" content="hea-nbh">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/EmrRegistration.js"></script>
+<script type="text/javascript" src="../js/emrweb0202020.js"></script>
+<script type="text/javascript" src="../js/emrweb02_NBH.js"></script>
+<script type="text/javascript">
+function PatientSearchNBH() {
+  redirect = "emrweb02.pbl?reportno=02&template=021";
+  SetCookie('PatSearchRedirectCookie',redirect);
+
+  url= "patweb90.pbl?reportno=01&template=060"
+  DFrameLink(url,0,0,1008,521);
+}
+function CancelLink() {
+  if (!isWhitespace(document.getElementById("eacregck").value)) {
+    location.href = document.getElementById("eacregck").value;
+  }
+  else {
+    document.LinkForm.emexp001.value =
+        document.UpdateForm.emexp001.value.replace(/ /g,"+")
+    document.LinkForm.submit();
+  }
+}
+function getExpAdvConCookie(){
+  if (GetCookieData("ExpAdvConCookie")!="unknown") {
+    document.getElementById("eacindct").value="1";
+    ExpireCookiePath("ExpAdvConCookie");
+  }
+}
+function getEACRegCookie() {
+  if (GetCookieData("EACRegCookie")!="unknown") {
+    document.getElementById("eacregck").value=GetCookieData("EACRegCookie");
+    ExpireCookiePath("EACRegCookie");
+  }
+}
+function genderName(){
+  if (document.UpdateForm.ptcnhdps.value=="3") {
+    intersexoption = document.createElement("option");
+    intersexoption.text = "Other";
+    intersexoption.value = "R";
+    document.UpdateForm.emexp004.add(intersexoption);
+  } else {
+    intersexoption = document.createElement("option");
+    intersexoption.text = "Intersex";
+    intersexoption.value = "R";
+    document.UpdateForm.emexp004.add(intersexoption);
+  }
+}
+function disablefields() {
+    document.getElementById("emexp002").disabled = true;
+    document.getElementById("emexp003").disabled = true;
+    document.getElementById("emexp004").disabled = true;
+    document.getElementById("emexp005").disabled = true;
+//
+    if(isWhitespace(document.UpdateForm.emexp018.value)) {
+      document.getElementById("emexp002").value =
+      document.getElementById("emexp002").defaultValue;
+      document.getElementById("emexp003").value =
+      document.getElementById("emexp003").defaultValue;
+      document.getElementById("emexp005").value =
+      document.getElementById("emexp005").defaultValue;
+      for (var i =0 ; i < document.UpdateForm.emexp004.length; i++) {
+      if  (document.UpdateForm.emexp004.options[i].value==
+           document.UpdateForm.d_emexp004.value ) {
+           document.UpdateForm.emexp004.selectedIndex=i }
+      }
+    }
+}
+function SetNewUR() {
+  if(document.UpdateForm.regiflag.value == "1" &&
+     !isWhitespace(document.UpdateForm.urnumber.value)) {
+     document.UpdateForm.emexp018.value=document.UpdateForm.urnumber.value;
+  }
+}
+function UpdateVisit() {
+  f = document.UpdateForm;
+
+  if (!validateMandatory(f)) { return; }
+
+  if (!CheckDateTimeRange(f.emvis001,
+                          f.emvis002,
+                          f.currdate,
+                          f.currtime)) {
+    alert('Arrival Date/Time cannot be after Current Date/Time');
+    return;
+  }
+
+  f.formactn.value="N3"
+  f.updttype.value="REGIS"
+  f.urnumber.value = f.emexp018.value;
+  UpdateWin = window.open("","HideUpdateWindow",
+    "width=10,height=10,top=1024,directories=no,location=no" +
+    ",scrollbars=no,status=no,toolbar=no,menubar=no,resizeable=no")
+  f.target="HideUpdateWindow";
+
+  if (isWhitespace(f.emvis006.value)){
+    f.emvis006.value="WR";
+  }
+
+  f.submit();
+}
+function DefaultLocation() {
+  f = document.UpdateForm;
+  var loc = f.emstdloc.value;
+  if (!isWhitespace(loc)) {
+    for (var i =0 ; i < f.emvis006.length; i++) {
+      if (f.emvis006.options[i].value == loc) {
+        f.emvis006.selectedIndex = i;
+      }
+    }
+  }
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);SetNewUR();SetFields();
+              getExpAdvConCookie();getEACRegCookie();
+              justifyRight(document.UpdateForm.emexp018);
+              PatientReturn();  
+              genderName();disablefields();
+              DefaultLocation();
+              validateLocation(UpdateForm.emvis006,
+                               UpdateForm.name_emvis006);">
+<span class=DFrameTitleBar>
+Register Expected Emergency Patient Visit
+</span>
+<div id=PageBodySection>
+<form name=UpdateForm action="emrweb02.pbl" method=post style="margin:0">
+<input type=hidden name=reportno value="02">
+<input type=hidden name=template value="20">
+<input type=hidden name=updatety value="4">
+<input type=hidden name=formactn>
+<input type=hidden name=updttype>
+<input type=hidden name=urnumber value="%EMRWEB02.02.003">
+<input type=hidden name=admissno value="%EMRWEB02.02.081">
+<input type=hidden name=updateky value="%EMRWEB02.02.700">
+<input type=hidden name=nextpage value="14">
+<input type=hidden name=redirect value="emrweb01.pbl?reportno=1&template=009">
+<input type=hidden name=deceased>
+<input type=hidden name=selsex>
+<input type=hidden name=gname>
+<input type=hidden name=sname>
+<input type=hidden name=pfgname>
+<input type=hidden name=pfsname>
+<input type=hidden name=dummy>
+<input type=hidden name=dummyadm> 
+<input type=hidden name=pcomdeft value="0">
+<input type=hidden name=emexp001 value="%EMRWEB02.02.410">
+<input type=hidden name=d_emexp004 value="%EMRWEB02.02.413">
+<input type=hidden name=emexp007 value="">
+<input type=hidden name=emexp008 value="">
+<input type=hidden name=emexp009 value="">
+<input type=hidden name=emexp010 value="">
+<input type=hidden name=emexp011 value="">
+<input type=hidden name=emexp012 value="">
+<input type=hidden name=emexp013 value="">
+<input type=hidden name=eacindct id=eacindct value="">
+<input type=hidden name=eacregck id=eacregck value="">
+<input type=hidden name=ptcnhdps value="%STANDARD.01.025.080.250.1.1">
+<input type=hidden name=regiflag value="%EMRWEB02.02.461">
+<input type=hidden name=ptcnnmpr value="%STANDARD.01.025.128.226.1.1">
+<input type=hidden name=currdate id=currdate value="%STANDARD.01.015">
+<input type=hidden name=currtime id=currtime value="%STANDARD.01.016">
+<input type=hidden name=heanbhfl id=heanbhfl value="1">
+<input type=hidden name=emstdloc id=emstdloc value="%EMRWEB02.02.959">
+<input type=hidden name=name_emvis006 id=name_emvis006 value="">
+  
+<table align=center width=95% border=0 cellspacing=0 cellpadding=0>
+<tr><td class=DataLabel>U/R</td> 
+    <td><input type=text size=10 maxlength=8 name=emexp018 tabindex=2
+       title="U/R number" class=Mandatory value="%EMRWEB02.02.435"
+       onchange="justifyRight(this);PatientReturn();disablefields();">
+       <img src=../images/SearchIcon.gif class=Icon 
+       onclick="PatientSearchNBH();">
+    </td>
+    <td class=DataLabel>Surname </td>
+    <td><input type=text size=25 maxlength=25 name=emexp002 id=emexp002
+         tabindex=3
+         value="%EMRWEB02.02.411"
+         onblur="UpCase(this);"></td>
+    <td class=DataLabel>Given Name </td>
+    <td><input type=text size=25 maxlength=25
+         name=emexp003 id=emexp003
+         tabindex=4 value="%EMRWEB02.02.412"
+         onblur="UpCase(this);"></td></tr>
+
+<tr id=PrefNamesBoth style="display:none">
+    <td>&nbsp;</td><td>&nbsp;</td>
+    <td class=DataLabel>Preferred Surname</td>
+    <td><input disabled type=text size=20 maxlength=20 name=pmpxi82b id=pmpxi82b
+         title="Preferred Surname" tabindex=3 class=Readonly></td>
+    <td class=DataLabel>Preferred Given Name</td>
+    <td><input disabled type=text size=25 maxlength=25 name=pmpxi83b id=pmpxi83b
+         title="Preferred Given Name" tabindex=3 class=Readonly></td>
+</tr>
+
+<tr id=PrefNamesGiven style="display:none">
+    <td>&nbsp;</td><td>&nbsp;</td>
+    <td>&nbsp;</td><td>&nbsp;</td>
+    <td class=DataLabel>Preferred Given Name</td>
+    <td><input disabled type=text size=25 maxlength=25 name=pmpxi83g id=pmpxi83g
+         title="Preferred Given Name" tabindex=3 class=Readonly></td>
+</tr>
+
+<tr id=PrefNamesSurname style="display:none">
+    <td>&nbsp;</td><td>&nbsp;</td>
+    <td class=DataLabel>Preferred Surname</td>
+    <td><input disabled type=text size=20 maxlength=20 name=pmpxi82s id=pmpxi82s
+         title="Preferred Surname" tabindex=3 class=Readonly></td>
+    <td>&nbsp;</td><td>&nbsp;</td>
+</tr>
+
+<tr><td></td>
+    <td></td>
+    <td class=DataLabel>Sex</td>
+    <td><select name=emexp004 class=SelectSml tabindex=5 id=emexp004>
+         <option> </option>
+         <option value="U">Unknown</option>
+         <option value="I">Indeterminate</option>
+         <option value="M">Male</option>
+         <option value="F">Female</option>
+       </select></td>
+    <td class=DataLabel>Date of Birth </td>
+    <td><input type=text size=12 maxlength=11 name=emexp005 id=emexp005
+         tabindex=6
+         value="%EMRWEB02.02.414"
+         title="Date of Birth" class="Past Date" tabindex=6>
+        <img src=../images/DateTimeStamp.gif class=Icon 
+         date=document.UpdateForm.emexp005>
+        <img src=../images/DateLookup.gif class=Icon
+         date=document.UpdateForm.emexp005>
+        </td></tr>
+
+<tr><td colspan=6><hr></td></tr>
+
+<tr>
+  <td class=DataLabel>Arrival Date/Time </td>
+  <td>
+    <input type=text size=11 maxlength=11 name=emvis001 id=emvis001
+     title="Arrival Date" class="Mandatory PastDate" tabindex=10
+     value="%STANDARD.01.015">
+    <img notab src="../images/DateLookup.gif" class=Icon
+     alt="Show Calendar" date="UpdateForm.emvis001">
+    <input type=text size=8 maxlength=8 name=emvis002 id=emvis002
+     title="Arrival Time" class=Mandatory tabindex=11
+     value="%STANDARD.01.016">
+    <img notab src="../images/DateTimeStamp.gif" class=Icon
+     alt="Current" date="UpdateForm.emvis001" time="UpdateForm.emvis002">
+    <img notab src="../images/TimeLookup.gif" class="Icon"
+     alt="Time Select" time="UpdateForm.emvis002">
+  </td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+</tr>
+
+<tr>
+  <td class=DataLabel>Location</td>
+  <td><select name=emvis006 id=emvis006 tabindex=12
+       title="Location"
+       class="Mandatory SelectMed"
+       onchange="validateLocation(UpdateForm.emvis006,
+                                  UpdateForm.name_emvis006);">
+       <option value=" "></option>
+        %EMRWEB02.02.106.2
+      </select>
+  </td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+</tr>
+
+<tr><td colspan=6 align=center><br>
+    <input type=button value="Add" class="button" tabindex=40
+     name=AddButton id=AddButton
+     onclick="tempDisable(this);UpdateVisit();">
+    <input type=button value="Cancel" class="button" tabindex=41
+     onclick="CancelLink();">
+    </td></tr>
+</table>
+</form>
+
+<form name=LinkForm action="emrweb02.pbl" method=get style="margin:0">
+<input type=hidden name=reportno value="02">
+<input type=hidden name=template value="011">
+<input type=hidden name=formactn value="SP">
+<input type=hidden name=emexp001>
+</form>
+</div>
+
+<script type="text/javascript">
+function init(){
+  f = document.UpdateForm;
+  for (var i =0 ; i < f.emexp004.length; i++) {
+    if (f.emexp004.options[i].value == "%EMRWEB02.02.413") {
+      f.emexp004.selectedIndex = i;
+    }
+  }
+}
+</script>

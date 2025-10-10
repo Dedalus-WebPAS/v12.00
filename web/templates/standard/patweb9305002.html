@@ -1,0 +1,131 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);checkShowDischargeDelay();">
+<!--        Sub-Frame Header Section       -->
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon" 
+ src="../images/ExitIcon.gif" onclick="DFrameExitRefresh();">
+Update Condition - %PATWEB93.05.002
+</span>
+<!--        Sub-Frame Details Sections     -->
+<div id=PageBodySection>
+<form name=PatCondPopup method=post %PATWEB93.05.101 
+
+<table border=0 align=center width=100%>
+<tr>
+    <td class=DataLabel>Last Update</td>
+    <td><input type=text class=readonly readonly size=20 name=patconup
+               value="%PATWEB93.05.108"></td></tr>
+<tr><td class=DataLabel>Condition </td>
+    <td><select name=patconcd>
+        <option value="   "></option>
+        %PATWEB93.05.102
+        </select>
+    </td></tr>
+<tr><td class=DataLabel>Ambulatory Status</td>
+    <td><select name=patconam>
+        <option value="   "></option>
+        %PATWEB93.05.107
+        </select>
+    </td></tr>
+<tr><td class=DataLabel> Visitors Allowed ?</td>
+    <td><input name=patconva type=checkbox value=1>                   
+    </td></tr>
+<tr><td class=DataLabel> Phone Calls Allowed ?</td>
+    <td><input name=patconpa type=checkbox value=1>                   
+    </td></tr>
+<tr><td class=DataLabel>Discharge Preparation Status</td>
+    <td><select name=pmswo007 title="Discharge Preparation Status">
+        <option value="   "></option>
+        %PATWEB93.05.214.2
+        </select>
+    </td></tr>
+<tr><td class=DataLabel>Expected Discharge Date</td>
+    <td><input type=text size=12 name=pmswo005 id=pmswo005 tabindex=31
+         class="Date" value="%PATWEB93.05.205" title="Expected Discharge Date">
+        <img notab src="../images/DateLookup.gif" class=Icon 
+         onclick="DateLookupFrame(PatCondPopup.pmswo005);">
+        Time
+        <input type=text name=pmswo006 id=pmswo006 size=8
+         title="Expected Discharge Time"
+         value="%PATWEB93.05.213">
+        <img notab src=../images/DateTimeStamp.gif class=Icon
+         onclick="SetCurrentDateTime(PatCondPopup.pmswo005,
+                                     PatCondPopup.pmswo006);">
+        <img notab src=../images/TimeLookup.gif class=Icon
+         onclick="TimeLookupFrame(PatCondPopup.pmswo006);">
+    </td></tr>
+<tr><td class=DataLabel> Comments</td>
+    <td><input name=patconds size=35 maxlength=35 value="%PATWEB93.05.103">
+    </td></tr>
+<tr id="clredida">
+    <td class=DataLabel>Clinically Ready for Discharge Date</td>
+    <td><input type=text size=15 maxlength=12 name=mrfddate
+           id=mrfddate title="Clinically Ready for Discharge Date"
+           onblur="checkDate(this,'Date');disDelay(this);" class="Date"
+           value="%PATWEB93.05.134" >
+         <img notab src="../images/DateTimeStamp.gif" class=Icon
+              alt="Current"
+              onclick="SetCurrentDateTime(mrfddate,null);">
+         <img notab src="../images/DateLookup.gif" class=Icon
+              alt="Calendar" date="PatCondPopup.mrfddate"></td></tr>
+<tr id=rsndisde style="display: none;">
+<td class=DataLabel>Reason for Discharge Delay</td>
+    <td><select name=vsxdc014 id=vsxdc014 title="Reason for Discharge Delay">
+        <option></option>
+        %STANDARD.01.007.z1
+        </select></td></tr>
+<tr><td align=center colspan=2>
+<input type=submit value="Update" class="button">
+<input type=button value="Cancel" class="button"
+        onclick="DFrameCloseRefresh();">
+</td></tr>
+</table>
+</form>
+</div>
+ 
+<script type="text/javascript">
+if  ("%PATWEB93.05.106.1" == "1")
+{
+  document.PatCondPopup.patconva.checked="1";
+}
+if  ("%PATWEB93.05.106.2" == "1")
+{
+  document.PatCondPopup.patconpa.checked="1";
+}
+
+function disDelay(cliDis) {
+  if (!isWhitespace(cliDis.value)) {
+    document.getElementById("rsndisde").style.display = "";
+    document.getElementById("vsxdc014").className = "Mandatory";
+    document.getElementById("vsxdc014").disabled = false; 
+  } else {
+    document.getElementById("rsndisde").style.display = "none";
+    document.getElementById("vsxdc014").className = "";
+    document.getElementById("vsxdc014").disabled = true;
+    document.getElementById("vsxdc014").value = "";
+  }
+}
+
+function checkShowDischargeDelay() {
+  var ptcnhdpsVal = "%STANDARD.01.025.080.250.1.1";
+  if (ptcnhdpsVal !== "3" || ShowDischargeDelayFields !== true) {
+    document.getElementById("clredida").style.display = "none";
+    document.getElementById("rsndisde").style.display = "none";
+    document.getElementById("mrfddate").disabled = true;
+    document.getElementById("vsxdc014").disabled = true;
+  }
+}
+
+disDelay(document.getElementById('mrfddate'));
+for (var j=0; j < document.getElementById('vsxdc014').length; j++) {
+  if (document.getElementById('vsxdc014').options[j].value.substr(0,3)
+      =="%PATWEB93.05.135") {
+      document.getElementById('vsxdc014').selectedIndex=j;
+  }
+}
+</script>

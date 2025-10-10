@@ -1,0 +1,25 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Medical Records 
+                      Medical Record Visit Links 
+  
+TABLE NAME         :  mrtvisaf
+=====================================================================
+MRVSVSNO    char        8     1   Visit Number  
+MRVSMKEY    char       10     9   Medical Record Unique Key  
+MRVSXKY1    char       10    19   Additional Medical Record Key 1  
+MRVSXKY2    char       10    29   Additional Medical Record Key 2  
+MRVSXKY3    char       10    39   Additional Medical Record Key 3  
+MRVSXKY4    char       10    49   Additional Medical Record Key 4  
+MRVSXKY5    char       10    59   Additional Medical Record Key 5  
+MRVSSPAR    char       50    69   Spare  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+MRVSVSNO
+  
+UNIQUE INDEX 2
+MRVSMKEY
+MRVSVSNO
+  
+=====================================================================

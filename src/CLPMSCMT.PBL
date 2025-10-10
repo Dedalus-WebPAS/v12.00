@@ -1,0 +1,131 @@
+.---------------------------------------------------------------------------
+. Include Name : CLPMSCMT.PBL
+. Function     : Clear function for PMSCMTFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.04.01  20/12/2023 Thanh T        TSK 0910994 
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLPMSCMT  MOVE      SP70,PMCCCCOD      . Claim code     
+          MOVE      SP70,PMCCHFUN      . Health Fund     
+          MOVE      SP70,PMCCHFTY      . Health Fund Type    
+          MOVE      SP70,PMCCCMCD      . Casemix Code     
+          MOVE      SP70,DPMCCCNT      . Counter      
+          MOVE      ZERO,PMCCPODY      . Pre Op Cut Off Days  
+          MOVE      ZERO,PMCCNPDY      . No Pay Days    
+          MOVE      ZERO,PMCCHBPT      . High Boundary Point/Maximum Days St  
+          MOVE      ZERO,PMCCCCDY      . Critical Care Cut Off   
+          MOVE      ZERO,PMCCFTDG      . Field type for Disch DRG  
+          MOVE      SP70,PMCCDDRG      . Discharge DRG     
+          MOVE      ZERO,PMCCFTCM      . Field type for CMBS   
+          MOVE      SP70,PMCCPCMF      . Primary CMBS from    
+          MOVE      SP70,PMCCPCMT      . Primary CMBS to    
+          MOVE      ZERO,PMCCFTSC      . Field type for Secondary CMBS  
+          MOVE      SP70,PMCCSCMF      . Secondary CMBS fron    
+          MOVE      SP70,PMCCSCMT      . Secondary CMBS to    
+          MOVE      ZERO,PMCCFTTC      . Field type for Tertiary CMBS from 
+          MOVE      SP70,PMCCTCMF      . Tertiary CMBS from    
+          MOVE      SP70,PMCCTCMT      . Tertiary CMBS to    
+          MOVE      ZERO,PMCCFTDS      . Field type for disch status  
+          MOVE      SP70,PMCCDSTA      . Discharge Status 1    
+          MOVE      SP70,PMCCDST2      . Discharge Status 2    
+          MOVE      SP70,PMCCDST3      . Discharge Status 3    
+          MOVE      SP70,PMCCDST4      . Discharge Status 4    
+          MOVE      SP70,PMCCDST5      . Discharge Status 5    
+          MOVE      ZERO,PMCCFTDD      . Field type for disch destination  
+          MOVE      SP70,PMCCDDES      . Discharge Destination 1 (Cat DD)  
+          MOVE      SP70,PMCCDDE2      . Discharge Destination 2 (Cat DD)  
+          MOVE      SP70,PMCCDDE3      . Discharge Destination 3 (Cat DD)  
+          MOVE      SP70,PMCCDDE4      . Discharge Destination 4 (Cat DD)  
+          MOVE      SP70,PMCCDDE5      . Discharge Destination 5 (Cat DD)  
+          MOVE      ZERO,PMCCFTAS      . Field type for Adm Source  
+          MOVE      SP70,PMCCASRC      . Admission Source 1 (Cat S)  
+          MOVE      SP70,PMCCASR2      . Admission Source 2 (Cat S)  
+          MOVE      SP70,PMCCASR3      . Admission Source 3 (Cat S)  
+          MOVE      SP70,PMCCASR4      . Admission Source 4 (Cat S)  
+          MOVE      SP70,PMCCASR5      . Admission Source 5 (Cat S)  
+          MOVE      ZERO,PMCCFT1C      . Field type for ICD disease  
+          MOVE      SP70,PMCCPICD      . Primary ICD disease 1 (PRIMARY)  
+          MOVE      SP70,PMCCPIC2      . Primary ICD disease 2 (AND/SECONDAR  
+          MOVE      SP70,PMCCPIC3      . Primary ICD disease 3 (AND/TERTIARY  
+          MOVE      SP70,PMCCPIC4      . Primary ICD disease 4 (OR/PRIMARY)  
+          MOVE      SP70,PMCCPIC5      . Primary ICD disease 5 (OR/PRIMARY)  
+          MOVE      ZERO,PMCCFTAT      . Field type for Adm type  
+          MOVE      SP70,PMCCATYP      . Admission Type 1 (Cat A)  
+          MOVE      SP70,PMCCATY2      . Admission Type 2 (Cat A)  
+          MOVE      SP70,PMCCATY3      . Admission Type 3 (Cat A)  
+          MOVE      SP70,PMCCATY4      . Admission Type 4 (Cat A)  
+          MOVE      SP70,PMCCATY5      . Admission Type 5 (Cat A)  
+          MOVE      ZERO,PMCCFTAU      . Field type for Adm UDF  
+          MOVE      SP70,PMCCAUDF      . Admission UDF 1    
+          MOVE      SP70,PMCCAUD2      . Admission UDF 2    
+          MOVE      SP70,PMCCAUD3      . Admission UDF 3    
+          MOVE      SP70,PMCCAUD4      . Admission UDF 4    
+          MOVE      SP70,PMCCAUD5      . Admission UDF 5    
+          MOVE      ZERO,PMCCFTDU      . Field type for Care Class  
+          MOVE      SP70,PMCCDUDF      . Care Class 1 (Cat CC)  
+          MOVE      SP70,PMCCDUD2      . Care Class 2 (Cat CC)  
+          MOVE      SP70,PMCCDUD3      . Care Class 3 (Cat CC)  
+          MOVE      SP70,PMCCDUD4      . Care Class 4 (Cat CC)  
+          MOVE      SP70,PMCCDUD5      . Care Class 5 (Cat CC)  
+          MOVE      SP70,PMCCTYPE      . Record Type     
+          MOVE      SP70,PMCCCONT      . Contract ID     
+          MOVE      ZERO,PMCCMIND      . Minum Days Stay    
+          MOVE      SP70,PMCCICP1      . Primary ICD Procedure 1 (PRIMARY  
+          MOVE      SP70,PMCCICP2      . Primary ICD Procedure 2   
+          MOVE      SP70,PMCCICP3      . Primary ICD Procedure 3   
+          MOVE      SP70,PMCCICP4      . Primary ICD Procedure 4 (OR/PRIMARY  
+          MOVE      SP70,PMCCICP5      . Primary ICD Procedure 5 (OR/PRIMARY  
+          MOVE      ZERO,PMCCICPF      . Field type for ICD Procedure  
+          MOVE      ZERO,PMCCFTS4      . Field type for Fourth CMBS  
+          MOVE      SP70,PMCCPC4F      . Fourth CMBS from    
+          MOVE      SP70,PMCCPC4T      . Fourth CMBS to    
+          MOVE      ZERO,PMCCFT5C      . Field type for Fifth CMBS  
+          MOVE      SP70,PMCCSC5F      . Fifth CMBS from    
+          MOVE      SP70,PMCCSC5T      . Fifth CMBS to    
+          MOVE      ZERO,PMCCFT6C      . Field type for Sixth CMBS from 
+          MOVE      SP70,PMCCTC6F      . Sixth CMBS from    
+          MOVE      SP70,PMCCTC6T      . Sixth CMBS to    
+          MOVE      ZERO,PMCCFTAD      . Field Type for Attending Dr  
+          MOVE      SP70,PMCCADOC      . Attending Doctor (patmi1af.adocta)    
+          MOVE      ZERO,PMCCFTCC      . Field Type for Concession Card Type 
+          MOVE      SP70,PMCCCCT1      . Concession Card Type 1 (cat ct) 
+          MOVE      SP70,PMCCCCT2      . Concession Card Type 2 (cat ct) 
+          MOVE      SP70,PMCCCCT3      . Concession Card Type 3 (cat ct) 
+          MOVE      SP70,PMCCCCT4      . Concession Card Type 4 (cat ct) 
+          MOVE      SP70,PMCCCCT5      . Concession Card Type 1 (cat ct) 
+          MOVE      ZERO,PMCCFDDU      . Field Type for Discharge UDF  
+          MOVE      SP70,PMCCUDF1      . Discharge UDF 1    
+          MOVE      SP70,PMCCUDF2      . Discharge UDF 2    
+          MOVE      SP70,PMCCUDF3      . Discharge UDF 3    
+          MOVE      SP70,PMCCUDF4      . Discharge UDF 4    
+          MOVE      SP70,PMCCUDF5      . Discharge UDF 5    
+          MOVE      ZERO,PMCCFCTA      . Field Type A    
+          MOVE      SP70,PMCCFCA1      . Cat Code A 1   
+          MOVE      SP70,PMCCFCA2      . Cat Code A 2   
+          MOVE      SP70,PMCCFCA3      . Cat Code A 3   
+          MOVE      SP70,PMCCFCA4      . Cat Code A 4   
+          MOVE      SP70,PMCCFCA5      . Cat Code A 5   
+          MOVE      ZERO,PMCCFCTB      . Field Type B    
+          MOVE      SP70,PMCCFCB1      . Cat Code B 1   
+          MOVE      SP70,PMCCFCB2      . Cat Code B 2   
+          MOVE      SP70,PMCCFCB3      . Cat Code B 3   
+          MOVE      SP70,PMCCFCB4      . Cat Code B 4   
+          MOVE      SP70,PMCCFCB5      . Cat Code B 5   
+          MOVE      ZERO,PMCCFCTC      . Field Type C    
+          MOVE      SP70,PMCCFCC1      . Cat Code C 1   
+          MOVE      SP70,PMCCFCC2      . Cat Code C 2   
+          MOVE      SP70,PMCCFCC3      . Cat Code C 3   
+          MOVE      SP70,PMCCFCC4      . Cat Code C 4   
+          MOVE      SP70,PMCCFCC5      . Cat Code C 5   
+          MOVE      ZERO,PMCCFCTD      . Field Type D    
+          MOVE      SP70,PMCCFCDC      . Code D     
+          MOVE      ZERO,PMCCFCTE      . Field Type E    
+          MOVE      SP70,PMCCFCEC      . Code E     
+          MOVE      ZERO,PMCCFCTF      . Field Type F    
+          MOVE      SP70,PMCCFCFC      . Code F     
+          MOVE      SP70,PMCCSPAR      . Spare      
+.
+          RETURN

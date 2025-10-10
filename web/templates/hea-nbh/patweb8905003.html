@@ -1,0 +1,286 @@
+<meta name="TemplateVersion" content="V12.00.01">
+<meta name="TemplateHome"    content="hea-nbh">
+<meta name="HelpFileName"    content="NoContextSet.html">
+<meta name="CrossBrowser"    content="true">
+<link rel="stylesheet" href="../html/postcode.css" type="text/css">
+<script type="text/javascript" src="../js/IBA_Category_LA.js"></script>
+<script type="text/javascript" src="../js/IBA_Category_C_.js"></script>
+<script type="text/javascript" src="../js/AutoPostCode.js"></script>
+<script type="text/javascript" src="../js/patweb89.js"></script>
+<script type="text/javascript" src="../js/patweb69.js"></script>
+<script type="text/javascript" src="../js/AddressSearch.js"></script>
+
+<script type="text/javascript">
+function checkNames()
+{
+  var str = document.AddForm.ptmas006.value;
+  document.AddForm.ptmas006.value = str.replace(/^\s+|\s+$/g,'');
+  str = document.AddForm.pmpmi084.value;
+  document.AddForm.pmpmi084.value = str.replace(/^\s+|\s+$/g,'');
+
+  checkSecondName(document.AddForm.ptcnusgn,
+                   document.AddForm.ptmas006,document.AddForm.pmpmi084,
+                   document.AddForm.pmpmi085);
+}
+//if param second name is turned off, make fname the gname
+function checkSecondName(paramSecondName,gname,fname,secname) {
+  if (paramSecondName.value == 1) {
+    if (!isWhitespace(secname.value)) {
+      if (!isWhitespace(fname.value)) {
+        gname.value = fname.value + " " + secname.value;
+      }
+      else {
+        gname.value = secname.value;
+      }
+    }
+    else {
+      gname.value = fname.value;
+    }
+  }
+  else {
+    gname.value = fname.value;
+  }
+}
+function init() {
+  document.AddForm.ptmas001.focus();
+
+  turnOnSecondGivenName(document.AddForm.ptcnusgn.value,
+                        document.AddForm.ptmas006,
+                        document.AddForm.pmpmi084,
+                        document.AddForm.pmpmi085);
+  DefaultUPIData();
+  DefaultDOB();
+}
+function DefaultUPIData() {
+
+  var p = document.AddForm;
+
+  if (p.ptcnuepm.value == "1") {
+    if (!isWhitespace(p.d_sgname.value)) {
+      p.pmpmi085.value = p.d_sgname.value;  // Second Given Name
+    }
+
+    // Set other fields using UPI retrieved data
+    if (!isWhitespace(p.upinumbr.value)) {
+      var datArr = GetUPIData(p.upinumbr.value,p.upinspid.value);
+      if (datArr != undefined) {
+        p.ptmas001.value = CharPadEnd(datArr[0].split("~")[1]," ",4);  // Title
+        p.ptmas005.value = datArr[1];  // Surname
+        p.pmpmi084.value = datArr[2];  // First Given Name
+        p.pmpmi085.value = datArr[3];  // Second Given Name
+        p.ptmas017.value = GetFullDateString(datArr[5]);  // DOB
+
+        // Gender/Sex
+        for (i=0; i < p.ptmas015.length; i++) {
+          if (p.ptmas015.options[i].value.substr(0,1) == datArr[4]) {
+            p.ptmas015.selectedIndex = i;
+          }
+        }
+
+      }
+    }
+  }
+}
+function DefaultDOB() {
+  f = document.AddForm;
+
+  if (!isWhitespace(f.ptmas017.value)) { return; }
+  if (isWhitespace(f.cwebddob.value)) { return; }  
+  
+  f.ptmas017.value = GetFullDateString(f.cwebddob.value);
+}
+function ChkGenderTitle(f) {
+  if (f.ptmas015.selectedIndex == 0) { return; }
+
+  ind10 = f.ptmas015.value.substr(12,1);
+  if (ind10 != 'N') {
+    AddClassName('ptmas001',"Mandatory");
+  }
+  else {
+    RemoveClassName('ptmas001',"Mandatory");
+  }
+}
+function PostForm() {
+  SubmitHidden05(document.AddForm);
+}
+function SubmitHidden05(f) {
+  f = document.AddForm;
+
+  CheckLeadingSpace(f.ptmas005);
+  if (ans == false) { return; }
+
+  if (f.ptmas006 != undefined) {
+    CheckLeadingSpace(f.ptmas006);
+    if (ans == false){
+      return;
+    }
+  }
+  if (f.mpmi084 != undefined) {
+    CheckLeadingSpace(f.pmpmi084);
+    if (ans == false){
+      return;
+    }
+  }
+
+  if (!validateMandatory(f)) { return; }
+
+  CookieName = "PatSearchRedirectCookie"
+  ExpireCookiePath(CookieName);
+
+  if (f.d_pmpmi006.checked==true){
+    f.pmpmi006.value = "1";
+  }
+  else {
+    f.pmpmi006.value = "0";
+  }
+
+  if (isWhitespace(f.ptmas005.value)) {
+    f.ptmas005.value = "UNKNOWN";
+  }
+
+  if (f.pmpmi084 != undefined) {
+    if (isWhitespace(f.pmpmi084.value)) {
+      f.ptmas006.value = "UNKNOWN";
+      f.pmpmi084.value = "UNKNOWN";
+    }
+  }
+
+  if (!isWhitespace(document.getElementById("ptsrrdck").value)) {
+    f.redirect.value = document.getElementById("ptsrrdck").value;
+    f.redirect.value = f.redirect.value +
+                       "&formactn=SN&regiflag=1"
+  }
+
+  f.target="PopUpFrame"
+  f.submit();
+}
+function getPatientSearchCookie() {
+  CookieName = "PatSearchRedirectCookie"
+  if (GetCookieData(CookieName) != "unknown") {
+    document.getElementById("ptsrrdck").value =
+        GetCookieData(CookieName);
+  }
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onLoad="PageLoad(event);
+              ChkGenderTitle(document.AddForm);
+              getPatientSearchCookie();">
+
+<span class=DFrameTitleBar>
+  <img align="right" alt="Exit" class="MenuIcon"
+   src="../images/ExitIcon.gif" onclick="DFrameExit();">
+</span>
+<div id=PageBodySection style="overflow: auto;">
+<form name=AddForm action="patweb89.pbl" method=post style="margin:0" 
+ onsubmit='return validateMandatory(this)'>
+<input type=hidden name=reportno value="05">
+<input type=hidden name=formactn value="NR">
+<input type=hidden name=updttype value="">
+<input type=hidden name=chckname>
+<input type=hidden name=redirflg value="1">
+<input type=hidden name=nextpage value="3">
+<input type=hidden name=updateky value="%PATWEB89.05.700">
+<input type=hidden name=redirect value="emrweb02.pbl?reportno=2&template=020">
+<input type=hidden name=admissno>
+<input type=hidden name=dummy value="">
+<input type=hidden name=hidgname id=hidgname value="%PATWEB89.05.010">
+<input type=hidden name=ptcnusgn value="%STANDARD.01.025.114.219.0.1">
+<input type=hidden name=ptcnnmpr value="%STANDARD.01.025.128.226.1.1">
+<input type=hidden name=cwebddob value="%STANDARD.01.025.101.098.0.8">
+<input type=hidden name=upemmrin value="1">
+<input type=hidden name=ptcnhdps id=ptcnhdps 
+       value="%STANDARD.01.025.080.250.1.1">
+<input type=hidden name=ptcnuepm value="%STANDARD.01.025.125.155.0.1">
+<input type=hidden name=upinumbr value="%PATWEB89.05.999.095">
+<input type=hidden name=d_sgname value="%PATWEB89.05.999.096">
+<input type=hidden name=upinspid value="%PATWEB89.05.999.098">
+<input type=hidden name=ptsrrdck id=ptsrrdck value="">
+<input type=hidden name=heanbhfl id=heanbhfl value="1">
+
+<table align=center width=100% border=1 cellspacing=0 cellpadding=0>
+<tr><td class=HeadingCell colspan=6 align=center>
+     New Patient Details </td></tr>
+</table>
+
+<table align=center width=100% border=0 cellspacing=0 cellpadding=1>
+
+<tr><td class=DataLabel>Title</td>
+    <td><select title="Patient Title"
+         name=ptmas001 id=ptmas001 tabindex=1>
+         <option></option>
+         %STANDARD.01.029
+        </select>
+    </td>
+</tr>
+
+<tr><td class=DataLabel>Surname</td>
+    <td><input type=text size=35 maxlength=40 tabindex=2
+         name=ptmas005 id=ptmas005 value="%PATWEB89.05.009"
+         title="Patient Surname" onblur="UpCase(this)"></td>
+
+<tr><td class=DataLabel id="givenNameLabel">Given Names</td>
+    <td><input type=hidden name=ptmas006 id=ptmas006 title="Given Name"
+         value="%PATWEB89.05.010">
+        <input type=text size=35 maxlength=40
+         title="First Given Name" tabindex=3
+         name=pmpmi084 id=pmpmi084 value="%PATWEB89.05.010"
+         onblur="UpCase(this)">
+    </td>
+</tr>
+
+<tr><td class=DataLabel id="secondGivenNameLabel">Second Given Name</td>
+    <td><input type=text size=35 maxlength=40 id="secondGivenName"
+        title="Second Given Name" tabindex=4
+        name=pmpmi085 value="" onblur="UpCase(this);">
+    </td>
+</tr>
+
+<tr><td class=DataLabel>%STANDARD.01.017.G </td>
+    <td><select name="ptmas015" id="ptmas015" tabindex=5 class=Mandatory
+          title="%STANDARD.01.017.G "
+          onchange="ChkGenderTitle(document.AddForm);">
+         <option></option>
+          %PATWEB89.05.086.099.061.9.1.19.3.H
+        </select>
+    </td>
+</tr>
+
+<tr><td class=DataLabel>Date of Birth</td>
+    <td><input type=text size=12 name=ptmas017 id=ptmas017 title="Date of Birth"
+         value="%PATWEB89.05.020" tabindex=6 class="Mandatory PastDate"
+       onblur="checkDate(this,'Date of Birth');" >
+       &nbsp;Estimated DOB&nbsp;
+       <input type=hidden name=pmpmi006 id=pmpmi006>
+       <input type=checkbox name=d_pmpmi006 id=d_pmpmi006 title="Est DOB"
+         value="0" tabindex=7 >
+    </td>
+</tr>
+</table>
+
+<table width=100% border=0>
+<tr><td>&nbsp;</td></tr>
+<tr><td align=center>
+    <input type=button value="Register" class=button tabindex=61 id=pat89sub
+     onclick="tempDisable(this,5);checkNames();PostForm();">
+    <input type=button value="Cancel" class="button" tabindex=62
+     onclick="history.go(-1)"></td></tr>
+</table>
+
+</form>
+</div>
+
+<script type="text/javascript">
+   UsualPRFA="%PATWEB89.05.909"
+</script>
+
+<form name=PatientLinks method=get>                         
+<input type=hidden name=reportno value=1>                   
+<input type=hidden name=template value=004>                 
+<input type=hidden name=regexstm value=102>                 
+<input type=hidden name=urnumber>                           
+<input type=hidden name=admissno>                           
+<input type=hidden name=MenuType value="11">                
+</form>                        
+

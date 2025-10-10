@@ -1,0 +1,34 @@
+.---------------------------------------------------------------------------
+. Include Name : CLPRIPRA.PBL
+. Function     : Clear function for PRIPRAFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.04.01  12/12/2023  Thanh T       TSK 0932089
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLPRIPRA  MOVE      SP70,PRPRCODE      . Medical Practice Code    
+          MOVE      SP70,PRPRDESC      . M.P. Description     
+          MOVE      SP70,PRPRPDOC      . M.P. Primary Doctor    
+          MOVE      SP70,PRPRADD1      . M.P. Address Line 1   
+          MOVE      SP70,PRPRADD2      . M.P. Address Line 2   
+          MOVE      SP70,PRPRADD3      . M.P. Address Line 3   
+          MOVE      SP70,PRPRPOST      . M.P. Postcode     
+          MOVE      SP70,PRPRTELP      . M.P. Telephone     
+          MOVE      ZERO,PRPRSTAT      . M.P. Status     
+          MOVE      ZERO,PRPRTIME      . Service Time on invoice   
+          MOVE      SP70,PRPRRANG      . Spare      
+          MOVE      SP70,PRPRPMCI      . MCI (3 alpha and 5 numeric) 
+          MOVE      SP70,PRPRPYEE      . Payee Name Provider Number   
+          MOVE      SP70,PRPRREGI      . Register      
+          MOVE      SP70,PRPRRDAT      . Fees Invoiced Reset Date (ccyymmdd)  
+          MOVE      SP70,PRPRHRSN      . Reason for Hold Code (Cat rh) 
+          PACK      PRPRFTXT,SP70,SP70 . Reason for Hold Free Text  
+          MOVE      SP70,PRPRHIFD      . Hold Invoices From Date (ccyymmdd)  
+          MOVE      SP70,PRPRHLDT      . On Hold Last Update Date (ccyymmdd) 
+          MOVE      SP70,PRPRHLTI      . On Hold Last Update Time (hh:mm:ss) 
+          MOVE      SP70,PRPRHLUI      . On Hold Last Update User ID 
+          MOVE      SP70,PRPRSPAR      . Spare Variable     
+.
+          RETURN

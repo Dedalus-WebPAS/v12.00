@@ -1,0 +1,614 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/patweb87.js"></script>
+<script type="text/javascript" src="../js/ReportStandard.js"></script>
+<script type="text/javascript">
+function setReportScheduleExtended(schList) {
+  if (typeof schList !== "undefined") {
+  schList.innerHTML = "";
+  schList.options[schList.options.length]=
+  new Option("","");
+  schList.options[schList.options.length]=
+  new Option("Today","01");
+  schList.options[schList.options.length]=
+  new Option("Yesterday","02");
+  schList.options[schList.options.length]=
+  new Option("Minus 2 Days","11");
+  schList.options[schList.options.length]=
+  new Option("Minus 3 Days","27");
+  schList.options[schList.options.length]=
+  new Option("Minus 4 Days","28");
+  schList.options[schList.options.length]=
+  new Option("Minus 5 Days","29");
+  schList.options[schList.options.length]=
+  new Option("Minus 6 Days","30");
+  schList.options[schList.options.length]=
+  new Option("Previous Week(Including Current)","03");
+  schList.options[schList.options.length]=
+  new Option("Previous Week(Excluding Current)","04");
+  schList.options[schList.options.length]=
+  new Option("Previous Fortnight(Including Current)","05");
+  schList.options[schList.options.length]=
+  new Option("Previous Fortnight(Excluding Current)","06");
+  schList.options[schList.options.length]=
+  new Option("Previous 4 Weeks(Including Current)","07");
+  schList.options[schList.options.length]=
+  new Option("Previous 4 Weeks(Excluding Current)","08");
+  schList.options[schList.options.length]=
+  new Option("Current Calendar Month","09");
+  schList.options[schList.options.length]=
+  new Option("Previous Calendar Month","10");
+  schList.options[schList.options.length]=
+  new Option("Tomorrow","12");
+  schList.options[schList.options.length]=
+  new Option("Plus 2 Days","22");
+  schList.options[schList.options.length]=
+  new Option("Plus 3 Days","23");
+  schList.options[schList.options.length]=
+  new Option("Plus 4 Days","24");
+  schList.options[schList.options.length]=
+  new Option("Plus 5 Days","25");
+  schList.options[schList.options.length]=
+  new Option("Plus 6 Days","26");
+  schList.options[schList.options.length]=
+  new Option("Plus 7 Days","31");
+  schList.options[schList.options.length]=
+  new Option("Plus 8 Days","35");
+  schList.options[schList.options.length]=
+  new Option("Plus 9 Days","36");
+  schList.options[schList.options.length]=
+  new Option("Plus 10 Days","37");
+  schList.options[schList.options.length]=
+  new Option("Plus 11 Days","38");
+  schList.options[schList.options.length]=
+  new Option("Plus 12 Days","39");
+  schList.options[schList.options.length]=
+  new Option("Plus 13 Days","40");
+  schList.options[schList.options.length]=
+  new Option("Plus 14 Days","41");
+  schList.options[schList.options.length]=
+  new Option("Plus 15 Days","42");
+  schList.options[schList.options.length]=
+  new Option("Plus 20 Days","43");
+  schList.options[schList.options.length]=
+  new Option("Plus 25 Days","44");
+  schList.options[schList.options.length]=
+  new Option("Plus 30 Days","45");
+  schList.options[schList.options.length]=
+  new Option("Plus 45 Days","46");
+  schList.options[schList.options.length]=
+  new Option("Plus 60 Days","47");
+  schList.options[schList.options.length]=
+  new Option("Plus 75 Days","48");
+  schList.options[schList.options.length]=
+  new Option("Plus 90 Days","49");
+  schList.options[schList.options.length]=
+  new Option("Plus 120 Days","50");
+  schList.options[schList.options.length]=
+  new Option("Plus 150 Days","51");
+  schList.options[schList.options.length]=
+  new Option("Plus 180 Days","52");
+  schList.options[schList.options.length]=
+  new Option("Next Week","13");
+  schList.options[schList.options.length]=
+  new Option("Next Fortnight","15");
+  schList.options[schList.options.length]=
+  new Option("Next 4 Weeks","17");
+  schList.options[schList.options.length]=
+  new Option("Next Calendar Month","20"); 
+  }
+}
+
+function ProcessReport() {
+  if (!validateMandatory(ReportForm)) {
+    return;
+  }
+
+  if (ReportForm.schdrdat.value == "") {
+    ReportForm.keystr03.title = "From Date";
+    ReportForm.keystr04.title = "To Date";
+    ReportForm.keystr03.value = ReportForm.datran01.value;
+    ReportForm.keystr04.value = ReportForm.datran02.value;
+
+    if (!CheckDateRange(ReportForm.keystr03,ReportForm.keystr04)) {
+      return;
+    }
+  } else {
+     ReportForm.keystr03.title="From Schedule";
+     ReportForm.keystr04.title="To Schedule";
+  }
+
+  var samFormVal = typeof ReportForm.SampleFrom
+
+  if (samFormVal == "undefined") {
+    if (SetDateYYYYMMDD(ReportForm.schddate.value) > 
+        SetDateYYYYMMDD(document.getElementById('datran02').value)) {
+          alert("'Schedule Date' cannnot be after 'Booking Date'.");
+          return;
+    }
+  } else {
+    if (SetDateYYYYMMDD(ReportForm.schddate.value) >
+        SetDateYYYYMMDD(ReportForm.SampleFrom.value)) {
+      alert("'Schedule Date' cannnot be after 'Booking Date'.");
+      return;
+    }
+  }
+
+  if(ReportForm.multiple.selectedIndex == -1) {
+    alert("Please select the " + trim(ReportForm.multiple.title) + " value(s)");
+    return;
+  }
+
+  if(ReportForm.multipl1.selectedIndex == -1) {
+    alert("Please select the " + trim(ReportForm.multipl1.title) + " value(s)");
+    return;
+  }
+
+  if (typeof ReportForm.multipl2 != "undefined") {
+    if(ReportForm.multipl2.selectedIndex == -1) {
+      alert("Please select the " + trim(ReportForm.multipl2.title) + " value(s)");
+      return;
+    }
+  }
+
+  if(ReportForm.multipl3.selectedIndex == -1) {
+    alert("Please select the " + trim(ReportForm.multipl3.title) + " value(s)");
+    return;
+  }
+
+  if(ReportForm.multipl4.selectedIndex == -1) {
+    alert("Please select the " + trim(ReportForm.multipl4.title) + " value(s)");
+    return;
+  }
+
+  if(ReportForm.multipl5.selectedIndex == -1) {
+    alert("Please select the " + trim(ReportForm.multipl5.title) + " value(s)");
+    return;
+  }
+
+  var keycount=0;
+  for (i=0; i < ReportForm.multiple.options.length; i++) {
+      if(ReportForm.multiple.options[i].selected == true) {
+        keycount++;
+      }
+  }
+
+  for (i=0; i < ReportForm.multipl1.options.length; i++) {
+      if(ReportForm.multipl1.options[i].selected == true) {
+        keycount++;
+      }
+  }
+
+  if (typeof ReportForm.keystr10 == "undefined") {
+    var newkeystr10 = document.createElement("input");
+    newkeystr10.name = "keystr10";
+    newkeystr10.type = "hidden";
+    newkeystr10.value = "G";
+    document.getElementById("opunwrap").appendChild(newkeystr10);
+  }
+
+  if (typeof ReportForm.multipl2 != "undefined") {
+    for (i=0; i < ReportForm.multipl2.options.length; i++) {
+      if(ReportForm.multipl2.options[i].selected == true) {
+        keycount++;
+      }
+    }
+  } 
+
+  for (i=0; i < ReportForm.multipl3.options.length; i++) {
+      if(ReportForm.multipl3.options[i].selected == true) {
+        keycount++;
+      }
+  }
+
+  for (i=0; i < ReportForm.multipl4.options.length; i++) {
+      if(ReportForm.multipl4.options[i].selected == true) {
+        keycount++;
+      }
+  }
+
+  for (i=0; i < ReportForm.multipl5.options.length; i++) {
+      if(ReportForm.multipl5.options[i].selected == true) {
+        keycount++;
+      }
+  }
+
+  if(keycount>=130) {
+    alert("Error a maximum of 130 selections has been exceeded.");
+  }
+
+  SubmitReport(ReportForm);
+}
+
+function DisableFields() {
+  var p = document.ReportForm;
+  
+  if (p.ptcnsmsn.value != "1" || p.ptcnnewc.value != "1") {
+    p.keystr02.disabled = true;  // SMS Message Type
+    document.getElementById('datran01').disabled = true;
+    document.getElementById('datran02').disabled = true;
+    p.keystr05.disabled = true;
+    p.keystr06.disabled = true;
+    p.multiple.disabled = true;
+    p.keystr08.disabled = true;
+    p.multipl1.disabled = true;
+    p.keystr12.disabled = true;
+    p.multipl3.disabled = true;
+    p.keystr14.disabled = true;
+    p.multipl4.disabled = true;
+    p.keystr16.disabled = true;
+    p.multipl5.disabled = true;
+    p.btnUpdate.disabled = true;
+  }
+}
+
+function CheckFutureDate(InpFld, Title) {
+  if (isWhitespace(InpFld.value))
+    return true;
+
+  if (checkDate(InpFld,Title)) {
+    var InpDate = SetDateYYYYMMDD(InpFld.value);
+    var Today = new Date()
+    var ThisDay=Today.getDate();
+    var ThisMth=parseInt(Today.getMonth(),10) +1;
+    var ThisYrs=Today.getFullYear();
+    if (ThisDay < 10) ThisDay="0" + ThisDay
+    if (ThisMth < 10) ThisMth="0" + ThisMth
+    ThisDate="";
+    ThisDate=ThisDate.concat(ThisYrs,ThisMth,ThisDay);
+
+    if (InpDate < ThisDate) {
+      alert(Title + " must be in the Future.");
+      InpFld.select();
+      InpFld.focus();
+      return false;
+    }
+  }
+  return true;
+}
+
+function ChangeHospital(){
+  var p = document.ReportForm;
+  SelectOptionsHospCatCode1(p.bkcode,p.keystr05,p.multiple);
+  if (typeof p.multipl2 != "undefined") {
+    SelectOptionsHospCatCode1(p.stcode,p.keystr05,p.multipl2);
+  }
+  SelectOptionsHospCatCode1(p.clcode,p.keystr05,p.multipl3);
+  SelectOptionsHospCatCode1(p.apcode,p.keystr05,p.multipl4);
+  SelectOptionsHospCatCode1(p.pcode,p.keystr05,p.multipl5);
+  p.multiple.options[0].text="All";
+  p.multipl1.options[0].text="All";
+  if (typeof p.multipl2 != "undefined") {
+    p.multipl2.options[0].text="All";
+  }
+  p.multipl3.options[0].text="All";
+  p.multipl4.options[0].text="All";
+  p.multipl5.options[0].text="All";
+}
+
+function ValidateSelect(IncludeExclude,List) {
+  if(IncludeExclude[0].checked != true &&
+     List.selectedIndex==0) {
+     alert("Invalid option exclude All");
+     List.options[0].selected=false;
+  }
+  if (List.selectedIndex == 0) {  // 'All' option selected
+    for (i=1; i < List.options.length; i++) {
+      List.options[i].selected = false;  // de-select all other options
+    }
+  }
+}
+
+function ClearSelect(List) {
+    for (i=0; i < List.options.length; i++) {
+      List.options[i].selected = false;  // de-select all options
+    }
+}
+function TrapCtrlA(List) {
+  if (event.keyCode == 65) {               // 65 = Ctrl A (Select All)`
+   List.options[0].selected = false;       // de-select all
+  }
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);SetHospital();
+              ReportLoad();DisableFields();
+              SetReportCopies(ReportForm.schdcopy,50);">
+<div id="PageBodySection">
+<form name=ReportForm method=post action=rshweb02.pbl>
+<input type=hidden name=reportno value="4">
+<input type=hidden name=template value="001">
+<input type=hidden name=bkretype value="">
+<input type=hidden name=updttype value="A">
+<input type=hidden name=nextpage value="1">
+<input type=hidden name=setdfprg value="IBABOK30">
+<input type=hidden name=setdfrep value="01">
+<input type=hidden name=schdpgid value="IBABOK30">
+<input type=hidden name=schddesc value="SMS for Bookings">
+<input type=hidden name=schdtype value="3">
+<input type=hidden name=redirect value="rshweb02.pbl?reportno=1&template=1">
+<input type=hidden name=ibcnmhos value="%STANDARD.01.025.000.043.1.1">
+<input type=hidden name=ptcnsmsn value="%STANDARD.01.025.120.243.0.1">
+<input type=hidden name=ptcnnewc value="%STANDARD.01.025.118.138.0.1">
+<input type=hidden name="ptcnsmso" id="ptcnsmso"
+         value="%STANDARD.01.025.128.106.0.1">
+<input type=hidden name=bkcode value="BK">
+<input type=hidden name=stcode value="ST">
+<input type=hidden name=clcode value="CL">
+<input type=hidden name=apcode value="ap ">
+<input type=hidden name=pcode value="P ">
+<input type=hidden name=keystr01 value="3">
+
+<table border=0 width=100% cellspacing=0 cellpadding=0>
+<tr><td class=HeadingCell align=center colspan=2>SMS For Bookings</td></tr>
+<tr><td class=DataLabel>&nbsp;</td></tr>
+</table>
+<table align=center width=80% border=0 cellspacing=2 cellpadding=1>
+<tr><td class=DataLabel width=25%>Schedule Date</td>
+<td class=DataLabel><input type=text id=schddate size=12 title="Schedule Date"
+value="%STANDARD.01.015" name=schddate onblur="checkDate(this,'Schedule Date')">
+<img src="../images/DateLookup.gif" class="Icon" alt="Show Calendar"
+onclick="DateLookupFrame(schddate);">
+Time<input type=text id=schdtime name=schdtime size=12 title="Schedule Time"
+value="%STANDARD.01.016">
+<img src="../images/DateTimeStamp.gif" alt="Schedule Time" class="Icon"
+onclick="SetCurrentDateTime(schddate,schdtime);">
+<img src="../images/TimeLookup.gif" alt="Time Select" class="Icon"
+onclick="TimeLookupFrame(schdtime);"></td></tr>
+<tr><td class=DataLabel>Printer</td>
+<td><input type=text value="%RSHWEB02.01.199.002" name="d_schdprntdesc" 
+     class="readonly" readonly>
+    <input type="hidden" name="schdprnt" value="%STANDARD.01.025.124.105.0.6"></td></tr>
+<tr><td class=DataLabel>Number of Copies</td>
+<td><select name=schdcopy title='Number of SMSes' class=Mandatory>
+    </select></td></tr>
+<tr><td class=DataLabel>Re-schedule Type</td>
+    <td class=DataLabel colspan=3>
+    <select name=schdrdat id="schdrdat" title="Schedule Type"
+     onchange="SetReportDates();setReportScheduleExtended(ReportForm.datsch01);">
+    <option></option>
+    </select></td></tr>
+<tr><td class=DataLabel>Re-schedule Until Date</td>
+    <td class=DataLabel colspan=3><input type=text id=schdrend name=schdrend
+        size=12 onblur="checkDate(this,'Re-schedule Until Date')">
+    <img src="../images/DateTimeStamp.gif" class="Icon" alt="Current"
+     onclick="SetCurrentDateTime(schdrend,null);">
+    <img src="../images/DateLookup.gif" class="Icon" alt="Show Calendar"
+     onclick="DateLookupFrame(schdrend);"></td></tr>
+<tr><td colspan="2" align="center"><hr width="80%"></td></tr>
+</table>
+<table align=center width=80% border=0 cellspacing=2 cellpadding=1>
+<tr><td class=DataLabel width=25%>SMS Message to Send</td>
+    <td><select name=keystr02 class=Mandatory class=Mandatory
+         title="SMS Message Type">
+    <option> </option>
+    %RSHWEB02.01.199.009
+    </select></td></tr>
+</table>
+
+<input type=hidden name=keystr03 value=" ">
+<input type=hidden name=keystr04 value=" ">
+
+<span id=DateRange></span>
+
+<table align=center width=80% border=0 cellspacing=2 cellpadding=1>
+<tr><td class=DataLabel id=HospHead width=25%></td><td></td>
+    <td id=HospOptn></td></tr>
+<tr><td class=DataLabel>%STANDARD.01.017.BK</td>
+    <td><input type=radio name=keystr06 id=inbk value="N" checked
+         onClick="ClearSelect(ReportForm.multiple);">
+      <label for="inbk">&nbsp;Include</label>
+      <input type=radio name=keystr06 id=exbk value="E"
+         onClick="ClearSelect(ReportForm.multiple);">
+      <label for="exbk">&nbsp;Exclude&nbsp;</label></td>
+    <td><select multiple id=multiple name=multiple 
+    class="SelectMultipleLarge SelectBig" title="%STANDARD.01.017.BK"
+    onkeyup="return TrapCtrlA(this);"
+    onclick="ValidateSelect(ReportForm.keystr06, this);showOU();">
+    <option value="">All</option>
+    %STANDARD.01.007.BK
+    </select></td><td align=left>Press CTRL or SHIFT to select multiple codes
+    </td></tr>
+<tr><td class=DataLabel id=theconti>Surgeon/Consultant</td>
+    <td><input type=radio name=keystr08 id=insuco value="N" checked
+         onClick="ClearSelect(ReportForm.multipl1);">
+      <label for="insuco">Include</label>
+      <input type=radio name=keystr08 id=exsuco value="E"
+         onClick="ClearSelect(ReportForm.multipl1);">
+      <label for="exsuco">Exclude</label></td>
+    <td><select multiple id=multipl1 name=multipl1
+    class="SelectMultipleLarge SelectBig" 
+    onkeyup="return TrapCtrlA(this);"
+    onclick="ValidateSelect(ReportForm.keystr08, this);" 
+    title="Surgeon/Consultant">
+    <option value="">All</option>
+    %RSHWEB02.01.199.008
+    </select></td><td align=left>Press CTRL or SHIFT to select multiple codes
+    </td></tr>
+<tr id=opunwrap></tr>
+<tr><td class=DataLabel>%STANDARD.01.017.CL</td>
+    <td><input type=radio name=keystr12 id=incl value="N" checked
+         onClick="ClearSelect(ReportForm.multipl3);">
+      <label for="incl">Include</label>
+      <input type=radio name=keystr12 id=excl value="E"
+         onClick="ClearSelect(ReportForm.multipl3);">
+      <label for="excl">Exclude</label></td>
+    <td><select multiple id=multipl3 name=multipl3
+    class="SelectMultipleLarge SelectBig" title="%STANDARD.01.017.CL"
+    onkeyup="return TrapCtrlA(this);"
+    onclick="ValidateSelect(ReportForm.keystr12, this);">
+    <option value="">All</option>
+    %STANDARD.01.007.CL
+    </select></td><td align=left>Press CTRL or SHIFT to select multiple codes
+    </td></tr>
+<tr><td class=DataLabel>%STANDARD.01.017.ap </td>
+    <td><input type=radio name=keystr14 id=inap value="N" checked
+         onClick="ClearSelect(ReportForm.multipl4);">
+      <label for="inap">Include</label>
+      <input type=radio name=keystr14 id=exap value="E"
+         onClick="ClearSelect(ReportForm.multipl4);">
+      <label for="exap">Exclude</label></td>
+    <td><select multiple id=multipl4 name=multipl4
+    class="SelectMultipleLarge SelectBig" title="%STANDARD.01.017.ap "
+    onkeyup="return TrapCtrlA(this);"
+    onclick="ValidateSelect(ReportForm.keystr14, this);">
+    <option value="">All</option>
+    %STANDARD.01.007.ap
+    </select></td><td align=left>Press CTRL or SHIFT to select multiple codes
+    </td></tr>
+<tr><td class=DataLabel>%STANDARD.01.017.P </td>
+    <td><input type=radio name=keystr16 id=inp value="N" checked
+         onClick="ClearSelect(ReportForm.multipl5);">
+      <label for="inp">Include</label>
+      <input type=radio name=keystr16 id=exp value="E"
+         onClick="ClearSelect(ReportForm.multipl5);">
+      <label for="exp">Exclude</label></td>
+    <td><select multiple id=multipl5 name=multipl5
+    class="SelectMultipleLarge SelectBig" title="%STANDARD.01.017.P "
+    onkeyup="return TrapCtrlA(this);"
+    onclick="ValidateSelect(ReportForm.keystr16, this);">
+    <option value="">All</option>
+    %STANDARD.01.007.P 
+    </select></td><td align=left>Press CTRL or SHIFT to select multiple codes
+    </td></tr>
+    <input type=hidden name=keystr18 value="%STANDARD.01.008">
+    <input type=hidden name=keystr19 value="Y">
+    <input type=hidden name=keystr20 value=" ">
+</table>
+<table border=0 width=100% cellspacing=0 cellpadding=4>
+<tr valign=bottom>
+  <td colspan=4 width=100% align=center valign=bottom>
+    <input type=button value="Ok" class=button id=btnUpdate
+     onclick="ProcessReport();">
+    <input type=button value="Cancel" class=button onclick="history.go(-1);">
+  </td>
+</tr>
+</table>
+</form>
+</div>
+<span id=SetDateRange style="display:none">
+  <table align=center width=80% border=0 cellspacing=2 cellpadding=1>
+    <tr>
+      <td class=DataLabel width=25%>Booking Date Range</td>
+      <td><input type=text class=Mandatory size=12 maxlength=12 name=datran01
+         id=datran01 title="From Date" 
+         onblur='CheckFutureDate(this,"From Date");'>
+      <img src="../images/DateTimeStamp.gif" class="Icon" alt="Current"
+         date="document.ReportForm.datran01">
+      <img src="../images/DateLookup.gif" class="Icon" alt="Calendar"
+         date="document.ReportForm.datran01">
+      To <input type=text class=Mandatory size=12 maxlength=12 name=datran02
+         id=datran02 title="To Date" 
+         onblur='CheckFutureDate(this,"To Date");'>
+      <img src="../images/DateTimeStamp.gif" class="Icon" alt="Current"
+         date="document.ReportForm.datran02">
+      <img src="../images/DateLookup.gif" class="Icon" alt="Current"
+         date="document.ReportForm.datran02"></td>
+</tr></table></span>
+
+<div id=SetScheduleRange style="display:none;">
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+<tr><td class=DataLabel width=25%>Booking Date Range</td>
+    <td><select name=datsch01 id=datsch01 title="Schedule Range" class=Mandatory
+    onblur="UpReportSchedule(this,ReportForm.keystr03,ReportForm.keystr04);">
+    </select>
+    Sample Range
+    <input type=text name=SampleFrom size=12> To 
+    <input type=text name=SampleTo size=12>
+    </td></tr>
+</table>
+</div>
+
+<span id=hosphead style="display:none">
+  Hospital
+</span>
+<span id=hospoptn style="display:none">
+  <select name=keystr05 id=keystr05 class="SelectMed" title="Hospital"
+     onchange="ChangeHospital()">
+    <option value="">All</option>
+    %RSHWEB02.01.122
+  </select>
+</span>
+
+<span id=hospblank style="display:none">
+    <input type=hidden name=filthosp value="">
+</span>
+
+<table style="display: none;">
+  <tr id=oudrpdwn><td class=DataLabel>%STANDARD.01.017.ST</td>
+    <td><input type=radio name=keystr10 id=inst value="N" checked
+         onClick="ClearSelect(ReportForm.multipl2);changeOUStatus();">
+      <label for="inst">Include</label>
+      <input type=radio name=keystr10 id=exst value="E"
+         onClick="ClearSelect(ReportForm.multipl2);changeOUStatus();">
+      <label for="exst">Exclude</label></td>
+    <td><select multiple id=multipl2 name=multipl2
+    class="SelectMultipleLarge SelectBig" title="%STANDARD.01.017.ST"
+    onclick="ValidateSelect(ReportForm.keystr10, this);">
+    <option value="">All</option>
+    %STANDARD.01.007.ST
+    </select></td><td align=left>Press CTRL or SHIFT to select multiple codes
+    </td></tr>
+</table>
+
+<script>
+function SetHospital() {
+  if (document.ReportForm.ibcnmhos.value == "1") {
+    HospHead.innerHTML = hosphead.innerHTML;
+    HospOptn.innerHTML = hospoptn.innerHTML;
+  }
+  else {
+    HospHead.innerHTML = "";
+    HospOptn.innerHTML = hospblank.innerHTML;
+  }
+}
+isSelected = false;
+function showOU() {
+  for (var i = 0; i < ReportForm.multiple.length; i++) {
+    if ( ReportForm.multiple[i].selected == true && 
+           ( ReportForm.multiple[i].value.substr(14,3) == "THE" || 
+               ReportForm.multiple[i].value == "" )) {
+       isSelected = true;
+       opunwrap.innerHTML = "";
+       opunwrap.innerHTML = oudrpdwn.innerHTML;
+       var allBKValsSel = checkAllBKTValues();
+       if (ReportForm.multiple[0].selected == true || allBKValsSel) {
+         document.getElementById("multipl2").value = "";
+         for (var j = 1; j < document.getElementById("multipl2").length; j++) {
+           document.getElementById("multipl2")[j].disabled = true;
+         }
+       }
+       return;
+    }
+  }
+  isSelected = false;
+  opunwrap.innerHTML = ""; 
+}
+function checkAllBKTValues() {
+  for (var j = 1; j < document.getElementById("multiple").length; j++) {
+    if (document.getElementById("multiple")[j].selected != true) {
+      return false;
+    }
+  }
+  return true;
+}
+function changeOUStatus() {
+  if (document.getElementById("inst").checked == true) {
+      document.getElementById("multipl2").value = "";
+      document.getElementById("multipl2")[0].disabled = false;
+      document.getElementById("multipl2")[0].selected = true;
+      for (var j = 1; j < document.getElementById("multipl2").length; j++) {
+        document.getElementById("multipl2")[j].disabled = true;
+      }
+  } else if (document.getElementById("exst").checked == true) {
+    document.getElementById("multipl2")[0].disabled = true;
+    document.getElementById("multipl2")[0].selected = false;
+    for (var j = 1; j < document.getElementById("multipl2").length; j++) {
+      document.getElementById("multipl2")[j].disabled = false;
+    }
+  } 
+}
+</script>

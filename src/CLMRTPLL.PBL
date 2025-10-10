@@ -1,0 +1,28 @@
+.---------------------------------------------------------------------------
+. Include Name : CLMRTPLL.PBL
+. Function     : Clear Medical Records Pulling List table
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.04.01 24/11/2023 Thanh T         TSK 0871324  
+.           Initial Version 
+.---------------------------------------------------------------------------
+.
+CLMRTPLL  MOVE      SP70,MRPLVISN      . Visit Number
+          MOVE      SP70,MRPLMRKY      . Medical Record Key
+          MOVE      SP70,MRPLRQST      . Request Status
+          MOVE      SP70,MRPLCUID      . Added By UserID (from websecaf)
+          MOVE      SP70,MRPLCDAT      . Date Record Added
+          MOVE      SP70,MRPLCTIM      . Time Record Added
+          MOVE      SP70,MRPLUUID      . Updated By UserID (from websecaf)
+          MOVE      SP70,MRPLUDAT      . Date Record Updated
+          MOVE      SP70,MRPLUTIM      . Time Record Updated
+          MOVE      SP70,MRPLUDF1      . User Defined Field 1
+          MOVE      SP70,MRPLUDF2      . User Defined Field 2
+          MOVE      SP70,MRPLUDC1      . User Defined Coded Field 1
+          MOVE      SP70,MRPLUDC2      . User Defined Coded Field 2
+          PACK      MRPLFTX1,SP70,SP70 . Free text field 1
+          PACK      MRPLFTX2,SP70,SP70 . Free Text Field 2
+          MOVE      SP70,MRPLSPAR      . Spare
+.
+          RETURN

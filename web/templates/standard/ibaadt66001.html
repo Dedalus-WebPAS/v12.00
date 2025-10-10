@@ -1,0 +1,400 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName"    content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/ReportStandard.js"></script>
+<script type="text/javascript">
+function ProcessReport() {
+if(validateMandatory(document.ReportForm)){
+  document.ReportForm.keystr01.value=document.ReportForm.keyinoption.value;
+
+  if(document.ReportForm.keyinoption.value=="2") { //Remove
+    document.ReportForm.keystr02.value=document.ReportForm.optionby.value;
+    document.ReportForm.keystr03.value=
+         document.getElementById('claimcod').value.substring(0,3);
+
+    if (document.ReportForm.alladmis.checked == true) {
+      document.ReportForm.keystr04.value="All";
+    } else {
+      document.ReportForm.keystr04.value=
+         document.getElementById('admissty').value.substring(0,3);
+    }
+    if(document.ReportForm.keystr02.value == 1) { //HF Group
+      if (document.ReportForm.allhfgrp.checked == true) {
+        document.ReportForm.keystr05.value="All";
+      } else {
+        document.ReportForm.keystr05.value=
+           document.ReportForm.hfngroup.value
+      }
+      document.ReportForm.keystr06.value=document.ReportForm.userid.value;
+      document.ReportForm.keystr07.value="P";
+      document.ReportForm.keystr08.value=" ";
+    } else if (document.ReportForm.keystr02.value == 2) { //HF Code
+      if (document.ReportForm.allhfund.checked == true) {
+        document.ReportForm.keystr05.value="All";
+      } else {
+        document.ReportForm.keystr05.value=
+           document.ReportForm.hfndcode.value
+      }
+      document.ReportForm.keystr06.value=document.ReportForm.userid.value;
+      document.ReportForm.keystr07.value="P";
+      document.ReportForm.keystr08.value=" "; 
+    } else {
+      document.ReportForm.keystr05.value=document.ReportForm.userid.value;
+      document.ReportForm.keystr06.value="P";
+      document.ReportForm.keystr07.value=" ";
+    }
+
+    SubmitReport(ReportForm);
+    return;
+  }
+  if(document.ReportForm.keyinoption.value=="1") { //Upload
+    document.ReportForm.keystr02.value="Import File Name";
+    document.ReportForm.keystr03.value=document.ReportForm.optionby.value;
+    document.ReportForm.keystr04.value=
+         document.getElementById('claimcod').value.substring(0,3);
+    if (document.ReportForm.alladmis.checked == true) {
+      document.ReportForm.keystr05.value="All";
+    } else {
+      document.ReportForm.keystr05.value=
+         document.getElementById('admissty').value.substring(0,3);
+    }
+    if(document.ReportForm.keystr03.value == 1) { //HF Group
+      if (document.ReportForm.allhfgrp.checked == true) {
+        document.ReportForm.keystr06.value="All";
+      } else {
+        document.ReportForm.keystr06.value=
+           document.ReportForm.hfngroup.value
+      }
+      document.ReportForm.keystr07.value=
+         document.getElementById('rmvfiles').value;
+      if(document.ReportForm.ibcnmhos.value==1) { // multi hospital
+        document.ReportForm.keystr08.value=
+           document.getElementById('hospital').value;
+        document.ReportForm.keystr09.value=document.ReportForm.userid.value;
+        document.ReportForm.keystr10.value="P";
+        document.ReportForm.keystr11.value=" ";
+      } else {                                    // single hospital
+        document.ReportForm.keystr08.value=document.ReportForm.userid.value;
+        document.ReportForm.keystr09.value="P";
+        document.ReportForm.keystr10.value=" ";
+      }
+    } else if (document.ReportForm.keystr03.value == 2){ //HF Code
+      if (document.ReportForm.allhfund.checked == true) {
+        document.ReportForm.keystr06.value="All";
+      } else {
+        document.ReportForm.keystr06.value=
+           document.ReportForm.hfndcode.value
+      }
+      document.ReportForm.keystr07.value=
+         document.getElementById('rmvfiles').value;
+      if(document.ReportForm.ibcnmhos.value==1) { // multi hospital
+        document.ReportForm.keystr08.value=
+           document.getElementById('hospital').value;
+        document.ReportForm.keystr09.value=document.ReportForm.userid.value;
+        document.ReportForm.keystr10.value="P";
+        document.ReportForm.keystr11.value=" ";
+      } else {                                    // single hospital
+        document.ReportForm.keystr08.value=document.ReportForm.userid.value;
+        document.ReportForm.keystr09.value="P";
+        document.ReportForm.keystr10.value=" ";
+      }
+    } else {
+      document.ReportForm.keystr06.value=
+         document.getElementById('rmvfiles').value;
+      if(document.ReportForm.ibcnmhos.value==1) { // multi hospital
+        document.ReportForm.keystr07.value=
+           document.getElementById('hospital').value;
+        document.ReportForm.keystr08.value=document.ReportForm.userid.value;
+        document.ReportForm.keystr09.value="P";
+        document.ReportForm.keystr10.value=" ";
+      } else {                                    // single hospital
+        document.ReportForm.keystr07.value=document.ReportForm.userid.value;
+        document.ReportForm.keystr08.value="P";
+        document.ReportForm.keystr09.value=" ";
+      }
+    }
+
+    SubmitReport(ReportForm);
+    return;
+  }
+   SubmitReport(document.ReportForm);
+ }
+}
+
+function selectAll(chkbox,field) {
+  a = document.ReportForm;
+  if (chkbox.checked==true) {
+    field.disabled=true;
+    field.value="";
+    field.classList.remove("Mandatory");
+    if (chkbox.name=="allhfund") {
+      a.funddesc.value="";
+      a.hfimg.style.display='none';
+    }
+  } else {
+    field.disabled=false;
+    if (chkbox.name=="allhfund" || chkbox.name=="allhfgrp" || chkbox.name=="alladmis") {
+      field.classList.add("Mandatory");
+      if (chkbox.name=="allhfund") { a.hfimg.style.display='inline-block';}
+    }
+  }
+}
+
+function valHfund(ReturnFund,FundName) {
+  if(!isWhitespace(ReturnFund.value)) {
+     validateCode(16,ReturnFund,FundName)
+  }
+  if(isWhitespace(ReturnFund.value)) {
+    ReturnFund.value="";
+    FundName.value="";
+  }
+}
+
+function CheckUploadOption() {
+  ind=document.ReportForm.keyinoption.value;
+  if (ind==2) { //Remove
+    document.getElementById('PathnameSpan').innerHTML=""
+    document.getElementById('InputsSpan').innerHTML=
+         document.getElementById('Inputs').innerHTML
+    document.getElementById('HFOption').innerHTML=""
+    document.getElementById('RemoveSpan').innerHTML=""
+    document.getElementById('HospSpan').innerHTML=""
+  } else { //Upload
+    document.getElementById('PathnameSpan').innerHTML=
+         document.getElementById('Pathname').innerHTML
+    document.getElementById('InputsSpan').innerHTML=
+         document.getElementById('Inputs').innerHTML
+    document.getElementById('HFOption').innerHTML=""
+    document.getElementById('RemoveSpan').innerHTML=
+         document.getElementById('DelRec').innerHTML
+    if (document.ReportForm.ibcnmhos.value==1) {
+      document.getElementById('HospSpan').innerHTML=
+         document.getElementById('HospID').innerHTML
+    } 
+  }
+}
+
+function SelectHFOption() {
+ind=document.ReportForm.optionby.value;
+  if (ind==1){ //HF Group
+    document.getElementById('HFOption').innerHTML=
+         document.getElementById('HFGroup').innerHTML
+  } else if (ind==2) { //HF Code
+    document.getElementById('HFOption').innerHTML=
+         document.getElementById('HFund').innerHTML
+  } else { //blank
+    document.getElementById('HFOption').innerHTML=""
+  }
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);ReportLoad();">
+
+<form name=ReportForm method=post action=rshweb02.pbl style="margin:0"
+   enctype="multipart/form-data">
+  <input type=hidden name=reportno value=4>
+  <input type=hidden name=template value=001>
+  <input type=hidden name=updttype value="A">
+  <input type=hidden name=setdfprg value="IBAADT66">
+  <input type=hidden name=setdfrep value="01">
+  <input type=hidden name=schdpgid value="IBAADT66">    
+  <input type=hidden name=schddesc value="Upload MBS Explosion Charges">
+  <input type=hidden name=userid value="%STANDARD.01.008">
+  <input type=hidden name=nextpage value="1">
+  <input type=hidden name=redirect value="rshweb02.pbl?reportno=1&template=1">
+  <input type=hidden name=keystr01 value=" ">
+  <input type=hidden name=keystr02 value=" ">
+  <input type=hidden name=keystr03 value=" ">
+  <input type=hidden name=keystr04 value=" ">
+  <input type=hidden name=keystr05 value=" ">
+  <input type=hidden name=keystr06 value=" ">
+  <input type=hidden name=keystr07 value=" ">
+  <input type=hidden name=keystr08 value=" ">
+  <input type=hidden name=keystr09 value=" ">
+  <input type=hidden name=keystr10 value=" ">
+  <input type=hidden name=keystr11 value=" ">
+  <input type=hidden name=dummy1 value=" ">
+  <input type=hidden name=dummy2 value=" ">
+  <input type=hidden name=ibcnmhos value="%RSHWEB02.01.118.000.043.1.1">
+
+<table width=100% align=center border=0 cellspacing=>
+<tr><td class=HeadingCell align=center colspan=2>
+     Upload MBS Explosion Charges</td></tr>
+<tr><td>
+
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+<tr><td class=DataLabel width=25%>Schedule Date</td>
+    <td class=DataLabel>
+    <input type=text name=schddate size=12 title="Schedule Date"
+    value="%STANDARD.01.015"
+    onblur="checkDate(this,'Schedule Date');">
+    <img notab src="../images/DateLookup.gif" class="Icon" 
+     alt="Show Calendar" date="document.ReportForm.schddate">
+    Time
+    <input type=text name=schdtime size=12 title="Schedule Time"
+    value="%STANDARD.01.016">
+    <img notab src="../images/DateTimeStamp.gif" class="Icon"
+     alt="Current" date="document.ReportForm.schddate" 
+              time="document.ReportForm.schdtime">
+    <img notab src="../images/TimeLookup.gif" class="Icon" 
+     alt="Time Select" time="document.ReportForm.schdtime">
+    </td></tr>
+
+<tr><td class=DataLabel>Printer</td>
+    <td><select name=schdprnt title="Printer" class=Mandatory>
+        <option></option>
+        %STANDARD.01.001.IBAADT66.01
+        </select>
+    </td></tr>
+
+   <input type=hidden name=schdcopy title='Number of Copies' value=1>
+   <input type=hidden name=schdrdat title="Schedule Type">
+   <input type=hidden name=schdrend size=12>
+
+<tr><td colspan=2 align=center><hr width=100%></td></tr>
+</table>
+
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+
+<tr><td class=DataLabel width=25%>Option</td>
+    <td><select name=keyinoption title="Option" class=Mandatory
+        onchange="CheckUploadOption();">
+        <option value=""></option>
+        <option value="1">Upload MBS Item Explosion Charges</option>
+        <option value="2">Remove MBS Item Explosion Charges</option>
+        </select>
+</td></tr>
+</table>
+
+<span id=PathnameSpan></span>
+
+<span id=InputsSpan></span>
+
+<span id=HFOption></span>
+
+<span id=RemoveSpan></span>
+
+<span id=HospSpan></span>
+
+
+
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+<tr><td><hr width=100%></td></tr>
+<tr><td bgcolor=#FF0000 class=DataLabel>&nbsp;</td></tr>
+<tr><td bgcolor=#99FFFF class=DataLabel>
+       <b>Warning: This Program will
+       write the Content of your Upload file DIRECTLY into the Current files.
+       </b></td></tr>
+<tr bgcolor=#99FFFF><td class=DataLabel><b>
+       Note: A tab delimited backup is made first.</b></td></tr>
+<tr><td bgcolor=#FF0000 class=DataLabel>&nbsp;</td></tr>
+<tr><td><hr width=100%></td></tr>
+
+
+<tr><td align=center colspan=2><br>
+    <input type=button value=Ok class=button onclick='ProcessReport();'>
+    <input type=button value=Cancel class=button 
+     onclick='location.href="../lookups/blank.html"' >
+    </td></tr>
+</table>
+</td></tr>
+</table>
+</form>
+
+<span id=Pathname style="display:none">
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+<tr><td class=DataLabel width=25%>Path & File Name</td>
+    <td><input type=file name=loadfnam id=loadfnam title="Path & File name" 
+          size=40 maxlength=120 class=Mandatory>&nbsp;&nbsp;
+         <input type=hidden size=50 name=filedesc id=filedesc 
+         Readonly tabindex=-1  style=border:0;background:paper.gif;>
+    </td></tr>
+</table>
+</span>
+
+<span id=Inputs style="display:none">
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+<tr><td class=DataLabel width=25%>%STANDARD.01.017.CL</td>
+    <td><select name=claimcod id=claimcod class=Mandatory 
+        title='%STANDARD.01.017.CL' style='width:200px;'>
+        <option value=""></option>
+        %STANDARD.01.007.CL
+        </select>
+</td></tr>
+
+<tr><td class=DataLabel width=25%>%STANDARD.01.017.A </td>
+    <td><select name=admissty id=admissty class=Mandatory 
+        title='%STANDARD.01.017.A ' style='width:200px;'>
+        <option value=" "></option>
+        %STANDARD.01.007.A 
+        </select></td>
+    <td width="45%">All<input type=checkbox name="alladmis" id="alladmis" 
+    value=1 title="All Admission Types" onclick="selectAll(alladmis,admissty);"></td>    
+</tr>
+
+<tr><td class=DataLabel width=25%>Health Fund</td>
+    <td><select name=optionby id=optionby title="Health Fund" class=Mandatory
+        onchange="SelectHFOption();">
+        <option value=""></option>
+        <option value="1">By Health Fund Group</option>
+        <option value="2">By Health Fund Code</option>
+        <option value="3">Blank HF & HF Group</option>
+        </select>
+</td></tr>
+</table>
+</span>
+
+<span id=HFGroup style="display:none">
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+<tr><td class=DataLabel width=25%>Health Fund Group</td>
+    <td class=DataField>
+    <select name=hfngroup id=hfngroup title="Health Fund Group" class=Mandatory>
+    <option value=""> </option>
+     %RSHWEB02.01.113
+    </select>
+    </td>
+    <td width="45%">All<input type=checkbox name="allhfgrp" id="allhfgrp" 
+    value=1 title="All Health Fund Groups" onclick="selectAll(allhfgrp,hfngroup);"></td>    
+</tr>
+</table>
+</span>
+
+<span id=HFund style="display:none">
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+<tr><td class=DataLabel width=25%>Health Fund Code</td>
+    <td><input type=text size=6 name=hfndcode id=hfndcode maxlength=6
+      class=Mandatory value="" title="Health Fund Code" 
+      onblur="valHfund(hfndcode,funddesc);">
+     <input type=text size=30 name=funddesc id=funddesc title="Health Fund"
+      readonly value="" class=Readonly notab tabindex=-1>
+     <img src=../images/SearchIcon.gif name=hfimg id=hfimg border=0 hspace=0 align=absmiddle notab
+      onClick="HealthFundSearchFrame(hfndcode,funddesc,dummy1,dummy2);">
+     </td>
+     <td width="45%">All<input type=checkbox name="allhfund" id="allhfund" value=1
+     title="All Health Funds" onclick="selectAll(allhfund,hfndcode);"></td> 
+</tr>
+</table>
+</span>
+
+<span id=DelRec style="display:none">
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+<tr><td class=DataLabel width=25%>Remove All Existing Files </td>
+    <td><select name=rmvfiles id=rmvfiles title="Remove All Existing Files">
+        <option value="N">No</option>
+        <option value="Y">Yes</option>
+        </select>
+</td></tr>
+</table>
+</span>
+
+<span id=HospID style="display:none">
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+<tr><td class=DataLabel width=25%>Hospital ID</td>
+    <td><select name=hospital id=hospital title="Hospital ID">
+        %RSHWEB02.01.122
+        </select>
+</td></tr>
+</table>
+</span>

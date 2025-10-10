@@ -1,0 +1,53 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Patient System 
+                      Hospital Attributes 
+  
+TABLE NAME         :  pmshataf
+=====================================================================
+PMHTHOSP    char        3     1   Hospital Id (pathspaf)  
+                                   Blank - for Single Hospital  
+PMHTTYPE    char        3     4   Type of Attribute  
+                                   001 - Discharge DRG Code for CWO  
+PMHTKVAL    char       25     7   Key Value  
+                                   Type of Attribute:  
+                                   001 - Health Fund(D6),Disc.DRG(D4)  
+PMHTSDAT    char        8    32   Effective Start Date (ccyymmdd)  
+PMHTEDAT    char        8    40   Effective End Date (ccyymmdd)  
+PMHTTXT1    char       80    48   Text 1  
+PMHTTXT2    char       80   128   Text 2  
+PMHTTXT3    char       80   208   Text 3  
+PMHTTXT4    char       80   288   Text 4  
+PMHTVAL1    char        6   368   Value 1  
+PMHTVAL2    char        6   374   Value 2  
+PMHTVAL3    char        6   380   Value 3  
+PMHTVAL4    char        6   386   Value 4  
+PMHTIND1    char        1   392   Indicator 1 (1=Yes/0=No)  
+                                   Type of Attribute:  
+                                   001 - Active/Inactive  
+PMHTIND2    char        1   393   Indicator 2 (Yes/No)  
+PMHTIND3    char        1   394   Indicator 3 (Yes/No)  
+PMHTIND4    char        1   395   Indicator 4 (Yes/No)  
+PMHTCOD1    char        3   396   Coded Value 1  
+PMHTCOD2    char        3   399   Coded Value 2  
+PMHTCOD3    char        3   402   Coded Value 3  
+PMHTCOD4    char        3   405   Coded Value 4  
+PMHTCUSR    char       10   408   User who Created Record (websecaf)  
+PMHTCDAT    char        8   418   Date Record Created (ccyymmdd)  
+PMHTCTIM    char        8   426   Time Record Created (hh:mm:ss)  
+PMHTUUSR    char       10   434   User who Updated Record (websecaf)  
+PMHTUDAT    char        8   444   Date Record Updated (ccyymmdd)  
+PMHTUTIM    char        8   452   Time Record Updated (hh:mm:ss)  
+PMHTFUSR    char       10   460   User who Finished Attribute(websec)  
+PMHTFDAT    char        8   470   Date Attribute Finished (ccyymmdd)  
+PMHTFTIM    char        8   478   Time Attribute Finished (hh:mm:ss)  
+PMHTSPAR    char      100   486   Spare  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+PMHTHOSP
+PMHTTYPE
+PMHTKVAL
+PMHTSDAT
+  
+=====================================================================

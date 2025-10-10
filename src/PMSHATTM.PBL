@@ -1,0 +1,319 @@
+. *----------------------------------------------------------------------
+. * Include Name  :   PMSHATTM.PBL
+. *
+. * Function      :   CGI variables for PMSHATFD - pmshataf.dat
+. *
+. *----------------------------------------------------------------------
+.  Modifications :
+.
+.  V11.05.00  29/01/2025  J.Tan         TASK 0946490
+.             Created include for Text and Value fields
+.------------------------------------------------------------------------
+.   Clear variables
+.------------------------------------------------------------------------
+CPPMHA00  MOVE      Z70,PMHAT001  * Hospital Id
+          MOVE      Z70,PMHAT002  * Type of Attribute
+          MOVE      Z70,PMHAT003  * Key Value
+          MOVE      Z70,PMHAT004  * Effective Start date
+          MOVE      Z70,PMHAT005  * Effective Start date
+          MOVE      Z70,PMHTTXT1  * Text 1
+          MOVE      Z70,PMHTTXT2  * Text 2
+          MOVE      Z70,PMHTTXT3  * Text 3
+          MOVE      Z70,PMHTTXT4  * Text 4
+          MOVE      Z70,PMHTVAL1  * Value 1
+          MOVE      Z70,PMHTVAL2  * Value 2
+          MOVE      Z70,PMHTVAL3  * Value 3
+          MOVE      Z70,PMHTVAL4  * Value 4
+          MOVE      Z70,PMHTIND1  * Indicator 1 (Yes/No)
+          MOVE      Z70,PMHTIND2  * Indicator 2 (Yes/No)
+          MOVE      Z70,PMHTIND3  * Indicator 3 (Yes/No)
+          MOVE      Z70,PMHTIND4  * Indicator 4 (Yes/No)
+
+CPPMHA99  RETURN
+.------------------------------------------------------------
+. set Tags 
+.------------------------------------------------------------
+PMHA0000  BRANCH    FLDITMNO,PMHA0010,PMHA0020,PMHA0030,PMHA0040,PMHA0050:
+                             PMHA0060,PMHA0070,PMHA0080,PMHA0090,PMHA0100:
+                             PMHA0110,PMHA0120,PMHA0130,PMHA0140,PMHA0150:
+                             PMHA0160,PMHA0170
+.
+          WRITE     HTMLFILE;"Invalid IBA Tag";
+          GOTO      PMHA9999
+.
+PMHA0010  COMPARE   ONE,IBCNMHOS
+          GOTO      PMHA9999 IF NOT EQUAL
+.
+          UNPACK    DIM127,D1,KEY1,DIM127
+          MOVE      ZERO,F1
+          MOVE      KEY1,F1
+          BRANCH    F1,PMHA0610,PMHA0620
+.
+          WRITE     HTMLFILE;PMHTHOSP;
+          GOTO      PMHA9999
+.
+PMHA0610  MATCH     SP70,PMHTHOSP
+          IF        @EQUAL
+            WRITE     HTMLFILE;"All";
+          ELSE
+            PACK      KEY3,PMHTHOSP,SP70
+            CALL      RDPTHSP1
+            BRANCH    OVRCD,PMHA9999
+            WRITE     HTMLFILE;PTHSNAME;           * hospital name
+          ENDIF
+          GOTO      PMHA9999
+.
+PMHA0620  MOVE      ONE,F1
+          CALL      HSPSEL00           * Hospital Selection List
+          GOTO      PMHA9999
+.
+PMHA0020  WRITE     HTMLFILE;PMHTTYPE;
+          GOTO      PMHA9999
+.
+PMHA0030  WRITE     HTMLFILE;PMHTKVAL;
+          GOTO      PMHA9999
+.
+PMHA0040  MATCH     PMHTSDAT,SP70
+          GOTO      PMHA9999 IF EQUAL
+.
+          UNPACK    PMHTSDAT,CCENT,CYEAR,CMON,CDAY
+          MOVE      CMON,F2
+          LOAD      MTHNAM3,F2,JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC
+          WRITE     HTMLFILE;CDAY,SP1,MTHNAM3,SP1,CCENT,CYEAR;
+          GOTO      PMHA9999
+.
+PMHA0050  MATCH     PMHTEDAT,SP70
+          GOTO      PMHA9999 IF EQUAL
+.
+          UNPACK    PMHTEDAT,CCENT,CYEAR,CMON,CDAY
+          MOVE      CMON,F2
+          LOAD      MTHNAM3,F2,JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC
+          WRITE     HTMLFILE;CDAY,SP1,MTHNAM3,SP1,CCENT,CYEAR;
+          GOTO      PMHA9999
+.
+PMHA0060  WRITE     HTMLFILE;PMHTTXT1;
+          GOTO      PMHA9999
+.
+PMHA0070  WRITE     HTMLFILE;PMHTTXT2;
+          GOTO      PMHA9999
+.
+PMHA0080  WRITE     HTMLFILE;PMHTTXT3;
+          GOTO      PMHA9999
+.
+PMHA0090  WRITE     HTMLFILE;PMHTTXT4;
+          GOTO      PMHA9999
+.
+PMHA0100  WRITE     HTMLFILE;PMHTVAL1;
+          GOTO      PMHA9999
+.
+PMHA0110  WRITE     HTMLFILE;PMHTVAL2;
+          GOTO      PMHA9999
+.
+PMHA0120  WRITE     HTMLFILE;PMHTVAL3;
+          GOTO      PMHA9999
+.
+PMHA0130  WRITE     HTMLFILE;PMHTVAL4;
+          GOTO      PMHA9999
+.
+PMHA0140  WRITE     HTMLFILE;PMHTIND1;
+          GOTO      PMHA9999
+.
+PMHA0150  WRITE     HTMLFILE;PMHTIND2;
+          GOTO      PMHA9999
+.
+PMHA0160  WRITE     HTMLFILE;PMHTIND3;
+          GOTO      PMHA9999
+.
+PMHA0170  WRITE     HTMLFILE;PMHTIND4;
+          GOTO      PMHA9999
+.
+PMHA9999  RETURN
++
+.------------------------------------------------------------
+.   Set fields
+.------------------------------------------------------------
+SPHAT000  MOVE      ZERO,EXIT
+          UNPACK    QRYNAME,KEY5,KEY3
+          MOVE      KEY3,F3
+          BRANCH    F3,SPHAT001,SPHAT002,SPHAT003,SPHAT004,SPHAT005:
+                       SPHAT006,SPHAT007,SPHAT008,SPHAT009,SPHAT010:
+                       SPHAT011,SPHAT012,SPHAT013,SPHAT014,SPHAT015:
+                       SPHAT016,SPHAT017
+.
+          MOVE      ONE,EXIT
+          GOTO      SPHAT999
+.
+SPHAT001  SQUEEZE   QRYDATA
+          MOVE      QRYDATA,PMHAT001
+          PACK      PMHAT001,PMHAT001,SP70
+          GOTO      SPHAT999
+.
+SPHAT002  MOVE      QRYDATA,PMHAT002
+          GOTO      SPHAT999
+.
+SPHAT003  MOVE      QRYDATA,PMHAT003
+          GOTO      SPHAT999
+.
+SPHAT004  MATCH     Z70,QRYDATA
+          IF        !@EQUAL
+            MATCH     SP70,QRYDATA
+            IF        @EQUAL | @EOS
+              MOVE      SP70,PMHAT004
+            ELSE
+              UNPACK    QRYDATA,CDAY,KEY1,MTHNAM3,KEY1,CCENT,CYEAR
+              CALL      SETMTH00
+              PACK      PMHAT004,CCENT,CYEAR,CMON,CDAY
+              REP       " 0",PMHAT004
+            ENDIF
+          ENDIF
+          GOTO      SPHAT999
+.
+SPHAT005  MATCH     Z70,QRYDATA
+          IF        !@EQUAL
+            MATCH     SP70,QRYDATA
+            IF        @EQUAL | @EOS
+              MOVE      SP70,PMHAT005
+            ELSE
+              UNPACK    QRYDATA,CDAY,KEY1,MTHNAM3,KEY1,CCENT,CYEAR
+              CALL      SETMTH00
+              PACK      PMHAT005,CCENT,CYEAR,CMON,CDAY
+              REP       " 0",PMHAT005
+            ENDIF
+          ENDIF
+          GOTO      SPHAT999
+.
+SPHAT006  PACK      PMHAT006,QRYDATA,SP70
+          GOTO      SPHAT999
+.
+SPHAT007  PACK      PMHAT007,QRYDATA
+          GOTO      SPHAT999
+.
+SPHAT008  PACK      PMHAT008,QRYDATA
+          GOTO      SPHAT999
+.
+SPHAT009  PACK      PMHAT009,QRYDATA
+          GOTO      SPHAT999
+.
+SPHAT010  PACK      PMHAT010,QRYDATA
+          GOTO      SPHAT999
+.
+SPHAT011  PACK      PMHAT011,QRYDATA
+          GOTO      SPHAT999
+.
+SPHAT012  PACK      PMHAT012,QRYDATA
+          GOTO      SPHAT999
+.
+SPHAT013  PACK      PMHAT013,QRYDATA
+          GOTO      SPHAT999
+.
+SPHAT014  PACK      PMHAT014,QRYDATA
+          GOTO      SPHAT999
+.
+SPHAT015  PACK      PMHAT015,QRYDATA
+          GOTO      SPHAT999
+.
+SPHAT016  PACK      PMHAT016,QRYDATA
+          GOTO      SPHAT999
+.
+SPHAT017  PACK      PMHAT017,QRYDATA
+          GOTO      SPHAT999
+.
+SPHAT999  RETURN
+.
+.------------------------------------------------------------
+.  Update fields
+.------------------------------------------------------------
+MVPMHA00  MATCH     PMHAT001,Z70
+          IF        !@EQUAL
+            MOVE      PMHAT001,PMHTHOSP
+          ENDIF
+.
+          MATCH     PMHAT002,Z70
+          IF        !@EQUAL
+            MOVE      PMHAT002,PMHTTYPE
+          ENDIF
+.
+          MATCH     PMHAT003,Z70
+          IF        !@EQUAL
+            PACK      PMHTKVAL,PMHAT003,SP70
+          ENDIF
+.
+          MATCH     PMHAT004,Z70
+          IF        !@EQUAL
+            PACK      PMHTSDAT,PMHAT004,SP70
+          ENDIF
+.
+          MATCH     PMHAT005,Z70
+          IF        !@EQUAL
+            PACK      PMHTEDAT,PMHAT005,SP70
+          ENDIF
+.
+          MATCH     PMHAT006,Z70
+          IF        !@EQUAL
+            PACK      PMHTTXT1,PMHAT006,SP70
+          ENDIF
+.
+          MATCH     PMHAT007,Z70
+          IF        !@EQUAL
+            PACK      PMHTTXT2,PMHAT007,SP70
+          ENDIF
+.
+          MATCH     PMHAT008,Z70
+          IF        !@EQUAL
+            PACK      PMHTTXT3,PMHAT008,SP70
+          ENDIF
+.
+          MATCH     PMHAT009,Z70
+          IF        !@EQUAL
+            PACK      PMHTTXT4,PMHAT009,SP70
+          ENDIF
+.
+          MATCH     PMHAT010,Z70
+          IF        !@EQUAL
+            PACK      PMHTVAL1,PMHAT010,SP70
+          ENDIF
+.
+          MATCH     PMHAT011,Z70
+          IF        !@EQUAL
+            PACK      PMHTVAL2,PMHAT011,SP70
+          ENDIF
+.
+          MATCH     PMHAT012,Z70
+          IF        !@EQUAL
+            PACK      PMHTVAL3,PMHAT012,SP70
+          ENDIF
+.
+          MATCH     PMHAT013,Z70
+          IF        !@EQUAL
+            PACK      PMHTVAL4,PMHAT013,SP70
+          ENDIF
+.
+          MATCH     "1",PMHAT014
+          IF        @EQUAL
+            MOVE      ONE,PMHTIND1        * active
+          ELSE
+            MOVE      ZERO,PMHTIND1       * not active
+          ENDIF
+.
+          MATCH     "1",PMHAT015
+          IF        @EQUAL
+            MOVE      ONE,PMHTIND2        * active
+          ELSE
+            MOVE      ZERO,PMHTIND2       * not active
+          ENDIF
+          MATCH     "1",PMHAT016
+          IF        @EQUAL
+            MOVE      ONE,PMHTIND3        * active
+          ELSE
+            MOVE      ZERO,PMHTIND3       * not active
+          ENDIF
+          MATCH     "1",PMHAT017
+          IF        @EQUAL
+            MOVE      ONE,PMHTIND4        * active
+          ELSE
+            MOVE      ZERO,PMHTIND4       * not active
+          ENDIF
+.
+MVPMHA99  RETURN
+.
++

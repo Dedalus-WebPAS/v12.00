@@ -1,0 +1,98 @@
+#!/bin/bash
+shopt -s xpg_echo
+#------------------------------------------------------------
+#  When run from the command line we need to pass in two switches
+#  Inputs : 1 - AMHCC Input File Name
+#           2 - AMHCC output File Name
+#
+# ===========================================================
+
+# variables
+LOGFILE=/home/iba/mrtweb02.amhcc.log
+COMMAND=/opt/iba/bin
+
+echo "====== STARTING ========" >> $LOGFILE
+echo "ARGS: " $0 $1 $2 $3 $4 >> $LOGFILE
+date >> $LOGFILE
+
+#DRGINP=${1}
+AMHCCI=${1}
+PORT=`echo "${AMHCCI}" | cut -c 7-8`
+WORK=`pwd`
+PORTDIR=`pwd`/$PORT
+
+# Remove existing temp file folders older than 5 days
+echo "Removing port directories (e.g. A3, 7Q etc.) > 5 days old" >> $LOGFILE
+find . -maxdepth 1 -type d -name "[0-9,A-Z][0-9,A-Z]" -mtime +5 -exec rm -rf {} \;
+
+# create folder for temp files and link to grouper libraries
+[ -d $PORTDIR ] || {
+   mkdir $PORTDIR
+}
+
+echo "AMHCC INPUT: " $AMHCCI  >> $LOGFILE
+echo "PORT: " $PORT >> $LOGFILE
+echo "CURRENT DIR: " $WORK  >> $LOGFILE
+echo "PORT DIR: " $PORTDIR  >> $LOGFILE
+
+#------------------------------------------------------------
+#  Grouper Variables GD to the parent dir of where 3M Quickgroup is installed
+#------------------------------------------------------------
+#export GD=/opt/3mintl/cgs
+export GD=/opt/3mhis/cgs
+#export JD=/opt/3mintl/cgs/jre
+export JD=/opt/3mhis/cgs/jre
+export GROUPING_TABLES_3M=$GD
+export SHLIB_PATH=$GD/jars:$SHLIB_PATH:/usr/local/lib
+export GROUPER_ERR_LOGFILE_3M=$GD/grouper.log
+export PATH=$PATH:$GD/jars
+export IFS="%"
+
+# ---------------------- Group_Edition --------------------
+# Runs the grouper for the ICD-10-AM edition specified by ${1} using commands
+# from file specified by ${2}
+AMHCC_Edition()
+{
+    echo "AMHCC Edition ${1} file exists ... processing" >> $LOGFILE
+    echo "Output file ${2} " >> $LOGFILE
+ 
+    $GD/CGSXpres -error_log /tmp/3Mlog.log -input $PORTDIR/AMHCCI.txt -input_template $GD/templates/amhcc_Input.dic -upload $PORTDIR/${2}.txt -upload_template $GD/templates/amhcc_Output.dic -schedule off -grouper 58101 -map_date 07012022
+   
+# move file back to where web PAS can pick it up
+
+     cp $PORTDIR/amhcco.txt $DD/tmp/amhcco${PORT}.txt
+}
+# --------- End Group_Edition ----------
+
+# ---------------------- Clean_Up --------------------
+# Removes file specified by ${1} if exists
+Clean_Up()
+{ 
+   [[ -s ${1} ]] && rm ${1}
+}
+# --------- End Clean_Up ----------
+
+#------------- Start of MAIN Logic -------------------------
+
+echo "Removing temp files from previous run." >> $LOGFILE
+
+Clean_Up $PORTDIR/AMHCCI.txt
+Clean_Up $PORTDIR/amhcco.txt
+Clean_Up $DD/tmp/amhcco${PORT}.txt
+
+cp ${AMHCCI}.txt $PORTDIR/AMHCCI.txt
+
+echo "Running the AMHCC." >>$LOGFILE
+
+# run grouper from temp file directory
+cd $PORTDIR
+
+if [ -s $PORTDIR/AMHCCI.txt ]
+  then
+
+    AMHCC_Edition 12 amhcco 
+fi 
+
+date >> $LOGFILE
+
+echo "====== ENDING ========" >> $LOGFILE

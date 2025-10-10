@@ -1,0 +1,125 @@
+. ******************************************************************************
+.* System         : Patient Billing                                           *
+.* Include Name   : PATECHRDS.PBL                                             *
+.* Author         : J.Tan                                                     *
+.* Date           : 20/03/2024                                                *
+.* Function       : Routine to find Exploding Misc.item for MBS item          *
+.*                                                                            *
+.* Modification   :                                                           *
+.*                  V11.04.00 J.Tan Task 0919569                              *
+.*                  Created routine to check valid key for MBS Exploding      *
+.*                  Misc.items                                                *
+.*                                                                            *
+.* Requires       :                                                           *
+.*                  KEY30  - Claim Code                                       *
+.*                         - Admission Type                                   *
+.*                         - Health Fund                                      *
+.*                         - Helath Fund Group                                *
+.*                         - MBS Code                                         *
+.*                                                                            *
+.* Returns        : KEY30  - valid Key for MBS Exploding Mis.items            *
+.*                  EXIT   - Record not found                                 *
+.*                                                                            *
+. ******************************************************************************
+PATECHRD  MOVE      ZERO,EXIT
+.
+          UNPACK    KEY30,WKECCTYP,WKECATYP,WKECHFND,WKECHGRP,WKECMBSC
+.
+.         Set up HF Group for the HF code
+.         If HF is not blank, start search with HF code and blank HF Group
+.
+          MOVE      ONE,F1
+          MATCH     SP70,WKECHFND           * check for blank HF code
+          IF        !@EQUAL
+            MOVE      "0000",KEY4
+            PACK      KEY14,WKECHFND,KEY4,SP70
+            CALL      RDFUND1
+            IF        OVRCD=0
+              MOVE      PTHFHGRP,WKECHGRP   * HF Group
+             PACK       KEY30,WKECCTYP,WKECATYP,WKECHFND,WKECHGRP,WKECMBSC,SP70
+            ENDIF
+          ELSE
+.
+.       If HF code is blank, then start search with blank HF and blank HF Group
+.
+            MOVE      FOUR,F1
+          ENDIF
+.
+          MOVE      KEY30,DIM30             * save original key
+          MOVE      SP70,WKECHGRP           * start with blank HF Group
+.
+.         Claim code, Adm.type with HF Code, blank HF Group, MBS Code
+.
+PTECH100  PACK      KEY30,WKECCTYP,WKECATYP,WKECHFND,WKECHGRP,WKECMBSC,SP70
+          CALL      RSPTECH1                * Position on & read the exploding
+PTECH120  CALL      RKPTECH1                  charges file
+          BRANCH    OVRCD,PTECH200
+.
+          MATCH     WKECCTYP,PTECCTYP
+          GOTO      PTECH200 IF NOT EQUAL   * different claim code
+.
+          MATCH     WKECATYP,PTECATYP
+          GOTO      PTECH200 IF NOT EQUAL   * different admission type
+.
+          MATCH     WKECHFND,PTECHFND
+          GOTO      PTECH200 IF NOT EQUAL   * different health fund code
+          MATCH     WKECHGRP,PTECHGRP
+          GOTO      PTECH200 IF NOT EQUAL   * different health fund group
+.
+          MATCH     WKECMBSC,PTECMBSC
+          GOTO      PTECH980 IF EQUAL       * same MBS Code
+.
+PTECH200  BRANCH    F1,PTECH210,PTECH220,PTECH230:
+                       PTECH240,PTECH250
+          GOTO      PTECH900
+.
+.         Claim type, Admission type with Blank HF code and HF group
+.
+PTECH210  UNPACK    DIM30,WKECCTYP,WKECATYP,WKECHFND,WKECHGRP,WKECMBSC
+          MOVE      SP70,WKECHFND           * blank health fund code
+          MOVE      TWO,F1
+          GOTO      PTECH100
+.
+.         Claim type, Admission type with Blank HF code and blank HF Group
+.
+PTECH220  MOVE      SP70,WKECHFND           * blank health fund code
+          MOVE      SP70,WKECHGRP           * blank health fund group
+          MOVE      THREE,F1
+          GOTO      PTECH100
+.
+.         Claim type, blank Adm.type with HF code and blank HF group
+.
+PTECH230  UNPACK    DIM30,WKECCTYP,WKECATYP,WKECHFND,WKECHGRP,WKECMBSC
+.
+          MATCH     SP70,WKECHFND
+          GOTO      PTECH250 IF EQUAL       * blank HF code
+.
+          MOVE      SP70,WKECATYP           * blank admission type
+	  MOVE      SP70,WKECHGRP           * blank health fund group
+          MOVE      FOUR,F1
+          GOTO      PTECH100
+.
+.         Claim type, blank Adm.type with blank HF code and HF Group
+.
+PTECH240  UNPACK    DIM30,WKECCTYP,WKECATYP,WKECHFND,WKECHGRP,WKECMBSC
+.
+          MOVE      SP70,WKECATYP           * blank admission type
+          MOVE      SP70,WKECHFND           * blank health fund code
+          MOVE      FIVE,F1
+          GOTO      PTECH100
+.
+.         Claim type, blank Adm.type with blank HF Code and blank HF Group
+.
+PTECH250  UNPACK    DIM30,WKECCTYP,WKECATYP,WKECHFND,WKECHGRP,WKECMBSC
+.
+          MOVE      SP70,WKECATYP           * blank admission type
+          MOVE      SP70,WKECHGRP           * blank health fund group
+          MOVE      SP70,WKECHFND           * blank health fund code
+          MOVE      SIX,F1
+          GOTO      PTECH100
+.
+PTECH900  MOVE      ONE,EXIT
+          GOTO      PTECH999
+.
+PTECH980  MOVE      ZERO,EXIT
+PTECH999  RETURN

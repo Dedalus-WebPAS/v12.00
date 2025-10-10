@@ -1,0 +1,810 @@
+.******************************************************************************
+.* System    :   Patient Management                                           *
+.* Program   :   IBAADT68                                                     *
+.* Desc      :   Update Complete Date on Past Future Actions                  *
+.******************************************************************************
+.* Date      :   06/12/2024                                                   *
+.* Author    :   J.Tan (Task 0945920)                                         *
+.* Function  :   This program updates the 'Complete Date' on 'past' Future    *
+.*               Actions where the Complete date is blank based on the search *
+.*               criteria                                                     *
+.*                                                                            *
+.* Modifications  :                                                           *
+.*                                                                            *
+.******************************************************************************
+.*      V11.05.01   26/02/2024  J.Tan            TSK 0945920                  *
+.*                  Added Header report                                       *
+.*      V11.05.00   06/12/2024  J.Tan            TSK 0945920                  *
+.*                  Created new                                               *
+.******************************************************************************
+.
+          INC       STD001FD
+.
+          INC       PATFN1FD/INC       * Health Fund File
+          INC       PATHGPFD/INC       * HF Group file
+          INC       PATINVFD/INC       * Patient Invoices
+          INC       PATFACFD/INC       * Future Action file
+          INC       PATCODFD/INC       * Patient codes file
+.
+.
+.         Temp filename includes
+.
+.
+. =========================================================================
+.         Program Variables
+. =========================================================================
+FACTYARR  DIM       3[99]    * Future Action code filter array (max 99)
+FACTYKEY  DIM       2        * Future Action code filter array size (keyin)
+FACTYSIZ  FORM      2        * Future Action code filter array size
+FACTYCNT  FORM      2        * Future Action code array counter
+.
+OGRPYARR  DIM       3[99]    * Occupational Code filter array (max 99)
+OGRPYKEY  DIM       2        * Occupational Code filter array size (keyin)
+OGRPYSIZ  FORM      2        * Occupational Code filter array size
+OGRPYCNT  FORM      2        * Occupational Code array counter
+.
+CFNAMEA   DIM       8        * Temp filename
+CMDLINE   DIM       100      * Command Line
+CODE      DIM       3        * Category Code
+CURRDATE  DIM       8        * Current Date
+DISPTDTE  DIM       10       * Display Date
+FORM12P2  FORM      12.2
+FILTHFND  DIM       6        * Filter Health Fund
+FILTHGRP  DIM       6        * Filter Health Fund group
+FILTZINV  DIM       1        * Filter Zero invoice balance
+
+DATOLDER  DIM       3
+DATESFLD  DATE      8
+TODATE    DIM       8        * Todate
+RECUPDT   FORM      6
+.
+IBCNUGST  FORM      1
+INCXFACT  DIM       1        * Include/Exclude Future Action Code
+INCXOGRP  DIM       1        * Include/Exclude Occupational Group
+.
+USERID    DIM       10
+ZERO8     INIT      "0000    "
+.
+.-------------------------------------------------------------------------
+PRGID     INIT      "IBAADT68"
+PRGNAM    INIT      "Update Complete Date on Past Future Action"
+VERSION   INIT      "V12.00.00"
+.-------------------------------------------------------------------------
++
+.******************************************************************************
+.*                           MAIN0000                                         *
+.*                  Main program loop                                         *
+.******************************************************************************
+.
+MAIN0000  CALL      INIT0000           * Initialisation and open files
+          BRANCH    EXIT,MAIN9999      * Failed
+.
+MAIN0100  CALL      OPTN0000           * Select options
+          BRANCH    COPTION,MAIN1000
+          GOTO      MAIN9999
+.
+MAIN1000  CALL      KFLD0000           * Keyin selection fields
+          BRANCH    EXIT,MAIN0100
+.
+          CALL      CONTQST            * Ok to Continue ?
+          BRANCH    CEXIT,MAIN8100:    * Yes
+                          MAIN1000:    * No
+                          MAIN0100     * Cancel
+          GOTO      MAIN9999
+.
+MAIN8100  CALL      UPDFAC00           * Process updating complete date
+          GOTO      MAIN9999
+.
+MAIN9999  CHAIN     PGM                * chain back to program
++
+.******************************************************************************
+.*                           INIT0000                 Called by: MAIN0000     *
+.*        Initialisation and open files                                       *
+.******************************************************************************
+INIT0000  CALL      DISPHEAD                * Display screen heading
+.
+          OPEN      CONTROLF,"controlf"     * Inpatient CONTROL File
+          READ      CONTROLF,ZERO;*85,IBCNUGST
+.
+          DISPLAY   *P56:24,"Opening ":
+                    *P64:24,"patcodes";     * Codes file
+          OPEN      PATCODE1,"patcodes"
+.
+          DISPLAY   *P64:24,"patfn1af"      * Health Fund Details
+          OPEN      PATFN1A1,"patfn1af"
+          OPEN      PATHGRP1,"pathgrpf"
+.
+          DISPLAY   *P64:24,"patinvrf"      * Patient Invoices
+          OPEN      PATINVR1,"patinvrf"
+.
+          DISPLAY   *P64:24,"patfactf";     * Visit Extension file
+          OPEN      PATFACT2,"patfactf"
+.
+          CALL      IBACLOCK
+          PACK      CURRDATE,CCC,CYY,CMM,CDD
+          REP       " 0",CURRDATE
+.
+INIT9999  RETURN
++
+.******************************************************************************
+.*                           OPTN0000                 Called by: MAIN0000     *
+.*        Get user options or exit                                            *
+.*                                                                            *
+.*        Returns:  EXIT = (0)  Valid option selected                         *
+.*                         (1)  Exit option selected                          *
+.******************************************************************************
+OPTN0000  DISPLAY   *P1:3,*EF,*P1:4,*V2LON,ZERO,*HOFF,". Exit":
+                    *P1:5,*V2LON,ONE,*HOFF,". Update Complete Date"
+.
+OPTN0500  KEYIN     *P1:8,*EL,"Select Option : ":
+                    *P17:8,*V2LON,COPTION
+.
+          COMPARE   ZERO,COPTION            * Exit selected ?
+          GOTO      OPTN9100 IF EQUAL       * Yes
+.
+          BRANCH    COPTION,OPTN1000
+.
+          BEEP
+          GOTO      OPTN0500
+.
+OPTN1000  MOVE      ZERO,EXIT
+          GOTO      OPTN9999
+.
+OPTN9100  MOVE      ONE,EXIT
+OPTN9999  RETURN
++
+.******************************************************************************
+.*                           KFLD0000                 Called by: MAIN0000     *
+.*        Input search criteria                                               *
+.******************************************************************************
+KFLD0000  MOVE      SP70,FILTHFND
+          MOVE      SP70,FILTHGRP
+          MOVE      SP70,FILTZINV
+.
+          CALL      KODT0000           * Keyin Date Older Option
+          BRANCH    EXIT,KFLD9999
+.
+          CALL      KFAC0000           * Keyin Future Action code
+          CALL      KOGR0000           * Keyin Occupational Group
+          CALL      KHFN0000           * Keyin Health fund
+          CALL      KFGR0000           * Keyin Health Fund group
+          CALL      KZBL0000           * Keyin zero invoice balance
+          CALL      KUSR0000           * keyin the User Id
+.
+KFLD9999  RETURN
+.
+.****************************************************************************
+.         Keyin Date Older option
+.         90 days, 180 days, 365 days
+.****************************************************************************
+KODT0000  DISPLAY   *P1:11,*EF,"Date Older than:";
+          MOVE      SP70,DATOLDER
+.
+KODT1000  KEYIN     *P23:11,*EL,DATOLDER;
+          PACK      DATOLDER,DATOLDER,SP70
+.
+          MOVE      CURRDATE,DATESFLD
+          MATCH     " 90",DATOLDER
+          IF        @EQUAL
+            SUB       " 90",DATESFLD
+          ELSE
+            MATCH   "180",DATOLDER
+            IF      @EQUAL
+              SUB       "180",DATESFLD
+            ELSE
+              SUB       "365",DATESFLD
+            ENDIF
+          ENDIF
+          MOVE      DATESFLD,TODATE
+.
+          UNPACK    TODATE,XCENT,XYEAR,XMON,XDAY
+          PACK      DISPTDTE,XDAY,SLASH,XMON,SLASH,XCENT,XYEAR
+.
+          MATCH     CURRDATE,TODATE
+          IF        !@LESS
+            DISPLAY   *P1:24,*EL,*B,*V2LON:
+                             "** From Date must be in the Past ** ";
+            CALL      HITENTER
+            GOTO      KODT1000
+          ENDIF
+          MOVE      ZERO,EXIT
+          GOTO      KODT9999
+.
+KODT9000  MOVE      ONE,EXIT
+KODT9999  RETURN
++
+.****************************************************************************
+.         Keyin Future Action code
+.****************************************************************************
+KFAC0000  DISPLAY   *P1:14,*EF,"Future Action Code  : "
+.
+KFAC1000  KEYIN     *P23:14,*EF,"I(N)clude or (E)xclude : ",INCXFACT
+          PACK      INCXFACT,INCXFACT,SP70
+          MATCH     ANSN,INCXFACT           * Include
+          IF        !@EQUAL
+            MATCH     ANSE,INCXFACT         * Exclude
+            IF        !@EQUAL
+              DISPLAY   *P1:24,*EL,*B,*V2LON,"* Invalid I(N)clude (E)xclude":
+                                             " value **";
+              CALL      HITENTER
+              GOTO      KFAC1000
+            ENDIF
+          ENDIF
+.
+          MOVE      ZERO,FACTYCNT      * Future Action code array counter
+          MOVE      ZERO,FACTYSIZ      * Future Action array size
+          MOVE      SP10,FACTYKEY      * Future Action array size keyin
+.
+          MOVE      ONE,F3
+          WHILE     F3 <= 99
+            PACK      FACTYARR[F3],SP70 * Clear Future Action Code array
+            ADD       ONE,F3
+          DO
+.
+          KEYIN     *P23:14,*EL,"Number of Future Action Code : ",FACTYKEY
+          MATCH     SP70,FACTYKEY
+          IF        @EOS | @EQUAL
+.
+.           Blank input; i.e. ALL selected
+.
+            DISPLAY   *P23:14,*EL,*V2LON,"All",*HOFF;
+            GOTO      KFAC9999
+          ENDIF
+.
+          MOVE      FACTYKEY,FACTYSIZ       * Zero Keyins
+          IF        FACTYSIZ < 1
+            GOTO      KFAC9999
+          ENDIF
+.
+          MOVE      ONE,FACTYCNT
+          DISPLAY   *P23:14,*EL;
+.
+KFAC2000  MOVE      "FA",CODE
+          MOVE      SP3,CKYIDEF3
+          MOVE      ZERO,CKYIMAND
+          MOVE      "14",EVERT
+          MOVE      "23",ECOL
+          CALL      PATCODKY
+.
+          IF        EXIT=1
+            MOVE      "All",TDESC
+          ELSE
+            IF        EXIT = 2
+              MOVE      ONE,EXIT         * \ Entered so abort
+              GOTO      KFAC9999
+            ENDIF
+          ENDIF
+          PACK      FACTYARR[FACTYCNT],ACODE,SP70
+.
+          DISPLAY   *P26:14,*EL," Added ",*P33:14,*V2LON,TDESC,*HOFF;
+          ADD       ONE,FACTYCNT
+.
+          COMPARE   FACTYSIZ,FACTYCNT
+          GOTO      KFAC2000 IF LESS
+          GOTO      KFAC2000 IF EQUAL
+.
+KFAC9999  RETURN
++
+.****************************************************************************
+.         Keyin Occupational Group
+.****************************************************************************
+KOGR0000  DISPLAY   *P1:15,*EF,"Occupational Group  : "
+.
+KOGR1000  KEYIN     *P23:15,*EF,"I(N)clude or (E)xclude : ",INCXOGRP
+          PACK      INCXOGRP,INCXOGRP,SP70
+          MATCH     ANSN,INCXOGRP           * Include
+          IF        !@EQUAL
+            MATCH     ANSE,INCXOGRP         * Exclude
+            IF        !@EQUAL
+              DISPLAY   *P1:24,*EL,*B,*V2LON,"* Invalid I(N)clude (E)xclude":
+                                             " value **";
+              CALL      HITENTER
+              GOTO      KOGR1000
+            ENDIF
+          ENDIF
+.
+          MOVE      ZERO,OGRPYCNT      * Occupational Group array counter
+          MOVE      ZERO,OGRPYSIZ      * Occupational Group array size
+          MOVE      SP10,OGRPYKEY      * Occupational Group array size keyin
+.
+          MOVE      ONE,F3
+          WHILE     F3 <= 99
+            PACK      OGRPYARR[F3],SP70 * Clear Occupational Group array
+            ADD       ONE,F3
+          DO
+.
+          KEYIN     *P23:15,*EL,"Number of Occupational Group : ",OGRPYKEY
+          MATCH     SP70,OGRPYKEY
+          IF        @EOS | @EQUAL
+.
+.           Blank input; i.e. ALL selected
+.
+            DISPLAY   *P23:15,*EL,*V2LON,"All",*HOFF;
+            GOTO      KOGR9999
+          ENDIF
+.
+          MOVE      OGRPYKEY,OGRPYSIZ       * Zero Keyins
+          IF        OGRPYSIZ < 1
+            GOTO      KOGR9999
+          ENDIF
+.
+          MOVE      ONE,OGRPYCNT
+          DISPLAY   *P23:15,*EL;
+.
+KOGR2000  MOVE      "w0",CODE
+          MOVE      SP3,CKYIDEF3
+          MOVE      ZERO,CKYIMAND
+          MOVE      "15",EVERT
+          MOVE      "23",ECOL
+          CALL      PATCODKY
+.
+          IF        EXIT=1
+            MOVE      "All",TDESC
+          ELSE
+            IF        EXIT = 2
+              MOVE      ONE,EXIT         * \ Entered so abort
+              GOTO      KOGR9999
+            ENDIF
+          ENDIF
+          PACK      OGRPYARR[OGRPYCNT],ACODE,SP70
+.
+          DISPLAY   *P26:15,*EL," Added ",*P33:15,*V2LON,TDESC,*HOFF;
+          ADD       ONE,OGRPYCNT
+.
+          COMPARE   OGRPYSIZ,OGRPYCNT
+          GOTO      KOGR2000 IF LESS
+          GOTO      KOGR2000 IF EQUAL
+.
+KOGR9999  RETURN
++
+.****************************************************************************
+.         Keyin Health Fund
+.****************************************************************************
+KHFN0000  MOVE      SP70,FILTHFND
+          MOVE      ZERO,EXIT
+.
+          KEYIN     *P1:16,*EL,"Health Fund         : ":
+                    *P26:16,*V2LON,FILTHFND;
+          RESET     FILTHFND
+          GOTO      KHFN9999 IF EOS
+.
+          ENDSET    FILTHFND
+          APPEND    SP70,FILTHFND
+          RESET     FILTHFND
+.
+          CMATCH    EXITCHAR,FILTHFND
+          GOTO      KHFN9000 IF EQUAL
+.
+          MATCH     SP70,FILTHFND
+          GOTO      KHFN9200 IF EQUAL
+.
+          PACK      KEY14,FILTHFND,ZERO8
+          CALL      RDFUND1
+          BRANCH    OVRCD,KHFN2000
+.
+          DISPLAY   *P26:16,*V2LON,FILTHFND,*P30:16,HFNAME;
+          GOTO      KHFN9999
+.
+KHFN2000  DISPLAY   *P1:24,*EL,*B,*V2LON,"Invalid Health Fund code.  "
+          CALL      HITENTER
+          GOTO      KHFN0000
+.
+KHFN9000  MOVE      ONE,EXIT        * exit char. entered
+          GOTO      KHFN9999
+.
+KHFN9200  MOVE      TWO,EXIT        * spaces entered
+          GOTO      KHFN9999
+.
+KHFN9999  RETURN
++
+.****************************************************************************
+.         Keyin Health Fund Group
+.****************************************************************************
+KFGR0000  MOVE      SP10,FILTHGRP
+          MOVE      ZERO,EXIT
+.
+          KEYIN     *P1:17,*EL,"Health Fund Group   : ":
+                    *P26:17,*V2LON,FILTHGRP;
+          ENDSET    FILTHGRP
+          APPEND    SP70,FILTHGRP
+          RESET     FILTHGRP
+.
+          MATCH     "All",FILTHGRP
+          GOTO      KFGR8000 IF EQUAL       * All HF group
+          MATCH     SP70,FILTHGRP
+          GOTO      KFGR8000 IF EQUAL       * All HF group
+.
+          PACK      KEY6,FILTHGRP
+          CALL      RDPAHGP1
+          BRANCH    OVRCD,KFGR2000
+.
+          DISPLAY   *P26:17,*V2LON,FILTHGRP,*P30:17,PTHGDESC;
+          GOTO      KFGR8000
+.
+KFGR2000  DISPLAY   *P1:24,*EL,*B,*V2LON,"Invalid Health fund Group code.  ";
+          CALL      HITENTER
+          GOTO      KFGR0000
+.
+KFGR8000  MOVE      ZERO,EXIT
+          GOTO      KFGR9999
+.
+KFGR9999  RETURN
++
+.****************************************************************************
+.         Keyin zero invoice balance
+.****************************************************************************
+KZBL0000  MOVE      "0",FILTZINV
+          KEYIN     *P1:18,*EL,"Zero $ Invoice Balance : ":
+                    *P26:18,FILTZINV
+          PACK      FILTZINV,FILTZINV,SP70
+.
+          REP       "yYnN",FILTZINV
+          MATCH     "Y",FILTZINV
+          GOTO      KZBL9999 IF NOT EQUAL
+.
+          MOVE      "1",FILTZINV
+.
+KZBL9999  RETURN
++
+.****************************************************************************
+.         Keyin user id
+.****************************************************************************
+KUSR0000  KEYIN     *P1:19,*EL,"User Id.               : ":
+                    *P26:19,*V2LON,USERID;
+          PACK      USERID,USERID,SP70
+          MATCH     SP70,USERID
+          GOTO      KUSR9500 IF EQUAL
+.
+          MOVE      ZERO,EXIT
+          GOTO      KUSR9999
+.
+KUSR9500  MOVE      ONE,EXIT
+KUSR9999  RETURN
++
+.******************************************************************************
+.*                           UPDFAC00                 Called by: MAIN0000     *
+.*        Update Complete date for the selected future action
+.******************************************************************************
+UPDFAC00  CALL      IBACLOCK
+          CALL      PRHD0000                 * Print header
+.
+          MOVE      ZERO,RECUPDT
+          MOVE      ZERO,EXIT
+          PACK      KEY19,SP70
+          CALL      RDSFACT2
+UPDFAC10  CALL      RDKFACT2
+          BRANCH    OVRCD,UPDFAC90
+.
+          MATCH     SP70,PTFCDTCP            * date completed
+          GOTO      UPDFAC10 IF NOT EQUAL    * not  blank
+.
+          MATCH     FADATE,TODATE            * Action  Date > To Date Range?
+          GOTO      UPDFAC90 IF LESS
+.
+          MATCH     SP70,PTFCINVN
+          GOTO      UPDFAC10 IF EQUAL        * blank invoice number
+.
+          CALL      FACD0000                * Filter Future Action code ?
+          BRANCH    EXIT,UPDFAC10
+.
+          CALL      OCGR0000                * Filter Occupational group ?
+          BRANCH    EXIT,UPDFAC10
+.
+          MATCH     SP70,FILTHFND            * Filter Health fund
+          GOTO      UPDFAC20 IF EQUAL
+.
+          MATCH     PTFCHFND,FILTHFND
+          GOTO      UPDFAC10 IF NOT EQUAL
+          GOTO      UPDFAC40
+.
+UPDFAC20  MATCH     "All",FILTHGRP           * Filter Health Fund group ?
+          GOTO      UPDFAC40 IF EQUAL
+          MATCH     SP70,FILTHGRP            * Filter Health Fund group ?
+          GOTO      UPDFAC40 IF EQUAL
+.           
+          PACK      KEY14,PTFCHFND,ZERO8
+          CALL      RDFUND1
+          BRANCH    OVRCD,UPDFAC10
+.
+          MATCH     PTHFHGRP,FILTHGRP
+          GOTO      UPDFAC10 IF NOT EQUAL
+.
+UPDFAC40  MATCH     "1",FILTZINV
+          GOTO      UPDFAC60 IF NOT EQUAL    * no zero invoice 
+.
+          MOVE      PTFCINVN,KEY8
+          CALL      RDINV1
+          BRANCH    OVRCD,UPDFAC10
+.
+          MATCH     "1",PTINCRST
+          GOTO      UPDFAC10 IF EQUAL        * Fully credited
+.
+          MOVE      ZERO,FORM12P2
+          MOVE      PINVAMT,FORM12P2
+          ADD       PINVPATA,FORM12P2
+          ADD       PINVHFDA,FORM12P2
+          ADD       PINVOTHA,FORM12P2
+          ADD       PINVJOUR,FORM12P2
+          ADD       PTINCRTT,FORM12P2
+          IF        IBCNUGST=2 | IBCNUGST=3
+            ADD       PTINGSTJ,FORM12P2
+          ENDIF
+.
+          COMPARE   ZERO,FORM12P2            * invoice balanced ?
+          GOTO      UPDFAC10 IF NOT EQUAL    * no, ignore invoice
+.
+UPDFAC60  PACK      PTFCDTCP,CCC,CYY,CMM,CDD            * date completed
+          REP       " 0",PTFCDTCP
+.
+          PACK      PTFCUDAT,CCC,CYY,CMM,CDD            * date record updated
+          REP       " 0",PTFCUDAT
+          CLOCK     TIME,PTFCUTIM                       * time record updated
+          MOVE      USERID,PTFCUUID
+          CALL      UPFACT2
+.
+          ADD       ONE,RECUPDT
+          GOTO      UPDFAC10
+.
+UPDFAC90  PRINT     *N,*1,"Number of Records Updated : ",RECUPDT:
+                    *N,*N,"*** End of Report ***",*N
+.
+UPDFAC99  RETURN
+.
+.******************************************************************************
+.*                                  PRHD0000                                  *
+.*                        Print Header                                        *
+.******************************************************************************
+PRHD0000  CALL      HEAD132
+.
+          UNPACK    TODATE,CCENT,CYEAR,CMON,CDAY
+          CALL      PACDATE
+.
+          MOVE      "No ",KEY3
+          MATCH     "1",FILTZINV            * zero invoice balance
+          IF        @EQUAL
+            MOVE      "Yes",KEY3
+          ENDIF
+.
+          PRINT     *N,"Date Older than           : ",CPCDATE
+.
+          CALL      PFAC0000                 * Print Future Action
+          CALL      POCG0000                 * Print Occupational group
+.
+          MATCH     SP70,FILTHFND
+          IF        !@EQUAL
+            PACK      KEY14,FILTHFND,ZERO8
+            CALL      RDFUND1
+            IF        OVRCD=0
+              PRINT     *N,"Health Fund               : ",HFNAME;
+            ELSE
+              PRINT     *N,"Health Fund               : ",FILTHFND;
+            ENDIF
+          ELSE
+            MATCH     "All",FILTHGRP
+            GOTO      PRHD4000 IF EQUAL
+            MATCH     SP70,FILTHGRP
+            GOTO      PRHD4000 IF EQUAL
+.
+            PACK      KEY6,FILTHGRP
+            CALL      RDPAHGP1
+            IF        OVRCD=0
+              PRINT     *N,"Health Fund Group         : ",PTHGDESC;
+            ELSE
+              PRINT     *N,"Health Fund Group         : ",FILTHGRP;
+            ENDIF
+            GOTO      PRHD6000
+.
+PRHD4000    PRINT     *N,"Health Fund Group         : All";
+          ENDIF
+.
+PRHD6000  PRINT     *N,"Zero $ Invoice Balance    : ",KEY3
+.
+          PRINT     *N,"Date               : ",CDATE:
+                    *N,"Time               : ",CTIMEIS:
+                    *N,"User ID            : ",USERID
+.
+PRHD9999  RETURN
++
+.******************************************************************************
+.         Print Future Action
+.******************************************************************************
+PFAC0000  PRINT     *N,"Future Action Code ";
+.
+          MOVE      "Include:",KEY8
+          MATCH     ANSE,INCXFACT
+          IF        @EQUAL
+            MOVE      "Exclude:",KEY8
+          ENDIF
+          PRINT     *20,KEY8;
+.
+          IF        FACTYCNT = 0
+            GOTO      PFAC8000           * ALL Future Action code selected
+          ENDIF
+.
+          IF        FACTYCNT = 2
+            MATCH     FACTYARR[ONE],SP70 * ALL Future Action code selected
+            GOTO      PFAC8000 IF EQUAL
+          ENDIF
+.
+          MOVE      ZERO,F3
+PFAC1000  ADD       ONE,F3
+.
+          MATCH     SP70,FACTYARR[F3]
+          IF        !@EQUAL
+            PRINT     *29,FACTYARR[F3];
+            MOVE      "FA",KEY2
+            PACK      KEY5,KEY2,FACTYARR[F3],SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              PRINT     *33,TDESC;
+            ENDIF
+            PRINT     *N;
+          ENDIF
+.
+          COMPARE   FACTYCNT,F3
+          GOTO      PFAC1000 IF LESS
+          GOTO      PFAC9999
+.
+PFAC8000  PRINT     *29,"All"
+.
+PFAC9999  RETURN
++
+.******************************************************************************
+.        Print Occupational group
+.******************************************************************************
+POCG0000  PRINT     *N,"Occupational Group ";
+.
+          MOVE      "Include:",KEY8
+          MATCH     ANSE,INCXOGRP
+          IF        @EQUAL
+            MOVE      "Exclude:",KEY8
+          ENDIF
+          PRINT     *20,KEY8;
+.
+          IF        OGRPYCNT = 0
+            GOTO      POCG8000           * ALL Occupational Group selected
+          ENDIF
+.
+          IF        OGRPYCNT = 2
+            MATCH     OGRPYARR[ONE],SP70 * ALL Occupational Group selected
+            GOTO      POCG8000 IF EQUAL
+          ENDIF
+.
+          MOVE      ZERO,F3
+POCG1000  ADD       ONE,F3
+.
+          MATCH     SP70,OGRPYARR[F3]
+          IF        !@EQUAL
+            PRINT     *29,OGRPYARR[F3];
+            MOVE      "w0",KEY2
+            PACK      KEY5,KEY2,OGRPYARR[F3],SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              PRINT     *33,TDESC;
+            ENDIF
+            PRINT     *N;
+          ENDIF
+.
+          COMPARE   OGRPYCNT,F3
+          GOTO      POCG1000 IF LESS
+          GOTO      POCG9999
+.
+POCG8000  PRINT     *29,"All"
+.
+POCG9999  RETURN
++
+.******************************************************************************
+.* FACD0000 Check Future Action code exists in filter array                   *
+.*                                                                            *
+.*        Parameter:                                                          *
+.*          FACTYARR - Future Action code                                     *
+.*                                                                            *
+.*        Return:                                                             *
+.*              EXIT : 0 - Exists                                             *
+.*                     1 - Does NOT exist                                     *
+.******************************************************************************
+FACD0000  IF        FACTYCNT = 0
+            GOTO      FACD9000           * ALL Future Action selected
+          ENDIF
+.
+          IF        FACTYCNT = 2
+            MATCH     FACTYARR[ONE],SP70 * ALL Future Action selected
+            GOTO      FACD9000 IF EQUAL
+          ENDIF
+.
+          MOVE      ZERO,F3
+FACD1000  ADD       ONE,F3
+.
+          MATCH     SP70,FACTYARR[F3]
+          IF        !@EQUAL
+            MATCH     FACTYARR[F3],FACODE   * Do not select blank
+            GOTO      FACD9000 IF EQUAL     * when all is not selected
+          ENDIF
+.
+          COMPARE   FACTYCNT,F3
+          GOTO      FACD1000 IF LESS
+.
+          GOTO      FACD9100
+.
+FACD9000  MATCH     ANSE,INCXFACT   * Exclude
+          IF        @EQUAL
+            MOVE      ONE,EXIT      * Future Action code exists exclude
+          ELSE
+            MOVE      ZERO,EXIT     * Future Action code exists include
+          ENDIF
+          GOTO      FACD9999
+.
+FACD9100  MATCH     ANSE,INCXFACT    * Exclude
+          IF        @EQUAL
+            MOVE      ZERO,EXIT      * Future Action code does NOT exists include
+          ELSE
+            MOVE      ONE,EXIT       * Future Action code does NOT exist exclude
+          ENDIF
+          GOTO      FACD9999
+.
+FACD9999  RETURN
++
+.******************************************************************************
+.* OCGR0000 Check Occupational Group (code) exists in filter array            *
+.*                                                                            *
+.*        Parameter:                                                          *
+.*          OGRPYARR - Occupational Group                                     *
+.*                                                                            *
+.*        Return:                                                             *
+.*              EXIT : 0 - Exists                                             *
+.*                     1 - Does NOT exist                                     *
+.******************************************************************************
+OCGR0000  IF        OGRPYCNT = 0
+            GOTO      OCGR9000           * ALL Occupational Group selected; bypass check
+          ENDIF
+.
+          IF        OGRPYCNT = 2
+            MATCH     OGRPYARR[ONE],SP70 * ALL Occupational Group selected
+            GOTO      OCGR9000 IF EQUAL
+          ENDIF
+.
+          MOVE      ZERO,F3
+OCGR1000  ADD       ONE,F3
+.
+          MATCH     SP70,OGRPYARR[F3]
+          IF        !@EQUAL
+            MATCH     OGRPYARR[F3],PTFCOCGR * Do not select blank
+            GOTO      OCGR9000 IF EQUAL     * when all is not selected
+          ENDIF
+.
+          COMPARE   OGRPYCNT,F3
+          GOTO      OCGR1000 IF LESS
+.
+          GOTO      OCGR9100
+.
+OCGR9000  MATCH     ANSE,INCXOGRP   * Exclude
+          IF        @EQUAL
+            MOVE      ONE,EXIT      * Occupational Group exists exclude
+          ELSE
+            MOVE      ZERO,EXIT     * Occupational Group exists include
+          ENDIF
+          GOTO      OCGR9999
+.
+OCGR9100  MATCH     ANSE,INCXOGRP   * Exclude
+          IF        @EQUAL
+            MOVE      ZERO,EXIT     * Occupational Group does NOT exist Include
+          ELSE 
+            MOVE      ONE,EXIT      * Occupational Group does NOT exist exclude
+          ENDIF
+          GOTO      OCGR9999
+.
+OCGR9999  RETURN
++
+. =========================================================================
+.         I/O Includes
+. =========================================================================
+.
+          INC       STD001IO
+          INC       PATCODKY
+          INC       PATFN1IO/INC       * Health Fund File
+          INC       PATHGPIO/INC       * HF Group file
+          INC       PATINVIO/INC       * Patient Invoices
+          INC       PATFACIO/INC       * Future Action file
+          INC       PATCODIO/INC       * Patient codes file
+.
+.

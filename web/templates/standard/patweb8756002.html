@@ -1,0 +1,88 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript">
+function Add() {
+  var p = document.AddForm;
+  if (validateMandatory(p)) {
+  
+    if (CheckDateRange(p.pmhat004,p.pmhat005)) {
+        p.submit();
+    }
+  }
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);">
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon"
+ src="../images/ExitIcon.gif" onclick="DFrameExit();">
+Health Fund %PATWEB87.56.203 - CWO MV DRG
+</span>
+<div id=PageBodySection>
+<form name=AddForm method=post action=patweb87.pbl>
+<input type=hidden name=reportno value="56">
+<input type=hidden name=template value="002">
+<input type=hidden name=updttype value="A">
+<input type=hidden name=ibcnmhos value="%STANDARD.01.025.000.043.1.1">
+<input type=hidden name=hfund001 value="%PATWEB87.56.203">
+<input type=hidden name=pmhat001 value="%PATWEB87.56.006.0">
+<input type=hidden name=pmhat002 value="001">
+
+<table width=90% border=0 cellspacing=0 cellpadding=2 align=center>
+<tr id=trHospital>
+  <td class=DataLabel>Hospital</td>
+  <td><input type=text title="Hospital ID" name=d_pmhat001 id=d_pmhat001
+         class=Readonly readonly value="%PATWEB87.56.006.1">
+  </td>
+</tr>
+
+<tr><td class=DataLabel>Discharge DRG</td>
+    <td colspan=5><input type=text name=ddrgcode id=pmcmt011
+      size=8 title='DRG Code' class=Mandatory
+       onchange='validateCode(5,AddForm.ddrgcode,AddForm.n_ddrgcode);'>
+      <input type=text name=n_ddrgcode id=n_ddrgcode size=30 title='DRG Description'>
+      <img src="../images/SearchIcon.gif" class="Icon" alt="Search"
+       onclick='DrgSearchFrame(AddForm.ddrgcode,AddForm.n_ddrgcode);'>
+    </td>
+</tr>
+
+<tr><td class=DataLabel>Active</td>
+   <td><input type=checkbox name=pmhat014 value="1" checked
+        title="Active">
+    </td></tr>
+
+<tr>
+  <td class=DataLabel width=30%>Effective From Date</td>
+  <td><input type="text" name=pmhat004 id=pmhat004 class=Mandatory
+       title="Effective From Date" size="12" maxlength="11"
+       onblur="checkDate(this);">
+      <img src="../images/DateLookup.gif" class=Icon
+       onclick="DateLookupFrame(pmhat004);">
+</tr>
+<tr>
+  <td class=DataLabel>Effective To Date</td>
+  <td><input type="text" name=pmhat005 id=pmhat005
+       title="Effective To Date" size="12" maxlength="11" 
+       onblur="checkDate(this);">
+      <img src="../images/DateLookup.gif" class=Icon
+       onclick="DateLookupFrame(pmhat005);">
+</tr>
+<tr>
+  <td colspan=5 align=center>
+    <input type=button value="Add" class="button" onclick="Add();">
+    <input type=button Value="Close" class="button" onclick="DFrameExit();">
+  </td>
+</tr>
+</table>
+</form>
+</div>
+
+<script type="text/javascript">
+if (document.AddForm.ibcnmhos.value == "0") {
+  document.getElementById('trHospital').style.display = "none";
+}
+
+</script>

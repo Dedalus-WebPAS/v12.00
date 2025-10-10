@@ -1,0 +1,150 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript">
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);">
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon" 
+ src="../images/ExitIcon.gif" onclick="DFrameExit();">
+WebServices NIHC MyHR Response Details &nbsp;&nbsp; %COMWEB06.11.002
+</span>
+
+<div id=PageBodySection style="overflow: auto;">
+<table border=0 width=100% cellspacing=0 cellpadding=0>
+<form name=SelectCode action=comweb06.pbl method=get">
+<input type=hidden name=reportno value=11>
+<input type=hidden name=template value=1>
+<input type=hidden name=ireqtype id=ireqtype value="%COMWEB06.11.101">
+<input type=hidden name=ireqcode id=ireqcode value="%COMWEB06.11.102">
+<input type=hidden name=ireqdate id=ireqdate value="%COMWEB06.11.103">
+<input type=hidden name=ireqtime id=ireqtime value="%COMWEB06.11.104">
+<input type=hidden name=urnumber id=urnumber value="%COMWEB06.11.003">
+<input type=hidden name=ptcnunet id=ptcnunet
+  value="%STANDARD.01.025.120.158.0.1">
+</form>
+</table>
+
+<table cellspacing=0 border=0 width=100%>
+  <tr><td class="DataLabel">&nbsp;</td></tr>
+  <tr><td class="DataLabel" width=25%>Request Type</td>
+      <td class="DataField">%COMWEB06.11.105</td>
+  </tr>
+  <tr><td class="DataLabel">Request Code</td>
+      <td class="DataField">%COMWEB06.11.106</td>
+  </tr>
+  <tr><td class="DataLabel">Request Date</td>
+      <td class="DataField">%COMWEB06.11.107.1</td>
+  </tr>
+  <tr><td class="DataLabel">Request Time</td>
+      <td class="DataField">%COMWEB06.11.108</td>
+  </tr>
+  <tr><td class="DataLabel">NIHC Error Message</td>
+      <td class="DataField">%COMWEB06.11.109</td>
+  </tr>
+  <tr><td class="DataLabel">Response Code</td>
+      <td class="DataField">%COMWEB06.11.110</td>
+  </tr>
+  <tr><td class="DataLabel">Response Code Description</td>
+      <td class="DataField">%COMWEB06.11.111</td>
+  </tr>
+  <tr><td class="DataLabel">Response Code Details</td>
+      <td class="DataField">%COMWEB06.11.112</td>
+  </tr>
+  <tr><td class="DataLabel">Status</td>
+      <td class="DataField">%COMWEB06.11.113</td>
+  </tr>
+  <tr><td class="DataLabel">Hospital ID</td>
+      <td class="DataField">%COMWEB06.11.114</td>
+  </tr>
+  <tr><td class="DataLabel">PasFacCd Hospital Code</td>
+      <td class="DataField">%COMWEB06.11.115</td>
+  </tr>
+  <tr><td class="DataLabel">Patient Id</td>
+      <td class="DataField">%COMWEB06.11.116</td>
+  </tr>
+  <tr><td class="DataLabel">MRN</td>
+      <td class="DataField">%COMWEB06.11.117</td>
+  </tr>
+  <tr><td class="DataLabel">Source Episode Id</td>
+      <td class="DataField">%COMWEB06.11.118</td>
+  </tr>
+  <tr><td class="DataLabel">Admission Date</td>
+      <td class="DataField">%COMWEB06.11.119.0</td>
+  </tr>
+  <tr><td class="DataLabel">Admission Reason</td>
+      <td class="DataField">%COMWEB06.11.120</td>
+  </tr>
+  <tr><td class="DataLabel">Discharge Date</td>
+      <td class="DataField">%COMWEB06.11.121.0</td>
+  </tr>
+  <tr><td class="DataLabel">Health Provider Identifier</td>
+      <td class="DataField">%COMWEB06.11.122</td>
+  </tr>
+  <tr><td class="DataLabel">Health Provider Identifier Auth Id</td>
+      <td class="DataField">%COMWEB06.11.123</td>
+  </tr>
+  <tr><td class="DataLabel">Episode Type</td>
+      <td class="DataField">%COMWEB06.11.124</td>
+  </tr>
+  <tr><td class="DataLabel">Episode Lifecycle ID</td>
+      <td class="DataField">%COMWEB06.11.125</td>
+  </tr>
+  <tr><td class="DataLabel">Consent Withdrawn</td>
+      <td class="DataField">%COMWEB06.11.126</td>
+  </tr>
+  <tr><td class="DataLabel">Ward</td>
+      <td class="DataField">%COMWEB06.11.127</td>
+  </tr>
+  <tr><td class="DataLabel">Room</td>
+      <td class="DataField">%COMWEB06.11.128</td>
+  </tr>
+  <tr><td class="DataLabel">Bed</td>
+      <td class="DataField">%COMWEB06.11.129</td>
+  </tr>
+  <tr><td class="DataLabel">Episode Date Created</td>
+      <td class="DataField">%COMWEB06.11.130.0<td>
+  </tr>
+  <tr><td class="DataLabel">Episode Date Modified</td>
+      <td class="DataField">%COMWEB06.11.131.0<td>
+  </tr>
+  <tr><td class="DataLabel">Date Created</td>
+      <td class="DataField">%COMWEB06.11.132.1<td>
+  </tr>
+  <tr><td class="DataLabel">Time Created</td>
+      <td class="DataField">%COMWEB06.11.133<td>
+  </tr>
+  <tr><td class="DataLabel">Created By</td>
+      <td class="DataField">%COMWEB06.11.134<td>
+  </tr>
+  <tr><td class="DataLabel">Date Updated</td>
+      <td class="DataField">%COMWEB06.11.135.1<td>
+  </tr>
+  <tr><td class="DataLabel">Time Created</td>
+      <td class="DataField">%COMWEB06.11.136<td>
+  </tr>
+  <tr><td class="DataLabel">Updated By</td>
+      <td class="DataField">%COMWEB06.11.137<td>
+  </tr>
+
+  <tr><td>&nbsp;</td></tr> 
+  <tr><td>&nbsp;</td></tr> 
+</table>
+
+<table width=100% bgcolor=#CCCCCC><tr>
+  <td align=center>
+  <input type=button value="Close" class="button"
+   onclick='DFrameExit();'>
+</td></tr>
+</table>
+</td></tr>
+</table>
+
+<table cellspacing=0 border=0 width=100%>
+  <tr><td class="DataLabel">&nbsp;</td></tr>
+</table>
+
+</div>

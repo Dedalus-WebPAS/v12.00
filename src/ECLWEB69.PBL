@@ -1,0 +1,2578 @@
+.----------------------------------------------------------------------
+.
+. Function      : Medicare WebServices DVAW DVRW Polling JSON Response
+.                 Server
+.
+. Modifications :
+.
+.----------------------------------------------------------------------
+. V12.00.01 05/05/2025  Peter Vela      Task 0939466
+.           Created Medicare WebServices DVAW DVRW Polling Response Server
+.----------------------------------------------------------------------
+          INC       IBAWEBDF    
+          INC       CHKDIGVR/INC
+          INC       EMRICDFD/INC
+          INC       EMRHISFD/INC 
+          INC       APSMASFD/INC
+          INC       AAEDE1FD/INC
+          INC       EMRLPCFD/INC
+          INC       EMRCONFD/INC                                       *I-50421
+          INC       EMRLOCFD/INC
+          INC       EMRSITFD/INC
+          INC       PATCALAG/INC
+          INC       PATDHEAD/INC
+          INC       ELTRONVR/INC
+          INC       EOCLNKFD/INC
+          INC       EOCREFFD/INC
+          INC       EMRVISFD/INC
+          INC       EMRCLIFD/INC
+          INC       EMRGRCFD/INC
+          INC       EMRPROFD/INC                                       *I-50421
+          INC       EMRUNKFD/INC
+          INC       IBADLABS/INC
+          INC       IBATMDFD/INC
+          INC       MEHDLSFD/INC
+          INC       NHIETHFD/INC
+          INC       NHIMASFD/INC
+          INC       OUTBB1FD/INC
+          INC       OUTBOAFD/INC
+          INC       OPRNURFD/INC
+          INC       PATCONFD/INC
+          INC       AAECONFD/INC   *****
+          INC       PATALRFD/INC   *****
+          INC       PMSALNFD/INC
+          INC       PATDO1FD/INC
+          INC       PATFN1FD/INC
+          INC       PATGO1FD/INC
+          INC       PATHSPFD/INC
+          INC       PMSCCDFD/INC
+          INC       PMSCEXFD/INC
+          INC       PMSHCPFD/INC
+          INC       PMSHCGFD/INC
+          INC       PMSHCPTD/INC
+          INC       PMSHCGTD/INC
+          INC       PMSIHIFD/INC
+          INC       PMSMDTFD/INC
+          INC       PMSMTXFD/INC
+          INC       PATIN1FD/INC
+          INC       PRIITMFD/INC
+          INC       PATITMFD/INC                                       *I-50421
+          INC       PATICDFD/INC                                       *I-50421
+          INC       PATICOFD/INC                                       *I-50421
+          INC       PATMA1FD/INC
+          INC       PATMI1FD/INC
+          INC       PMSPX2FD/INC
+          INC       PMSRELFD/INC              
+          INC       PMSTLEFD/INC   
+          INC       PATNIDFD/INC
+          INC       PATRE1FD/INC
+          INC       PATVADFD/INC
+          INC       PATVISFD/INC
+          INC       PMSVX1FD/INC                                       *I-55214
+          INC       PATWC1FD/INC 
+          INC       PMSWX1FD/INC
+          INC       PATWMAFD/INC
+          INC       PATWR1FD/INC
+          INC       PATWVEFD/INC
+          INC       SCRPSTFD/INC
+          INC       SCRSBGFD/INC
+          INC       SCRSLTFD/INC
+          INC       SCRMASFD/INC
+          INC       PATHGPFD/INC
+.
+          INC       EMRDCMFD/INC       
+          INC       OBSDETFD/INC                                       *I-54627
+          INC       OBSMTXFD/INC
+          INC       OBSMDTFD/INC
+          INC       EMRISMFD/INC 
+          INC       EMRINCFD/INC 
+          INC       EMRWFMFD/INC
+          INC       EMRVCDFD/INC
+          INC       EMRMTXFD/INC
+          INC       EMRVPRFD/INC
+          INC       VISCMTFD/INC
+          INC       VISCODFD/INC
+          INC       VISMDTFD/INC
+          INC       VISXDCFD/INC
+          INC       EMRMANFD/INC 
+          INC       VISMTXFD/INC
+          INC       WEBB2BFD/INC
+          INC       WEBDVWFD/INC
+          INC       WEBDVAFD/INC
+          INC       WEBDVBFD/INC
+          INC       WEBDVDFD/INC
+          INC       WEBDVEFD/INC
+          INC       WEBDVFFD/INC
+          INC       WEBETRFD/INC
+          INC       WEBDVIFD/INC
+          INC       TFILEVAR/INC
+.
+          INC       PATATRFD/INC
+          INC       PATATRTD/INC
+.
+ANSLI     INIT      "i"
+ANSLW     INIT      "w"
+DAYDESC   DIM       9
+DEEXDATE  DIM       8
+DIM16     DIM       16
+DIM21     DIM       21
+DIM22     DIM       22
+DIM23     DIM       23
+DIM24     DIM       24
+DIM27     DIM       27
+DIM28     DIM       28
+DIM29     DIM       29
+DIM30     DIM       30
+DIM32     DIM       32
+DIM33     DIM       33
+DIM35     DIM       35
+DIM50     DIM       50
+DIM80     DIM       80
+DIM100    DIM       100
+DFNAME    DIM       60
+DSMOKE    DIM       3
+GATTIMER  FORM      3
+GETTOKF4  FORM      4
+GPFRMTNM  DIM       40
+LINEA17   DIM       17
+LINEB17   DIM       17
+LINEC17   DIM       17
+LINED17   DIM       17
+LINEE17   DIM       17
+LINEF17   DIM       17
+LINEG17   DIM       17
+LINEH17   DIM       17
+LINEI17   DIM       17
+LINEA37   DIM       37
+LINEB37   DIM       37
+LINEC37   DIM       37
+LINED37   DIM       37
+LINEE37   DIM       37
+LINEF37   DIM       37
+LINEG37   DIM       37
+LINEH37   DIM       37
+LINEI37   DIM       37
+TYPE4     INIT      "004"
+TYPE5     INIT      "005"
+SAVKEY5   DIM       5
+SAVENCOM  FORM      1
+SAVEDCOM  FORM      1
+SAVDOC    DIM       10
+SKEY8     DIM       8
+DOCTIME   DIM       8
+HOUR      DIM       2
+MEDINUMB  DIM       13
+MIN       DIM       2
+MONTHDES  DIM       9
+NUM3      FORM      3
+PTFRMTNM  DIM       40
+SEC       DIM       2
+MEDNOTES  DIM       70
+TEMPDATE  DIM       12
+.
+NEWCOUNT  FORM      10
+.
+ADLABEL   FORM      2
+ATT       DIM       80         * attribute string
+AFTDECP   FORM      2          * After Decimal Place
+AFTDECPF  FORM      2          * After Decimal Place Format String
+.
+BEFDECP   FORM      2          * Before Decimal Place
+BEFDECPF  FORM      2          * Before Decimal Place Format String
+BIRTHDAT  DIM       10            * formatted DOB variable
+.
+CALDAYS    FORM      3
+CDEFPRT2  DIM       6
+CHG       FORM      1
+CHKMNCNT  FORM      1          * check mandatory fields cycle counter
+CLAIMCOD  DIM       3
+CLMDET1   DIM       50
+CLMDET2   DIM       50
+CMDLINE   DIM       200
+CONTTYPE  DIM       1
+CONTTYP2  FORM      1
+COUNTER   FORM      1
+CPPAPER2  FORM      2
+CURRROW   FORM      3
+CODEDESC  DIM       100                                                *I-50421
+.
+DANS1     DIM       20
+DCASE     DIM       3
+DECIMALP  INIT      "."  
+DIM2L     DIM       2
+DIM3      DIM       3
+DIM6      DIM       6
+DIM4      DIM       4
+DIM5      DIM       5                                                  *I-54309
+DIM8      DIM       8             * U/R variable (spaces removed)
+DIM9      DIM       9
+DIM10     DIM       10 
+DIM10A    DIM       10
+DIM10B    DIM       10
+DIM11     DIM       11
+DIM11G    DIM       11            * given name variable for small labels
+DIM11S    DIM       11            * surname variable for small labels
+DIM12     DIM       12
+DIM14     DIM       14
+DIM15     DIM       15
+DIM17     DIM       17
+DIM18     DIM       18            * given name variable for large labels
+DIM20     DIM       20
+DIM25     DIM       25
+DIM31     DIM       31            * formatted address
+DIM60     DIM       60
+DOCTCODE  DIM       6
+BURNO     DIM       9
+BADMNO    DIM       9
+PTURNO    DIM       8             * U/R variable (spaces removed)
+PTADMNO   DIM       8             * Admission No variable (spaces removed)
+EDOCNAME  DIM       23
+PSURNAME  DIM       23
+PGIVNAME  DIM       23
+PCLMTYPD  DIM       20
+PADDRSS1  DIM       23 
+PADDRSS2  DIM       23
+PAGEYRS   DIM       4
+PGPNAME   DIM       30
+PRTLABL1  DIM       17
+PRTLABL2  DIM       20
+PRTLABL3  DIM       16
+PRTLABL4  DIM       15
+PRTLABL5  DIM       17
+PRTLABL6  DIM       24
+.
+EMRFLAG   FORM      1 
+EMRPREV   DIM       20 
+EMRSEEN   DIM       8
+EMRDOCT   DIM       13
+EMRINSUR  DIM       5
+EMRDESC   DIM       20
+EMRURNO   DIM       8
+ENDFLG    FORM      1
+.
+FIRSTCH   FORM      1                                                  *I-60700
+FIELDNO   FORM      5
+FORM1A    FORM      1                                                  *I-54627
+FORM1B    FORM      1                                                  *I-54627
+FORM3     FORM      3
+FORM3A    FORM      3                                                  *I-50421
+FORM5     FORM      5
+FORM21    FORM      21
+FORMAT21  FORM      21
+FRMPRINT  DIM       6
+.                                                                     *I-196463
+DIM3A     DIM       3
+DIM3B     DIM       3
+DIM15A    DIM       15
+DIM50A    DIM       50
+DIM80A    DIM       80
+.
+MBIRURNO  DIM       8
+MBIRTYOR  DIM       24
+.
+LINSREQD  FORM      5
+PAGENUMB  FORM      3
+PAGETOTL  FORM      3
+PAGEMAXL  FORM      3                       * Maximum lines per page
+PASSNO    FORM      1
+PGLINES   DIM       6
+PRINTEND  FORM      1
+.
+WFLINE3A  DIM       20
+WFLINE2A  DIM       20
+WFLINE8A  DIM       20
+WFLINE6A  DIM       20
+WFLINE4A  DIM       20
+WFLINE7A  DIM       20
+WFLINE5A  DIM       20
+WFLINE1A  DIM       20
+.
+HIGH14    DIM       4
+HIGH24    DIM       4
+HIGH34    DIM       4
+.HELPAGE   FORM      1
+.HELPRNT   FORM      3
+.HELSIZE   FORM      1
+.HEMR5COD  DIM       6            * Code for user defined stationary
+HEPMR5B   FORM      "1"          * Patient MR5 form sheet 1=Yes, 0=No
+.HEMR5L    FORM      "1"          * Layout for MR5.
+.                                  0 = Modbury
+.                                  1 = User Defined
+.
+IHINUMBR  DIM       20
+JYEAR     FORM      2
+.
+LASTROW   FORM      3
+LABSIZE   FORM      1
+LARGELAB  DIM       16
+SMALLLAB  DIM       21
+LBLPRINT  DIM       6
+LABELATT  DIM       80[24]
+LABELDAT  DIM       80[24]
+LABELTYP  DIM       10
+LLCNT     FORM      5
+LEFTBRAK  INIT      "(" 
+LINE60    DIM       60                                                 *I-60700
+.
+MANDINUR  FORM      1
+MADESC    DIM       3
+MODE4     DIM       4
+.
+NEGOFSET  DIM       8             * U/R variable (spaces removed)
+NMPNUMB   DIM       20
+NOLABEL   FORM      3
+NOTEFILT  DIM       3
+.
+OPFLG     FORM      1
+.
+PRDGFLAG  FORM      1
+PRINTVAR  DIM       80
+PRNTSTRT  FORM      3
+PRIDSYET  FORM      1
+.
+QADD1     DIM       25
+QADD2     DIM       25
+QADD4     DIM       15
+QGNAME    DIM       14
+QLOCDOC   DIM       30
+QMEDI     DIM       10
+QOCCUP    DIM       14
+QPOST     DIM       4
+QSAGE     FORM      3
+QSEX      DIM       1
+QSNAME    DIM       15
+QSUBRB    DIM       15
+QTELEP    DIM       12
+QTITL     DIM       4
+.
+RESPONSD  DIM       3             * Cat EZ code for doctor responsible
+RESPONSN  DIM       3             * Cat EZ code for nurse responsible
+RESPONSC  DIM       3             * Cat EZ code for psc responsible
+REFDEVF6  FORM      6
+.
+RTAOVRCD  FORM      1
+.
+SAVTYP    DIM       3
+SAVKEY35  DIM       35
+SAVKEY51  DIM       51
+SCRID     DIM       2
+SHRTBDAT  DIM       8
+SHRTMDAT  DIM       7
+SHRTVDAT  DIM       8
+SVSTNCOD  DIM       6
+STATNCOD  DIM       6
+SIT4      DIM       4
+SRC4      DIM       4
+.
+TEMPTRID  DIM       24
+TEMPMSID  DIM       36
+TRIDFILE  DIM       8
+MSIDFILE  DIM       8
+.
+UNIQF5    FORM      5
+VADESC    DIM       3
+VARIABLE  DIM       127
+VISITDAT  DIM       10            * formatted emergency visit date variable
+VISITNUM  DIM       8             * emergency visit number variable
+VISNOTES  DIM       100
+.
+WAITTIME  FORM      4
+WCDESC    DIM       3
+WCNAME    DIM       20
+WDATE1    DIM       8
+WDATE2    DIM       8
+XPRIDIAG  DIM       6      * Primary Diagnosis
+XADDIAG1  DIM       6      * Additional Diagnosis 1
+.
+VISXDCIN  FORM      1
+.
+ANSHP     INIT      "HP"
+ANSPP     INIT      "PP"
+CODEA     INIT      "A "
+CODEA1    INIT      "A1"
+CODEA2    INIT      "A2"
+CODEA3    INIT      "A3"
+CODEA4    INIT      "A4"
+CODEA5    INIT      "A5"
+CODEA6    INIT      "A6"
+CODEA7    INIT      "A7"
+CODEA8    INIT      "A8"
+CODEAA    INIT      "AA"
+CODEAE    INIT      "AE"
+CODEAI    INIT      "AI"
+CODEAP    INIT      "AP"
+CODEAR    INIT      "AR"
+CODECL    INIT      "CL"
+CODEC     INIT      "C "
+CODECC    INIT      "CC"
+CODECT    INIT      "ct"
+CODEEA    INIT      "EA"
+CODEES    INIT      "ES"
+CODEEP    INIT      "EP"
+CODEED    INIT      "ED"
+CODEEW    INIT      "EW"
+CODEEZ    INIT      "EZ"
+CODEH1    INIT      "H1"
+CODEH2    INIT      "H2"
+CODEH3    INIT      "H3"
+CODEM     INIT      "M "
+CODEP     INIT      "P "
+CODEP1    INIT      "P1"
+CODEP2    INIT      "P2"
+CODEP3    INIT      "P3"
+CODEP4    INIT      "P4"
+CODEP5    INIT      "P5"
+CODEP6    INIT      "P6"
+CODER     INIT      "R "
+CODERA    INIT      "RA"
+CODET     INIT      "T "
+CODEU1    INIT      "U1"
+CODEV6    INIT      "V6"
+CODEV7    INIT      "V7"
+CODEV8    INIT      "V8"
+CODES     INIT      "S "
+CATcw     INIT      "cw"
+CATEA     INIT      "ea"
+CATEB     INIT      "eb"
+CATEC     INIT      "ec"
+CATED     INIT      "ed"
+CATEE     INIT      "ee"
+CATEF     INIT      "ef"
+CATEG     INIT      "eg"
+CATEH     INIT      "eh"
+CATEI     INIT      "ei"
+CATEJ     INIT      "ej"
+CATEK     INIT      "ek"
+CATEL     INIT      "el"
+CATEM     INIT      "em"
+CATEN     INIT      "en"
+CATEO     INIT      "eo"
+CATEP     INIT      "ep"
+CATEQ     INIT      "eq"
+CATER     INIT      "er"
+CATES     INIT      "es"
+CATET     INIT      "et"
+CATEU     INIT      "eu"
+CATEV     INIT      "ev"
+CATEW     INIT      "ew"
+CATEY     INIT      "ey"
+CATHP     INIT      "HP"
+CATLS     INIT      "LS"
+CATTC     INIT      "tc"
+CATWS     INIT      "ws"                                               *I-59548
+CATWT     INIT      "wt"
+CATWU     INIT      "wu"
+CATWQ     INIT      "wq"                                               *I-59548
+CATWR     INIT      "wr"                                               *I-59548
+CATW0     INIT      "w0"
+DASH      INIT      "-"
+OTHER     INIT      "Other"
+SP12      INIT      "            "
+SP127     INIT      "                                          ":
+                    "                                          ":
+                    "                                           "
+SP40      INIT      "                                       "
+X27       INIT      "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
+X100      INIT      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX":
+                    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+ZERO4     INIT      "0000"
+.
+CARET     INIT      "^"
+MJAN      INIT      "January"
+MFEB      INIT      "February"
+MMAR      INIT      "March"
+MAPR      INIT      "April"
+MMAY      INIT      "May"
+MJUN      INIT      "June"
+MJUL      INIT      "July"
+MAUG      INIT      "August"
+MSEP      INIT      "September"
+MOCT      INIT      "October"
+MNOV      INIT      "November"
+MDEC      INIT      "December"
+.
+. webServices PRODA Variables
+.
+WBSPROPF  FILE      ASCII,FIXED=256
+WBSACTVF  FILE      ASCII,FIXED=256
+WBSTOKNF  FILE      ASCII,FIXED=256
+WBSACTIF  FILE      ASCII,FIXED=256
+WBSTOKIF  FILE      ASCII,FIXED=256
+WBSACTEF  FILE      ASCII,FIXED=256
+WBSTRIDF  FILE      ASCII,FIXED=256
+WBSMSIDF  FILE      ASCII,FIXED=256
+WBSIHCRF  FILE      ASCII,FIXED=500
+.
+PRODAIND  DIM       1
+.
+PRDAPATH  DIM       120
+ACTVPATH  DIM       120
+TOKNPATH  DIM       120
+ACTIPATH  DIM       120
+TOKIPATH  DIM       120
+ACTEPATH  DIM       120
+TRIDPATH  DIM       120
+MSIDPATH  DIM       120
+.
+PRDAFILE  INIT      "webPAS_PRODA.properties"
+ACTVFILE  INIT      "webPAS_PRODA_ActivateDevice_curl_response"
+TOKNFILE  INIT      "webPAS_PRODA_GetAccessToken_curl_response"
+ACTIFILE  INIT      "webPAS_PRODA_ActivateDevice_curl_response_indicator"
+TOKIFILE  INIT      "webPAS_PRODA_GetAccessToken_curl_response_indicator"
+ACTEFILE  INIT      "webPAS_PRODA_ActivateDevice_curl_expiry_indicator"
+.
+WBSACTIN  DIM       1
+WBSTOKIN  DIM       1
+WBSACTE1  DIM       1
+WBSACTE2  DIM       1
+WBSACTE3  DIM       1
+.
+OPENBRAC  DIM       1
+CLOSBRAC  DIM       1
+.
+DEVISLAB  DIM       20
+KEYSTLAB  DIM       17
+KEYEXLAB  DIM       17
+DEVIXLAB  DIM       20
+.
+DEVISVAL  DIM       6
+KEYSTVAL  DIM       6
+KEYEXVAL  DIM       19
+DEVIXVAL  DIM       19
+.
+ACCTKLAB  DIM       16
+ACCTKVAL  DIM       837
+ACCDELAB  DIM       30
+ACCDEVAL  DIM       19
+ACCKELAB  DIM       16
+ACCKEVAL  DIM       19
+ACCTTLAB  DIM       16
+ACCTTVAL  DIM       6
+ACCEILAB  DIM       15
+ACCEIVAL  DIM       4
+.
+. ----- WebServices B2B Device Properties -----
+.
+WBSPROID  DIM       60                * Product ID
+WBSJKSLO  DIM       60                * JKS/Certificate File Location
+WBSPRORG  DIM       60                * PRODA Organisation ID
+WBSDVNAM  DIM       60                * Device Name
+WBSCLIID  DIM       60                * Client ID
+WBSACTAU  DIM       60                * Access Token Audience
+WBSACTVC  DIM       60                * Activation Code
+WBSDACUR  DIM       60                * Device Activation URL
+WBSDAUUR  DIM       60                * Device Authentication URL
+WBSRDKUR  DIM       60                * Refresh Device Key URL
+WBSWSCLI  DIM       60                * WebServices Claiming Client Id
+WBSLOCAT  DIM       60                * Location Id
+WBSNOTEM  DIM       60                * Notification Email
+.
+WBSPILAB  DIM       17                * Product ID Label
+WBSJKLAB  DIM       20                * JKS File Location Label
+WBSPOLAB  DIM       18                * Proda Org Id Label
+WBSDNLAB  DIM       18                * Device Name Label
+WBSCILAB  DIM       16                * Client ID Label
+WBSATLAB  DIM       27                * Access Token Audience Label
+WBSACLAB  DIM       22                * Activation Code Label
+WBSDALAB  DIM       27                * Device Activation URL Label
+WBSDULAB  DIM       31                * Device Authentication URL Label
+WBSRDLAB  DIM       27                * Refresh Device Key URL Label
+WBSWSLAB  DIM       27                * WebServices Claiming Client Id Label
+WBSLOLAB  DIM       18                * Location Id Label
+WBSNOLAB  DIM       25                * Notification Email Label
+.
+WBSRV001  DIM       60                * Product ID
+WBSRV002  DIM       60                * JKS/Certificate File Location
+WBSRV003  DIM       60                * PRODA Organisation ID
+WBSRV004  DIM       60                * Device Name
+WBSRV005  DIM       60                * Client ID
+WBSRV006  DIM       60                * Access Token Audience
+WBSRV007  DIM       60                * Activation Code
+WBSRV008  DIM       60                * Device Activation URL
+WBSRV009  DIM       60                * Device Authentication URL
+WBSRV010  DIM       60                * Refresh Device Key URL
+WBSRV011  DIM       60                * WebServices Claiming Client Id
+WBSRV012  DIM       60                * Location Id
+WBSRV013  DIM       60                * Notification Email
+.
+PROPFLNM  DIM       35 
+PROPFILE  FILE      ASCII,FIXED=256
+PROPLITR  INIT      ".properties"
+.
+DVREFLNM  DIM       36
+DVREFILE  FILE      ASCII,FIXED=500
+DVRELITR  INIT      "_dvrw_errors"
+.
+DVRELINE  DIM       500
+DVREINDC  DIM       1
+.
+DVRRFLNM  DIM       38
+DVRRFILE  FILE      ASCII,FIXED=500
+DVRRLITR  INIT      "_dvrw_response"
+.
+DVRRLINE  DIM       500
+DVRRWORK  DIM       500
+.
+JSONCODE  DIM       4
+JSONTEXT  DIM       500
+.
+WEBDVIIN  DIM       1
+.
+. PROGRAM CONSTANTS
+. -----------------
+.
+. Site specific soft font (16602). Change to this when delivery to site
+.
+ARIAL10N  INIT      "(8U(s1p10.00v0s0b16602T"  * Arial 10pt font/normal
+ARIAL10B  INIT      "(8U(s1p10.00v0s3b16602T"  * Arial 10pt font/bold
+.
+.ARIAL10N  INIT      "(8U(s1p10.00v0s0b0T"     * Time Roman 10pt font/normal
+.ARIAL10B  INIT      "(8U(s1p10.00v0s3b0T"     * Time Roman 10pt font/bold
+.
+HORZT001  INIT      "&a1C"      * tab to column 1
+HORZT028  INIT      "&a28C"     * tab to column 28 
+HORZT049  INIT      "&a49C"     * tab to column 49 
+HORZT050  INIT      "&a50C"     * tab to column 50 
+HORZT057  INIT      "&a57C"     * tab to column 57
+HORZT082  INIT      "&a82C"     * tab to column 82 
+HORZT086  INIT      "&a86C"     * tab to column 86
+HORZT099  INIT      "&a99C"     * tab to column 99
+HORZT100  INIT      "&a100C"    * tab to column 100
+HORZT113  INIT      "&a113C"    * tab to column 113
+HORZT141  INIT      "&a141C"    * tab to column 141
+HORZT148  INIT      "&a148C"    * tab to column 148
+HORZT149  INIT      "&a149C"    * tab to column 149
+HORZT155  INIT      "&a155C"    * tab to column 155 
+HORZT170  INIT      "&a170C"    * tab to column 170 
+.
+LINESPAC  INIT      "&l6D"      * line spacing - 6 lines/inch
+.
+NBARCODE  INIT      "(6U(s0p6.25h18.0v0s-6b0T*"      * Barcode style
+.
+PRIRESET  INIT      "E"         * printer reset
+.
+TMARGIN   INIT      "&l1e68F"   * top margin - 1 line
+.                                   text length - 68 lines
+.
+.         Vertical movement is required for the barcode otherwise
+.         it will print above the top line of the large labels (verttab1/2)
+.
+VERTTAB1  INIT      "*p+30Y"    * move 30 PCL units down (for barcode)
+VERTTAB2  INIT      "*p-30Y"    * move 30 PCL units up (for barcode)
+VERTTAB3  INIT      "*p+5Y"     * move 5  PCL units up (vertical space between
+VERTTAB5  INIT      "*p+5Y"     * move 2  PCL units up (vertical space between
+CONST1    INIT      "ED  UR"
+CONST2    INIT      "A/T"
+CONST3    INIT      "GP:"
+.-------------------------------------------------------------------------------
+NSETBOLD  INIT      "(s0bT"
+SETBOLD   INIT      "(s7bT"
+.
+ALRCOMM   DIM       100
+MULTILIN  FORM      1  
+.-------------------------------------------------------------------------------
+PRGID     INIT      "ECLWEB69"
+VERSION   INIT      "V12.00.01"
+PRGNAM    INIT      "Medicare WebServices DVAW DVRW Polling Response Server"
+.--------------------------------------------------------------------------------
+.
+          CALL      WEBINT00       * Initialise Fifo Etc.
+.
+          CALL      INIT0000       * Open Files
+.
+MAIN0000  COMMIT
+.
+          BEGIN
+.
+          DISPLAY   *W2
+.
+          MATCH     "1",PTCNWSIN
+          GOTO      MAIN0000 IF NOT EQUAL
+.
+          MATCH     "1",PTCNDVAW
+          GOTO      MAIN0000 IF NOT EQUAL
+.
+          MOVE      ZERO,EXIT
+.
+          PACK      KEY51,ZERO,TWENTY,SP70
+          CALL      RSWBETR1
+MAIN1000  CALL      RKWBETR1
+          BRANCH    OVRCD,MAIN9999
+.
+          MATCH     "0",WBETSTAT
+          GOTO      MAIN9999 IF NOT EQUAL
+.
+          MATCH     "20",WBETTYPE
+          GOTO      MAIN9999 IF NOT EQUAL
+.
+          PACK      KEY17,WBETINVN,WBETBATN,WBETMODL,SP70
+          CALL      RDWBDVW2
+          BRANCH    OVRCD,MAIN1000
+.
+          MATCH     WBDWTRID,WBETTRID
+          IF        !@EQUAL
+.
+            PACK      KEY51,WBETSTAT,WBETTYPE,WBETLOCN,WBETCDTE,WBETCTIM:
+                      WBETTRID,SP70
+            CALL      RDWBETR1
+.
+            MOVE      "E",WBETSTAT
+.
+            CALL      IBACLOCK
+            PACK      WBETUDTE,CCC,CYY,CMM,CDD
+            REP       " 0",WBETUDTE
+            MOVE      CTIMEIS,WBETUTIM
+            MOVE      USERID,WBETUUID
+            CALL      UPWBETR1
+.
+            GOTO      MAIN1000
+.
+          ENDIF
+.
+          PACK      KEY71,WBDWHOSP,SP70          * Read B2B Device Table
+          CALL      RSWBB2B3
+          CALL      RKWBB2B3
+          BRANCH    OVRCD,MAIN1000
+.
+          MATCH     WBDWHOSP,WBB2HOSP            * Same Hospital
+          GOTO      MAIN1000 IF NOT EQUAL
+.
+          MATCH     "ACTIVE",WBB2DSTA            * Device Active
+          GOTO      MAIN1000 IF NOT EQUAL
+.
+          MATCH     SP70,WBB2DPTH
+          GOTO      MAIN1000 IF EQUAL
+.
+          CALL      PROPN000                     * Valid Properties File?
+.
+          MATCH     "1",PRODAIND
+          GOTO      MAIN1000 IF EQUAL
+.
+          PACK      SAVKEY51,WBETSTAT,WBETTYPE,WBETLOCN,WBETCDTE,WBETCTIM:
+                             WBETTRID,SP70
+.
+          OPEN      WBSPROPF,PRDAPATH
+.
+. Parse _dvrw_response file (DVAW DVRW Response JSON file)
+. ************************************************************
+.
+MAIN2000  CLEAR     CMDLINE
+          APPEND    WBB2DPTH,CMDLINE
+          RESET     CMDLINE
+          STRIP     CMDLINE
+          ENDSET    CMDLINE
+          APPEND    "/webPAS_claims/dvrw/",CMDLINE
+          RESET     CMDLINE
+          STRIP     CMDLINE
+          ENDSET    CMDLINE
+          APPEND    WBETSTRD,CMDLINE
+          APPEND    DVRRLITR,CMDLINE
+          RESET     CMDLINE
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      DVRRFILE,CMDLINE
+          TRAPCLR   IO
+          IF        OVRCD=1
+            GOTO      MAIN3000
+          ENDIF
+.
+          CALL      DVRPRS00                   * Parse DVAW DVRW Response JSON
+.
+          GOTO      MAIN8000
+.
+. Parse _dvrw_errors file (DVAW DVRW Stderrs/Stdout file)
+. ******************************************************
+.
+MAIN3000  CLEAR     CMDLINE
+          APPEND    WBB2DPTH,CMDLINE
+          RESET     CMDLINE
+          STRIP     CMDLINE
+          ENDSET    CMDLINE
+          APPEND    "/webPAS_claims/dvrw/",CMDLINE
+          RESET     CMDLINE
+          STRIP     CMDLINE
+          ENDSET    CMDLINE
+          APPEND    WBETSTRD,CMDLINE
+          APPEND    DVRELITR,CMDLINE
+          RESET     CMDLINE
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      DVREFILE,CMDLINE
+          TRAPCLR   IO
+          IF        OVRCD=1
+            MOVE      "Response files not found.",DVRELINE  
+            GOTO      MAIN3500
+          ENDIF
+.
+MAIN3100  READ      DVREFILE,SEQ;DVRELINE
+          IF        @OVER
+            MOVE      "Refer to DVAW DVRW Details.",DVRELINE
+            GOTO      MAIN3500 
+          ENDIF
+.
+          SCAN      "error",DVRELINE
+          IF        @EQUAL
+            GOTO      MAIN3500
+          ENDIF
+.
+          GOTO      MAIN3100
+.
+MAIN3500  
+.         MOVE      "1",DVREINDC
+.
+          MOVE      WBDWINVN,WBDAINVN
+          CALL      IBACLOCK
+          PACK      WBDADATE,CCC,CYY,CMM,CDD
+          REP       " 0",WBDADATE
+          MOVE      CTIMEIS,WBDATIME
+          MOVE      WBDWBATN,WBDABATN
+          MOVE      THREE,WBDASTAT
+          MOVE      " 5",WBDATYPE
+          MOVE      SP70,WBDAOPER
+          MOVE      WBDWTRID,WBDATRID
+          MOVE      SP70,WBDAEROR
+          MOVE      DVRELINE,WBDAEROT
+          MOVE      WBDWMSID,WBDAMSID
+          MOVE      WBDWMODL,WBDAMODL
+          PACK      WBDASPAR,SP70,SP70
+.
+          PACK      KEY27,WBDAINVN,WBDADATE,WBDATIME,WBDATYPE,WBDAMODL,SP70
+          CALL      RAWBDVA1
+          IF        OVRCD=0
+            GOTO      MAIN3500
+          ENDIF
+.
+          TRAP      OVERCOND IF IO
+          CALL      WRWBDVA1
+          TRAPCLR   IO
+.
+          GOTO      MAIN8000
+.
+. ******************************************************************************
+.
+MAIN8000  PACK      KEY30,WBDWFLAG,WBDWHOSP,WBDWMODL,WBDWUNIQ,WBDWINVN:
+                          WBDWBATN,SP70
+          CALL      RDWBDVW7
+          IF        OVRCD=0
+.
+            MATCH     "1",DVREINDC
+            IF        @EQUAL
+              MOVE      THREE,WBDWFLAG
+            ENDIF
+
+            CALL      IBACLOCK
+            PACK      WBDWUDAT,CCC,CYY,CMM,CDD
+            REP       " 0",WBDWUDAT
+            MOVE      CTIMEIS,WBDWUTIM
+            MOVE      USERID,WBDWUUID
+            CALL      UPWBDVW7
+.
+          ENDIF
+.
+          PACK      KEY51,WBETSTAT,WBETTYPE,WBETLOCN,WBETCDTE,WBETCTIM:
+                    WBETTRID,SP70
+          CALL      RDWBETR1
+.
+          MOVE      "1",WBETSTAT
+.
+          CALL      IBACLOCK
+          PACK      WBETUDTE,CCC,CYY,CMM,CDD
+          REP       " 0",WBETUDTE
+          MOVE      CTIMEIS,WBETUTIM
+          MOVE      USERID,WBETUUID
+          CALL      UPWBETR1
+.
+MAIN9000  CLOSE     WBSPROPF
+          CLOSE     DVRRFILE
+          CLOSE     DVREFILE
+.
+          GOTO      MAIN1000
+.
+MAIN9999  CLOSE     WBSPROPF
+          CLOSE     DVRRFILE
+          CLOSE     DVREFILE
+.
+          GOTO      MAIN0000
++
+.------------------------------------------------------------
+.  Parse DVAW DVRW Response JSON
+.------------------------------------------------------------
+.
+DVRPRS00  MOVE      SP70,JSONCODE
+          PACK      JSONTEXT,SP70,SP70,SP70,SP70,SP70,SP70,SP70,SP70
+          MOVE      SP70,DVREINDC
+.
+DVRPRS01  READ      DVRRFILE,SEQ;DVRRLINE
+          GOTO      DVRPRS99 IF OVER
+.
+. ***********************************************************
+. Errors
+. ***********************************************************
+.
+          SCAN      "highestSeverity",DVRRLINE
+          IF        @EQUAL
+.
+.           MOVE      "1",DVREINDC
+.
+DVRPRS05    READ      DVRRFILE,SEQ;DVRRLINE
+            GOTO      DVRPRS90 IF OVER
+.
+.           *************************************************
+.           serviceMessage
+.           *************************************************
+.
+            SCAN      "serviceMessage",DVRRLINE
+            IF        @EQUAL
+.
+DVRPRS07      READ      DVRRFILE,SEQ;DVRRLINE
+              GOTO      DVRPRS20 IF OVER
+.
+.             ***********************************************
+.             {    
+.             ***********************************************
+.
+              SCAN      "{",DVRRLINE
+              IF        @EQUAL
+                MOVE      SP70,JSONCODE
+                PACK      JSONTEXT,SP70,SP70,SP70,SP70,SP70,SP70,SP70,SP70
+.
+                GOTO      DVRPRS07
+.
+              ENDIF
+.
+.             ***********************************************
+.             code
+.             ***********************************************
+.
+              SCAN      "#"code#"",DVRRLINE
+              IF        @EQUAL
+                RESET     DVRRLINE
+.               UNPACK    DVRRLINE,DIM14,JSONCODE
+.
+                SCAN      ":",DVRRLINE
+                IF        @EQUAL
+                  MOVE      DVRRLINE,DVRRWORK
+                  REP       ": ",DVRRWORK
+                  REP       "#" ",DVRRWORK
+                  LJUSTIFY  DVRRWORK
+                  MOVE      DVRRWORK,JSONCODE
+                  RESET     DVRRLINE
+                ENDIF
+.
+                GOTO      DVRPRS07
+.
+              ENDIF
+.
+.             ***********************************************
+.             text
+.             ***********************************************
+.
+              SCAN      "reason",DVRRLINE
+              IF        @EQUAL
+                RESET     DVRRLINE
+.               UNPACK    DVRRLINE,DIM16,JSONTEXT
+.
+                SCAN      ":",DVRRLINE
+                IF        @EQUAL
+                  MOVE      DVRRLINE,DVRRWORK
+                  REP       ": ",DVRRWORK
+                  REP       "#" ",DVRRWORK
+                  LJUSTIFY  DVRRWORK
+                  MOVE      DVRRWORK,JSONTEXT
+                  RESET     DVRRLINE
+                ENDIF
+.
+                REP       ", ",JSONTEXT
+                REP       "#" ",JSONTEXT
+.
+                GOTO      DVRPRS07
+.
+              ENDIF
+.
+.             ***********************************************
+.             }
+.             ***********************************************
+.
+              SCAN      "}",DVRRLINE
+              IF        @EQUAL
+.
+DVRPRS10        MOVE      WBDWINVN,WBDAINVN
+                CALL      IBACLOCK
+                PACK      WBDADATE,CCC,CYY,CMM,CDD
+                REP       " 0",WBDADATE
+                MOVE      CTIMEIS,WBDATIME
+                MOVE      WBDWBATN,WBDABATN
+                MOVE      THREE,WBDASTAT
+                MOVE      " 4",WBDATYPE
+                MOVE      SP70,WBDAOPER
+                MOVE      WBDWTRID,WBDATRID
+                MOVE      JSONCODE,WBDAEROR
+                MOVE      JSONTEXT,WBDAEROT
+                MOVE      WBDWMSID,WBDAMSID
+                MOVE      WBDWMODL,WBDAMODL
+                PACK      WBDASPAR,SP70,SP70
+.
+                PACK      KEY27,WBDAINVN,WBDADATE,WBDATIME,WBDATYPE,WBDAMODL:
+                                SP70
+                CALL      RAWBDVA1
+                IF        OVRCD=0
+                  GOTO      DVRPRS10
+                ENDIF
+.
+                TRAP      OVERCOND IF IO
+                CALL      WRWBDVA1
+                TRAPCLR   IO
+.
+                GOTO      DVRPRS07
+.
+              ENDIF
+.
+.             ***********************************************
+.             ]
+.             ***********************************************
+.
+              SCAN      "]",DVRRLINE
+              IF        @EQUAL
+                GOTO      DVRPRS20
+              ENDIF
+.
+              GOTO      DVRPRS07
+.
+            ENDIF
+.
+DVRPRS20    GOTO      DVRPRS05   
+.
+          ENDIF
+.
+. ***********************************************************
+. DHSEIN
+. ***********************************************************
+.
+          SCAN      "DHSEIN",DVRRLINE
+          IF        @EQUAL
+            MOVE      SP70,JSONCODE
+            RESET     DVRRLINE
+            UNPACK    DVRRLINE,JSONTEXT
+            REP       "#" ",JSONTEXT
+.
+.           MOVE      "1",DVREINDC
+.
+DVRPRS30    MOVE      WBDWINVN,WBDAINVN
+            CALL      IBACLOCK
+            PACK      WBDADATE,CCC,CYY,CMM,CDD
+            REP       " 0",WBDADATE
+            MOVE      CTIMEIS,WBDATIME
+            MOVE      WBDWBATN,WBDABATN
+            MOVE      THREE,WBDASTAT
+            MOVE      " 5",WBDATYPE
+            MOVE      SP70,WBDAOPER
+            MOVE      WBDWTRID,WBDATRID
+            MOVE      JSONCODE,WBDAEROR
+            MOVE      JSONTEXT,WBDAEROT
+            MOVE      WBDWMSID,WBDAMSID
+            MOVE      WBDWMODL,WBDAMODL
+            PACK      WBDASPAR,SP70,SP70
+.
+            PACK      KEY27,WBDAINVN,WBDADATE,WBDATIME,WBDATYPE,WBDAMODL,SP70
+            CALL      RAWBDVA1
+            IF        OVRCD=0
+              GOTO      DVRPRS30
+            ENDIF
+.
+            TRAP      OVERCOND IF IO
+            CALL      WRWBDVA1
+            TRAPCLR   IO
+.
+          ENDIF
+.
+. ***********************************************************
+. 401
+. ***********************************************************
+.
+          SCAN      "401",DVRRLINE
+          IF        @EQUAL
+            MOVE      "401 ",JSONCODE
+            RESET     DVRRLINE
+            UNPACK    DVRRLINE,JSONTEXT
+            REP       "#" ",JSONTEXT
+.
+.           MOVE      "1",DVREINDC
+.
+DVRPRS40    MOVE      WBDWINVN,WBDAINVN
+            CALL      IBACLOCK
+            PACK      WBDADATE,CCC,CYY,CMM,CDD
+            REP       " 0",WBDADATE
+            MOVE      CTIMEIS,WBDATIME
+            MOVE      WBDWBATN,WBDABATN
+            MOVE      THREE,WBDASTAT
+            MOVE      " 5",WBDATYPE
+            MOVE      SP70,WBDAOPER
+            MOVE      WBDWTRID,WBDATRID
+            MOVE      JSONCODE,WBDAEROR
+            MOVE      JSONTEXT,WBDAEROT
+            MOVE      WBDWMSID,WBDAMSID
+            MOVE      WBDWMODL,WBDAMODL
+            PACK      WBDASPAR,SP70,SP70
+.
+            PACK      KEY27,WBDAINVN,WBDADATE,WBDATIME,WBDATYPE,WBDAMODL,SP70
+            CALL      RAWBDVA1
+            IF        OVRCD=0
+              GOTO      DVRPRS40
+            ENDIF
+.
+            TRAP      OVERCOND IF IO
+            CALL      WRWBDVA1
+            TRAPCLR   IO
+.
+          ENDIF
+.
+. ***********************************************************
+. claimAssessment
+. ***********************************************************
+.
+          SCAN      "claimAssessment",DVRRLINE
+          IF        @EQUAL
+.
+            CALL      CLWEBDVD
+.
+            CALL      RKEY0000
+.
+DVRPRS50    READ      DVRRFILE,SEQ;DVRRLINE
+            GOTO      DVRPRS90 IF OVER
+.
+.           ***********************************************************
+.           medicalEvent
+.           ***********************************************************
+.
+            SCAN      "medicalEvent",DVRRLINE
+            IF        @EQUAL
+.
+              CALL      CLWEBDVE
+.
+DVR50EAA      READ      DVRRFILE,SEQ;DVRRLINE
+              GOTO      DVRPRS70 IF OVER
+.
+.             ***********************************************************
+.             service
+.             ***********************************************************
+.
+              SCAN      "service",DVRRLINE
+              IF        @EQUAL
+.
+                CALL      CLWEBDVF
+.
+DVR50BBB        READ      DVRRFILE,SEQ;DVRRLINE
+                GOTO      DVR50EAZ IF OVER
+.
+.         claimAssessment/medicalEvent/service
+.
+
+.
+.               ***********************************************
+.               numberOfPatientsSeen
+.               ***********************************************
+.
+                SCAN      "numberOfPatientsSeen",DVRRLINE
+                IF        @EQUAL
+                  RESET     DVRRLINE
+.                 UNPACK    DVRRLINE,DIM37,WBDFNOFP
+.
+                  SCAN      ":",DVRRLINE
+                  IF        @EQUAL
+                    MOVE      DVRRLINE,DVRRWORK
+                    REP       ": ",DVRRWORK
+                    REP       "#" ",DVRRWORK
+                    LJUSTIFY  DVRRWORK
+                    MOVE      DVRRWORK,WBDFNOFP
+                    RESET     DVRRLINE
+                  ENDIF
+.
+                  REP       "#" ",WBDFNOFP
+                  REP       ", ",WBDFNOFP
+                ENDIF
+.
+.               ***********************************************
+.               itemNumber
+.               ***********************************************
+.
+.                SCAN      "itemNumber",DVRRLINE
+.                IF        @EQUAL
+.                  RESET     DVRRLINE
+..                 UNPACK    DVRRLINE,DIM27,WBDFITMN
+..
+.                  SCAN      ":",DVRRLINE
+.                  IF        @EQUAL
+.                    MOVE      DVRRLINE,DVRRWORK
+.                    REP       ": ",DVRRWORK
+.                    REP       "#" ",DVRRWORK
+.                    LJUSTIFY  DVRRWORK
+.                    MOVE      DVRRWORK,WBDFITMN
+.                    RESET     DVRRLINE
+.                  ENDIF
+..
+.                  REP       "#" ",WBDFITMN
+.                  REP       ", ",WBDFITMN
+.                ENDIF
+.
+.               ***********************************************
+.               itemNumber
+.               ***********************************************
+.
+                SCAN      "itemNumber",DVRRLINE
+                IF        @EQUAL
+                  RESET     DVRRLINE
+.                 UNPACK    DVRRLINE,DIM27,WBDFITMN
+.
+                  SCAN      ":",DVRRLINE
+                  IF        @EQUAL
+                    MOVE      DVRRLINE,DVRRWORK
+                    REP       ": ",DVRRWORK
+                    REP       "#" ",DVRRWORK
+                    LJUSTIFY  DVRRWORK
+                    MOVE      DVRRWORK,WBDFITMN
+                    RESET     DVRRLINE
+                  ENDIF
+.
+                  REP       "#" ",WBDFITMN
+                  REP       ", ",WBDFITMN
+                ENDIF
+.
+.               ***********************************************
+.               id
+.               ***********************************************
+.
+                SCAN      "#"id#"",DVRRLINE
+                IF        @EQUAL
+                  RESET     DVRRLINE
+.                 UNPACK    DVRRLINE,DIM19,WBDFSVID
+.
+                  SCAN      ":",DVRRLINE
+                  IF        @EQUAL
+                    MOVE      DVRRLINE,DVRRWORK
+                    REP       ": ",DVRRWORK
+                    REP       "#" ",DVRRWORK
+                    LJUSTIFY  DVRRWORK
+                    MOVE      DVRRWORK,WBDFSVID
+                    RESET     DVRRLINE
+                  ENDIF
+.
+                  REP       "#" ",WBDFSVID
+                  REP       ", ",WBDFSVID
+                ENDIF
+.
+.               ***********************************************
+.               chargeAmount
+.               ***********************************************
+.
+                SCAN      "chargeAmount",DVRRLINE
+                IF        @EQUAL
+                  RESET     DVRRLINE
+.                 UNPACK    DVRRLINE,DIM29,WBDFCHAM
+.
+                  SCAN      ":",DVRRLINE
+                  IF        @EQUAL
+                    MOVE      DVRRLINE,DVRRWORK
+                    REP       ": ",DVRRWORK
+                    REP       "#" ",DVRRWORK
+                    LJUSTIFY  DVRRWORK
+                    MOVE      DVRRWORK,WBDFCHAM
+                    RESET     DVRRLINE
+                  ENDIF
+.
+                  REP       "#" ",WBDFCHAM
+                  REP       ", ",WBDFCHAM
+                ENDIF
+.
+.               ***********************************************
+.               benefitPaid
+.               ***********************************************
+.
+                SCAN      "benefitPaid",DVRRLINE
+                IF        @EQUAL
+                  RESET     DVRRLINE
+.                 UNPACK    DVRRLINE,DIM28,WBDFBEPD
+.
+                  SCAN      ":",DVRRLINE
+                  IF        @EQUAL
+                    MOVE      DVRRLINE,DVRRWORK
+                    REP       ": ",DVRRWORK
+                    REP       "#" ",DVRRWORK
+                    LJUSTIFY  DVRRWORK
+                    MOVE      DVRRWORK,WBDFBEPD
+                    RESET     DVRRLINE
+                  ENDIF
+.
+                  REP       "#" ",WBDFBEPD
+                  REP       ", ",WBDFBEPD
+                ENDIF
+.
+.               ***********************************************
+.               assessmentCode
+.               ***********************************************
+.
+                SCAN      "assessmentCode",DVRRLINE
+                IF        @EQUAL
+                  RESET     DVRRLINE
+.                 UNPACK    DVRRLINE,DIM31,WBDFASSC
+.
+                  SCAN      ":",DVRRLINE
+                  IF        @EQUAL
+                    MOVE      DVRRLINE,DVRRWORK
+                    REP       ": ",DVRRWORK
+                    REP       "#" ",DVRRWORK
+                    LJUSTIFY  DVRRWORK
+                    MOVE      DVRRWORK,WBDFASSC
+                    RESET     DVRRLINE
+                  ENDIF
+.
+                  REP       "#" ",WBDFASSC
+                  REP       ", ",WBDFASSC
+                ENDIF
+.
+.               ***********************************************
+.               accountReferenceNumber
+.               ***********************************************
+.
+                SCAN      "accountReferenceNumber",DVRRLINE
+                IF        @EQUAL
+                  RESET     DVRRLINE
+.                 UNPACK    DVRRLINE,DIM39,WBDFACRF
+.
+                  SCAN      ":",DVRRLINE
+                  IF        @EQUAL
+                    MOVE      DVRRLINE,DVRRWORK
+                    REP       ": ",DVRRWORK
+                    REP       "#" ",DVRRWORK
+                    LJUSTIFY  DVRRWORK
+                    MOVE      DVRRWORK,WBDFACRF
+                    RESET     DVRRLINE
+                  ENDIF
+.
+                  REP       "#" ",WBDFACRF
+                  REP       ", ",WBDFACRF
+                ENDIF
+.
+.               ***********************************************
+.               gstInd
+.               ***********************************************
+.
+                SCAN      "gstInd",DVRRLINE
+                IF        @EQUAL
+                  RESET     DVRRLINE
+.                 UNPACK    DVRRLINE,DIM23,WBDFGSTI
+.
+                  SCAN      ":",DVRRLINE
+                  IF        @EQUAL
+                    MOVE      DVRRLINE,DVRRWORK
+                    REP       ": ",DVRRWORK
+                    REP       "#" ",DVRRWORK
+                    LJUSTIFY  DVRRWORK
+                    MOVE      DVRRWORK,WBDFGSTI
+                    RESET     DVRRLINE
+                  ENDIF
+.
+                  REP       "#" ",WBDFGSTI
+                  REP       ", ",WBDFGSTI
+                ENDIF
+.
+.               ***********************************************
+.               close curly bracket
+.               ***********************************************
+.
+                SCAN      "}",DVRRLINE
+                IF        @EQUAL
+.
+.                 get latest report counter from webdvdaf
+.                 --------------------------------------
+.
+                  PACK      WBDDCLID,WBDDCLID,SP70
+                  PACK      WBETSTRD,WBETSTRD,SP70
+.
+                  MOVE      ZERO,FORM3
+DVR50BBC          ADD       ONE,FORM3
+                  MOVE      FORM3,WBDDRPTC
+.
+                  PACK      KEY33,WBDDCLID,WBDDRPTC,WBETSTRD,SP70
+                  CALL      RAWBDVD1
+                  IF        OVRCD=0
+                    GOTO      DVR50BBC
+                  ENDIF
+.
+.                 get latest medicalEvent counter from webdveaf
+.                 ----------------------------------------------
+.
+                  MOVE      WBDDCLID,WBDECLID
+                  MOVE      FORM3,WBDERPTC
+                  MOVE      WBETSTRD,WBDERKEY
+.
+                  MOVE      ZERO,FORM2
+DVR50BBD          ADD       ONE,FORM2
+                  MOVE      FORM2,WBDEMEVC
+.
+                  PACK      KEY35,WBDECLID,WBDERPTC,WBDEMEVC,WBDERKEY,SP70
+                  CALL      RAWBDVE1
+                  IF        OVRCD=0
+                    GOTO      DVR50BBD
+                  ENDIF
+.
+.                 write to webdvfaf
+.                 -----------------
+.
+                  MOVE      WBDDCLID,WBDFCLID
+                  MOVE      FORM3,WBDFRPTC
+                  MOVE      FORM2,WBDFMEVC
+                  MOVE      WBETSTRD,WBDFRKEY
+                  MOVE      WBETTRID,WBDFTRID
+                  MOVE      WBETMSID,WBDFMSID
+.
+                  MOVE      ZERO,FORM2
+DVR50BBE          ADD       ONE,FORM2
+                  MOVE      FORM2,WBDFSRVC
+.
+                  PACK      KEY37,WBDFCLID,WBDFRPTC,WBDFMEVC,WBDFSRVC:
+                                  WBDFRKEY,SP70
+                  CALL      RAWBDVF1
+                  IF        OVRCD=0
+                    GOTO      DVR50BBE
+                  ENDIF
+.
+                  CALL      WRWBDVF1
+.
+                  CALL      CLWEBDVF
+.
+                ENDIF
+.
+.               ***********************************************
+.               close square bracket
+.               ***********************************************
+.
+                SCAN      "]",DVRRLINE
+                IF        @EQUAL
+                  GOTO      DVR50EAZ
+                ENDIF
+.
+DVR50BBZ        GOTO      DVR50BBB
+.
+              ENDIF
+.
+.             ***********************************************************
+.             patient
+.             ***********************************************************
+.
+              SCAN      "patient",DVRRLINE
+              IF        @EQUAL
+.
+DVR50AAA        READ      DVRRFILE,SEQ;DVRRLINE
+                GOTO      DVR50EAZ IF OVER
+.
+.               ***********************************************************
+.               currentMember
+.               ***********************************************************
+.
+                SCAN      "#"currentMember#"",DVRRLINE
+                IF        @EQUAL
+.
+DVR50ABB          READ      DVRRFILE,SEQ;DVRRLINE
+                  GOTO      DVR50AAZ IF OVER
+.
+.                 ***********************************************
+.                 givenName
+.                 ***********************************************
+.
+                  SCAN      "givenName",DVRRLINE
+                  IF        @EQUAL
+                    RESET     DVRRLINE
+.                   UNPACK    DVRRLINE,DIM26,WBDEPTGN
+.
+                    SCAN      ":",DVRRLINE
+                    IF        @EQUAL
+                      MOVE      DVRRLINE,DVRRWORK
+                      REP       ": ",DVRRWORK
+                      REP       "#" ",DVRRWORK
+                      LJUSTIFY  DVRRWORK
+                      MOVE      DVRRWORK,WBDEPTGN
+                      RESET     DVRRLINE
+                    ENDIF
+.
+                    REP       "#" ",WBDEPTGN
+                    REP       ", ",WBDEPTGN
+                  ENDIF
+.
+.                 ***********************************************
+.                 familyName
+.                 ***********************************************
+.
+                  SCAN      "familyName",DVRRLINE
+                  IF        @EQUAL
+                    RESET     DVRRLINE
+.                   UNPACK    DVRRLINE,DIM27,WBDEPTFN
+.
+                    SCAN      ":",DVRRLINE
+                    IF        @EQUAL
+                      MOVE      DVRRLINE,DVRRWORK
+                      REP       ": ",DVRRWORK
+                      REP       "#" ",DVRRWORK
+                      LJUSTIFY  DVRRWORK
+                      MOVE      DVRRWORK,WBDEPTFN
+                      RESET     DVRRLINE
+                    ENDIF
+.
+                    REP       "#" ",WBDEPTFN
+                    REP       ", ",WBDEPTFN
+                  ENDIF
+.
+.                 ***********************************************
+.                 close bracket
+.                 ***********************************************
+.
+                  SCAN      "}",DVRRLINE
+                  IF        @EQUAL
+                    GOTO      DVR50AAZ
+                  ENDIF
+.
+DVR50ABZ          GOTO      DVR50ABB
+.
+                ENDIF
+.
+.               ***********************************************************
+.               currentMembership
+.               ***********************************************************
+.
+                SCAN      "currentMembership",DVRRLINE
+                IF        @EQUAL
+.
+DVR50ACC          READ      DVRRFILE,SEQ;DVRRLINE
+                  GOTO      DVR50AAZ IF OVER
+.
+.                 ***********************************************
+.                 memberRefNumber
+.                 ***********************************************
+.
+.                  SCAN      "memberRefNumber",BPRRLINE
+.                  IF        @EQUAL
+.                    RESET     BPRRLINE
+..                   UNPACK    BPRRLINE,DIM32,WBBEPTMR
+..
+.                    SCAN      ":",BPRRLINE
+.                    IF        @EQUAL
+.                      MOVE      BPRRLINE,BPRRWORK
+.                      REP       ": ",BPRRWORK
+.                      REP       "#" ",BPRRWORK
+.                      LJUSTIFY  BPRRWORK
+.                      MOVE      BPRRWORK,WBBEPTMR
+.                      RESET     BPRRLINE
+.                    ENDIF
+..
+.                    REP       "#" ",WBBEPTMR
+.                    REP       ", ",WBBEPTMR
+.                  ENDIF
+.
+.                 ***********************************************
+.                 veteranNumber
+.                 ***********************************************
+.
+                  SCAN      "veteranNumber",DVRRLINE
+                  IF        @EQUAL
+                    RESET     DVRRLINE
+.                   UNPACK    DVRRLINE,DIM30,WBDEPTMN
+.
+                    SCAN      ":",DVRRLINE
+                    IF        @EQUAL
+                      MOVE      DVRRLINE,DVRRWORK
+                      REP       ": ",DVRRWORK
+                      REP       "#" ",DVRRWORK
+                      LJUSTIFY  DVRRWORK
+                      MOVE      DVRRWORK,WBDEPTMN
+                      RESET     DVRRLINE
+                    ENDIF
+.
+                    REP       "#" ",WBDEPTMN
+                    REP       ", ",WBDEPTMN
+                  ENDIF
+.
+.                 ***********************************************
+.                 close bracket
+.                 ***********************************************
+.
+                  SCAN      "}",DVRRLINE
+                  IF        @EQUAL
+                    GOTO      DVR50AAZ
+                  ENDIF
+.
+DVR50ACZ          GOTO      DVR50ACC
+.
+                ENDIF
+.
+.               ***********************************************************
+.               status
+.               ***********************************************************
+.
+                SCAN      "status",DVRRLINE
+                IF        @EQUAL
+.
+DVR50ADD          READ      DVRRFILE,SEQ;DVRRLINE
+                  GOTO      DVR50AAZ IF OVER
+.
+.                 ***********************************************
+.                 text
+.                 ***********************************************
+.
+                  SCAN      "text",DVRRLINE
+                  IF        @EQUAL
+                    RESET     DVRRLINE
+.                   UNPACK    DVRRLINE,DIM21,WBDEPTST
+.
+                    SCAN      ":",DVRRLINE
+                    IF        @EQUAL
+                      MOVE      DVRRLINE,DVRRWORK
+                      REP       ": ",DVRRWORK
+                      REP       "#" ",DVRRWORK
+                      LJUSTIFY  DVRRWORK
+                      MOVE      DVRRWORK,WBDEPTST
+                      RESET     DVRRLINE
+                    ENDIF
+.
+                    REP       "#" ",WBDEPTST
+                    REP       ", ",WBDEPTST
+                  ENDIF
+.
+.                 ***********************************************
+.                 code
+.                 ***********************************************
+.
+                  SCAN      "#"code#"",DVRRLINE
+                  IF        @EQUAL
+                    RESET     DVRRLINE
+.                   UNPACK    DVRRLINE,DIM21,WBDEPTSC
+.
+                    SCAN      ":",DVRRLINE
+                    IF        @EQUAL
+                      MOVE      DVRRLINE,DVRRWORK
+                      REP       ": ",DVRRWORK
+                      REP       "#" ",DVRRWORK
+                      LJUSTIFY  DVRRWORK
+                      MOVE      DVRRWORK,WBDEPTSC
+                      RESET     DVRRLINE
+                    ENDIF
+.
+                    REP       "#" ",WBDEPTSC
+                    REP       ", ",WBDEPTSC
+                  ENDIF
+.
+.                 ***********************************************
+.                 close bracket
+.                 ***********************************************
+.
+                  SCAN      "}",DVRRLINE
+                  IF        @EQUAL
+                    GOTO      DVR50AAZ
+                  ENDIF
+.
+DVR50ADZ          GOTO      DVR50ADD
+.
+                ENDIF
+.
+.               ***********************************************
+.               close bracket
+.               ***********************************************
+.
+                SCAN      "}",DVRRLINE
+                IF        @EQUAL
+                  GOTO      DVR50EAZ
+                ENDIF
+.
+DVR50AAZ        GOTO      DVR50AAA
+.
+              ENDIF
+.
+.             ***********************************************
+.             id
+.             ***********************************************
+.
+              SCAN      "id",DVRRLINE
+              IF        @EQUAL
+                RESET     DVRRLINE
+.               UNPACK    DVRRLINE,DIM15,WBDEEVID
+.
+                SCAN      ":",DVRRLINE
+                IF        @EQUAL
+                  MOVE      DVRRLINE,DVRRWORK
+                  REP       ": ",DVRRWORK
+                  REP       "#" ",DVRRWORK
+                  LJUSTIFY  DVRRWORK
+                  MOVE      DVRRWORK,WBDEEVID
+                  RESET     DVRRLINE
+                ENDIF
+.
+                REP       "#" ",WBDEEVID
+                REP       ", ",WBDEEVID
+              ENDIF
+.
+.             ***********************************************
+.             eventDate
+.             ***********************************************
+.
+              SCAN      "eventDate",DVRRLINE
+              IF        @EQUAL
+                RESET     DVRRLINE
+.               UNPACK    DVRRLINE,DIM22,WBDEEVDT
+.
+                SCAN      ":",DVRRLINE
+                IF        @EQUAL
+                  MOVE      DVRRLINE,DVRRWORK
+                  REP       ": ",DVRRWORK
+                  REP       "#" ",DVRRWORK
+                  REP       "- ",DVRRWORK
+                  SQUEEZE   DVRRWORK
+                  LJUSTIFY  DVRRWORK
+                  MOVE      DVRRWORK,WBDEEVDT
+                  RESET     DVRRLINE
+                ENDIF
+.
+                REP       "#" ",WBDEEVDT
+                REP       ", ",WBDEEVDT
+              ENDIF
+.
+.             ***********************************************
+.             close curly bracket
+.             ***********************************************
+.
+              SCAN      "}",DVRRLINE
+              IF        @EQUAL
+.
+.               get latest report counter from webdvdaf
+.               --------------------------------------
+.
+                PACK      WBDDCLID,WBDDCLID,SP70
+                PACK      WBETSTRD,WBETSTRD,SP70
+.
+                MOVE      ZERO,FORM3
+DVR50EAB        ADD       ONE,FORM3
+                MOVE      FORM3,WBDDRPTC
+.
+                PACK      KEY33,WBDDCLID,WBDDRPTC,WBETSTRD,SP70
+                CALL      RAWBDVD1
+                IF        OVRCD=0
+                  GOTO      DVR50EAB
+                ENDIF
+.
+.               write to webdveaf
+.               -----------------
+.
+                MOVE      WBDDCLID,WBDECLID
+                MOVE      FORM3,WBDERPTC
+                MOVE      WBETSTRD,WBDERKEY
+                MOVE      WBETTRID,WBDETRID
+                MOVE      WBETMSID,WBDEMSID
+.
+.               get latest medicalEvent counter from webdveaf
+.               ----------------------------------------------
+.
+                MOVE      ZERO,FORM2
+DVR50EAC        ADD       ONE,FORM2
+                MOVE      FORM2,WBDEMEVC
+.
+                PACK      KEY35,WBDECLID,WBDERPTC,WBDEMEVC,WBDERKEY,SP70
+                CALL      RAWBDVE1
+                IF        OVRCD=0
+                  GOTO      DVR50EAC
+                ENDIF
+.
+                CALL      WRWBDVE1
+.
+              ENDIF
+.
+.             ***********************************************
+.             close square bracket
+.             ***********************************************
+.
+              SCAN      "]",DVRRLINE
+              IF        @EQUAL
+                GOTO      DVRPRS70
+              ENDIF
+.
+DVR50EAZ      GOTO      DVR50EAA
+.
+            ENDIF
+.
+.           ***********************************************************
+.           serviceProvider
+.           ***********************************************************
+.
+            SCAN      "serviceProvider",DVRRLINE
+            IF        @EQUAL
+.
+DVRP50BB      READ      DVRRFILE,SEQ;DVRRLINE
+              GOTO      DVRPRS70 IF OVER
+.
+.             *************************************************
+.             providerNumber
+.             *************************************************
+.
+              SCAN      "providerNumber",DVRRLINE
+              IF        @EQUAL
+                RESET     DVRRLINE
+.               UNPACK    DVRRLINE,DIM25,WBDDSRVP
+.
+                SCAN      ":",DVRRLINE
+                IF        @EQUAL
+                  MOVE      DVRRLINE,DVRRWORK
+                  REP       ": ",DVRRWORK
+                  REP       "#" ",DVRRWORK
+                  LJUSTIFY  DVRRWORK
+                  MOVE      DVRRWORK,WBDDSRVP
+                  RESET     DVRRLINE
+                ENDIF
+.
+                REP       "#" ",WBDDSRVP
+                REP       ", ",WBDDSRVP
+              ENDIF
+.
+.             ***********************************************
+.             close bracket
+.             ***********************************************
+.
+              SCAN      "}",DVRRLINE
+              IF        @EQUAL
+                GOTO      DVRPRS70
+              ENDIF
+.
+DVRP50BZ      GOTO      DVRP50BB
+.
+            ENDIF 
+.
+.           *************************************************
+.           claimId
+.           *************************************************
+.
+            SCAN      "claimId",DVRRLINE
+            IF        @EQUAL
+              RESET     DVRRLINE
+.             UNPACK    DVRRLINE,DIM16,WBDDCLID
+.
+              SCAN      ":",DVRRLINE
+              IF        @EQUAL
+                MOVE      DVRRLINE,DVRRWORK
+                REP       ": ",DVRRWORK
+                REP       "#" ",DVRRWORK
+                LJUSTIFY  DVRRWORK
+                MOVE      DVRRWORK,WBDDCLID
+                RESET     DVRRLINE
+              ENDIF
+.
+              REP       "#" ",WBDDCLID
+              REP       ", ",WBDDCLID
+            ENDIF
+.
+.           *************************************************
+.           chargeAmount
+.           *************************************************
+.
+            SCAN      "chargeAmount",DVRRLINE
+            IF        @EQUAL
+              RESET     DVRRLINE
+.             UNPACK    DVRRLINE,DIM21,WBDDCLCA
+.
+              SCAN      ":",DVRRLINE
+              IF        @EQUAL
+                MOVE      DVRRLINE,DVRRWORK
+                REP       ": ",DVRRWORK
+                REP       "#" ",DVRRWORK
+                LJUSTIFY  DVRRWORK
+                MOVE      DVRRWORK,WBDDCLCA
+                RESET     DVRRLINE
+              ENDIF
+.
+              REP       "#" ",WBDDCLCA
+              REP       ", ",WBDDCLCA
+            ENDIF
+.
+.           *************************************************
+.           benefitPaid
+.           *************************************************
+.
+            SCAN      "benefitPaid",DVRRLINE
+            IF        @EQUAL
+              RESET     DVRRLINE
+.             UNPACK    DVRRLINE,DIM20,WBDDCLBP
+.
+              SCAN      ":",DVRRLINE
+              IF        @EQUAL
+                MOVE      DVRRLINE,DVRRWORK
+                REP       ": ",DVRRWORK
+                REP       "#" ",DVRRWORK
+                LJUSTIFY  DVRRWORK
+                MOVE      DVRRWORK,WBDDCLBP
+                RESET     DVRRLINE
+              ENDIF
+.
+              REP       "#" ",WBDDCLBP
+              REP       ", ",WBDDCLBP
+            ENDIF
+.
+.           ***********************************************
+.           close bracket
+.           ***********************************************
+.
+            SCAN      "}",DVRRLINE
+            IF        @EQUAL
+.
+.             write to webdvdaf
+.             -----------------
+.
+              PACK      WBDDCLID,WBDDCLID,SP70
+              PACK      WBETSTRD,WBETSTRD,SP70
+.
+              MOVE      WBETMSID,WBDDMSID
+              CALL      IBACLOCK
+              PACK      WBDDCDAT,CCC,CYY,CMM,CDD
+              REP       " 0",WBDDCDAT
+              MOVE      CTIMEIS,WBDDCTIM
+              MOVE      WBETTRID,WBDDTRID
+              MOVE      WBETSTRD,WBDDRKEY
+.
+              MOVE      ZERO,FORM3
+DVRPRS60      ADD       ONE,FORM3
+              MOVE      FORM3,WBDDRPTC
+.
+              PACK      KEY33,WBDDCLID,WBDDRPTC,WBETSTRD,SP70
+              CALL      RAWBDVD1    
+              IF        OVRCD=0
+                GOTO      DVRPRS60
+              ENDIF
+.
+              CALL      WRWBDVD1
+.
+.             write to webdvaaf
+.             -----------------
+.
+DVRPRS62      MOVE      WBDWINVN,WBDAINVN
+              CALL      IBACLOCK
+              PACK      WBDADATE,CCC,CYY,CMM,CDD
+              REP       " 0",WBDADATE
+              MOVE      CTIMEIS,WBDATIME
+              MOVE      WBDWBATN,WBDABATN
+.
+              MOVE      " 6",WBDASTAT
+.
+              MOVE      " 2",WBDATYPE
+              MOVE      SP70,WBDAOPER
+              MOVE      WBDWTRID,WBDATRID
+              MOVE      SP70,WBDAEROR
+              PACK      WBDAEROT,WBDDSTAT,SP70
+              MOVE      WBDWMSID,WBDAMSID
+              MOVE      WBDWMODL,WBDAMODL
+              PACK      WBDASPAR,SP70,SP70
+.
+              PACK      KEY27,WBDAINVN,WBDADATE,WBDATIME,WBDATYPE,WBDAMODL,SP70
+              CALL      RAWBDVA1
+              IF        OVRCD=0
+                GOTO      DVRPRS62
+              ENDIF
+.
+              TRAP      OVERCOND IF IO
+              CALL      WRWBDVA1
+              TRAPCLR   IO
+.
+.             update to webdvwaf
+.             -----------------
+.
+              MOVE      SP70,WEBDVIIN
+.
+              PACK      KEY53,WBDWTRID,SP70                           
+              CALL      RSWBDVI2
+              CALL      RKWBDVI2
+              IF        OVRCD=0
+.
+                MATCH     WBDWTRID,WBDITRID
+                IF        @EQUAL
+                  MOVE      "1",WEBDVIIN
+                ENDIF
+.
+              ENDIF
+.
+              PACK      KEY30,WBDWFLAG,WBDWHOSP,WBDWMODL,WBDWUNIQ,WBDWINVN:
+                              WBDWBATN,SP70
+              CALL      RDWBDVW7
+              IF        OVRCD=0
+.
+                MOVE      SIX,WBDWFLAG
+.
+                MATCH     "1",WEBDVIIN
+                IF        @EQUAL
+                  MOVE      SEVEN,WBDWFLAG
+                ENDIF
+.
+                CALL      IBACLOCK
+                PACK      WBDWUDAT,CCC,CYY,CMM,CDD
+                REP       " 0",WBDWUDAT
+                MOVE      CTIMEIS,WBDWUTIM
+                MOVE      USERID,WBDWUUID
+                CALL      UPWBDVW7
+.
+              ENDIF
+.
+DVRPRS69      GOTO      DVRPRS90
+            ENDIF
+.
+DVRPRS70    GOTO      DVRPRS50
+.
+          ENDIF
+.
+.         *************************************************
+.         status
+.         *************************************************
+.
+          SCAN      "status",DVRRLINE
+          IF        @EQUAL
+            RESET     DVRRLINE
+.           UNPACK    DVRRLINE,DIM13,WBDDSTAT
+.
+            SCAN      ":",DVRRLINE
+            IF        @EQUAL
+              MOVE      DVRRLINE,DVRRWORK
+              REP       ": ",DVRRWORK
+              REP       "#" ",DVRRWORK
+              LJUSTIFY  DVRRWORK
+              MOVE      DVRRWORK,WBDDSTAT
+              RESET     DVRRLINE
+            ENDIF
+.
+            REP       "#" ",WBDDSTAT
+            REP       ", ",WBDDSTAT
+.
+            MATCH     "REPORT_EXPIRED",WBDDSTAT
+            IF        @EQUAL
+.
+.             write to webdvaaf
+.             -----------------
+.
+DVRPRS80      MOVE      WBDWINVN,WBDAINVN
+              CALL      IBACLOCK
+              PACK      WBDADATE,CCC,CYY,CMM,CDD
+              REP       " 0",WBDADATE
+              MOVE      CTIMEIS,WBDATIME
+              MOVE      WBDWBATN,WBDABATN
+.
+              MOVE      " 8",WBDASTAT
+.
+              MOVE      " 2",WBDATYPE
+              MOVE      SP70,WBDAOPER
+              MOVE      WBDWTRID,WBDATRID
+              MOVE      SP70,WBDAEROR
+              PACK      WBDAEROT,WBDDSTAT,SP70
+              MOVE      WBDWMSID,WBDAMSID
+              MOVE      WBDWMODL,WBDAMODL
+              PACK      WBDASPAR,SP70,SP70
+.
+              PACK      KEY27,WBDAINVN,WBDADATE,WBDATIME,WBDATYPE,WBDAMODL,SP70
+              CALL      RAWBDVA1
+              IF        OVRCD=0
+                GOTO      DVRPRS80
+              ENDIF
+.
+              TRAP      OVERCOND IF IO
+              CALL      WRWBDVA1
+              TRAPCLR   IO
+.
+              PACK      KEY30,WBDWFLAG,WBDWHOSP,WBDWMODL,WBDWUNIQ,WBDWINVN:
+                              WBDWBATN,SP70
+              CALL      RDWBDVW7
+              IF        OVRCD=0
+.
+                MOVE      EIGHT,WBDWFLAG
+.
+                CALL      IBACLOCK
+                PACK      WBDWUDAT,CCC,CYY,CMM,CDD
+                REP       " 0",WBDWUDAT
+                MOVE      CTIMEIS,WBDWUTIM
+                MOVE      USERID,WBDWUUID
+                CALL      UPWBDVW7
+.
+              ENDIF
+.
+            ENDIF
+.
+          ENDIF
+.
+DVRPRS90  GOTO      DVRPRS01
+.
+DVRPRS99  RETURN
++
+.------------------------------------------------------------
+.  Open PRODA Text Files
+.------------------------------------------------------------
+PROPN000  MOVE      SP70,PRODAIND
+.
+          CLEAR     PRDAPATH
+          APPEND    WBB2DPTH,PRDAPATH
+          RESET     PRDAPATH
+          STRIP     PRDAPATH
+          ENDSET    PRDAPATH
+          APPEND    SLASH,PRDAPATH
+          APPEND    PRDAFILE,PRDAPATH
+          RESET     PRDAPATH
+.
+          MOVE      ZERO,PRODAIND
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      WBSPROPF,PRDAPATH
+          TRAPCLR   IO
+          IF        OVRCD=1
+            MOVE      ONE,PRODAIND
+            GOTO      PROPN999
+          ENDIF
+          CLOSE     WBSPROPF
+.
+PROPN999  RETURN
++
+.------------------------------------------------------------
+. Read WebServices PRODA properties file
+.------------------------------------------------------------
+RDWBSR00  READ      WBSPROPF,SEQ;WBSPILAB,WBSPROID
+          READ      WBSPROPF,SEQ;WBSJKLAB,WBSJKSLO
+          READ      WBSPROPF,SEQ;WBSPOLAB,WBSPRORG
+          READ      WBSPROPF,SEQ;WBSDNLAB,WBSDVNAM
+          READ      WBSPROPF,SEQ;WBSCILAB,WBSCLIID
+          READ      WBSPROPF,SEQ;WBSATLAB,WBSACTAU
+          READ      WBSPROPF,SEQ;WBSACLAB,WBSACTVC
+          READ      WBSPROPF,SEQ;WBSDALAB,WBSDACUR
+          READ      WBSPROPF,SEQ;WBSDULAB,WBSDAUUR
+          READ      WBSPROPF,SEQ;WBSRDLAB,WBSRDKUR
+          READ      WBSPROPF,SEQ;WBSWSLAB,WBSWSCLI
+          READ      WBSPROPF,SEQ;WBSLOLAB,WBSLOCAT
+          READ      WBSPROPF,SEQ;WBSNOLAB,WBSNOTEM
+.
+RDWBSR99  RETURN
++
+.------------------------------------------------------------
+.  Move spaces to WebServices variables
+.------------------------------------------------------------
+CLWBSR00  MOVE      SP70,WBSPROID
+          MOVE      SP70,WBSJKSLO
+          MOVE      SP70,WBSPRORG
+          MOVE      SP70,WBSDVNAM
+          MOVE      SP70,WBSCLIID
+          MOVE      SP70,WBSACTAU
+          MOVE      SP70,WBSACTVC
+          MOVE      SP70,WBSDACUR
+          MOVE      SP70,WBSDAUUR
+          MOVE      SP70,WBSRDKUR
+          MOVE      SP70,WBSWSCLI
+          MOVE      SP70,WBSLOCAT
+          MOVE      SP70,WBSNOTEM
+.
+CLWBSR99  RETURN
++
+.------------------------------------------------------------
+. Program Initialisation
+.------------------------------------------------------------
+.
+INIT0000  MOVE      ONE,EMRFLAG
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      EMRVISA1,"emrvisaf"
+          OPEN      EMRVISA2,"emrvisaf"
+          TRAPCLR   IO
+          IF        OVRCD=1
+            MOVE      ZERO,EMRFLAG
+          ENDIF
+          OPEN      EMRCLIA1,"emrcliaf"
+.
+          OPEN      EMRHISA1,"emrhisaf"
+          OPEN      EMRDCMA1,"emrdcmaf"
+          OPEN      OBSDETA1,"obsdetaf"                                *I-54627
+          OPEN      OBSMDTA1,"obsmdtaf"     * Patient Medical Notes
+          OPEN      OBSMTXA1,"obsmtxaf"     * Patient Medical Notes fre
+
+          OPEN      VISCMTA1,"viscmtaf"
+          OPEN      VISMTXA1,"vismtxaf"
+          OPEN      EMRICDA1,"emricdaf"
+          OPEN      EMRWFMA1,"emrwfmaf"
+          OPEN      EMRWFMA2,"emrwfmaf"
+          OPEN      EMRWFMA3,"emrwfmaf"
+          OPEN      EMRWFMA4,"emrwfmaf"
+          OPEN      EMRISMA1,"emrismaf"
+          OPEN      EMRINCA1,"emrincaf"
+          OPEN      EMRINCA2,"emrincaf"
+          OPEN      EMRINCA3,"emrincaf"
+          OPEN      EMRVCDA1,"emrvcdaf"
+          OPEN      EMRVCDA2,"emrvcdaf"                               *I-215117
+          OPEN      EMRMTXA3,"emrmtxaf"
+.
+          OPEN      EMRUNKA1,"emrunkaf"
+          OPEN      EMRLPCA1,"emrlpcaf"
+          OPEN      EMRLOCA1,"emrlocaf"
+          OPEN      EMRPROA1,"emrproaf"                                *I-50421
+          OPEN      EMRSITA1,"emrsitaf"
+.
+          OPEN      OPRNURA1,"oprnuraf"                   
+          OPEN      PATALRT1,"patalrtf"                                *I-54627
+          OPEN      PATALTT1,"pataltaf"
+          OPEN      PATHSPA1,"pathspaf"
+          OPEN      PMSMDTA1,"pmsmdtaf"
+          OPEN      PMSALNA1,"pmsalnaf"
+          OPEN      PMSMDTA1,"pmsmdtaf"
+          OPEN      PMSMTXA1,"pmsmtxaf"
+          OPEN      PATMA1A1,"patma1af"
+          OPEN      PATMI1A1,"patmi1af"
+          OPEN      PATMX1A1,"patmx1af"
+          OPEN      PMSCCDA1,"pmsccdaf"
+          OPEN      PMSPX2A1,"pmspx2af"
+          OPEN      PATVISA1,"patvisaf"
+          OPEN      AAEDE1A1,"aaede1af"
+          OPEN      PATCODE1,"patcodes"
+          OPEN      PATDO1A1,"patdo1af"
+          OPEN      PATITEM1,"patitemn"                                *I-50421
+          OPEN      PATICDO1,"paticdof"                                *I-50421
+          OPEN      PATRE1A1,"patre1af"
+          OPEN      PATFN1A1,"patfn1af"
+          OPEN      PATWR1A1,"patwr1af"
+          OPEN      PMSHCPA1,"pmshcpaf"
+          OPEN      PMSHCGA1,"pmshcgaf"
+          OPEN      PATVADA1,"patvadaf"
+          OPEN      PMSVX1A1,"pmsvx1af"                                *I-55214
+          OPEN      PMSRELA1,"pmsrelaf"
+          OPEN      PMSTLEA1,"pmstleaf"
+          OPEN      PMSCEXA1,"pmscexaf"
+          OPEN      PRIITEM1,"priitemf"
+          OPEN      VISCODA1,"viscodaf"
+          OPEN      VISMDTA1,"vismdtaf"
+.
+          OPEN      IBAPDFA1,"ibapdfaf"
+          OPEN      IHAPASS1,"ihapassf"
+          OPEN      IBACODE1,"ibacodef"
+          OPEN      IBATMHA1,"ibatmhaf"
+          OPEN      IBATDET1,"ibatmdaf"
+          OPEN      IBASPOL1,"ibaspolf"
+          OPEN      MEHDLSA1,"mehdlsaf"
+          OPEN      WEBSECA3,"websecaf"
+.
+          OPEN      SCRSBGA1,"scrsbgaf"
+          OPEN      SCRPSTA1,"scrpstaf"
+          OPEN      SCRMASA1,"scrmasaf"
+          OPEN      PATHGRP1,"pathgrpf"
+.
+          READ      CONTROLF,ZERO;*43,IBCNMHOS
+          READ      CONTROLF,TWO;*182,CSNAME                           *I-54627
+.
+          READ      CONTROLF,TWENTY1;*138,PTCNNHII
+          READ      CONTROLF,THIRTY;*89,HELPAGE,*90,HELPRNT,HELSIZE
+.
+          READ      CONTROLF,FIFTY9;*132,CALRDESC
+          READ      CONTROLF,SEVENTY8;*64,AECNLABL
+          READ      CONTROLF,EIGHTY;*250,PTCNHDPS
+          READ      CONTROLF,EIGHTY9;*138,EMCNICDF                     *I-50421
+          READ      CONTROLF,HUND03;*220,PTCNDEES,*221,PTCNDDES
+          READ      CONTROLF,HUND18;*138,PTCNNEWC
+          READ      CONTROLF,HUND20;*158,PTCNUNET
+          READ      CONTROLF,HUND22;*8,EMCNURSE
+          READ      CONTROLF,HUND29;*1,PTCNWSDR,*61,PTCNWSIN,*62,PTCNRKDY:
+                                    *68,PTCNTKMN,*193,PTCNBBSW,*249,PTCNDVAW
+.
+          IF        IBCNMHOS=1
+            OPEN      MLTCODA1,"mltcodaf"
+            OPEN      MLTCODA2,"mltcodaf"
+          ENDIF
+.
+          IF        EMCNICDF=0
+              OPEN      PATICDD1,"paticddf"
+              OPEN      PATICDD2,"paticddf"
+              OPEN      PATI10D1,"pati10df"
+              OPEN      PATI10D2,"pati10df"
+          ELSE
+              OPEN      EMRICDA1,"emricdaf"
+              OPEN      EMRICDA2,"emricdaf"
+              OPEN      EMRICDA3,"emricdaf"
+          ENDIF
+.
+.          OPEN      PMSIHIA1,"pmsihiaf"     * IHI Details
+.
+          MOVE      ZERO,VISXDCIN
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      VISXDCA1,"visxdcaf"
+          TRAPCLR   IO
+          IF        OVRCD=1
+            MOVE      ONE,VISXDCIN
+          ENDIF
+.
+. **** WebServices ****
+.
+          OPEN      WEBB2BA1,"webb2baf"
+          OPEN      WEBB2BA2,"webb2baf"
+          OPEN      WEBB2BA3,"webb2baf"
+.
+          OPEN      WEBDVWA1,"webdvwaf"
+          OPEN      WEBDVWA2,"webdvwaf"
+          OPEN      WEBDVWA3,"webdvwaf"
+          OPEN      WEBDVWA4,"webdvwaf"
+          OPEN      WEBDVWA5,"webdvwaf"
+          OPEN      WEBDVWA6,"webdvwaf"
+          OPEN      WEBDVWA7,"webdvwaf"
+.
+          OPEN      WEBDVAA1,"webdvaaf"
+          OPEN      WEBDVAA2,"webdvaaf"
+          OPEN      WEBDVAA3,"webdvaaf"
+          OPEN      WEBDVAA4,"webdvaaf"
+          OPEN      WEBDVAA5,"webdvaaf"
+.
+          OPEN      WEBETRA1,"webetraf"
+          OPEN      WEBETRA2,"webetraf"
+          OPEN      WEBETRA3,"webetraf"
+          OPEN      WEBETRA4,"webetraf"
+          OPEN      WEBETRA5,"webetraf"
+          OPEN      WEBETRA6,"webetraf"
+          OPEN      WEBETRA7,"webetraf"
+.
+          OPEN      WEBDVBA1,"webdvbaf"
+          OPEN      WEBDVBA2,"webdvbaf"
+.
+          OPEN      WEBDVDA1,"webdvdaf"
+          OPEN      WEBDVDA2,"webdvdaf"
+          OPEN      WEBDVDA3,"webdvdaf"
+          OPEN      WEBDVDA4,"webdvdaf"
+.
+          OPEN      WEBDVEA1,"webdveaf"
+          OPEN      WEBDVEA2,"webdveaf"
+          OPEN      WEBDVEA3,"webdveaf"
+          OPEN      WEBDVEA4,"webdveaf"
+.
+          OPEN      WEBDVFA1,"webdvfaf"
+          OPEN      WEBDVFA2,"webdvfaf"
+          OPEN      WEBDVFA3,"webdvfaf"
+. 
+          OPEN      WEBDVIA2,"webdviaf"
+.
+          RETURN
++
+.------------------------------------------------------------------
+. Get the Report Key from the DVRW JSON Response "status" "claimId"
+. And reposition again at "claimAssessment"
+.------------------------------------------------------------------
+RKEY0000  READ      DVRRFILE,SEQ;DVRRLINE
+          GOTO      RKEY5000 IF OVER
+.
+.         *************************************************
+.         status
+.         *************************************************
+.
+          SCAN      "status",DVRRLINE
+          IF        @EQUAL
+            RESET     DVRRLINE
+.           UNPACK    DVRRLINE,DIM13,WBDDSTAT
+.UPTOHERE
+            SCAN      ":",DVRRLINE
+            IF        @EQUAL
+              MOVE      DVRRLINE,DVRRWORK
+              REP       ": ",DVRRWORK
+              REP       "#" ",DVRRWORK
+              LJUSTIFY  DVRRWORK
+              MOVE      DVRRWORK,WBDDSTAT
+              RESET     DVRRLINE
+            ENDIF
+.
+            REP       "#" ",WBDDSTAT
+            REP       ", ",WBDDSTAT
+          ENDIF
+.
+.         *************************************************
+.         claimId
+.         *************************************************
+.
+          SCAN      "claimId",DVRRLINE
+          IF        @EQUAL
+            RESET     DVRRLINE
+.           UNPACK    DVRRLINE,DIM16,WBDDCLID
+.
+            SCAN      ":",DVRRLINE
+            IF        @EQUAL
+              MOVE      DVRRLINE,DVRRWORK
+              REP       ": ",DVRRWORK
+              REP       "#" ",DVRRWORK
+              LJUSTIFY  DVRRWORK
+              MOVE      DVRRWORK,WBDDCLID
+              RESET     DVRRLINE
+            ENDIF
+.
+            REP       "#" ",WBDDCLID
+            REP       ", ",WBDDCLID
+          ENDIF
+.
+          GOTO      RKEY0000
+.
+.         close and reopen dvrw response json file and read from the start
+.         ----------------------------------------------------------------
+.
+RKEY5000  CLOSE     DVRRFILE
+.
+          CLEAR     CMDLINE
+          APPEND    WBB2DPTH,CMDLINE
+          RESET     CMDLINE
+          STRIP     CMDLINE
+          ENDSET    CMDLINE
+          APPEND    "/webPAS_claims/dvrw/",CMDLINE
+          RESET     CMDLINE
+          STRIP     CMDLINE
+          ENDSET    CMDLINE
+          APPEND    WBETSTRD,CMDLINE
+          APPEND    DVRRLITR,CMDLINE
+          RESET     CMDLINE
+.
+          OPEN      DVRRFILE,CMDLINE
+.
+.         reposition at "claimAssessment" line
+.         ----------------------------
+.
+RKEY6000  READ      DVRRFILE,SEQ;DVRRLINE
+          GOTO      RKEY9999 IF OVER
+.
+          SCAN      "claimAssessment",DVRRLINE
+          GOTO      RKEY9999 IF EQUAL
+.
+          GOTO      RKEY6000
+.
+RKEY9999  RETURN
++
+.---------------------------------------------------------------
+. Clear Parameters (NOT USED REQUIRED FOR STANDARD WEB INCLUDES)
+.---------------------------------------------------------------
+CLRPAR00  RETURN 
+.---------------------------------------------------------------
+. Set Parameters   (NOT USED REQUIRED FOR STANDARD WEB INCLUDES)
+.---------------------------------------------------------------
+SETPAR00  RETURN
+.---------------------------------------------------------------
+. Process Fields   (NOT USED REQUIRED FOR STANDARD WEB INCLUDES)
+.---------------------------------------------------------------
+PROFLD00  RETURN
+.------------------------------------------------------------
++
+          INC       IBAWEBCD
+.
+          INC       CLPMSVX1
+          INC       CLWEBDVD
+          INC       CLWEBDVE
+          INC       CLWEBDVF
+          INC       DXPATCOD
+          INC       GCCARD00
+          INC       GTIHINUM
+          INC       NAMSTRCD
+          INC       WEBDITEM
+          INC       WEBBGRND
+.
+          INC       APSMASIO/INC
+          INC       EMRCHMAN
+          INC       EMRLPCIO/INC
+          INC       EMRLOCIO/INC
+          INC       EMRSITIO/INC
+          INC       EMRVISIO/INC
+          INC       EMRCLIIO/INC
+          INC       EMRGRCIO/INC
+          INC       EMRPROIO/INC                                       *I-50421
+          INC       EMRUNKIO/INC
+          INC       IBATMDIO/INC
+          INC       MEHDLSIO/INC
+          INC       NHIETHIO/INC
+          INC       NHIMASIO/INC
+          INC       PATGO1IO/INC
+          INC       PMSHCPIO/INC
+          INC       PMSHCGIO/INC
+          INC       AAEDE1IO/INC    *****
+          INC       PATALRIO/INC
+          INC       PMSALNIO/INC
+          INC       PMSRELIO/INC
+          INC       PMSTLEIO/INC
+          INC       PMSHCPTM
+          INC       PMSHCGTM 
+          INC       AAESETLB        *****
+          INC       OPRNURIO/INC
+          INC       PRIITMIO/INC
+          INC       PATITMIO/INC                                       *I-50421
+          INC       PATICOIO/INC                                       *I-50421
+          INC       PATICDIO/INC                                       *I-50421
+          INC       PATNIDIO/INC
+          INC       PATVISIO/INC
+          INC       PMSVX1IO/INC                                       *I-55214
+          INC       PATDO1IO/INC
+          INC       PATHSPIO/INC
+          INC       PATIN1IO/INC
+          INC       PMSCCDIO/INC
+          INC       PMSCEXIO/INC
+          INC       PMSIHIIO/INC
+          INC       PMSMDTIO/INC
+          INC       PMSMTXIO/INC
+          INC       PMSPX2IO/INC
+          INC       PATFN1IO/INC
+          INC       PATMA1IO/INC
+          INC       PATMI1IO/INC
+          INC       PATRE1IO/INC
+          INC       PATWC1IO/INC
+          INC       PMSWX1IO/INC 
+          INC       PATWMAIO/INC
+          INC       PATWR1IO/INC
+          INC       PATWVEIO/INC
+          INC       PATVADIO/INC
+          INC       SCRPSTIO/INC
+          INC       SCRSBGIO/INC
+          INC       SCRSLTIO/INC
+          INC       SCRMASIO/INC
+
+.
+          INC       EOCLNKIO/INC
+          INC       EOCREFIO/INC
+          INC       EMRISMIO/INC
+          INC       EMRINCIO/INC
+          INC       EMRWFMIO/INC
+          INC       EMRVCDIO/INC
+          INC       EMRMTXIO/INC
+          INC       EMRVPRIO/INC
+          INC       VISCMTIO/INC
+          INC       VISCODIO/INC
+          INC       VISMTXIO/INC
+          INC       VISMDTIO/INC
+          INC       VISXDCIO/INC
+          INC       EMRMANIO/INC
+          INC       OBSDETIO/INC                                       *I-54627
+          INC       OBSMTXIO/INC
+          INC       OBSMDTIO/INC
+          INC       EMRDCMIO/INC   
+          INC       EMRHISIO/INC 
+          INC       EMRICDIO/INC 
+          INC       PATHGPIO/INC
+          INC       WEBB2BIO/INC
+          INC       WEBDVWIO/INC
+          INC       WEBDVAIO/INC
+          INC       WEBDVBIO/INC
+          INC       WEBDVDIO/INC
+          INC       WEBDVEIO/INC
+          INC       WEBDVFIO/INC
+          INC       WEBDVIIO/INC
+          INC       WEBETRIO/INC
+
+          INC       PATDOCTM
+          INC       PATITMRD
+.
+          INC       PACADDRS
+          INC       PMIGTNID
+          INC       PMSCEXCD
+          INC       CALCAGE
+          INC       CALCYRS
+          INC       AGECHK
+          INC       PATDOCCD
+          INC       CLPATMAS
+          INC       CLPMSCEX
+          INC       CLPMSHCP
+          INC       CLPMSPX2
+          INC       CLEMRVIS                                          *I-153218
+          INC       CLPATVIS                                          *I-153218
+          INC       DAYOFWEK
+          INC       SGCHKDIG
+          INC       GETALTID
+          INC       TFILENAM
+.
+          INC       PATATRIO/INC
+          INC       MULBIR00
+.

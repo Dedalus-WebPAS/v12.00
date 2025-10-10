@@ -1,0 +1,100 @@
+.******************************************************************************
+.*                                  PATDDHRD                                  *
+.* Common routine to read Health Fund History file record (patddhaf)          *
+.*                                                                            *
+.* Requires:   KEY17 populated with -                                         *
+.*                      - Health Fund (usually AFUNDH)                        *
+.*                      - Field Type                                          *
+.*                        01 - HCP Equivalent                                 *
+.*                        02 - Health Fund Group                              *
+.*                        03 - Theatre Charging Indicator                     *
+.*                      - Service Date (defaults to current date)             *
+.*                      - Delete field blank                                  *
+.*                                                                            *
+.* Returns:    OVRCD 0 = found Undeleted record for a selected date           *
+.*                   1 = no valid record found                                *
+.*                                                                            *
+.* Modifications:                                                             *
+.*        V11.04.03 07/06/2024  J.Tan                 TSK 0924653             *
+.*                  Fixed populating Theatre banding not to use field F2      *
+.*        V11.04.02 08/03/2024  J.Tan                 TSK 0919335             *
+.*                  Mod to check for the exact date                           *
+.*        V11.04.01 01/02/2024  Jacob Jackson         TSK 0919335             *
+.*                  Init file                                                 *
+.******************************************************************************
+PATDDHRD  MOVE      ZERO,OVRCD
+          OPEN      CONTROLF,"controlf"
+          READ      CONTROLF,HUND28;*250,PTCNHFED
+          MATCH     "1",PTCNHFED
+          GOTO      FNDDH999 IF NOT EQUAL   * parameter is not set
+.
+          UNPACK    KEY17,WKDHAFND,WKDHFTYP,WKDHDTTO,WKDHDLEN
+          MATCH     SP70,WKDHAFND
+          GOTO      FNDDH999 IF EQUAL       * Blank health fund
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO          * trap for error opening file
+          OPEN      PATDDHA1,"patddhaf"
+          TRAPCLR   IO
+          BRANCH    OVRCD,FNDDH999
+.
+          MATCH     SP70,WKDHDTTO
+          IF        @EQUAL
+            PACK      WKDHDTTO,CCC,CYY,CMM,CDD,SP10 * default to current date
+            REP       " 0",WKDHDTTO
+            PACK      KEY17,WKDHAFND,WKDHFTYP,WKDHDTTO,WKDHDLEN,SP70
+          ENDIF
+          CALL      RDPTDDH1
+          COMPARE   ZERO,OVRCD
+          GOTO      FNDDH900 IF EQUAL       * found a valid record
+.
+FNDDH200  CALL      RKPTDDH1                * read next record
+          BRANCH    OVRCD,FNDDH920
+.
+          MATCH     WKDHAFND,PTDDFUND       * Check Health fund
+          GOTO      FNDDH920 IF NOT EQUAL
+.
+          MATCH     WKDHFTYP,PTDDFTYP       * Check Field type
+          GOTO      FNDDH920 IF NOT EQUAL
+.
+          MATCH     SP70,WKDHDLEN
+          IF        !@EQUAL
+            MATCH     WKDHDLEN,PTDDDLEN
+            GOTO      FNDDH920 IF NOT EQUAL
+          ELSE
+            MATCH     "1",PTDDDLEN
+            GOTO      FNDDH200 IF EQUAL       * deleted record
+          ENDIF
+.
+FNDDH900  MOVE      ZERO,OVRCD
+.
+          MATCH     "01",WKDHFTYP           * HCP Equivalent field type ?
+          IF        @EQUAL
+            MOVE      PTDDCFD1,PTHFHCPE     * HCP Eq.
+            GOTO      FNDDH999
+          ENDIF
+.
+          MATCH     "02",WKDHFTYP           * Health Fund Group field type ?
+          IF        @EQUAL
+            MOVE      PTDDCFD1,PTHFHGRP     * HF Group
+            GOTO      FNDDH999
+          ENDIF
+.
+          MATCH     "03",WKDHFTYP           * Theatre Charging Indicator field ?
+          IF        @EQUAL
+            STRIP     PTDDCFD1
+            MOVE      PTDDCFD1,HFBAND       * Theatre Charging indicator
+            GOTO      FNDDH999
+          ENDIF
+.
+FNDDH920  MOVE      ONE,OVRCD
+          PACK      PTDDFLD1,SP70,SP10
+          PACK      PTDDFLD2,SP70,SP10
+          PACK      PTDDCFD1,SP70,SP10
+          PACK      PTDDCFD2,SP70,SP10
+          MOVE      ZERO,PTDDFVL1        * Form Value 1
+          MOVE      ZERO,PTDDFVL2        * Form Value 2
+          MOVE      SP70,PTDDDLEN
+.
+FNDDH999  RETURN
+.

@@ -1,0 +1,284 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/TableSort.js"></script>
+<script type="text/javascript" src="../js/patweb9810001.js"></script>
+<script type="text/javascript">
+//----------------------------------------------------------------------------
+// Create New Table Object
+// Border, Cellspacing, Cellpadding, Width, Align, Heading Height, Row Height
+//----------------------------------------------------------------------------
+// Add Columns in Order Required
+// Heading,Type,Display Column,Sort Column, Align, Icon, Link Column
+// Columns Available
+//  0 - HTML Link                   
+//  1 - Date Time
+//  2 - Ward Name
+//  3 - Bed
+//  4 - Ward/Bed
+//  5 - Rate
+//  6 - Adm type
+//  7 - Doctor
+//  8 - Care Type
+//  9 - Movement
+// 10 - Unit
+// 11 - Bed Type
+// 12 - Claim Type Description
+// 13 - Team
+// 14 - Registra
+// 15 - Resident
+// 16 - User Id   
+//---------------------------------------------------------------------------
+
+function InitTable() {
+ document.title="Supervisor Insert Change for " + 
+                document.PatientLinks.dumyname.value;
+ t = new Table(1,0,1,"100%","center",40,40);
+ t.addColumn("Date & Time","DateTime",1,1,"left","","",70);
+ t.addColumn("Movement","String",9,9,"left","","",80);
+ t.addColumn("Ward/Bed","String",4,4,"left","","",90);
+ t.addColumn(document.PatientLinks.CLdesc.value,"String",12,12,"left","","",50);
+ t.addColumn(document.PatientLinks.admtype.value,"String",6,6,"left","","",100);
+ t.addColumn("Resp. Clinician","String",7,7,"left","","",110);
+ t.addColumn("Unit","String",10,10,"left","","",70);
+ if(document.UpdateForm.ptcnhdps.value==6){
+   t.addColumn("Team","String",13,13,"left","","",70);
+ }
+ t.addColumn("Care Type","String",8,8,"left","","",70);
+ t.addColumn("Bed Type","String",11,11,"left","","",80);
+ t.addColumn("Registrar","String",14,14,"left","","",100);
+ t.addColumn("Resident","String",15,15,"left","","",100);
+ t.addColumn("User Id","String",16,16,"left","","",60);
+ AddTableRows();
+ TableOutput(0,1);    // Order Column,Asc Dsc
+}
+function LoadWardBeds() {
+  var p=document.UpdateForm;
+  WardBedSelection(p.trntowrd,p.trntobed,'A',p.d_trntobed);
+}
+function OkButtonClicked() {
+  location.href="patweb98.pbl?reportno=01&template=021"
+      + "&urnumber=" + document.PatientLinks.urnumber.value
+      + "&admissno=" + document.PatientLinks.admissno.value;
+}
+function DefaultBedType () {
+  f = document.UpdateForm;
+  if(isWhitespace(f.trntowrd.value)) {
+    return;
+  }
+  var serverURL   = "../cgi-bin/comweb80.pbl?reportno=39" +
+                    "&valdward=" + f.trntowrd.value.replace(/ /g,"+") +
+                    "&valdabed=" + f.trntobed.value.replace(/ /g,"+")
+  var returnValue = RSExecute(serverURL);
+  if (returnValue.status==0) {
+    ReturnValue=returnValue.return_value.split("|")
+    for (var i =0 ; i < f.insbdtyp.length; i++) {
+      if (f.insbdtyp.options[i].value.substr(0,3)==ReturnValue[0]) {
+        insbdtyp.selectedIndex=i;
+      }
+    }
+  }
+  else {
+    f.insbdtyp.value="";
+  }
+}
+function InsertRecord() {
+  f = document.UpdateForm;
+  if (!validateMandatory(f)) {return;}
+  if (!validateInsertDetatils()) {return;}
+
+  f.submit();
+}
+function validateInsertDetatils() {
+  f = document.UpdateForm;
+  var insdate = SetDateYYYYMMDD(f.inschdat.value);
+  var serverURL   = "../cgi-bin/comweb81.pbl?reportno=70" +
+                    "&valdcode=" + f.trntowrd.value.replace(/ /g,"+") +
+                    "&valdcod2=" + f.trntobed.value.replace(/ /g,"+") +
+                    "&valdcod3=" + insdate.replace(/ /g,"+") +
+                    "&valdcod4=" + f.inschtim.value.replace(/ /g,"+") +
+                    "&valdcod5=" + f.admissno.value.replace(/ /g,"+") 
+  var returnValue = RSExecute(serverURL);
+  if (returnValue.status != 0) { return false;}
+  ReturnValue = returnValue.return_value.split("|");
+  if (ReturnValue[0] == "0") { return true; }
+
+  if (ReturnValue[0] == "1") {
+    alert("Error: Change record exists for this date/time");
+    return false;
+  }
+
+  if (ReturnValue[0] == "2") {
+    alert("Error: Admission does not exist");
+    return false;
+  }
+
+  if (ReturnValue[0] == "3") {
+    alert("Error: Patient must be discharged, current or on-leave");
+    return false;
+  }
+
+  if (ReturnValue[0] == "4") {
+    alert("Error: Change date/time must be greater admission date/time");
+    return false;
+  }
+
+  if (ReturnValue[0] == "5") {
+    alert("Error: Change date/time must be within admission date/and " +
+          "discharge date/time period");
+    return false;
+  }
+
+  if (ReturnValue[0] == "6") {
+    alert("Error: Change date cannot be before invoice accommodation date");
+    return false;
+  }
+
+  if (ReturnValue[0] == "7") {
+    alert("Error: Patient is on leave on date/time of movement. \n" +
+          "Date: " + ReturnValue[1] + " Time: " + ReturnValue[2]);
+    return false;
+  }
+
+  return true;
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);InitTable();">
+
+<div id=HeadingSection>
+<div id=PatientHeading></div>
+<script type="text/javascript">
+PatientURN="%PATWEB98.10.003";
+PatientVIS="%PATWEB98.10.081";
+PatientNAM="%PATWEB98.10.002";
+PatientSTA="%PATWEB98.10.086.078";
+PatientALT="%PATWEB98.10.084";
+PatientSEX="%PATWEB98.10.019";
+PatientDOB="%PATWEB98.10.020";
+PatientAGE="%PATWEB98.10.021";
+PatientLOC="%PATWEB98.10.083";
+PatientPRI="%PATWEB98.10.086.066.1";
+PatientUNT="%PATWEB98.10.066.0";
+DoctorCOD="%PATWEB98.10.082.003";
+DoctorNAM="%PATWEB98.10.082.002";
+PatientAID="%PATWEB98.10.086.090";
+PatientIND="%PATWEB98.10.086.091";
+PatientCUR="%PATWEB98.10.086.092";
+PatientCLC="%PATWEB98.10.086.093.1";
+PatientCLH="%STANDARD.01.017.CL";
+PatientHFT="%PATWEB98.10.086.094";
+PatientCDM="%PATWEB98.10.086.095";
+PatientVDH="%PATWEB98.10.086.099.015";
+InsertPatientHeader()
+</script>
+<div id=PatientMenu></div>
+<form name=UpdateForm action=patweb98.pbl method=get style="margin:0">
+<input type=hidden name=reportno value=10>
+<input type=hidden name=template value=004>
+<input type=hidden name=updttype value=I>
+<input type=hidden name=nextpage value=1>
+<input type=hidden name=trnsupty value="%PATWEB98.10.206">
+<input type=hidden name=urnumber value="%PATWEB98.10.003">
+<input type=hidden name=admissno value="%PATWEB98.10.081">
+<input type=hidden name=redirect value="%PATWEB98.10.001.patweb98.10.004">
+<input type=hidden name=ptcnhdps value="%STANDARD.01.025.080.250.1.1">
+<input type="hidden" name="admndate" id="admndate"
+       value="%PATWEB98.10.302">
+
+<table width=100% cellspacing=0 cellpadding=0 bgcolor=#cccccc>
+<tr>
+  <td class=DataLabel> &nbsp; Ward / Bed
+    <input type=hidden name=bedstat1>
+    <input type=hidden name=warddesc>
+    <select name=trntowrd class=Mandatory title="Ward"
+     onchange="LoadWardBeds();DefaultBedType();">
+      <option></option>
+      %PATWEB98.10.205
+    </select>
+    <input type=hidden name=d_trntobed>
+    <select name=trntobed title="Bed" notab
+      onchange="DefaultBedType();">
+    </select>
+    <img src="../images/SearchIcon.gif" class=Icon
+     onclick="WardBedSearchFrame(UpdateForm.trntowrd,
+                                 UpdateForm.warddesc,
+                                 UpdateForm.trntobed,
+                                 UpdateForm.bedstat1,
+                                 LoadWardBeds,DefaultBedType);">
+  </td>
+  <td class=DataLabel>Bed Type
+    <select name=insbdtyp id=insbdtyp
+      class=Mandatory title="Bed Type">
+      <option value=" "></option>
+        %STANDARD.01.021.BT 
+    </select>
+  </td>
+
+  <td class=DataLabel>Change Date
+    <input type=text size=12 name=inschdat class="Mandatory Date"
+     value="" title="Change Date">
+    <a href='javascript:DateLookupFrame(UpdateForm.inschdat)'>
+    <img src="../images/DateLookup.gif" class=Icon></a>
+  </td>
+
+  <td class=DataLabel>Change Time
+    <input type=text size=12 name=inschtim class="Mandatory"
+     value="" title="Change Time">
+    <a href='javascript:SetCurrentDateTime(null,UpdateForm.inschtim)'>
+    <img src="../images/DateTimeStamp.gif" class=Icon></a>
+    <a href='javascript:TimeLookupFrame(UpdateForm.inschtim)'>
+    <img src="../images/TimeLookup.gif" class=Icon></a>
+  </td>
+
+  <td class=DataLabel>Movement Type
+    <select name=insmvtyp class=Mandatory title="Movement Type">
+      <option value=" "></option>
+      <option value="C">Change</option>
+      <option value="L">On Leave</option>
+      <option value="R">Return from Leave</option>
+    </select>
+  </td>
+
+  <td class=DataLabel>Reason for Bed Transfer
+    <select name=chngreas class=Mandatory title="Reason for Bed Transfer">
+      <option></option>
+        %PATWEB98.10.221.9.1.03.1.I
+    </select>
+  </td>
+
+  <td align=right>
+    <input type=button class=bigButton value="Insert" id=btnInsert
+     onclick="tempDisable(this);InsertRecord();">
+    <input type=button class=bigButton value="OK" id=btnOk
+     onclick="OkButtonClicked();">
+  </td>
+</tr>
+
+</table>
+
+<div id=TableLocation></div>
+
+</form>
+</div>
+
+<script type="text/javascript">
+function AddTableRows() {
+%PATWEB98.10.199.029
+}
+</script>
+
+<form name=PatientLinks method=get style="margin:0">
+<input type=hidden name=reportno value=1>
+<input type=hidden name=template value=004>
+<input type=hidden name=urnumber value="%PATWEB98.10.003">
+<input type=hidden name=admissno value="%PATWEB98.10.081">
+<input type=hidden name=MenuType value="%PATWEB98.10.088">
+<input type=hidden name=multifin value="%STANDARD.01.025.118.134.0.1">
+<input type=hidden name=dumyname value="%PATWEB98.10.002">
+<input type=hidden name=admtype  value="%STANDARD.01.017.A ">
+<input type=hidden name=CLdesc   value="%STANDARD.01.017.CL ">
+<input type=hidden name="d_wbsehosp" value="%STANDARD.01.032">
+</form>

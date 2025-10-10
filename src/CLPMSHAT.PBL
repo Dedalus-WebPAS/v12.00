@@ -1,0 +1,42 @@
+.---------------------------------------------------------------------------
+. Include Name : CLPMSHAT.PBL
+. Function     : Clear function for PMSHATFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.05.01  29/01/2025  J.Tan         TSK 0946490 
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLPMSHAT  MOVE      SP70,PMHTHOSP      . Hospital ID (pathspaf)    
+          MOVE      SP70,PMHTTYPE      . Type of Attribute    
+          MOVE      SP70,PMHTKVAL      . Key Value
+          MOVE      SP70,PMHTSDAT      . Effective Start Date (ccyymmdd)   
+          MOVE      SP70,PMHTEDAT      . Effective End Date (ccyymmdd)   
+          PACK      PMHTTXT1,SP70,SP70 . Text 1     
+          PACK      PMHTTXT2,SP70,SP70 . Text 2     
+          PACK      PMHTTXT3,SP70,SP70 . Text 3     
+          PACK      PMHTTXT4,SP70,SP70 . Text 4     
+          MOVE      SP70,PMHTVAL1      . Value 1     
+          MOVE      SP70,PMHTVAL2      . Value 2     
+          MOVE      SP70,PMHTVAL3      . Value 3     
+          MOVE      SP70,PMHTVAL4      . Value 4     
+          MOVE      SP70,PMHTIND1      . Yes/No 1     
+          MOVE      SP70,PMHTIND2      . Yes/No 2     
+          MOVE      SP70,PMHTIND3      . Yes/No 3     
+          MOVE      SP70,PMHTIND4      . Yes/No 4     
+          MOVE      SP70,PMHTCOD1      . Coded Value 1    
+          MOVE      SP70,PMHTCOD2      . Coded Value 2    
+          MOVE      SP70,PMHTCOD3      . Coded Value 3    
+          MOVE      SP70,PMHTCOD4      . Coded Value 4    
+          MOVE      SP70,PMHTCUSR      . User who Created Record (websecaf)  
+          MOVE      SP70,PMHTCDAT      . Date Record Created (ccyymmdd)   
+          MOVE      SP70,PMHTCTIM      . Time Record Created (hh:mm:ss)   
+          MOVE      SP70,PMHTUUSR      . User who Updated Record (websecaf)  
+          MOVE      SP70,PMHTUDAT      . Date Record Updated (ccyymmdd)   
+          MOVE      SP70,PMHTUTIM      . Time Record Updated (hh:mm:ss)   
+          MOVE      SP70,PMHTFUSR      . User who Finished Attr (websecaf)  
+          MOVE      SP70,PMHTFDAT      . Date Attribute Finished (ccyymmdd)   
+          MOVE      SP70,PMHTFTIM      . Time Attribute Finished (hh:mm:ss)   
+          PACK      PMHTSPAR,SP70,SP70 . Spare      
+          RETURN

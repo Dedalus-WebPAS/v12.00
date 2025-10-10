@@ -1,0 +1,69 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/allweb01.js"></script>
+<script type="text/javascript">
+function InsertServiceSubtype() {
+  p = document.UpdateForm; 
+  if (!validateMandatory(p)) {return;}
+
+  var serverURL = "../cgi-bin/comweb81.pbl?reportno=63" +
+                  "&valdtype=" + p.deptcode.value.replace(/ /g,"+") +
+                  "&valdcode=ZX" +
+                  "&valdcod2=" + p.contcode.value.replace(/ /g,"+")
+  var returnValue = RSExecute(serverURL);
+  if (returnValue.status == 0) {
+    ReturnValue = returnValue.return_value.split("|")
+    if (ReturnValue.length != 1) {
+      alert('Subtype already existed in allcctaf.')
+      return
+    }
+  }
+   
+  p.submit();
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event)">
+
+<span class=DFrameTitleBar>
+  <img align="right" class="MenuIcon" src="../images/ExitIcon.gif" 
+   alt="Exit" onclick="DFrameExitRefresh();">
+   Service Subtype Codes
+</span>
+
+<form name=UpdateForm method=post action=allweb01.pbl style="margin:0">
+<input type=hidden name=reportno id=reportno value="24">
+<input type=hidden name=template id=template value="002">
+<input type=hidden name=updttype id=updttype value="A">
+<input type=hidden name=deptcode id=deptcode value="%ALLWEB01.24.003">
+
+<table align=center border=0>
+  <tr><td>&nbsp;</td></tr>
+  <tr>
+    <td align=right>
+      Subtype &nbsp; &nbsp;
+    </td>
+    <td align=left>
+      <select name=contcode id=contcode title="Subtype" class=Mandatory>
+        <option></option>
+          %ALLWEB01.24.002.2
+      </select>
+    </td>
+  </tr>
+  <tr><td>&nbsp;</td></tr>
+  <tr>
+    <td align=right>
+      <input type=button class=button value="Add" name=btnAdd id=btnAdd
+        onclick="InsertServiceSubtype();">
+    </td>
+    <td align=left>
+      <input type=button class=button value="Cancel" name=btnCancel
+        id=btnCancel
+        onclick="DFrameCloseRefresh();">
+    </td>
+  </tr>
+</table>
+</form>

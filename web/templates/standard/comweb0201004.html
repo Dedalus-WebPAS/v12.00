@@ -1,0 +1,331 @@
+<meta name="TemplateVersion" content="V12.00.03">
+<meta name="TemplateHome" content="standard">
+<meta name="CrossBrowser" content="true">
+<meta name="HelpFileName"    content="NoContextSet.html">
+<script type="text/javascript" src="../js/comweb0201.js"></script>
+<script type="text/javascript">
+function DispAdmissInvoiceNo() {
+  if (UpdateForm.pplantyp.value=="4") { // Payment Plan Type - Admission
+    UpdateForm.futureac.value="";
+    UpdateForm.futureac.className="Mandatory";
+    UpdateForm.ptdet003.value="";
+    UpdateForm.ptdet002.value="";
+    UpdateForm.ptdet001.value="";
+    UpdateForm.paystart.value="";
+    UpdateForm.paystart.className="Mandatory FutureDate";
+    document.getElementById('numrepay').innerHTML = "";
+    document.getElementById('lastpydt').innerHTML = "";
+
+    document.getElementById('admnno').style.display = ""; 
+    document.getElementById('invno').style.display = "none"; 
+    UpdateForm.ptdet001.classList.remove("Mandatory");
+    if(isWhitespace(UpdateForm.admissno.value)) {
+      alert("Admission does not exist for this patient");
+      UpdateForm.pplantyp.value="";
+      return;
+    } else {
+      UpdateForm.admnnum.value = UpdateForm.admissno.value;    
+    }
+    UpdateForm.outstand.value = trim(UpdateForm.admnoust.value);
+    if(trim(UpdateForm.admnoust.value) <= 0) {
+      alert("No Outstanding Amount for this admission - cannot create Payment Plan.");
+      UpdateForm.pplantyp.value="";
+      UpdateForm.admnnum.style.display="none";
+      UpdateForm.admnnum.value="";
+      UpdateForm.outstand.value = "";
+      return; 
+    }
+  } else if (UpdateForm.pplantyp.value=="2") { // Payment Plan Type - Invoice
+    UpdateForm.futureac.value="";
+    UpdateForm.futureac.className="Mandatory";
+    UpdateForm.ptdet003.value="";
+    UpdateForm.ptdet002.value="";
+    UpdateForm.ptdet001.value="";
+    UpdateForm.paystart.value="";
+    UpdateForm.paystart.className="Mandatory FutureDate";
+    document.getElementById('numrepay').innerHTML = "";
+    document.getElementById('lastpydt').innerHTML = "";
+
+    var NumOfInvoices = UpdateForm.numinv.value;
+    UpdateForm.outstand.value = "";
+    if(NumOfInvoices == "1"){
+      document.getElementById('admnno').style.display = "none"; 
+      document.getElementById('invno').style.display = ""; 
+      UpdateForm.ptdet001.classList.add("Mandatory");
+      
+    } else {
+      alert("No Invoices raised for this Admission");
+      UpdateForm.pplantyp.value = "";
+      document.getElementById('admnno').style.display = "none";
+      document.getElementById('invno').style.display = "none";
+      UpdateForm.outstand.value = "";
+      return;
+    }
+  } else {
+    UpdateForm.futureac.value="";
+    UpdateForm.futureac.className="Mandatory";
+    UpdateForm.ptdet003.value="";
+    UpdateForm.ptdet002.value="";
+    UpdateForm.ptdet001.value="";
+    UpdateForm.paystart.value="";
+    document.getElementById('numrepay').innerHTML = "";
+    document.getElementById('lastpydt').innerHTML = "";
+    
+    document.getElementById('admnno').style.display = "none";
+    document.getElementById('invno').style.display = "none";
+    UpdateForm.outstand.value = "";
+  }
+}
+
+function checkInv() {
+  UpdateForm.outstand.value=trim(UpdateForm.outstand.value);
+}
+
+function valAmtRepaid() {
+  if(parseFloat(UpdateForm.ptdet002.value) <= 0.00) {
+     alert("Amount to be repaid per period Must be Greater Than 0");
+     UpdateForm.ptdet002.value="";
+  }
+
+  if(parseFloat(UpdateForm.ptdet002.value) > 
+     parseFloat(UpdateForm.outstand.value)) {
+     alert("Amount to be repaid per period cannot be Greater than Outstanding Amount");
+     UpdateForm.ptdet002.value="";
+  }
+}
+
+function calcNumRepayments() {
+// Calculate Number of Repayments
+
+ if (UpdateForm.systemty.value!= "4") {
+  var outstandVal = UpdateForm.outstand.value;
+  var amntRepaidVal = UpdateForm.ptdet002.value;
+  if(outstandVal > 0 && amntRepaidVal > 0) {
+    var amount = outstandVal / amntRepaidVal;
+    document.getElementById('numrepay').innerHTML = Math.ceil(amount);
+    UpdateForm.numrepay.value = Math.ceil(amount);
+  } else {
+    document.getElementById('numrepay').innerHTML = "";
+    UpdateForm.numrepay.value = "";
+  }
+// Calculate Expected Last Payment Date
+  var NumOfRepayments = document.getElementById('numrepay').innerHTML;
+  var e = document.getElementById('ptdet003');
+  var RepayFrequency = trim(e.options[e.selectedIndex].value.substring(26,28));
+  var totalDays = RepayFrequency * (NumOfRepayments - 1);
+  UpdateForm.lastdate.value = UpdateForm.paystart.value;
+  AddSubtractDate(UpdateForm.lastdate,totalDays.toString(),"A");
+
+  if(!isWhitespace(UpdateForm.paystart.value) && !isWhitespace(NumOfRepayments) && !isWhitespace(RepayFrequency)) {
+    document.getElementById('lastpydt').innerHTML = UpdateForm.lastdate.value;
+    UpdateForm.lastpydt.value = UpdateForm.lastdate.value; 
+  } else {
+    document.getElementById('lastpydt').innerHTML = "";
+    UpdateForm.lastpydt.value = "";
+  }
+ }
+}
+
+function SubmitPatDebt() {
+  if (validateMandatory(UpdateForm)) {
+    if(document.UpdateForm.outstand.value<=0){
+       alert("Outstanding Amount must be greater than zero. Cannot create Payment Plan.");
+       return;
+    }
+    if(confirm("Set Payment Plan Debt indicator for this patient?")) {
+       if(UpdateForm.pplantyp.value=="2") { // Invoice 
+         UpdateForm.pymtplan.value = "2";
+         UpdateForm.invoicen.value = UpdateForm.ptdet001.value;}
+       if(UpdateForm.pplantyp.value=="4") { // Admission
+         UpdateForm.pymtplan.value = "4";
+         UpdateForm.invoicen.value = UpdateForm.admnnum.value;}
+
+       UpdateForm.fuaction.value = UpdateForm.futureac.value;
+       UpdateForm.periodpy.value = UpdateForm.ptdet002.value;
+       UpdateForm.freqrpay.value = UpdateForm.ptdet003.value;
+       UpdateForm.debttype.value = UpdateForm.pplantyp.value;
+       SubmitHiddenNew(UpdateForm);
+    }
+  }
+}
+</script>
+
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);">
+<div id=PatientHeading></div>
+<script type="text/javascript">
+PatientURN="%COMWEB02.01.003";
+PatientVIS="%COMWEB02.01.081";
+PatientNAM="%COMWEB02.01.002";
+PatientSTA="%COMWEB02.01.086.078";
+PatientALT="%COMWEB02.01.084";
+PatientSEX="%COMWEB02.01.019";
+PatientDOB="%COMWEB02.01.020";
+PatientAGE="%COMWEB02.01.021";
+PatientLOC="%COMWEB02.01.083";
+PatientPRI="%COMWEB02.01.086.066.1";
+PatientUNT="%COMWEB02.01.066.0";
+DoctorCOD="%COMWEB02.01.082.003";
+DoctorNAM="%COMWEB02.01.082.002";
+PatientAID="%COMWEB02.01.086.090";
+PatientIND="%COMWEB02.01.086.091";
+PatientCUR="%COMWEB02.01.086.092";
+PatientCLC="%COMWEB02.01.086.093.1";
+PatientCLH="%STANDARD.01.017.CL";
+PatientHFT="%COMWEB02.01.086.094";
+PatientCDM="%COMWEB02.01.086.095";
+PatientVDH="%COMWEB02.01.086.099.015";
+InsertPatientHeader()
+</script>
+<div id=PatientMenu></div>
+<div id=PageBodySection>
+<form name=UpdateForm method=post action=comweb02.pbl style="margin:0">
+   <input type=hidden name=reportno value="1">
+   <input type=hidden name=template value="004">
+   <input type=hidden name=updttype value="P">
+   <input type=hidden name=urnumber value="%COMWEB02.01.003">
+   <input type=hidden name=admissno value="%COMWEB02.01.081">
+   <input type=hidden name=patientn value="%COMWEB02.01.009">
+   <input type=hidden name=systemcd value="">
+   <input type=hidden name=nextpage value="4">
+   <input type=hidden name=invoicen value="">
+   <input type=hidden name=periodpy value="">
+   <input type=hidden name=freqrpay value="">
+   <input type=hidden name=debttype value="">
+   <input type=hidden name=systemty value="">
+   <input type=hidden name=admnoust value="%COMWEB02.01.112">
+   <input type=hidden name=dummy    value="">
+   <input type=hidden name=numrepay value="">
+   <input type=hidden name=lastpydt value="">
+   <input type=hidden name=lastdate value="">
+   <input type=hidden name=fuaction value="">
+   <input type=hidden name=numinv   value="%COMWEB02.01.111">
+   <input type=hidden name=pymtplan value="">
+   <input type=hidden name=visittyp id=visittyp value="">
+   <input type=hidden name=redirect value="%COMWEB02.01.001.comweb02.01.004">
+
+<table width=50% align=center border=1 cellspacing=0>
+<tr><td colspan=2 class=HeadingCell width=50% align=center>Set Payment Plan Debt Indicator
+    </td>
+<tr><td class=DataLabel width=50%>Surname</td>
+    <td class=DataField>%COMWEB02.01.009</td>
+
+<tr><td class=DataLabel>Given Names</td>
+    <td class=DataField>%COMWEB02.01.010</td>
+
+<tr><td class=DataLabel>Date of Birth</td>
+    <td class=DataField>%COMWEB02.01.020</td>
+
+<tr><td class=DataLabel>Sex</td>
+    <td class=DataField>%COMWEB02.01.019</td>
+
+<tr><td class=DataLabel>Medicare Number</td>
+    <td class=DataField>%COMWEB02.01.027 &nbsp;</td>
+
+<tr><td class=DataLabel>Address 1</td>
+    <td class=DataField>%COMWEB02.01.012 &nbsp;</td>
+
+<tr><td class=DataLabel>Address 2</td>
+    <td class=DataField>%COMWEB02.01.013 &nbsp;</td>
+
+<tr><td class=DataLabel>Address 3</td>
+    <td class=DataField>%COMWEB02.01.014 &nbsp;</td>
+
+<tr><td class=DataLabel>Address 4</td>
+    <td class=DataField>%COMWEB02.01.015 &nbsp;</td>
+
+<tr><td class=DataLabel>Postcode</td>
+    <td class=DataField>%COMWEB02.01.016 &nbsp;</td>
+    </tr>
+
+<tr><td class=DataLabel>Payment Plan Type</td>
+    <td class=DataField>
+    <select name=pplantyp class="SelectBig Mandatory" 
+     title="Payment Plan Type" onchange="DispAdmissInvoiceNo();">
+    <option value=""></option>
+    <option value="4">Admission</option>
+    <option value="2">Inpatient/Private Practice Invoice</option>
+    </select>
+    </td></tr>
+
+<tr><td class=DataLabel>Admission No / Invoice No</td>
+    <td class=DataField>
+    <span id=admnno style="display:none;">
+    <input type=text class=Readonly name="admnnum" class=Number size=12
+     maxlength=8 readonly></span>
+    <span id="invno" style="display:none;">
+    <input type=text name=ptdet001 id=ptdet001
+     title="Invoice Number" class=Mandatory
+     size=10 maxlength=8 onblur="validateInv();checkInv();calcNumRepayments();">
+    <img src="../images/SearchIcon.gif" class=Icon
+     onclick="InvoiceList(UpdateForm.urnumber,visittyp,ptdet001);"></span>
+    
+    </td>
+    </tr>
+
+<tr><td class=DataLabel>Payments Starting</td>
+    <td><input type=text name=paystart id=paystart size=12
+         title='Payments Starting' class='Mandatory FutureDate'
+         onblur="checkDate(this,this.title);calcNumRepayments();">
+        <img src=../images/DateLookup.gif class=Icon id=paystrt onclick="DateLookupFrame(paystart);"></td>
+    </tr>
+
+<tr><td class=DataLabel>Outstanding Amount</td>
+    <td class=DataField>
+    <input type=text class="Number Readonly" readonly title="Outstanding Amount" 
+     name=outstand size=12
+     maxlength=12 tabindex=-1 onchange="RoundNumber(this,2);calcNumRepayments();">
+    </td></tr>
+
+
+<tr><td class=DataLabel>Amount to be repaid per period</td>
+    <td class=DataField>
+    <input type=text name=ptdet002 class="Number Mandatory" size=12 maxlength=12
+     title="Amount to be repaid per period"
+     onchange="RoundNumber(this,2);valAmtRepaid();calcNumRepayments();">
+    </td></tr>
+
+<tr><td class=DataLabel>Repayment Frequency</td>
+    <td class=DataField>
+    <select name=ptdet003 id=ptdet003 class="SelectBig Mandatory" 
+     title="Repayment Frequency" onchange="calcNumRepayments();">
+    <option></option>
+    %COMWEB02.01.108.2
+    </select>
+    </td></tr>
+
+<tr><td class=DataLabel>Future Action Type</td>
+    <td class=DataField>
+    <select name="futureac" id="futureac" class="SelectBig Mandatory" 
+     title="Future Action Type">
+    <option></option>
+    %COMWEB02.01.110.9.6. 3.1.P
+    </select>
+    </td></tr>
+
+<tr><td class=DataLabel>Number of Repayments</td>
+    <td class=DataField id=numrepay ></td>
+    </tr>
+
+<tr><td class=DataLabel>Expected Last Payment Date</td>
+    <td class=DataField id=lastpydt></td>
+    </tr>
+
+<tr><td colspan=3 align=center>
+    <input type=button value=Set class="button" id=setbtn 
+           onclick="tempDisable(this);SubmitPatDebt();">
+    <input type=button value=Cancel class="button" 
+           onclick="PatientLinkTo('patweb98.pbl',1,1,0);">
+    </td></tr>
+</table>
+</form>
+</div>
+
+<form name="PatientLinks" method="get">
+<input type="hidden" name="reportno" value="1">
+<input type="hidden" name="template" value="002">
+<input type="hidden" name="urnumber" value="%COMWEB02.01.003">
+<input type="hidden" name="admissno" value="%COMWEB02.01.081">
+<input type="hidden" name="MenuType" value="%COMWEB02.01.088">
+</form>

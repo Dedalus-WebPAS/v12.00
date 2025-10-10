@@ -1,0 +1,29 @@
+.---------------------------------------------------------------------------
+. Include Name : CLPATFAC
+. Function     : Clear function for Patient Future Actions          
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.05.01 17/12/2024 Bella Turco     TSK 0925576
+.           Created         
+.---------------------------------------------------------------------------
+.
+CLPATFAC  MOVE      SP70,FADATE        . Future Action Date
+          MOVE      SP70,DFADMNO       . Admission Number
+          MOVE      SP70,FACODE        . Future Action Code
+          MOVE      SP70,FACOMM        . Comments            
+          MOVE      SP70,PTFCURNO      . UR Number
+          MOVE      SP70,PTFCDTCP      . Date Completed   
+          MOVE      SP70,PTFCOCGR      . Occupational Group              
+          MOVE      SP70,PTFCHFND      . Health Fund                   
+          MOVE      SP70,PTFCSTAT      . Status                         
+          MOVE      SP70,PTFCINVN      . Invoice Number                  
+          MOVE      SP70,PTFCCDAT      . Date Record Created CCYYMMDD  
+          MOVE      SP70,PTFCCTIM      . Time Record Created HH:MM:SS    
+          MOVE      SP70,PTFCCUID      . WEB User ID Created websecaf  
+          MOVE      SP70,PTFCUDAT      . Date Record Updated CCYYMMDD  
+          MOVE      SP70,PTFCUTIM      . Time Record Updated HH:MM:SS    
+          MOVE      SP70,PTFCUUID      . WEB User ID Updated websecaf  
+          MOVE      SP70,PTFCSPAR      . Spare            
+.
+          RETURN

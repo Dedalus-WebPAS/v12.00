@@ -1,0 +1,155 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="hea-nbh">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/TableSort.js"> </script>
+<script type="text/javascript" src="../js/emrweb0202020.js"></script>
+<script type="text/javascript" src="../js/emrweb02_NBH.js"></script>
+<script type="text/javascript">
+function SelectPatient(emexp001) {
+  f = document.UpdateForm;
+  f.emexp001.value = emexp001.replace(/ /g,"+");
+  f.formactn.value = "SP"; 
+  f.reportno.value = "02"; 
+  f.template.value = "011"; 
+  f.submit();
+}
+function PatientSearchNBH() {
+  redirect = "";
+  SetCookie('PatSearchRedirectCookie',redirect);
+
+  url= "patweb90.pbl?reportno=01&template=060" 
+  DFrameLink(url,0,0,1008,521);
+}
+// Only U/R field is shown on screen, others are all hidden
+function PatientReturn() {
+  f = document.UpdateForm;
+  validateUrMerge(8,
+                 f.emexp018,
+                 f.gname,
+                 f.dummy,
+                 f.emexp005,
+                 f.deceased,
+                 f.dummy,
+                 f.dummy,
+                 f.dummy,
+                 f.dummy,
+                 f.dummy,
+                 f.dummy,
+                 f.dummy,
+                 f.dummy,
+                 f.dummy,
+                 f.dummy,
+                 f.dummy,
+                 f.dummy,
+                 f.gname,
+                 f.sname,
+                 f.dummy,
+                 f.dummy,
+                 f.dummy,
+                 f.dummy,
+                 f.dummy,
+                 f.dummy,
+                 f.selsex,
+                 f.pfgname,
+                 f.pfsname);
+
+  if (f.deceased.value == "1") {
+    alert("Patient Deceased");
+    f.emexp018.value = "";
+    f.gname.value = "";
+    f.emexp002.value = "";
+    f.emexp003.value = "";
+    f.pfgname.value = "";
+    f.pfsname.value = "";
+    f.selsex.value = "";
+    f.emexp004.value = "";
+    f.emexp005.value = "";
+    return false;
+  }
+
+  if (!CheckEmrVisit(f.emexp018.value,f.emvis001.value)) {
+    f.emexp018.value = "";
+    f.gname.value = "";
+    f.emexp002.value = "";
+    f.emexp003.value = "";
+    f.pfgname.value = "";
+    f.pfsname.value = "";
+    f.selsex.value = "";
+    f.emexp004.value = "";
+    f.emexp005.value = "";
+    return false;
+   }
+
+  f.emexp002.value = f.gname.value.replace(/,/g,"");
+  f.emexp003.value = f.sname.value.replace(/,/g,"");
+
+  f.reportno.value = "02"; 
+  f.template.value = "020"; 
+  f.urnumber.value = f.emexp018.value; 
+  f.formactn.value = "SN"; 
+  f.frmemrls.value = "1"; 
+  f.submit();
+  return true;
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);InitTable();">
+<div id=HeadingSection>
+<table width=100% cellspacing=0 cellpadding=2 border=0>
+<tr>
+  <td align=right class=HeadingCell>
+    <input type=button class=Button value="New Patient"
+     name=btnNewPt id=btnNewPt title="New Patient"
+     onclick="PatientSearchNBH();">
+  </td>
+</tr>
+</table>
+</div>
+<div id=TableLocation></div>
+<script type="text/javascript">
+function InitTable() {
+ document.title="Expected Patient List"
+ t = new Table(1,0,2,"100%","center",30,35);    // Create New Table Object
+//
+// Add Columns in Order Required
+// Heading,Type,Display Column,Sort Column,Align
+//
+ t.addColumn("Notified Date","Date",12,12,"center","","",80)
+ t.addColumn("Time","String",13,13,"center","","",40)
+ t.addColumn("Patient","String",2,2,"left","PatientFolder.gif","0",180)
+ t.addColumn("Problem","String",4,4,"left","","",140)
+ t.addColumn("Exp Room","String",31,31,"left","","",60)
+ t.addColumn("ETA","DateTime",33,33,"left","","",80)
+ t.addColumn("Amb Case","String",30,30,"left","","",60)
+ t.addColumn("Accepting Source","String",23,23,"left","","",60)
+//
+// Add Rows to Table (Output from Web Server)
+//
+%EMRWEB01.01.022
+ t.sortTable(1,1);
+ TableOutput(0,1);
+}
+</script>
+<form name=UpdateForm action="emrweb02.pbl" method=get style="margin:0">
+<input type=hidden name=reportno>
+<input type=hidden name=template>
+<input type=hidden name=urnumber>
+<input type=hidden name=formactn>
+<input type=hidden name=deceased>
+<input type=hidden name=selsex>
+<input type=hidden name=gname>
+<input type=hidden name=sname>
+<input type=hidden name=pfgname>
+<input type=hidden name=pfsname>
+<input type=hidden name=dummy>
+<input type=hidden name=dummyadm>
+<input type=hidden name=emexp001>
+<input type=hidden name=emexp002>
+<input type=hidden name=emexp003>
+<input type=hidden name=emexp004>
+<input type=hidden name=emexp005>
+<input type=hidden name=emexp018>
+<input type=hidden name=emvis001>
+<input type=hidden name=frmemrls>
+</form>

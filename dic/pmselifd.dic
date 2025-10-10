@@ -1,0 +1,41 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Patient System 
+                      Items recorded on Eligibility Check 
+  
+TABLE NAME         :  pmseliaf
+=====================================================================
+PMEIVISN    char        8     1   Visit Number  
+PMEIRTYP    char        1     9   Record Type  
+                                   1=Theatre Fee Code/MBS  
+                                   2=Miscellaneous item Code  
+PMEICNTR    char        3    10   Counter  
+PMEIITMN    char        9    13   Theatre Fee Code/MBS or Misc.Code  
+PMEISERV    decimal     5    22   No of Items  
+PMEIGSTE    char        1    26   Disabled GST ? (1=Yes)  
+                                   -GST fields can only be entered for  
+                                   item with GST Applicable='Either'  
+PMEIGSTA    char        1    27   GST Payable 1=Yes, 0=No  
+                                   -Theatre/Misc.Item with Keyin GST  
+PMEIGSTC    char        6    28   GST Code  
+                                   -Theatre/Misc.item with keyin GST  
+PMEIKEYI    char        1    34   Keyin Rebate amount for Misc.item ?  
+                                   -SJOG IFC  
+                                   Misc.Item with Keyin Rebate option  
+                                   1 = Yes, 0 = No  
+                                   Theatre MBS item (Recordtype=1)  
+                                   X = MBS item from Booking  
+PMEIAMNT    decimal   14,2   35   Item Amount  
+                                   -SJOG IFC  
+                                   Misc.item with Keyin Rebate option  
+                                   -HEA IFC  
+                                   Item amount  
+PMEISPAR    char      100    43   Spare variable  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+PMEIVISN
+PMEIRTYP
+PMEICNTR
+  
+=====================================================================

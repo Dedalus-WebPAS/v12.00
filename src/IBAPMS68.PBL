@@ -1,0 +1,2765 @@
+.******************************************************************************
+.* Program        :  IBAPMS68                                                 *
+.* Description    :  Upload Surgical Preference Records Program               *
+.******************************************************************************
+.* Modifications  :                                                           *
+.******************************************************************************
+.* V11.04.01 14/02/2024  Thanh T     TSK 0923560                              *
+.*           Initial Version                                                  *
+.* V11.04.00 14/02/2024  Thanh T     TSK 0923560                              *
+.*           Initial Version                                                  *
+.******************************************************************************
+.
+          INC       STD001FD
+.
+          INC       IBACONFD/INC
+          INC       PATCONFD/INC
+          INC       PATCODFD/INC            * Codes file
+          INC       OPRDPHFD/INC            * Doctor Preference Header 
+          INC       OPRDPFFD/INC            * Doctor Preference Detailed 
+          INC       OPRPCMFD/INC            * Doctor Preference Comments 
+          INC       OPRTRAFD/INC            * Surgical Tray Header
+          INC       OPRTRBFD/INC            * Surgical Tray Detail
+          INC       OPRTPSFD/INC            * Speciality Tray Preference
+          INC       OPREQPFD/INC            * Equipment
+          INC       PMSUFIFD/INC            * Favourite Item Group 
+          INC       PMSHCPFD/INC             
+          INC       PATHSPFD/INC             
+          INC       NZPMCHFD/INC
+          INC       PATMCHFD/INC            * Miscellaneous Charges File
+          INC       MLTHCPFD/INC
+          INC       MLTCODFD/INC
+          INC       WEBSECFD/INC
+.
+          INC       UPLVALDW/INC
+.
+.         Doctor Preference Header Upload file
+.
+OPDPHTXT  FILE       HL7, FIXED=1000       
+.
+.Name     Type      Length Physical Start Description
+.----     ----      ------ -------- ----- -----------
+XPDHCODE  DIM       6      6        1     Doctor Code
+XPDHANTY  DIM       1      1        16    Anaesthetic Type. 1 or 0
+XPDHPREF  DIM       9      9        7     Preference Code
+XPDHDESC  DIM       50     50       17    Preference Description
+XPDHHOSP  DIM       3      3        67    Hospital ID (pathspaf)
+.
+.End of Record                      70
+.
+.         Doctor Preference Detailed Upload file
+.
+OPDPFTXT  FILE       HL7, FIXED=1000        
+.
+.Name     Type      Length Physical Start Description
+.----     ----      ------ -------- ----- -----------
+XPDFCODE  DIM       6      6        1     Doctor Code
+XPDFPREF  DIM       9      9        7     Preference Code
+XPDFCLSS  DIM       3      3        16    Class Type (Cat OG)
+XPDFTYPE  DIM       1      1        19    Item Type
+XPDFITEM  DIM       15     15       20    Item Code
+XPDFQTY   DIM       3      3        35    Quantity
+XPDFHOSP  DIM       3      3        38    Hospital ID (pathspaf)
+.
+.End of Record                      41
+.
+.         Doctor Preference Comments 
+.
+OPPCMTXT  FILE       HL7, FIXED=1000  
+.
+.Name     Type      Length Physical Start Description
+.----     ----      ------ -------- ----- -----------
+XPPCCODE  DIM       6      6        1     Doctor's code
+XPPCPREF  DIM       9      9        7     Preference code
+XPPCCLSS  DIM       3      3        16    Group/Class Type (Cat OG)
+XPPCLINE  DIM       3      3        19    Line Number
+XPPCDESC  DIM       70     70       22    Line Description
+XPPCHOSP  DIM       3      3        92    Hospital ID (pathspaf)
+.
+.End of Record                      95
+.
+.         Surgical Tray Header Upload file
+.
+OPTRATXT  FILE       HL7, FIXED=1000        * Upload file for ABF HAC Baseline 
+.
+.Name     Type      Length Physical Start Description
+.----     ----      ------ -------- ----- -----------
+XPTHCODE  DIM       15     15       1     Tray Code
+XPTHDESC  DIM       30     30       16    Description
+XPTHHOSP  DIM       3      3        46    Hospital ID (pathspaf)
+.
+.End of Record                      49
+.
+.         Surgical Tray Detail Upload file
+.
+OPTRBTXT  FILE       HL7, FIXED=1000
+.
+.Name     Type      Length Physical Start Description
+.----     ----      ------ -------- ----- -----------
+XPTDCODE  DIM       15     15       1     Tray Code
+XPTDITEM  DIM       15     15       16    Item Code
+XPTDQTY   DIM       3      3        31    Quantity
+XPTDHOSP  DIM       3      3        34    Hospital ID (pathspaf)
+.
+.End of Record                      37
+.
+.         Speciality Tray Preference Upload file
+.
+OPTPSTXT  FILE       HL7, FIXED=1000
+.
+.Name     Type      Length Physical Start Description
+.----     ----      ------ -------- ----- -----------
+XPTPSPEC  DIM       3      3        1     Specialty
+XPTPTRPR  DIM       15     15       4     Tray Preference
+XPTPHOSP  DIM       3      3        19    Hospital ID (pathspaf)
+.
+.End of Record                      22
+.
+.         Equipment Upload file
+.
+OPEQPTXT  FILE       HL7, FIXED=1000  
+.
+.Name     Type      Length Physical Start Description
+.----     ----      ------ -------- ----- -----------
+XPEQCODE  DIM       15     15       1     Equipment Code
+XPEQDESC  DIM       50     50       16    Equipment Description
+XPEQTYPE  DIM       3      3        66    Equipment type (Cat OE)
+XPEQSTAT  DIM       3      3        80    Current Status (Cat ER)
+XPEQDTSC  DIM       8      8        83    Date Status Changed (CCYYMMDD)
+XPEQUSLO  DIM       15     15       91    Usual Location/Tray
+XPEQCULO  DIM       15     15       106   Current Location/Tray
+XPEQDE1U  DIM       8      8        121   Date Equipment 1st Used (CCYYMMDD)
+XPEQMNOU  DIM       5      5        129   Maximum Number of Uses
+XPEQEEDT  DIM       8      8        134   Equipment Expiry Date (CCYYMMDD)
+XPEQNOUR  DIM       5      5        142   Number of Uses Remaining
+XPEQLSDT  DIM       8      8        147   Last Sterilisation Date (CCYYMMDD)
+XPEQULST  DIM       5      5        155   Total Num of Uses Since Last Steril
+XPEQSRNO  DIM       15     15       173   Equipment Serial Number
+XPEQSPNO  DIM       15     15       188   Supplier Catalog Number
+XPEQSPDT  DIM       50     50       203   Supplier Details
+XPEQNOTE  DIM       50     50       253   Notes
+XPEQACTV  DIM       1      1        441   Inactive? (Y=1, N=0)
+XPEQHOSP  DIM       3      3        442   Hospital ID (pathspaf)
+.
+.End of Record                      445
+.
+.         Favourite Item Group Upload file
+.
+PMUFITXT  FILE       HL7, FIXED=1000
+.
+.Name     Type      Length Physical Start Description
+.----     ----      ------ -------- ----- -----------
+XMUFUOGR  DIM       3      3        1     User Occupational Group (Cat w0)
+XMUFUSER  DIM       10     10       4     Web User (websecaf) blank for all
+XMUFHOSP  DIM       3      3        14    Hospital ID (pathspaf)
+XMUFFAVG  DIM       3      3        17    Favourite Group (Cat w4)
+XMUFFAVD  DIM       3      3        20    Default Favourite Group (Yes/No)
+XMUFGHED  DIM       3      3        23    Group Heading (Cat w5)
+XMUFCODE  DIM       9      9        26    Charge Code (patmchgf/nzpmchaf)
+XMUFQUAN  DIM       6      6        35    Quantity
+.                                         (nzpmchaf.nzmcdesc)
+.End of Record                      157
+.
+.
+. ----- Program Variables -----
+.
+ADDCOUNT  FORM      8
+CMDLINE   DIM       200
+WORKLINE  DIM       200
+CURRDATE  DIM       8
+.
+SPACLINE  INIT      "                                                                                                                                                                                                        "
+CMPCOUNT  FORM      3
+DIM3      DIM       3
+DIM4      DIM       4
+DIM9      DIM       9
+DIM15     DIM       15
+DIM30     DIM       30
+DIM80     DIM       80
+DIM100    DIM       100
+ERRCOUNT  FORM      8
+ERORDESC  DIM       60
+ERRFLAG   FORM      1
+ERORFLAG  FORM      1
+ERRORMSG  DIM       50
+ERRORMS2  DIM       50
+FNAMEI    DIM       500
+.
+DINFIELD  DIM       30
+DDECLEN   FORM      2
+DNEGALLW  FORM      1
+DTOTLEN   FORM      2
+.
+ERRAMHD   DIM       18
+FORM3     FORM      3
+.
+HOSPID    DIM       3 
+DOCTCODE  DIM       6 
+HOSPERR   FORM      1 
+DOCTERR   FORM      1 
+INFLDNAM  DIM       30
+MISCHOSP  DIM       3
+MISCCODE  DIM       9
+MISCDESC  DIM       90
+MISCEFFD  DIM       8
+.
+LINECNTR  FORM      8
+OUTFNAME  DIM       8
+PATHNAME  DIM       150
+USERID    DIM       10
+UPDCOUNT  FORM      8
+.
+XFLD0001  DIM       30
+XFLD0002  DIM       30
+XFLD0003  DIM       30
+XFLD0004  DIM       30
+XFLD0005  DIM       30
+XFLD0006  DIM       30
+XFLD0007  DIM       30
+XFLD0008  DIM       30
+XFLD0009  DIM       30
+XFLD0010  DIM       30
+XFLD0011  DIM       30
+XFLD0012  DIM       30
+XFLD0013  DIM       30
+XFLD0014  DIM       30
+XFLD0015  DIM       30
+XFLD0016  DIM       30
+XFLD0017  DIM       30
+XFLD0018  DIM       30
+XFLD0019  DIM       30
+XFLD0020  DIM       30
+XFLD0021  DIM       30
+XFLD0022  DIM       30
+XFLD0023  DIM       30
+XFLD0024  DIM       30
+XFLD0025  DIM       30
+XFLD0026  DIM       30
+XFLD0027  DIM       30
+XFLD0028  DIM       30
+XFLD0029  DIM       30
+XFLD0030  DIM       30
+XFLD0031  DIM       30
+XFLD0032  DIM       30
+XFLD0033  DIM       30
+XFLD0034  DIM       30
+XFLD0035  DIM       30
+XFLD0036  DIM       30
+XFLD0037  DIM       30
+XFLD0038  DIM       30
+XFLD0039  DIM       30
+XFLD0040  DIM       30
+.
+YFLD0001  DIM       100
+YFLD0002  DIM       100
+YFLD0003  DIM       100
+YFLD0004  DIM       100
+YFLD0005  DIM       100
+YFLD0006  DIM       100
+YFLD0007  DIM       100
+YFLD0008  DIM       100
+YFLD0009  DIM       100
+YFLD0010  DIM       100
+.
+ALPHANUM  INIT      "a~b~c~d~e~f~g~h~i~j~k~l~m~n~o~p~q~r~s~t~u~v~w~x~y~z~A~B~C~D~E~F~G~H~I~J~K~L~M~N~O~P~Q~R~S~T~U~V~W~X~Y~Z~1~2~3~4~5~6~7~8~9~0~ ~"
+MDBALNUM  INIT      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+.
+CISBLANK  INIT      "Is Blank"
+CNOHEADR  INIT      "There is no corresponding header records found"
+.
+PRGID     INIT      "IBAPMS68"
+PRGNAM    INIT      "Upload Surgical Preference Records Program"
+VERSION   INIT      "V12.00.00"
++
+.******************************************************************************
+.*                  Main Module                                               *
+.******************************************************************************
+ML0000    CALL      INIT0000                * Initailize variables & open files
+          CALL      KOPT0000                * Keyin Upload or Update option
+          BRANCH    EXIT,ML9999
+.
+          BRANCH    COPTION,ML1000,ML1000,ML1000,ML1000,ML1000:
+                            ML1000,ML1000,ML1000
+          GOTO      ML9999
+.
+ML1000    CALL      KASC0000                * Keyin file
+          BRANCH    EXIT,ML9900
+.
+ML1100    CALL      SCRD0000                * Display screen
+.
+          CALL      KUSR0000                * Keyin user id
+          BRANCH    EXIT,ML0000
+.
+          CALL      KPTH0000                * Keyin pathname
+          BRANCH    EXIT,ML0000
+.
+          CALL      SFLD0000
+          BRANCH    EXIT,ML1100
+.
+          CALL      PRHD0000                * Print header
+.
+          CALL      CTOT0000                * Clear total vars
+.
+          CALL      PROC0000                * with Updating file
+.
+          CALL      PTOT0000                * Print report totals
+.
+          GOTO      ML9999
+.
+ML9900    CALL      HEAD132
+          PRINT     *N,"Failed to open upload file. "
+.
+ML9999    CHAIN     PGM
++
+.******************************************************************************
+.*                  Initialize Variables & Open Files                         *
+.******************************************************************************
+INIT0000  CALL      DISPHEAD                * Display screen heading
+.
+          CALL      IBACLOCK
+.
+          DISPLAY   *P56:24,"Opening patcodes";
+          OPEN      PATCODE1,"patcodes"
+.
+          DISPLAY   *P64:24,"oprdphaf";
+          OPEN      OPRDPHA1,"oprdphaf"
+.
+          DISPLAY   *P64:24,"oprdpfaf";
+          OPEN      OPRDPFA1,"oprdpfaf"
+.
+          DISPLAY   *P64:24,"oprpcmaf";
+          OPEN      OPRPCMA1,"oprpcmaf"
+.
+          DISPLAY   *P64:24,"oprtryaf";
+          OPEN      OPRTRYA1,"oprtryaf"
+.
+          DISPLAY   *P64:24,"oprtrybf";
+          OPEN      OPRTRYB1,"oprtrybf"
+.
+          DISPLAY   *P64:24,"oprtpsaf";
+          OPEN      OPRTPSA1,"oprtpsaf"
+.
+          DISPLAY   *P64:24,"opreqpaf";
+          OPEN      OPREQPA1,"opreqpaf"
+.
+          DISPLAY   *P64:24,"pmsufiaf";
+          OPEN      PMSUFIA1,"pmsufiaf"
+.
+          DISPLAY   *P64:24,"pmshcpaf";
+          OPEN      PMSHCPA1,"pmshcpaf"
+.
+          DISPLAY   *P64:24,"pathspaf";
+          OPEN      PATHSPA1,"pathspaf"
+          OPEN      NZPMCHA3,"nzpmchaf"
+          OPEN      PATMCHG4,"patmchgf"
+          OPEN      MLTHCPA2,"mlthcpaf"
+          OPEN      MLTCODA1,"mltcodaf"
+          OPEN      WEBSECA1,"websecaf"
+.
+          OPEN      CONTROLF,"controlf"
+.
+          READ      CONTROLF,ZERO;*43,IBCNMHOS
+          READ      CONTROLF,TEN9;*212,CFEETYP
+.
+          CALL      IBACLOCK
+          PACK      CURRDATE,CCC,CYY,CMM,CDD
+          REP       " 0",CURRDATE
+          MOVE      CCC,CURRCENT
+.
+          MOVE      SP70,VERRMSG
+          MOVE      SP70,VERRMSG2
+.
+INIT9999  RETURN
++
+.******************************************************************************
+.*                  Choose Upload or Update files                             *
+.******************************************************************************
+KOPT0000  MOVE      ZERO,EXIT
+          MOVE      ZERO,COPTION
+          DISPLAY   *P1:4,*EF:
+                    *P1:4,*V2LON,"0",*HOFF," = Exit";
+          DISPLAY   *P1:5,*V2LON,"1",*HOFF:
+                      " = Upload Doctor Preference Header Records";
+          DISPLAY   *P1:6,*V2LON,"2",*HOFF:
+                      " = Upload Doctor Preference Detailed Records";
+          DISPLAY   *P1:7,*V2LON,"3",*HOFF:
+                      " = Upload Doctor Preference Comments Records";
+          DISPLAY   *P1:8,*V2LON,"4",*HOFF:
+                      " = Upload Surgical Tray Header Records";
+          DISPLAY   *P1:9,*V2LON,"5",*HOFF:
+                      " = Upload Surgical Tray Detail Records";
+          DISPLAY   *P1:10,*V2LON,"6",*HOFF:
+                      " = Upload Speciality Tray Preference Records";
+          DISPLAY   *P1:11,*V2LON,"7",*HOFF:
+                      " = Upload Equipment Records";
+          DISPLAY   *P1:12,*V2LON,"8",*HOFF:
+                      " = Upload Favourite Item Group Records";
+.
+          DISPLAY   *P1:14,"Select Option : ";
+.
+KOPT1000  KEYIN     *P17:14,*V2LON,COPTION;
+          BRANCH    COPTION,KOPT9999,KOPT9999,KOPT9999,KOPT9999,KOPT9999:
+                            KOPT9999,KOPT9999,KOPT9999
+.
+          COMPARE   ZERO,COPTION
+          GOTO      KOPT9000 IF EQUAL
+          BEEP
+          GOTO      KOPT1000
+.
+KOPT9000  MOVE      ONE,EXIT
+KOPT9999  RETURN
++
+.******************************************************************************
+.*                  Keyin file                                                *
+.******************************************************************************
+KASC0000  MOVE      ZERO,EXIT
+          PACK      FNAMEI WITH SP70,SP70,SP70
+.
+          IF        COPTION=1
+            DISPLAY   *P26:15,*EF,"Doctor Preference Header Load File";
+          ENDIF
+          IF        COPTION=2
+            DISPLAY   *P26:15,*EF,"Doctor Preference Detailed Load File";
+          ENDIF
+          IF        COPTION=3
+            DISPLAY   *P26:15,*EF,"Doctor Preference Comments";
+          ENDIF
+          IF        COPTION=4
+            DISPLAY   *P26:15,*EF,"Surgical Tray Header Load File";
+          ENDIF
+          IF        COPTION=5
+            DISPLAY   *P26:15,*EF,"Surgical Tray Detail Load File";
+          ENDIF
+          IF        COPTION=6
+            DISPLAY   *P26:15,*EF,"Speciality Tray Preference Load File";
+          ENDIF
+          IF        COPTION=7
+            DISPLAY   *P26:15,*EF,"Equipment Load File";
+          ENDIF
+          IF        COPTION=8
+            DISPLAY   *P26:15,*EF,"Favourite Item Group Records Load File";
+          ENDIF
+.
+          KEYIN     *P1:16,*EL,"Keyin Path & File Name : ",*V2LON,FNAMEI
+.
+          PACK      FNAMEI,FNAMEI,SP70,SP70,SP70
+.
+          MATCH     SP70,FNAMEI
+          GOTO      KASC9000 IF EQUAL
+.
+          SCAN      ".txt",FNAMEI
+          IF        !@EQUAL
+            SQUEEZE   FNAMEI
+            ENDSET    FNAMEI
+            APPEND    ".txt",FNAMEI      * add ".txt" if there is a path
+            APPEND    SP70,FNAMEI
+            RESET     FNAMEI
+          ENDIF
+          RESET     FNAMEI
+.
+          IF        COPTION=1
+            DISPLAY   *P26:16,*V2LON,*EL,FNAMEI;
+            MOVE      ZERO,OVRCD
+            TRAP      OVERCOND IF IO
+            OPEN      OPDPHTXT,FNAMEI
+            TRAPCLR   IO
+            BRANCH    OVRCD,KASC8000
+          ENDIF
+.
+          IF        COPTION=2
+            DISPLAY   *P26:16,*V2LON,*EL,FNAMEI;
+            MOVE      ZERO,OVRCD
+            TRAP      OVERCOND IF IO
+            OPEN      OPDPFTXT,FNAMEI
+            TRAPCLR   IO
+            BRANCH    OVRCD,KASC8000
+          ENDIF
+.
+          IF        COPTION=3
+            DISPLAY   *P26:16,*V2LON,*EL,FNAMEI;
+            MOVE      ZERO,OVRCD
+            TRAP      OVERCOND IF IO
+            OPEN      OPPCMTXT,FNAMEI
+            TRAPCLR   IO
+            BRANCH    OVRCD,KASC8000
+          ENDIF
+.
+          IF        COPTION=4
+            DISPLAY   *P26:16,*V2LON,*EL,FNAMEI;
+            MOVE      ZERO,OVRCD
+            TRAP      OVERCOND IF IO
+            OPEN      OPTRATXT,FNAMEI
+            TRAPCLR   IO
+            BRANCH    OVRCD,KASC8000
+          ENDIF
+.
+          IF        COPTION=5
+            DISPLAY   *P26:16,*V2LON,*EL,FNAMEI;
+            MOVE      ZERO,OVRCD
+            TRAP      OVERCOND IF IO
+            OPEN      OPTRBTXT,FNAMEI
+            TRAPCLR   IO
+            BRANCH    OVRCD,KASC8000
+          ENDIF
+.
+          IF        COPTION=6
+            DISPLAY   *P26:16,*V2LON,*EL,FNAMEI;
+            MOVE      ZERO,OVRCD
+            TRAP      OVERCOND IF IO
+            OPEN      OPTPSTXT,FNAMEI
+            TRAPCLR   IO
+            BRANCH    OVRCD,KASC8000
+          ENDIF
+.
+          IF        COPTION=7
+            DISPLAY   *P26:16,*V2LON,*EL,FNAMEI;
+            MOVE      ZERO,OVRCD
+            TRAP      OVERCOND IF IO
+            OPEN      OPEQPTXT,FNAMEI
+            TRAPCLR   IO
+            BRANCH    OVRCD,KASC8000
+          ENDIF
+.
+          IF        COPTION=8
+            DISPLAY   *P26:16,*V2LON,*EL,FNAMEI;
+            MOVE      ZERO,OVRCD
+            TRAP      OVERCOND IF IO
+            OPEN      PMUFITXT,FNAMEI
+            TRAPCLR   IO
+            BRANCH    OVRCD,KASC8000
+          ENDIF
+.
+          CALL      KOUT0000                * Keyin output file
+          BRANCH    EXIT,KASC9000
+.
+          CALL      EXCUS000
+          MOVE      ZERO,EXIT
+          GOTO      KASC9999
+.
+KASC8000  DISPLAY   *P1:24,*EL,*B,"File not found.  ";
+          CALL      HITENTER
+          GOTO      KASC0000
+.
+KASC9000  MOVE      ONE,EXIT
+.
+KASC9999  RETURN
++
+.******************************************************************************
+.*                  Screen display                                            *
+.******************************************************************************
+SCRD0000  DISPLAY   *P1:20,*EF:
+                    *P1:20," 1. Keyin User id      :":
+                    *P1:21," 2. Keyin Path name    :";
+SCRD9999  RETURN
++
+.******************************************************************************
+.*                  Keyin user id                                             *
+.******************************************************************************
+KUSR0000  KEYIN     *P26:20,*EL,*V2LON,USERID;
+          PACK      USERID,USERID,SP70
+          MATCH     SP70,USERID
+          GOTO      KUSR9500 IF EQUAL
+.
+          MOVE      ZERO,EXIT
+          GOTO      KUSR9999
+.
+KUSR9500  MOVE      ONE,EXIT
+KUSR9999  RETURN
++
+.******************************************************************************
+.*                  Keyin path name                                           *
+.******************************************************************************
+KPTH0000  PACK      PATHNAME,SP70,SP70,SP70
+          KEYIN     *P26:21,*EL,*V2LON,PATHNAME;
+          ENDSET    PATHNAME
+          APPEND    SP70,PATHNAME
+          APPEND    SP70,PATHNAME
+          APPEND    SP70,PATHNAME
+          RESET     PATHNAME
+.
+.         PACK      PATHNAME,PATHNAME,SP70,SP70,SP70
+          MATCH     SP70,PATHNAME
+          GOTO      KPTH9500 IF EQUAL
+.
+          MOVE      ZERO,EXIT
+          GOTO      KPTH9999
+.
+KPTH9500  MOVE      ONE,EXIT
+KPTH9999  RETURN
++
+.******************************************************************************
+.*                   Keyin output file                                        *
+.******************************************************************************
+KOUT0000  DISPLAY   *P1:17,"Keyin Output file      :";
+.
+          KEYIN     *P26:17,*EL,*V2LON,OUTFNAME;
+          PACK      OUTFNAME,OUTFNAME,SP70
+          MATCH     SP70,OUTFNAME
+          GOTO      KOUT9500 IF EQUAL
+.
+          MOVE      ZERO,EXIT
+          GOTO      KOUT9999
+.
+KOUT9500  MOVE      ONE,EXIT
+KOUT9999  RETURN
++
+.******************************************************************************
+.*                  Select Field                                              *
+.******************************************************************************
+SFLD0000  CALL      MAINQST                 * Select Item, (P)ost, (C)ancel ?
+.
+          COMPARE   ZERO,CCITEM
+          GOTO      SFLD9999 IF EQUAL
+          GOTO      SFLD1000 IF LESS
+.
+          MOVE      ZERO,EXIT
+.
+          PERFORM   CCITEM,KUSR0000:             * Keyin user id
+                           KPTH0000              * Keyin pathname
+          BRANCH    EXIT,SFLD9999
+          GOTO      SFLD0000
+.
+SFLD1000  MOVE      ONE,EXIT
+SFLD9999  RETURN
++
+.******************************************************************************
+.*                  Print the selection details                               *
+.******************************************************************************
+PRHD0000  CALL      HEAD132
+.
+          BRANCH    COPTION,PRHD1000,PRHD2000,PRHD3000,PRHD4000,PRHD5000:
+                            PRHD6000,PRHD7000,PRHD8000
+          GOTO      PRHD9999
+.
+PRHD1000  PRINT     *N,"Upload Doctor Preference Header"
+          PRINT     *N,"Date    : ",CDATE:
+                    *N,"Time    : ",CTIMEIS:
+                    *N,"User ID : ",USERID
+.
+          PRINT     *N,"Doctor Preference Header Load file : ":
+                    *N,"     ",PATHNAME
+          CALL      UND132
+.
+          PRINT     *1,"| Line No.",*12,"|Error Messages":
+                    *63,"|Doctor Code",*75,"|Anaes Type":
+                    *86,"|Pref Code":
+                    *98,"|Hosp":
+                    *132,"|"
+          GOTO      PRHD9000
+.
+PRHD2000  PRINT     *N,"Upload Doctor Preference Detailed"
+          PRINT     *N,"Date    : ",CDATE:
+                    *N,"Time    : ",CTIMEIS:
+                    *N,"User ID : ",USERID
+.
+          PRINT     *N,"Doctor Preference Detailed Load file : ":
+                    *N,"     ",PATHNAME
+          CALL      UND132
+.
+          PRINT     *1,"| Line No.",*12,"|Error Messages":
+                    *63,"|Doctor Code",*75,"|Prefer Code":
+                    *87,"|class":
+                    *93,"|Type":
+                    *98,"|Item":
+                    *114,"|Hosp":
+                    *132,"|"
+          GOTO      PRHD9000
+.
+PRHD3000  PRINT     *N,"Upload Doctor Preference Comments"
+          PRINT     *N,"Date    : ",CDATE:
+                    *N,"Time    : ",CTIMEIS:
+                    *N,"User ID : ",USERID
+.
+          PRINT     *N,"Doctor Preference Comments Load file : ":
+                    *N,"     ",PATHNAME
+          CALL      UND132
+.
+          PRINT     *1,"| Line No.",*12,"|Error Messages":
+                    *63,"|Doctor Code",*75,"|Prefer Code":
+                    *87,"|class|Line":
+                    *99,"|Hosp":
+                    *132,"|"
+          GOTO      PRHD9000
+.
+PRHD4000  PRINT     *N,"Upload Surgical Tray Header"
+          PRINT     *N,"Date    : ",CDATE:
+                    *N,"Time    : ",CTIMEIS:
+                    *N,"User ID : ",USERID
+.
+          PRINT     *N,"Surgical Tray Header Load file : ":
+                    *N,"     ",PATHNAME
+          CALL      UND132
+.
+          PRINT     *1,"| Line No.",*12,"|Error Messages":
+                    *63,"|Tray Code":
+                    *81,"|Hosp":
+                    *132,"|"
+          GOTO      PRHD9000
+.
+PRHD5000  PRINT     *N,"Upload Surgical Tray Detail"
+          PRINT     *N,"Date    : ",CDATE:
+                    *N,"Time    : ",CTIMEIS:
+                    *N,"User ID : ",USERID
+.
+          PRINT     *N,"Surgical Tray Detail Load file : ":
+                    *N,"     ",PATHNAME
+          CALL      UND132
+.
+          PRINT     *1,"| Line No.",*12,"|Error Messages":
+                    *63,"|Tray Code":
+                    *81,"|Item":
+                    *99,"|Hosp":
+                    *132,"|"
+          GOTO      PRHD9000
+.
+PRHD6000  PRINT     *N,"Upload Speciality Tray Preference"
+          PRINT     *N,"Date    : ",CDATE:
+                    *N,"Time    : ",CTIMEIS:
+                    *N,"User ID : ",USERID
+.
+          PRINT     *N,"Speciality Tray Preference Load file : ":
+                    *N,"     ",PATHNAME
+          CALL      UND132
+.
+          PRINT     *1,"| Line No.",*12,"|Error Messages":
+                    *63,"|Specialty":
+                    *73,"|Hosp":
+                    *132,"|"
+          GOTO      PRHD9000
+.
+PRHD7000  PRINT     *N,"Upload Equipment"
+          PRINT     *N,"Date    : ",CDATE:
+                    *N,"Time    : ",CTIMEIS:
+                    *N,"User ID : ",USERID
+.
+          PRINT     *N,"Equipment Load file : ":
+                    *N,"     ",PATHNAME
+          CALL      UND132
+.
+          PRINT     *1,"| Line No.",*12,"|Error Messages":
+                    *63,"|Equipment Code":
+                    *81,"|Hosp":
+                    *132,"|"
+          GOTO      PRHD9000
+.
+PRHD8000  PRINT     *N,"Upload Favourite Item Group"
+          PRINT     *N,"Date    : ",CDATE:
+                    *N,"Time    : ",CTIMEIS:
+                    *N,"User ID : ",USERID
+.
+          PRINT     *N,"Favourite Item Group Load file : ":
+                    *N,"     ",PATHNAME
+          CALL      UND132
+.
+          PRINT     *1,"| Line No.",*12,"|Error Messages":
+                    *63,"|Hosp":
+                    *69,"|Occp Code":
+                    *79,"|User Id":
+                    *90,"|Fav Group":
+                    *100,"|Sub-Group":
+                    *110,"|Charge Code":
+                    *132,"|"
+          GOTO      PRHD9000
+.
+PRHD9000  CALL      UND132
+          GOTO      PRHD9999
+.
+PRHD9999  RETURN
++
+.******************************************************************************
+.*                  Processing                                                *
+.******************************************************************************
+PROC0000  MOVE      ZERO,LINECNTR
+.
+          BRANCH    COPTION,PROC1000,PROC2000,PROC3000,PROC4000,PROC5000:
+                            PROC6000,PROC7000,PROC8000
+.
+PROC1000  CALL      ODPH0000         * Process Doctor Preference Header 
+          GOTO      PROC9999
+.
+PROC2000  CALL      ODPF0000         * Process Doctor Preference Detailed 
+          GOTO      PROC9999
+.
+PROC3000  CALL      OPCM0000         * Process Doctor Preference Comments 
+          GOTO      PROC9999
+.
+PROC4000  CALL      OTRA0000         * Process Surgical Tray Header
+          GOTO      PROC9999
+.
+PROC5000  CALL      OTRB0000         * Process Surgical Tray Detail
+          GOTO      PROC9999
+.
+PROC6000  CALL      OTPS0000         * Process Speciality Tray Preference
+          GOTO      PROC9999
+.
+PROC7000  CALL      OEQP0000         * Process Equipment 
+          GOTO      PROC9999
+.
+PROC8000  CALL      PUFI0000         * Process Favourite Item Group
+          GOTO      PROC9999
+.
+PROC9999  RETURN
++
+.******************************************************************************
+.*                   Generate Doctor Preference Header                        *
+.******************************************************************************
+ODPH0000  OPEN      OPDPHTXT,FNAMEI
+.
+ODPH1000  READ      OPDPHTXT,SEQ;XFLD0001,XFLD0002,XFLD0003,YFLD0001,XFLD0005
+          GOTO      ODPH9000 IF OVER
+.
+          MATCH     SP70,XFLD0001
+          IF        !@EQUAL & !@EOS
+            GOTO      ODPH2000 
+          ENDIF
+.
+          MATCH     SP70,XFLD0002
+          IF        !@EQUAL & !@EOS
+            GOTO      ODPH2000
+          ENDIF
+.
+          GOTO      ODPH1000
+.
+ODPH2000  ADD       ONE,LINECNTR            * Text file line counter for error
+          CALL      PFLD0000                * pack fields with spaces
+.
+          CALL      VALD0000                * Validate fields
+          BRANCH    ERRFLAG,ODPH1000
+.
+          PACK      XPDHCODE,XFLD0001,SP70
+          PACK      XPDHPREF,XFLD0003,SP70
+          PACK      XPDHDESC,YFLD0001,SP70
+          PACK      XPDHHOSP,XFLD0005,SP70
+.
+          CALL      CLOPRDPH                * clear fields
+.
+          PACK      KEY18,XPDHCODE,XPDHPREF,XPDHHOSP,SP70
+          CALL      RDOPDPH1
+          IF        OVRCD=1
+            CALL      SETF0000
+            ADD       ONE,ADDCOUNT       * Total records added
+            CALL      WROPDPH1
+          ELSE
+            CALL      SETF0000
+            ADD       ONE,UPDCOUNT       * Total records updated
+            CALL      UPOPDPH1
+          ENDIF
+.
+          GOTO      ODPH1000
+.
+ODPH9000  CLOSE     OPDPHTXT
+ODPH9999  RETURN
++
+.******************************************************************************
+.*                  Generate Doctor Preference Detailed                       *
+.******************************************************************************
+ODPF0000  OPEN      OPDPFTXT,FNAMEI
+.
+ODPF1000  READ      OPDPFTXT,SEQ;XFLD0001,XFLD0002,XFLD0003,XFLD0004,XFLD0005:
+                                 XFLD0006,XFLD0007         
+          GOTO      ODPF9000 IF OVER
+.
+          MATCH     SP70,XFLD0001
+          IF        !@EQUAL & !@EOS
+            GOTO      ODPF2000 
+          ENDIF
+.
+          MATCH     SP70,XFLD0002
+          IF        !@EQUAL & !@EOS
+            GOTO      ODPF2000
+          ENDIF
+.
+          GOTO      ODPF1000 
+.
+ODPF2000  ADD       ONE,LINECNTR            * Text file line counter for error
+          CALL      PFLD0000                * pack fields with spaces
+.
+          CALL      VALD0000                * Validate fields
+          BRANCH    ERRFLAG,ODPF1000
+.
+          PACK      XPDFCODE,XFLD0001,SP70
+          PACK      XPDFPREF,XFLD0002,SP70
+          PACK      XPDFCLSS,XFLD0003,SP70
+          PACK      XPDFTYPE,XFLD0004,SP70
+          PACK      XPDFITEM,XFLD0005,SP70
+          PACK      XPDFQTY,XFLD0006,SP70
+          PACK      XPDFHOSP,XFLD0007,SP70
+.
+          CALL      CLOPRDPF                * clear fields
+.
+          PACK      KEY37,XPDFCODE,XPDFPREF,XPDFCLSS,XPDFTYPE,XPDFITEM:
+                          XPDFHOSP,SP70   
+          CALL      RDOPDPF1
+          IF        OVRCD=1
+            CALL      SETF0000
+            ADD       ONE,ADDCOUNT       * Total records added
+            CALL      WROPDPF1
+          ELSE
+            CALL      SETF0000
+            ADD       ONE,UPDCOUNT       * Total records updated
+            CALL      UPOPDPF1
+          ENDIF
+.
+          GOTO      ODPF1000
+.
+ODPF9000  CLOSE     OPDPFTXT
+ODPF9999  RETURN
++
+.******************************************************************************
+.*                  Generate Doctor Preference Comments                       *
+.******************************************************************************
+OPCM0000  OPEN      OPPCMTXT,FNAMEI
+.
+OPCM1000  READ      OPPCMTXT,SEQ;XFLD0001,XFLD0002,XFLD0003,XFLD0004,YFLD0001:
+                                 XFLD0006
+          GOTO      OPCM9000 IF OVER
+.
+          MATCH     SP70,XFLD0001
+          IF        !@EQUAL & !@EOS
+            GOTO      OPCM2000
+          ENDIF
+.
+          MATCH     SP70,XFLD0002
+          IF        !@EQUAL & !@EOS
+            GOTO      OPCM2000
+          ENDIF
+.
+          GOTO      OPCM1000
+.
+OPCM2000  ADD       ONE,LINECNTR            * Text file line counter for error
+          CALL      PFLD0000                * pack fields with spaces
+.
+          CALL      VALD0000                * Validate fields
+          BRANCH    ERRFLAG,OPCM1000
+.
+          PACK      XPPCCODE,XFLD0001,SP70
+          PACK      XPPCPREF,XFLD0002,SP70
+          PACK      XPPCCLSS,XFLD0003,SP70
+          PACK      XPPCLINE,XFLD0004,SP70
+          PACK      XPPCDESC,YFLD0001,SP70
+          PACK      XPPCHOSP,XFLD0006,SP70
+.
+          MOVE     ZERO,F3
+          STRIP    XPPCLINE                 * Line Number
+          MOVE     XPPCLINE,F3
+          MOVE     F3,XPPCLINE
+.
+          CALL      CLOPRPCM                * clear fields
+.
+          PACK      KEY24,XPPCCODE,XPPCPREF,XPPCCLSS,XPPCLINE,XPPCHOSP,SP70
+          CALL      RDOPPCM1
+          IF        OVRCD=1
+            CALL      SETF0000
+            ADD       ONE,ADDCOUNT       * Total records added
+            CALL      WROPPCM1
+          ELSE
+            CALL      SETF0000
+            ADD       ONE,UPDCOUNT       * Total records updated
+            CALL      UPOPPCM1
+          ENDIF
+.
+          GOTO      OPCM1000
+.
+OPCM9000  CLOSE     OPPCMTXT
+OPCM9999  RETURN
++
+.******************************************************************************
+.*                  Generate Surgical Tray Header                             *
+.******************************************************************************
+OTRA0000  OPEN      OPTRATXT,FNAMEI
+.
+OTRA1000  READ      OPTRATXT,SEQ;XFLD0001,YFLD0001,XFLD0003
+          GOTO      OTRA9000 IF OVER
+.
+          MATCH     SP70,XFLD0001
+          IF        !@EQUAL & !@EOS
+            GOTO      OTRA2000 
+          ENDIF
+.
+          MATCH     SP70,YFLD0001
+          IF        !@EQUAL & !@EOS
+            GOTO      OTRA2000 
+          ENDIF
+.
+          GOTO      OTRA1000
+.
+OTRA2000  ADD       ONE,LINECNTR            * Text file line counter for error
+          CALL      PFLD0000                * pack fields with spaces
+.
+          CALL      VALD0000                * Validate fields
+          BRANCH    ERRFLAG,OTRA1000
+.
+          PACK      XPTHCODE,XFLD0001,SP70
+          PACK      XPTHDESC,YFLD0001,SP70
+          PACK      XPTHHOSP,XFLD0003,SP70
+.
+          CALL      CLOPRTRA                * clear fields
+.
+          PACK      KEY18,XPTHCODE,XPTHHOSP,SP70
+          CALL      RDOPTRA1
+          IF        OVRCD=1
+            CALL      SETF0000
+            ADD       ONE,ADDCOUNT       * Total records added
+            CALL      WROPTRA1
+          ELSE
+            CALL      SETF0000
+            ADD       ONE,UPDCOUNT       * Total records updated
+            CALL      UPOPTRA1
+          ENDIF
+.
+          GOTO      OTRA1000
+.
+OTRA9000  CLOSE     OPTRATXT
+OTRA9999  RETURN
++
+.******************************************************************************
+.*                  Generate Surgical Tray Detail                             *
+.******************************************************************************
+OTRB0000  OPEN      OPTRBTXT,FNAMEI
+.
+OTRB1000  READ      OPTRBTXT,SEQ;XFLD0001,XFLD0002,XFLD0003,XFLD0004
+          GOTO      OTRB9000 IF OVER
+.
+          MATCH     SP70,XFLD0001
+          IF        !@EQUAL & !@EOS
+            GOTO      OTRB2000 
+          ENDIF
+.
+          MATCH     SP70,XFLD0002
+          IF        !@EQUAL & !@EOS
+            GOTO      OTRB2000 
+          ENDIF
+.
+          GOTO      OTRB1000
+.
+OTRB2000  ADD       ONE,LINECNTR            * Text file line counter for error
+          CALL      PFLD0000                * pack fields with spaces
+.
+          CALL      VALD0000                * Validate fields
+          BRANCH    ERRFLAG,OTRB1000
+.
+          PACK      XPTDCODE,XFLD0001,SP70
+          PACK      XPTDITEM,XFLD0002,SP70
+          PACK      XPTDQTY,XFLD0003,SP70
+          PACK      XPTDHOSP,XFLD0004,SP70
+.
+          CALL      CLOPRTRB                 * clear fields
+.
+          PACK      KEY33,XPTDCODE,XPTDITEM,XPTDHOSP,SP70
+          CALL      RDOPTRB1
+          IF        OVRCD=1
+            CALL      SETF0000
+            ADD       ONE,ADDCOUNT       * Total records added
+            CALL      WROPTRB1
+          ELSE
+            CALL      SETF0000
+            ADD       ONE,UPDCOUNT       * Total records updated
+            CALL      UPOPTRB1
+          ENDIF
+.
+          GOTO      OTRB1000
+.
+OTRB9000  CLOSE     OPTRBTXT
+OTRB9999  RETURN
++
+.******************************************************************************
+.*                  Generate Speciality Tray Preference                       *
+.******************************************************************************
+OTPS0000  OPEN      OPTPSTXT,FNAMEI
+.
+OTPS1000  READ      OPTPSTXT,SEQ;XFLD0001,XFLD0002,XFLD0003
+          GOTO      OTPS9000 IF OVER
+.
+          MATCH     SP70,XFLD0001
+          IF        !@EQUAL & !@EOS
+            GOTO      OTPS2000 
+          ENDIF
+.
+          MATCH     SP70,XFLD0002
+          IF        !@EQUAL & !@EOS
+            GOTO      OTPS2000 
+          ENDIF
+.
+          GOTO      OTPS1000
+.
+OTPS2000  ADD       ONE,LINECNTR            * Text file line counter for error
+          CALL      PFLD0000                * pack fields with spaces
+.
+          CALL      VALD0000                * Validate fields
+          BRANCH    ERRFLAG,OTPS1000
+.
+          PACK      XPTPSPEC,XFLD0001,SP70
+          PACK      XPTPTRPR,XFLD0002,SP70
+          PACK      XPTPHOSP,XFLD0003,SP70
+.
+          CALL      CLOPRTPS                * clear fields
+.
+          PACK      KEY6,XPTPSPEC,XPTPHOSP,SP70
+          CALL      RDOPTPS1
+          IF        OVRCD=1
+            CALL      SETF0000
+            ADD       ONE,ADDCOUNT       * Total records added
+            CALL      WROPTPS1
+          ELSE
+            CALL      SETF0000
+            ADD       ONE,UPDCOUNT       * Total records updated
+            CALL      UPOPTPS1
+          ENDIF
+.
+          GOTO      OTPS1000
+.
+OTPS9000  CLOSE     OPTPSTXT 
+OTPS9999  RETURN
++
+.******************************************************************************
+.*                  Generate Equipment                                        *
+.******************************************************************************
+OEQP0000  OPEN      OPEQPTXT,FNAMEI
+.
+OEQP1000  READ      OPEQPTXT,SEQ;XFLD0001,YFLD0001,XFLD0003,XFLD0004,XFLD0005:
+                                 XFLD0006,XFLD0007,XFLD0008,XFLD0009,XFLD0010:
+                                 XFLD0011,XFLD0012,XFLD0013,XFLD0014,XFLD0015:
+                                 YFLD0002,YFLD0003,XFLD0018,XFLD0019
+          GOTO      OEQP9000 IF OVER
+.
+          MATCH     SP70,XFLD0001
+          IF        !@EQUAL & !@EOS
+            GOTO      OEQP2000 
+          ENDIF
+.
+          MATCH     SP70,YFLD0001
+          IF        !@EQUAL & !@EOS
+            GOTO      OEQP2000
+          ENDIF
+.
+          GOTO      OEQP1000
+.
+OEQP2000  ADD       ONE,LINECNTR            * Text file line counter for error
+          CALL      PFLD0000                * pack fields with spaces
+.
+          PACK      XPEQCODE,XFLD0001,SP70
+          PACK      XPEQDESC,YFLD0001,SP70
+          PACK      XPEQTYPE,XFLD0003,SP70
+          PACK      XPEQSTAT,XFLD0004,SP70
+          PACK      XPEQDTSC,XFLD0005,SP70
+          PACK      XPEQUSLO,XFLD0006,SP70
+          PACK      XPEQCULO,XFLD0007,SP70
+          PACK      XPEQDE1U,XFLD0008,SP70
+          PACK      XPEQMNOU,XFLD0009,SP70
+          PACK      XPEQEEDT,XFLD0010,SP70
+          PACK      XPEQNOUR,XFLD0011,SP70
+          PACK      XPEQLSDT,XFLD0012,SP70
+          PACK      XPEQULST,XFLD0013,SP70
+          PACK      XPEQSRNO,XFLD0014,SP70
+          PACK      XPEQSPNO,XFLD0015,SP70
+          PACK      XPEQSPDT,YFLD0002,SP70
+          PACK      XPEQNOTE,YFLD0003,SP70
+          PACK      XPEQACTV,XFLD0018,SP70
+          PACK      XPEQHOSP,XFLD0019,SP70
+.
+          CALL      VALD0000                * Validate fields
+          BRANCH    ERRFLAG,OEQP1000
+.
+          CALL      CLOPREQP                * clear fields
+.
+          PACK      KEY18,XPEQCODE,XPEQHOSP,SP70
+          CALL      RDOPEQP1
+          IF        OVRCD=1
+            CALL      SETF0000
+            ADD       ONE,ADDCOUNT       * Total records added
+            CALL      WROPEQP1
+          ELSE
+            CALL      SETF0000
+            ADD       ONE,UPDCOUNT       * Total records updated
+            CALL      UPOPEQP1
+          ENDIF
+.
+          GOTO      OEQP1000
+.
+OEQP9000  CLOSE     OPEQPTXT
+OEQP9999  RETURN
++
+.******************************************************************************
+.*                  Generite Favourite Item Group                             *
+.******************************************************************************
+PUFI0000  OPEN      PMUFITXT,FNAMEI
+.
+PUFI1000  READ      PMUFITXT,SEQ;XFLD0001,XFLD0002,XFLD0003,XFLD0004,XFLD0005:
+                                 XFLD0006,XFLD0007,XFLD0008
+          GOTO      PUFI9000 IF OVER
+.
+          MATCH     SP70,XFLD0001
+          IF        !@EQUAL & !@EOS
+            GOTO      PUFI2000 
+          ENDIF
+.
+          MATCH     SP70,XFLD0002
+          IF        !@EQUAL & !@EOS
+            GOTO      PUFI2000
+          ENDIF
+.
+          GOTO      PUFI1000
+.
+PUFI2000  ADD       ONE,LINECNTR            * Text file line counter for error
+          CALL      PFLD0000                * pack fields with spaces
+.
+          PACK      XMUFHOSP,XFLD0001,SP70
+          PACK      XMUFUOGR,XFLD0002,SP70
+          PACK      XMUFUSER,XFLD0003,SP70
+          PACK      XMUFFAVG,XFLD0004,SP70
+          PACK      XMUFFAVD,XFLD0005,SP70
+          PACK      XMUFGHED,XFLD0006,SP70
+          PACK      XMUFCODE,XFLD0007,SP70
+          PACK      XMUFQUAN,XFLD0008,SP70
+.
+          CALL      VALD0000                * Validate fields
+          BRANCH    ERRFLAG,PUFI1000
+.
+          CALL      CLPMSUFI                * clear fields
+.
+          PACK      KEY31,XMUFHOSP,XMUFUOGR,XMUFUSER,XMUFFAVG,XMUFGHED:
+                          XMUFCODE,SP70
+          CALL      RDPMUFI1
+          IF        OVRCD=1
+            CALL      SETF0000
+            ADD       ONE,ADDCOUNT       * Total records added
+            MOVE      USERID,PMUFCUSR
+            CALL      IBACLOCK
+            PACK      PMUFCDAT,CCC,CYY,CMM,CDD
+            REP       " 0",PMUFCDAT
+            MOVE      CTIMEIS,PMUFCTIM
+            CALL      WRPMUFI1
+          ELSE
+            CALL      SETF0000
+            ADD       ONE,UPDCOUNT       * Total records updated
+            CALL      UPPMUFI1
+          ENDIF
+.
+          GOTO      PUFI1000
+.
+PUFI9000  CLOSE     PMUFITXT
+PUFI9999  RETURN
++
+.******************************************************************************
+.*                             Set fields                                     *
+.******************************************************************************
+SETF0000  BRANCH    COPTION,SETF1000,SETF2000,SETF3000,SETF4000,SETF5000:
+                            SETF6000,SETF7000,SETF8000
+          GOTO      SETF9999
+.
+SETF1000  MOVE      XPDHCODE,OPDHCODE      * Doctor Code
+          MOVE      XPDHPREF,OPDHPREF      * Preference Code
+          MOVE      XPDHDESC,OPDHDESC      * Preference Description
+          MOVE      XPDHHOSP,OPDHHOSP      * Hospital ID
+          GOTO      SETF9999
+.
+SETF2000  MOVE      XPDFCODE,OPDFCODE      * Doctor Code
+          MOVE      XPDFPREF,OPDFPREF      * Preference Code
+          MOVE      XPDFCLSS,OPDFCLSS      * Class Type
+          MOVE      XPDFTYPE,OPDFTYPE      * Item Type
+          MOVE      XPDFITEM,OPDFITEM      * Item Code
+.          
+          MOVE      ZERO,F3
+          STRIP     XPDFQTY                * Quantity
+          MOVE      XPDFQTY,F3
+          MOVE      F3,OPDFQTY
+.
+          MOVE      XPDFHOSP,OPDFHOSP      * Hospital ID
+          GOTO      SETF9999
+.
+SETF3000  MOVE      XPPCCODE,OPPCCODE      * Doctor Code
+          MOVE      XPPCPREF,OPPCPREF      * Preference Code
+          MOVE      XPPCCLSS,OPPCCLSS      * Class Type
+.
+          MOVE      ZERO,F3
+          STRIP     XPPCLINE               * Line Number
+          MOVE      XPPCLINE,F3
+          MOVE      F3,OPPCLINE
+.
+          MOVE      XPPCDESC,OPPCDESC      * Line Description
+          MOVE      XPPCHOSP,OPPCHOSP      * Hospital ID
+          GOTO      SETF9999
+.
+SETF4000  MOVE      XPTHCODE,OPTHCODE      * Tray Code
+          MOVE      XPTHDESC,OPTHDESC      * Tray Description
+          MOVE      XPTHHOSP,OPTHHOSP      * Hospital ID 
+          GOTO      SETF9999
+.
+SETF5000  MOVE      XPTDCODE,OPTDCODE      * Tray Code
+          MOVE      XPTDITEM,OPTDITEM      * Item Code 
+.
+          MOVE      ZERO,F3
+          STRIP     XPTDQTY                * Quantity
+          MOVE      XPTDQTY,F3             
+          MOVE      F3,OPTDQTY
+.
+          MOVE      XPTDHOSP,OPTDHOSP      * Hospital ID 
+          GOTO      SETF9999
+.
+SETF6000  MOVE      XPTPSPEC,OPTPSPEC      * Specialty
+          MOVE      XPTPTRPR,OPTPTRPR      * Tray Preference
+          MOVE      XPTPHOSP,OPTPHOSP      * Hospital ID 
+          GOTO      SETF9999
+.
+SETF7000  MOVE      XPEQCODE,OPEQCODE      * Equipment Code
+          MOVE      XPEQDESC,OPEQDESC      * Equipment Description
+          MOVE      XPEQTYPE,OPEQTYPE      * Equipment type (Cat OE)
+          MOVE      XPEQSTAT,OPEQSTAT      * Current Status (Cat ER)
+          MOVE      XPEQDTSC,OPEQDTSC      * Date Status Changed (CCYYMMDD)
+          MOVE      XPEQUSLO,OPEQUSLO      * Usual Location/Tray
+          MOVE      XPEQCULO,OPEQCULO      * Current Location/Tray 
+          MOVE      XPEQDE1U,OPEQDE1U      * Date Equipment 1st Used (CCYYMMDD) 
+.
+          MOVE      ZERO,F5 
+          STRIP     XPEQMNOU
+          MOVE      XPEQMNOU,F5
+          MOVE      F5,OPEQMNOU            * Maximum Number of Uses
+.
+          MOVE      XPEQEEDT,OPEQEEDT      * Equipment Expiry Date (CCYYMMDD)
+.
+          MOVE      ZERO,F5
+          STRIP     XPEQNOUR
+          MOVE      XPEQNOUR,F5
+          MOVE      F5,OPEQNOUR            * Number of Uses Remaining
+.
+          MOVE      XPEQLSDT,OPEQLSDT      * Last Sterilisation Date (CCYYMMDD)
+.
+          MOVE      ZERO,F5
+          STRIP     XPEQULST 
+          MOVE      XPEQULST,F5
+          MOVE      F5,OPEQULST            * Total Num of Uses Since Last Steril
+.
+          MOVE      XPEQSRNO,OPEQSRNO      * quipment Serial Number
+          MOVE      XPEQSPNO,OPEQSPNO      * Supplier Catalog Number
+          MOVE      XPEQSPDT,OPEQSPDT      * Supplier Details
+          MOVE      XPEQNOTE,OPEQNOTE      * Notes 
+          MOVE      XPEQACTV,OPEQACTV      * Inactive? (Y=1, N=0)
+          MOVE      XPEQHOSP,OPEQHOSP      * Hospital ID (pathspaf)
+          GOTO      SETF9999
+.
+SETF8000  MOVE      XMUFUOGR,PMUFUOGR      * User Occupational Group
+          MOVE      XMUFUSER,PMUFUSER      * Web User (websecaf) blank for all
+          MOVE      XMUFHOSP,PMUFHOSP      * Hospital ID
+          MOVE      XMUFFAVG,PMUFFAVG      * Favourite Group (Cat w4) 
+          MOVE      XMUFFAVD,PMUFFAVD      * Default Favourite Group (Yes/No)
+          MOVE      XMUFGHED,PMUFGHED      * Group Heading (Cat w5)
+          MOVE      XMUFCODE,PMUFCODE      * Charge Code (patmchgf/nzpmchaf)
+.
+          MOVE      ZERO,F6
+          STRIP     XMUFQUAN               * Quantity
+          MOVE      XMUFQUAN,F6
+          MOVE      F6,PMUFQUAN
+.
+          MOVE      MISCDESC,PMUFDESC      * Charge Code Description
+          GOTO      SETF9999
+.
+SETF9999  RETURN
+.
+.******************************************************************************
+.         Execute us1 command before processing
+.******************************************************************************
+EXCUS000  CLEAR     CMDLINE
+          APPEND    "ibapms68.us1 ",CMDLINE
+          SQUEEZE   FNAMEI
+          APPEND    FNAMEI,CMDLINE
+          APPEND    SP1,CMDLINE
+          APPEND    OUTFNAME,CMDLINE
+          APPEND    SP70,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+EXCUS999  RETURN
+.
+.******************************************************************************
+. Validate input text file fields
+.******************************************************************************
+VALD0000  MOVE      ZERO,EXIT
+          MOVE      ZERO,ERRFLAG
+          BRANCH    COPTION,VALD1000,VALD2000,VALD3000,VALD4000,VALD5000:
+                            VALD6000,VALD7000,VALD8000
+          GOTO      VALD9999
+.
+VALD1000  CALL      VDPH0000           * Validate Doctor Preference Header 
+          GOTO      VALD9999
+.
+VALD2000  CALL      VDPF0000           * Validate Doctor Preference Detailed
+          GOTO      VALD9999
+.
+VALD3000  CALL      VPCM0000           * Validate Doctor Preference Comments 
+          GOTO      VALD9999
+.
+VALD4000  CALL      VTRA0000           * Validate Surgical Tray Header
+          GOTO      VALD9999
+.
+VALD5000  CALL      VTRB0000           * Validate Surgical Tray Detail
+          GOTO      VALD9999
+.
+VALD6000  CALL      VTPS0000           * Validate Speciality Tray Preference
+          GOTO      VALD9999
+.
+VALD7000  CALL      VEQP0000           * Validate Equipment
+          GOTO      VALD9999
+.
+VALD8000  CALL      VUFI0000           * Validate URG Classifications
+          GOTO      VALD9999
+.
+VALD9999  RETURN
+.
+.******************************************************************************
+. Validate Doctor Preference Header input text file fields
+.******************************************************************************
+VDPH0000  MOVE      XFLD0005,INFLDNAM
+          CALL      VHOSPI00
+.
+          MOVE      XFLD0001,INFLDNAM
+          CALL      VDOCCD00
+.
+          MATCH     SP70,XFLD0002
+          IF        @EQUAL
+            MOVE      "Anaesthetic Type Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0002,VINFIELD
+            MOVE      1,VINTLEN
+            MOVE      "Anaesthetic Type",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MOVE      XFLD0002,DIM1
+              MOVE      "01",DIM3
+              SCAN      DIM1,DIM3
+              IF        !@EQUAL
+                MOVE      "Anaesthetic Type Must Be 0 or 1",ERRORMSG
+                CALL      PERR0000
+              ELSE
+                CALL      VPRFCD00 
+              ENDIF
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,XFLD0003
+          IF        @EQUAL
+            MOVE      "Preference Code Is Blank",ERRORMSG
+            CALL      PERR0000
+          ENDIF
+.
+          MATCH     SP70,YFLD0001
+          IF        @EQUAL
+            MOVE      "Preference Description Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      YFLD0001,VINFIELD
+            MOVE      50,VINTLEN
+            MOVE      "Preference Description",VFLDNAME
+            CALL      CCHLEN00
+          ENDIF
+.      
+VDPH9999  RETURN
+.
+.------------------------------------------------------------------------------
+. Validate preference code
+.------------------------------------------------------------------------------
+VPRFCD00  MOVE      XFLD0002,DIM1
+.
+          MATCH     "0",DIM1
+          GOTO      VPRFCD40 IF EQUAL
+.
+          MATCH     SP70,XFLD0003
+          IF        !@EQUAL
+            MOVE      XFLD0003,VINFIELD
+            MOVE      3,VINTLEN
+            MOVE      "Preference Code",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MOVE      "Preference Code. Category OA",VFLDNAME
+              MOVE      "OA",DIM2
+              MOVE      XFLD0003,DIM3
+              CALL      CCATCH00
+            ENDIF
+          ENDIF 
+.
+          GOTO      VPRFCD99
+.
+VPRFCD40  MATCH     SP70,XFLD0003
+          IF        !@EQUAL
+            MOVE      XFLD0003,VINFIELD
+            MOVE      9,VINTLEN
+            MOVE      "Preference Code",VFLDNAME
+            CALL      CCHLEN00
+          ENDIF   
+.
+          GOTO      VPRFCD99
+.
+VPRFCD99  RETURN
+.
+.------------------------------------------------------------------------------
+. Validate Doctor code
+. Input: INFLDNAM
+.------------------------------------------------------------------------------
+VDOCCD00  MOVE      ZERO,DOCTERR 
+          PACK      DOCTCODE,INFLDNAM,SP70
+          MATCH     SP70,INFLDNAM
+          IF        @EQUAL
+            MOVE      "Doctor Code Is Blank",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,DOCTERR 
+          ELSE
+            MOVE      INFLDNAM,VINFIELD
+            MOVE      6,VINTLEN
+            MOVE      "Doctor Code",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              PACK      KEY10,INFLDNAM,SP70
+              CALL      VDOHCP00
+            ELSE
+              MOVE      ONE,DOCTERR 
+            ENDIF
+          ENDIF
+.
+VDOCCD99  RETURN
+.
+.------------------------------------------------------------------------------
+. Validate HCP status code. must be 0 2 4 6 8 10 11 or 13
+. Input: KEY10
+.------------------------------------------------------------------------------
+VDOHCP00  CALL      RDPMHCP1
+          IF        OVRCD=1
+            MOVE      "Doctor Code Not In pmshcpaf",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,DOCTERR
+            GOTO      VDOHCP99
+          ENDIF
+.
+          IF        PMHCHCST = 0
+            GOTO      VDOHCP40
+          ENDIF
+.
+          BRANCH    PMHCHCST,VDOHCP20,VDOHCP40,VDOHCP20,VDOHCP40,VDOHCP20:
+                             VDOHCP40,VDOHCP20,VDOHCP40,VDOHCP20,VDOHCP40:
+                             VDOHCP40,VDOHCP20,VDOHCP40
+.
+          GOTO      VDOHCP20
+.
+VDOHCP20  MOVE      ONE,DOCTERR
+          MOVE      "Invalid HCP Status",ERRORMSG
+          PACK      ERRORMSG,ERRORMSG,HYPHEN,PMHCHCST,SP70
+          CALL      PERR0000
+          MOVE      "- HCP Status Must Be 0 2 4 6 8 10 11 or 13",ERRORMS2  
+          CALL      PERS0000
+.
+          GOTO      VDOHCP99        
+.
+VDOHCP40  MATCH     "1",PMHCHOSS
+          GOTO      VDOHCP99 IF NOT EQUAL
+.
+. Check mlthcpaf
+.
+          BRANCH    HOSPERR,VDOHCP99
+.
+          IF        IBCNMHOS = 0
+            GOTO      VDOHCP99
+          ENDIF
+. 
+          PACK      KEY13,KEY10,SP70
+          CALL      RSMLHCP2
+VDOHCP50  CALL      RKMLHCP2
+          BRANCH    OVRCD,VDOHCP55
+.
+          MATCH     KEY10,MLHCHCPC
+          GOTO      VDOHCP55 IF NOT EQUAL
+.
+          MATCH     HOSPID,MLHCHOSP
+          GOTO      VDOHCP99 IF EQUAL
+.
+          GOTO      VDOHCP50 
+.
+VDOHCP55  MOVE      ONE,DOCTERR
+          MOVE      "Invalid Hospital Specific HCP",ERRORMSG
+          PACK      ERRORMSG,ERRORMSG,SP1,HYPHEN,SP1,PMHCHOSS,SP70
+          CALL      PERR0000
+          MOVE      "- No Matching Hospital For Doctor In mlthcpaf",ERRORMS2
+          CALL      PERS0000
+.
+VDOHCP99  RETURN
+.
+.------------------------------------------------------------------------------
+. Validate Input hospital code
+. Input: INFLDNAM
+.        IBCNMHOS - Multiple hospital flag
+.------------------------------------------------------------------------------
+VHOSPI00  MOVE      ZERO,HOSPERR
+          PACK      HOSPID,INFLDNAM,SP70
+.
+          IF        IBCNMHOS = 1
+            GOTO      VHOSPI50
+          ENDIF
+.
+          MATCH     SP70,INFLDNAM
+          IF        !@EQUAL
+            MOVE      "Hospital Code Must Be Blank For Single Hospital",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,HOSPERR
+          ENDIF 
+.
+          GOTO      VHOSPI99
+.
+. Multi hospital checking
+.
+VHOSPI50  MATCH     SP70,INFLDNAM
+          IF        @EQUAL
+            MOVE      "Hospital Code Is Blank",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,HOSPERR
+          ELSE
+            MOVE      INFLDNAM,VINFIELD
+            MOVE      3,VINTLEN
+            MOVE      "Hospital Code",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              PACK      KEY3,INFLDNAM,SP70
+              CALL      VHOSCD00
+            ELSE
+              MOVE      ONE,HOSPERR
+            ENDIF
+          ENDIF
+.
+VHOSPI99  RETURN
+.
+.------------------------------------------------------------------------------
+. Validate hospital code against pathspaf 
+. Input: DIM3
+.------------------------------------------------------------------------------
+VHOSCD00  CALL      RDPTHSP1
+          IF        OVRCD=1
+            MOVE      "Hospital Code Not In pathspaf",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,HOSPERR
+            GOTO      VHOSCD99
+          ENDIF
+.
+VHOSCD99  RETURN
+.
+.******************************************************************************
+. Validate Doctor Preference Detailed input text file fields
+.******************************************************************************
+VDPF0000  MOVE      XFLD0007,INFLDNAM
+          CALL      VHOSPI00
+.
+          MOVE      XFLD0001,INFLDNAM
+          CALL      VDOCCD00
+.
+          MATCH     SP70,XFLD0002
+          IF        @EQUAL
+            MOVE      "Preference Code Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0002,VINFIELD
+            MOVE      9,VINTLEN
+            MOVE      "Preference Code",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MOVE      XFLD0002,DIM9 
+              PACK      KEY18,DOCTCODE,DIM9,HOSPID,SP70
+              CALL      VOPPDH00 
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,XFLD0003
+          IF        @EQUAL
+            MOVE      "Class Type Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0003,VINFIELD
+            MOVE      3,VINTLEN
+            MOVE      "Class Type",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MOVE      "Class Type. Category OG",VFLDNAME
+              MOVE      "OG",DIM2
+              MOVE      XFLD0003,DIM3
+              CALL      CCATCH00 
+            ENDIF 
+          ENDIF
+.
+          MATCH     SP70,XFLD0004
+          IF        @EQUAL
+            MOVE      "Item Type Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0004,VINFIELD
+            MOVE      1,VINTLEN
+            MOVE      "Item Type",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MOVE      XFLD0004,DIM1
+              MOVE      "012",DIM3
+              SCAN      DIM1,DIM3
+              IF        !@EQUAL
+                MOVE      "Item Type Must Be 0, 1 or 2",ERRORMSG
+                CALL      PERR0000
+              ENDIF
+            ENDIF
+          ENDIF
+.
+VDPF6000  MATCH     SP70,XFLD0006
+          IF        @EQUAL
+            MOVE      "Quantity Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0006,VINFIELF
+            MOVE      "Quantity",VFLDNAME
+            MOVE      3,VINTLEN  
+            CALL      CNBLEN00
+            IF        VERRFLAG = 0
+              MOVE      ZERO,F3
+              MOVE      XFLD0006,DIM3
+              STRIP     DIM3
+              MOVE      DIM3,F3
+              IF        F3 = 0
+                MOVE      "Quantity Must Be > 0",ERRORMSG
+                CALL      PERR0000 
+              ENDIF
+            ENDIF
+          ENDIF
+.
+          CALL      VITMCD00 
+.      
+VDPF9999 RETURN
+.
+.------------------------------------------------------------------------------
+. Validate preference code against oprdphaf
+. Input: KEY18
+.------------------------------------------------------------------------------
+VOPPDH00  BRANCH    HOSPERR,VOPPDH99
+          BRANCH    DOCTERR,VOPPDH99
+.
+          CALL      RDOPDPH1
+          IF        OVRCD=1
+            MOVE      "Doctor Code/Preference Code/Hospital",ERRORMSG
+            CALL      PERR0000
+            PACK      ERRORMS2,HYPHEN,SP1,CNOHEADR
+            CALL      PERS0000
+            GOTO      VOPPDH99 
+          ENDIF
+.
+VOPPDH99  RETURN
+.
+.------------------------------------------------------------------------------
+. Validate Item code
+.------------------------------------------------------------------------------
+VITMCD00  MATCH     "0",XFLD0004
+          GOTO      VITMCD20 IF EQUAL 
+.
+          MATCH     "2",XFLD0004
+          GOTO      VITMCD40 IF EQUAL
+.
+          MATCH     "1",XFLD0004
+          GOTO      VITMCD60 IF EQUAL
+.
+          GOTO      VITMCD99
+.
+. Validate Tray
+.
+VITMCD20  MATCH     SP70,XFLD0005
+          IF        @EQUAL
+            MOVE      "Item Code Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0005,VINFIELD
+            MOVE      15,VINTLEN
+            MOVE      "Item Code",VFLDNAME
+            CALL      CCHLEN00
+            IF        (VERRFLAG = 0 & HOSPERR = 0)
+              MOVE      XFLD0005,KEY15
+              MOVE      HOSPID,DIM3
+              PACK      KEY18,KEY15,DIM3,SP70
+              CALL      RDOPTRA1
+              IF        OVRCD = 1
+                MOVE      "Item Code/Hospital Not In oprtryaf",ERRORMSG
+                CALL      PERR0000
+                GOTO      VITMCD99
+              ENDIF
+            ENDIF 
+          ENDIF
+.
+          GOTO      VITMCD99
+.
+. Validate Equipment
+.
+VITMCD40  MATCH     SP70,XFLD0005
+          IF        @EQUAL
+            MOVE      "Item Code Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0005,VINFIELD
+            MOVE      15,VINTLEN
+            MOVE      "Item Code",VFLDNAME
+            CALL      CCHLEN00
+            IF        (VERRFLAG = 0 & HOSPERR = 0)
+              MOVE      XFLD0005,KEY15
+              MOVE      HOSPID,DIM3
+              PACK      KEY18,KEY15,DIM3,SP70
+              CALL      RDOPEQP1
+              IF        OVRCD=1
+                MOVE      "Item Code/Hospital Not In opreqpaf",ERRORMSG
+                CALL      PERR0000
+                GOTO      VITMCD99
+              ENDIF
+            ENDIF
+          ENDIF
+.
+          GOTO      VITMCD99
+.
+. Validate Item
+.
+VITMCD60  MATCH     SP70,XFLD0005
+          IF        @EQUAL
+            MOVE      "Item Code Is Blank",ERRORMSG
+            CALL      PERR0000
+            GOTO      VITMCD99
+          ENDIF
+.
+          MOVE      XFLD0005,VINFIELD
+          MOVE      9,VINTLEN
+          MOVE      "Item Code",VFLDNAME
+          CALL      CCHLEN00
+          BRANCH    VERRFLAG,VITMCD99
+.
+          IF        CFEETYP = FIVE
+            MOVE      XFLD0005,MISCCODE
+            MOVE      HOSPID,MISCHOSP
+            CALL      GNZMCH00 
+          ELSE
+            MOVE      XFLD0005,MISCCODE
+            CALL      GPTMCH00
+          ENDIF
+.
+          GOTO      VITMCD99
+.
+VITMCD99  RETURN
+.
+.------------------------------------------------------------
+. Get latest charge code description from nzpmchaf
+. Input : MISCCODE
+.         MISCHOSP
+. Output: MISCDESC
+.         NZMCEFDT 
+.------------------------------------------------------------
+GNZMCH00  PACK      MISCDESC,SP70,SP70
+          MOVE      SP70,MISCEFFD
+.
+          BRANCH    HOSPERR,GNZMCH99
+.
+          PACK      KEY37,MISCCODE,SP70
+          CALL      RSNZMCH3
+GNZMCH20  CALL      RKNZMCH3
+          BRANCH    OVRCD,GNZMCH80
+.
+          MATCH     MISCCODE,NZMCMCHG
+          GOTO      GNZMCH80 IF NOT EQUAL
+.
+          MATCH     "1",NZMCACFL
+          GOTO      GNZMCH20 IF EQUAL
+.
+          MATCH     MISCHOSP,NZMCHOSP
+          GOTO      GNZMCH20 IF NOT EQUAL
+.
+          MATCH     MISCEFFD,NZMCEFDT            * Effective date start
+          GOTO      GNZMCH20 IF LESS
+.
+          MOVE      NZMCDESC,MISCDESC            * Charge Code Description
+          MOVE      NZMCEFDT,MISCEFFD
+          GOTO      GNZMCH200
+.
+GNZMCH80  MATCH     SP70,MISCEFFD
+          IF        @EQUAL
+            MOVE      "Item Code/Hospital Not In nzpmchaf",ERRORMSG
+            CALL      PERR0000
+          ENDIF
+.
+GNZMCH99  RETURN
+.
+.------------------------------------------------------------
+. Check code against patmchaf
+.------------------------------------------------------------
+GPTMCH00  PACK      KEY29,MISCCODE,SP70
+          CALL      RDSMCHG4
+GPTMCH20  CALL      RDKMCHG4
+          BRANCH    OVRCD,GPTMCH80
+.
+          MATCH     MISCCODE,MCHARGE
+          GOTO      GPTMCH80 IF NOT EQUAL
+.
+          MATCH     "1",PTMCACTV
+          GOTO      GPTMCH20 IF EQUAL
+.
+          MOVE      MDESC,MISCDESC 
+          GOTO      GPTMCH99
+.
+GPTMCH80  MOVE      "Item Code/Hospital Not In patmchaf",ERRORMSG
+          CALL      PERR0000
+          GOTO      GPTMCH99
+.
+GPTMCH99  RETURN
+.
+.******************************************************************************
+. Validate Doctor Preference Comments input text file fields
+.******************************************************************************
+VPCM0000  MOVE      XFLD0006,INFLDNAM
+          CALL      VHOSPI00
+.
+          MOVE      XFLD0001,INFLDNAM
+          CALL      VDOCCD00
+.
+          MATCH     SP70,XFLD0002
+          IF        @EQUAL
+            MOVE      "Preference Code Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0002,VINFIELD
+            MOVE      9,VINTLEN
+            MOVE      "Preference Code",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MOVE      XFLD0002,DIM9 
+              PACK      KEY18,DOCTCODE,DIM9,HOSPID,SP70
+              CALL      VOPPDH00 
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,XFLD0003
+          IF        @EQUAL
+            MOVE      "Class Type Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0003,VINFIELD
+            MOVE      3,VINTLEN
+            MOVE      "Class Type",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MOVE      "Class Type. Category OG",VFLDNAME
+              MOVE      "OG",DIM2
+              MOVE      XFLD0003,DIM3
+              CALL      CCATCH00
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,XFLD0004
+          IF        @EQUAL
+            MOVE      "Line Number Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0004,VINFIELF
+            MOVE      "Line Number",VFLDNAME
+            MOVE      3,VINTLEN
+            CALL      CNBLEN00
+          ENDIF
+.
+          MATCH     SP70,YFLD0001
+          IF        !@EQUAL
+            MOVE      YFLD0001,VINFIELD
+            MOVE      70,VINTLEN
+            MOVE      "Line Description",VFLDNAME
+            CALL      CCHLEN00
+          ENDIF
+.
+VPCM9999  RETURN
+.
+.******************************************************************************
+. Validate Surgical Tray Header input text file fields
+.******************************************************************************
+VTRA0000  MATCH     SP70,XFLD0001
+          IF        @EQUAL
+            MOVE      "Tray Code Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0001,VINFIELD
+            MOVE      15,VINTLEN
+            MOVE      "Tray Code",VFLDNAME
+            CALL      CCHLEN00
+          ENDIF
+.
+          MATCH     SP70,YFLD0001
+          IF        @EQUAL
+            MOVE      "Tray Description Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      YFLD0001,VINFIELD
+            MOVE      30,VINTLEN
+            MOVE      "Tray Description",VFLDNAME
+            CALL      CCHLEN00
+          ENDIF
+.
+          MOVE      XFLD0003,INFLDNAM
+          CALL      VHOSPI00
+.
+VTRA9999  RETURN
+.
+.******************************************************************************
+. Validate Surgical Tray Detail input text file fields
+.******************************************************************************
+VTRB0000  MOVE      XFLD0004,INFLDNAM
+          CALL      VHOSPI00
+.
+          MATCH     SP70,XFLD0001
+          IF        @EQUAL
+            MOVE      "Tray Code Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0001,VINFIELD
+            MOVE      15,VINTLEN
+            MOVE      "Tray Code",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MOVE      XFLD0001,DIM15
+              PACK      KEY18,DIM15,HOSPID,SP70
+              CALL      VOPTRA00
+            ENDIF
+          ENDIF
+.
+. Validate Item
+.
+VTRB2000  MATCH     SP70,XFLD0002
+          IF        @EQUAL
+            MOVE      "Item Code Is Blank",ERRORMSG
+            CALL      PERR0000
+            GOTO      VTRB4000    
+          ENDIF
+.
+          MOVE      XFLD0002,VINFIELD
+          MOVE      9,VINTLEN
+          MOVE      "Item Code",VFLDNAME
+          CALL      CCHLEN00
+          BRANCH    VERRFLAG,VTRB4000
+.
+          IF        CFEETYP = FIVE
+            MOVE      XFLD0002,MISCCODE
+            MOVE      HOSPID,MISCHOSP
+            CALL      GNZMCH00
+          ELSE
+            MOVE      XFLD0002,MISCCODE
+            CALL      GPTMCH00
+          ENDIF
+.
+VTRB4000  MATCH     SP70,XFLD0003
+          IF        @EQUAL
+            MOVE      "Quantity Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0003,VINFIELF
+            MOVE      "Quantity",VFLDNAME
+            MOVE      3,VINTLEN
+            CALL      CNBLEN00
+          ENDIF
+.
+VTRB9999  RETURN
+.
+.------------------------------------------------------------------------------
+. Validate tray code against oprtryaf
+. Input: KEY18
+.------------------------------------------------------------------------------
+VOPTRA00  BRANCH    HOSPERR,VOPPDH99
+.
+          CALL      RDOPTRA1
+          IF        OVRCD=1
+            MOVE      "Tray Code/Hospital",ERRORMSG
+            CALL      PERR0000
+            PACK      ERRORMS2,HYPHEN,SP1,CNOHEADR
+            CALL      PERS0000
+            GOTO      VOPTRA99
+          ENDIF
+.
+VOPTRA99  RETURN
+.
+.******************************************************************************
+. Validate Speciality Tray Preference input text file fields
+.******************************************************************************
+VTPS0000  MOVE      XFLD0003,INFLDNAM
+          CALL      VHOSPI00
+.
+          MATCH     SP70,XFLD0001
+          IF        @EQUAL
+            MOVE      "Speciality Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0001,VINFIELD
+            MOVE      3,VINTLEN
+            MOVE      "Speciality",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MOVE      "Speciality. Category ST",VFLDNAME
+              MOVE      "ST",DIM2
+              MOVE      XFLD0001,DIM3
+              CALL      CCATCH00
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,XFLD0002
+          IF        @EQUAL
+            MOVE      "Tray Preference Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0002,VINFIELD
+            MOVE      15,VINTLEN
+            MOVE      "Tray Preference",VFLDNAME
+            CALL      CCHLEN00
+            IF        (VERRFLAG = 0 & HOSPERR = 0)
+              MOVE      XFLD0002,KEY15
+              MOVE      HOSPID,DIM3
+              PACK      KEY18,KEY15,DIM3,SP70
+              CALL      RDOPTRA1
+              IF        OVRCD=1
+                MOVE      "Tray Preference/Hospital Not In oprtryaf",ERRORMSG
+                CALL      PERR0000
+                GOTO      VITMCD99
+              ENDIF
+            ENDIF
+          ENDIF
+.
+VTPS9999  RETURN
++
+.******************************************************************************
+. Validate Equipment input text file fields
+.******************************************************************************
+VEQP0000  MOVE      XFLD0019,INFLDNAM
+          CALL      VHOSPI00
+.
+          MATCH     SP70,XFLD0001
+          IF        @EQUAL
+            MOVE      "Equipment Code Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0001,VINFIELD
+            MOVE      15,VINTLEN
+            MOVE      "Equipment Code",VFLDNAME
+            CALL      CCHLEN00
+          ENDIF
+.
+          MATCH     SP70,YFLD0001
+          IF        @EQUAL
+            MOVE      "Equipment Description Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      YFLD0001,VINFIELD
+            MOVE      50,VINTLEN
+            MOVE      "Equipment Description",VFLDNAME
+            CALL      CCHLEN00
+          ENDIF
+.
+          MATCH     SP70,XFLD0003
+          IF        !@EQUAL
+            MOVE      XFLD0003,VINFIELD
+            MOVE      3,VINTLEN
+            MOVE      "Equipment Type",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MOVE      "Equipment Type. Category OE",VFLDNAME
+              MOVE      "OE",DIM2
+              MOVE      XFLD0003,DIM3
+              CALL      CCATCH00
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,XFLD0004
+          IF        !@EQUAL
+            MOVE      XFLD0004,VINFIELD
+            MOVE      3,VINTLEN
+            MOVE      "Current Status",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MOVE      "Current Status. Category ER",VFLDNAME
+              MOVE      "ER",DIM2
+              MOVE      XFLD0004,DIM3
+              CALL      CCATCH00
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,XFLD0005
+          IF        !@EQUAL
+            MOVE      "Date Status Changed Must Be Blank",ERRORMSG
+            CALL      PERR0000
+          ENDIF
+.
+          MATCH     SP70,XFLD0006
+          IF        !@EQUAL
+            MOVE      "Usual Location/Tray Must Be Blank",ERRORMSG
+            CALL      PERR0000
+          ENDIF
+.
+          MATCH     SP70,XFLD0007
+          IF        !@EQUAL
+            MOVE      "Current Location Tray Must Be Blank",ERRORMSG
+            CALL      PERR0000
+          ENDIF
+.
+          MATCH     SP70,XFLD0008
+          IF        !@EQUAL
+            MOVE      XFLD0008,VINFIELD
+            MOVE      8,VINTLEN
+            MOVE      "Date Equipment 1st Used",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              PACK      TEMPDATE,XFLD0008,SP70
+              MOVE      "Date Equipment 1st Used",VFLDNAME
+              CALL      VDAT0000
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,XFLD0009
+          IF        !@EQUAL
+            MOVE      XFLD0009,VINFIELF
+            MOVE      5,VINTLEN
+            MOVE      "Maximum Number of Uses",VFLDNAME
+            CALL      CNBLEN00
+          ENDIF
+.
+          MATCH     SP70,XFLD0010
+          IF        !@EQUAL
+            MOVE      XFLD0010,VINFIELD
+            MOVE      8,VINTLEN
+            MOVE      "Date Equipment Expiry Date",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              PACK      TEMPDATE,XFLD0010,SP70
+              MOVE      "Date Equipment Expiry Date",VFLDNAME
+              CALL      VDAT0000
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,XFLD0011
+          IF        !@EQUAL
+            MOVE      XFLD0011,VINFIELF
+            MOVE      5,VINTLEN
+            MOVE      "Number of Uses Remaining",VFLDNAME
+            CALL      CNBLEN00
+          ENDIF
+.
+          MATCH     SP70,XFLD0012
+          IF        !@EQUAL
+            MOVE      XFLD0012,VINFIELD
+            MOVE      8,VINTLEN
+            MOVE      "Last Sterilisation Date",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              PACK      TEMPDATE,XFLD0012,SP70
+              MOVE      "Last Sterilisation Date",VFLDNAME
+              CALL      VDAT0000
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,XFLD0013
+          IF        !@EQUAL
+            MOVE      "Total No. Uses Since Last Steril Must Be Blank",ERRORMSG
+            CALL      PERR0000
+          ENDIF
+.
+          MATCH     SP70,XFLD0014
+          IF        !@EQUAL
+            MOVE      XFLD0014,VINFIELD
+            MOVE      15,VINTLEN
+            MOVE      "Equipment Serial number",VFLDNAME
+            CALL      CCHLEN00
+          ENDIF
+.
+          MATCH     SP70,XFLD0015
+          IF        !@EQUAL
+            MOVE      XFLD0015,VINFIELD
+            MOVE      15,VINTLEN
+            MOVE      "Equipment Catalog Number",VFLDNAME
+            CALL      CCHLEN00
+          ENDIF
+.
+          MATCH     SP70,YFLD0002
+          IF        !@EQUAL
+            MOVE      YFLD0002,VINFIELD
+            MOVE      50,VINTLEN
+            MOVE      "Supplier Details",VFLDNAME
+            CALL      CCHLEN00
+          ENDIF
+.
+          MATCH     SP70,YFLD0003
+          IF        !@EQUAL
+            MOVE      YFLD0003,VINFIELD
+            MOVE      50,VINTLEN
+            MOVE      "Notes",VFLDNAME
+            CALL      CCHLEN00
+          ENDIF
+.
+          MATCH     SP70,XFLD0018
+          IF        @EQUAL
+            MOVE      "Active is blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0018,VINFIELD
+            MOVE      1,VINTLEN
+            MOVE      "Active",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MOVE      XFLD0018,DIM1
+              MOVE      "01",DIM3
+              SCAN      DIM1,DIM3
+              IF        !@EQUAL
+                MOVE      "Active Must be 0 or 1",ERRORMSG
+                CALL      PERR0000
+              ENDIF
+            ENDIF
+          ENDIF
+.
+VEQP9999  RETURN
++
+.******************************************************************************
+. Validate Favourite Item Group input text file fields
+.******************************************************************************
+VUFI0000  PACK      MISCDESC,SP70,SP70 
+          MOVE      XFLD0001,INFLDNAM
+          CALL      VHOSPI00
+.
+          MATCH     SP70,XFLD0002
+          IF        @EQUAL
+            MOVE      "User Occupational Group Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0002,VINFIELD
+            MOVE      3,VINTLEN
+            MOVE      "User Occupational Group",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MOVE      "User Occupational Group. Category w0",VFLDNAME
+              MOVE      "w0",DIM2
+              MOVE      XFLD0002,DIM3
+              CALL      CCATCH00
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,XFLD0003
+          IF        !@EQUAL
+            MOVE      XFLD0003,VINFIELD
+            MOVE      10,VINTLEN
+            MOVE      "User ID",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              PACK      KEY10,XFLD0003,SP10
+              CALL      RDWBSE1
+              IF        OVRCD = 1
+                MOVE      "User ID Not In websecaf",ERRORMSG
+                CALL      PERR0000
+              ELSE
+                MATCH     "1",WBSEACT            * Inactive?
+                IF        !@EQUAL
+                  PACK      ERRORMSG,VFLDNAME,SP1,CIS,SP1,CINACTIV
+                  CALL      PERR0000
+                ENDIF
+              ENDIF
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,XFLD0004
+          IF        @EQUAL
+            MOVE      "Favourite Group Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0004,VINFIELD
+            MOVE      3,VINTLEN
+            MOVE      "Favourite Group",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MOVE      "Favourite Group. Category w4",VFLDNAME
+              MOVE      "w4",DIM2
+              MOVE      XFLD0004,DIM3
+              CALL      CCATCH00
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,XFLD0005
+          IF        @EQUAL
+            MOVE      "Default Group Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0005,VINFIELD
+            MOVE      3,VINTLEN
+            MOVE      "Default Group",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MATCH     "No ",XFLD0005
+              GOTO      VUFI5000 IF EQUAL    
+              MATCH     "Yes",XFLD0005
+              GOTO      VUFI5000 IF EQUAL    
+              MOVE      "Default Group Must be 'Yes' or 'No'",ERRORMSG
+              CALL      PERR0000
+            ENDIF
+          ENDIF
+.
+VUFI5000  MATCH     SP70,XFLD0006
+          IF        @EQUAL
+            MOVE      "Sub-Group Heading Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0006,VINFIELD
+            MOVE      3,VINTLEN
+            MOVE      "Sub-Group Heading",VFLDNAME
+            CALL      CCHLEN00
+            IF        VERRFLAG = 0
+              MOVE      "Sub-Group Heading. Category w5",VFLDNAME
+              MOVE      "w5",DIM2
+              MOVE      XFLD0006,DIM3
+              CALL      CCATCH00
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,XFLD0008
+          IF        @EQUAL
+            MOVE      "Quantity Is Blank",ERRORMSG
+            CALL      PERR0000
+          ELSE
+            MOVE      XFLD0008,VINFIELF
+            MOVE      "Quantity",VFLDNAME
+            MOVE      6,VINTLEN
+            CALL      CNBLEN00
+          ENDIF
+.
+. Validate Charge Item
+.
+          MATCH     SP70,XFLD0007
+          IF        @EQUAL
+            MOVE      "Charge Item Is Blank",ERRORMSG
+            CALL      PERR0000
+            GOTO      VUFI9999
+          ENDIF
+.
+          MOVE      XFLD0007,VINFIELD
+          MOVE      9,VINTLEN
+          MOVE      "Charge Item",VFLDNAME
+          CALL      CCHLEN00
+          BRANCH    VERRFLAG,VUFI9999
+.
+          IF        CFEETYP = FIVE
+            MOVE      XFLD0007,MISCCODE
+            MOVE      HOSPID,MISCHOSP
+            CALL      GNZMCH00
+          ELSE
+            MOVE      XFLD0007,MISCCODE
+            CALL      GPTMCH00
+          ENDIF
+.
+VUFI9999  RETURN
+.
+.------------------------------------------------------------------------------
+. Validate a category code is still active and belongs to the hospital
+. Requires:  DIM2     - Category
+.            DIM3     - Category Code
+.            VFLDNAME - Field Description
+. Returns:   VERRFLAG - 1 if an error in the validation has occurred           
+.------------------------------------------------------------------------------
+CCATCH00  MOVE      ZERO,VERRFLAG
+          PACK      KEY5,DIM2,DIM3,SP70
+          CALL      RDCODE1
+          IF        OVRCD = 1
+            MOVE      ONE,VERRFLAG
+            PACK      ERRORMSG,CINVALID,SP1,VFLDNAME
+            CALL      PERR0000
+            GOTO      CCATCH99
+          ENDIF
+.
+          MATCH     "I",PTCOACTV            * Inactive?
+          IF        @EQUAL
+            MOVE      ONE,VERRFLAG
+            PACK      ERRORMSG,VFLDNAME,SP1,CIS,SP1,CINACTIV
+            CALL      PERR0000
+            GOTO      CCATCH99
+          ENDIF
+.
+          MATCH    "1",PTCDHOSS
+          GOTO     CCATCH99 IF NOT EQUAL
+.
+          IF        IBCNMHOS = 0
+            GOTO      CCATCH99
+          ENDIF
+.
+          BRANCH    HOSPERR,CCATCH99
+.
+          PACK     KEY8,HOSPID,DIM2,DIM3,SP70
+          CALL     RDMLCOD1
+          IF       OVRCD = 0
+            GOTO     CCATCH99   
+          ENDIF
+.
+          MOVE      ONE,VERRFLAG  
+          MOVE      VFLDNAME,ERRORMSG
+          PACK      ERRORMSG,ERRORMSG,SLASH,DIM3,SP70
+          CALL      PERR0000
+          MOVE      "- Category code does not belong to same hospital",ERRORMS2
+          CALL      PERS0000
+.
+CCATCH99  RETURN
+.
+.------------------------------------------------------------------------------
+. Write error message for a numeric field
+.------------------------------------------------------------------------------
+NERR0000  MOVE      ONE,VERRFLAG
+          STRIP     VFLDNAME
+          STRIP     VERRDESC
+.
+          BRANCH    COPTION,NERR1000,NERR1000,NERR1000,NERR1000,NERR1000:
+                            NERR1000,NERR1000,NERR1000
+          GOTO      NERR9900
+.
+NERR1000  PACK      DIM100,CINVALID,SP1,VFLDNAME,SP1,HYPHEN,SP1,VERRDESC,SP70
+          STRIP     DIM100
+          MOVELPTR  DIM100,F3
+          IF        F3 > 50
+            PACK      VERRMSG,CINVALID,SP1,VFLDNAME
+            MOVE      VERRMSG,ERRORMSG   
+            CALL      PERR0000
+            PACK      ERRORMS2,HYPHEN,SP1,VERRDESC
+            CALL      PERS0000
+          ELSE
+            MOVE      DIM100,ERRORMSG
+            CALL      PERR0000
+          ENDIF
+.
+          GOTO      NERR9900
+.
+NERR9900  MOVE      SP70,ERRORMSG
+          MOVE      SP70,ERRORMS2    
+.
+NERR9999  RETURN
++
+.******************************************************************************
+. Print error line
+.******************************************************************************
+PERR0000  ADD       ONE,ERRCOUNT            * Total error count
+          MOVE      ONE,ERRFLAG
+.
+          BRANCH    COPTION,PERR1000,PERR2000,PERR3000,PERR4000,PERR5000:
+                            PERR6000,PERR7000,PERR8000
+          GOTO      PERR9900
+.
+.         Doctor Preference Header
+.
+PERR1000  PACK      XPDHCODE,XFLD0001,SP70
+          PACK      XPDHANTY,XFLD0002,SP70  
+          PACK      XPDHPREF,XFLD0003,SP70
+          PACK      XPDHHOSP,XFLD0005,SP70
+.
+          PRINT     *1,"|",LINECNTR,*12,"|",ERRORMSG:
+                    *63,"|",*65,XPDHCODE:
+                    *75,"|",*77,XPDHANTY:
+                    *86,"|",*88,XPDHPREF:
+                    *98,"|",*100,XPDHHOSP:
+                    *132,"|"
+          GOTO      PERR9900
+.
+.         Doctor Preference Detailed
+.
+PERR2000  PACK      XPDFCODE,XFLD0001,SP70
+          PACK      XPDFPREF,XFLD0002,SP70
+          PACK      XPDFCLSS,XFLD0003,SP70
+          PACK      XPDFTYPE,XFLD0004,SP70
+          PACK      XPDFITEM,XFLD0005,SP70
+          PACK      XPDFHOSP,XFLD0007,SP70
+.
+          PRINT     *1,"|",LINECNTR,*12,"|",ERRORMSG:
+                    *63,"|",*65,XPDFCODE:
+                    *75,"|",*77,XPDFPREF:
+                    *87,"|",*89,XPDFCLSS:
+                    *93,"|",*95,XPDFTYPE:
+                    *98,"|",*99,XPDFITEM:
+                    *114,"|",*116,XPDFHOSP:
+                    *132,"|"
+          GOTO      PERR9900
+.
+.         Doctor Preference Comments 
+.
+PERR3000  PACK      XPPCCODE,XFLD0001,SP70
+          PACK      XPPCPREF,XFLD0002,SP70
+          PACK      XPPCCLSS,XFLD0003,SP70
+          PACK      XPPCLINE,XFLD0004,SP70
+          PACK      XPPCHOSP,XFLD0006,SP70
+.
+          PRINT     *1,"|",LINECNTR,*12,"|",ERRORMSG:
+                    *63,"|",*65,XPPCCODE:
+                    *75,"|",*77,XPPCPREF:
+                    *87,"|",*89,XPPCCLSS:
+                    *93,"|",*95,XPPCLINE:
+                    *99,"|",*101,XPPCHOSP:
+                    *132,"|"
+          GOTO      PERR9900
+.
+.         Surgical Tray Header 
+.
+PERR4000  PACK      XPTHCODE,XFLD0001,SP70
+          PACK      XPTHHOSP,XFLD0003,SP70
+.
+          PRINT     *1,"|",LINECNTR,*12,"|",ERRORMSG:
+                    *63,"|",*64,XPTHCODE:
+                    *81,"|",*83,XPTHHOSP:
+                    *132,"|"
+          GOTO      PERR9900
+.
+.         Surgical Tray Detail 
+.
+PERR5000  PACK      XPTDCODE,XFLD0001,SP70
+          PACK      XPTDITEM,XFLD0002,SP70
+          PACK      XPTDHOSP,XFLD0004,SP70
+.
+          PRINT     *1,"|",LINECNTR,*12,"|",ERRORMSG:
+                    *63,"|",*65,XPTDCODE:
+                    *81,"|",*83,XPTDITEM:
+                    *99,"|",*101,XPTDHOSP:
+                    *132,"|"
+          GOTO      PERR9900
+.
+.         Speciality Tray Preference 
+.
+PERR6000  PACK      XPTPSPEC,XFLD0001,SP70
+          PACK      XPTPHOSP,XFLD0003,SP70
+.
+          PRINT     *1,"|",LINECNTR,*12,"|",ERRORMSG:
+                    *63,"|",*65,XPTPSPEC:
+                    *73,"|",*75,XPTPHOSP:
+                    *132,"|"
+          GOTO      PERR9900
+.
+.         Equipment 
+.
+PERR7000  PACK      XPEQCODE,XFLD0001,SP70
+          PACK      XPEQHOSP,XFLD0019,SP70
+.    
+          PRINT     *1,"|",LINECNTR,*12,"|",ERRORMSG:
+                    *63,"|",*65,XPEQCODE:
+                    *80,"|",*81,XPEQHOSP:
+                    *132,"|"
+          GOTO      PERR9900
+.
+.         Favourite Item Group
+.
+PERR8000  PACK      XMUFHOSP,XFLD0001,SP70
+          PACK      XMUFUOGR,XFLD0002,SP70
+          PACK      XMUFUSER,XFLD0003,SP70
+          PACK      XMUFFAVG,XFLD0004,SP70
+          PACK      XMUFGHED,XFLD0006,SP70
+          PACK      XMUFCODE,XFLD0007,SP70
+.
+          PRINT     *1,"|",LINECNTR,*12,"|",ERRORMSG:
+                    *63,"|",*65,XMUFHOSP:
+                    *69,"|",*71,XMUFUOGR:
+                    *79,"|",*80,XMUFUSER:
+                    *90,"|",*92,XMUFFAVG:
+                    *101,"|",*103,XMUFGHED:
+                    *110,"|",*112,XMUFCODE:
+                    *132,"|"
+.
+          GOTO      PERR9900
+.
+PERR9900  MOVE      SP70,ERRORMSG
+.
+PERR9999  RETURN
++
+.-----------------------------------------------------------------------------
+. Print 2nd error line
+.-----------------------------------------------------------------------------
+PERS0000  BRANCH    COPTION,PERS1000,PERS1000,PERS1000,PERS1000,PERS1000:
+                            PERS1000,PERS1000,PERS1000
+          GOTO      PERS99999
+.
+PERS1000  PRINT     *1,"| ",*12,"|":
+                    *13,ERRORMS2,*132,"|"
+          GOTO      PERS9999
+.
+PERS9999  RETURN
++
+.******************************************************************************
+. Pack fields with spaces
+.******************************************************************************
+PFLD0000  PACK      XFLD0001,XFLD0001,SP70
+          PACK      XFLD0002,XFLD0002,SP70
+          PACK      XFLD0003,XFLD0003,SP70
+          PACK      XFLD0004,XFLD0004,SP70
+          PACK      XFLD0005,XFLD0005,SP70
+          PACK      XFLD0006,XFLD0006,SP70
+          PACK      XFLD0007,XFLD0007,SP70
+          PACK      XFLD0008,XFLD0008,SP70
+          PACK      XFLD0009,XFLD0009,SP70
+          PACK      XFLD0010,XFLD0010,SP70
+          PACK      XFLD0011,XFLD0011,SP70
+          PACK      XFLD0012,XFLD0012,SP70
+          PACK      XFLD0013,XFLD0013,SP70
+          PACK      XFLD0014,XFLD0014,SP70
+          PACK      XFLD0015,XFLD0015,SP70
+          PACK      XFLD0016,XFLD0016,SP70
+          PACK      XFLD0017,XFLD0017,SP70
+          PACK      XFLD0018,XFLD0018,SP70
+          PACK      XFLD0019,XFLD0019,SP70
+          PACK      XFLD0020,XFLD0020,SP70
+          PACK      XFLD0021,XFLD0021,SP70
+          PACK      XFLD0022,XFLD0022,SP70
+          PACK      XFLD0023,XFLD0023,SP70
+          PACK      XFLD0024,XFLD0024,SP70
+          PACK      XFLD0025,XFLD0025,SP70
+          PACK      XFLD0026,XFLD0026,SP70
+          PACK      XFLD0027,XFLD0027,SP70
+          PACK      XFLD0028,XFLD0028,SP70
+          PACK      XFLD0029,XFLD0029,SP70
+          PACK      XFLD0030,XFLD0030,SP70
+.
+          PACK      YFLD0001,YFLD0001,SP70,SP70
+          PACK      YFLD0002,YFLD0002,SP70,SP70
+          PACK      YFLD0003,YFLD0003,SP70,SP70
+          PACK      YFLD0004,YFLD0004,SP70,SP70
+          PACK      YFLD0005,YFLD0005,SP70,SP70
+          PACK      YFLD0006,YFLD0006,SP70,SP70
+          PACK      YFLD0007,YFLD0007,SP70,SP70
+          PACK      YFLD0008,YFLD0008,SP70,SP70
+          PACK      YFLD0009,YFLD0009,SP70,SP70
+          PACK      YFLD0010,YFLD0010,SP70,SP70
+.
+PFLD9999  RETURN
++
+.******************************************************************************
+. Clear total vars
+.******************************************************************************
+CTOT0000  MOVE      ZERO,ERRCOUNT
+          MOVE      ZERO,ADDCOUNT
+          MOVE      ZERO,UPDCOUNT
+.
+CTOT999   RETURN
++
+.******************************************************************************
+. Print total line
+.******************************************************************************
+PTOT0000  CALL      UND132
+.
+          PRINT     *1,"| Total Records In File : ",LINECNTR,*132,"|"
+          PRINT     *1,"| Total Records Added   : ",ADDCOUNT,*132,"|"
+          PRINT     *1,"| Total Records Updated : ",UPDCOUNT,*132,"|"
+          PRINT     *1,"| Total Errors Found    : ",ERRCOUNT,*132,"|"
+.
+          CALL      UND132
+.
+PTOT9999  RETURN
+.
+          INC       STD001IO
+          INC       CLOPRDPH                 * clear fields
+          INC       CLOPRDPF                 * clear fields
+          INC       CLOPRPCM                 * clear fields
+          INC       CLOPRTRA                 * clear fields
+          INC       CLOPRTRB                 * clear fields
+          INC       CLOPRTPS                 * clear fields
+          INC       CLOPREQP                 * clear fields
+          INC       CLPMSUFI                 * clear fields
+          INC       UPLVALDS
+.
+          INC       PATCODIO/INC
+          INC       OPRDPHIO/INC            * Doctor Preference Header 
+          INC       OPRDPFIO/INC            * Doctor Preference Detailed 
+          INC       OPRPCMIO/INC            * Doctor Preference Comments 
+          INC       OPRTRAIO/INC            * Surgical Tray Header
+          INC       OPRTRBIO/INC            * Surgical Tray Detail
+          INC       OPRTPSIO/INC            * Speciality Tray Preference
+          INC       OPREQPIO/INC            * Equipment
+          INC       PMSUFIIO/INC            * Favourite Item Group 
+          INC       PMSHCPIO/INC             
+          INC       PATHSPIO/INC             
+          INC       NZPMCHIO/INC
+          INC       PATMCHIO/INC   * Miscellaneous Charges File IO
+          INC       MLTHCPIO/INC
+          INC       MLTCODIO/INC
+          INC       WEBSECIO/INC

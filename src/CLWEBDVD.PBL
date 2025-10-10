@@ -1,0 +1,26 @@
+.*****************************************************************************
+.* Clear WEBDVDFD variables                                                  *
+.*****************************************************************************
+.* V12.00.01 19/06/2025 Peter Vela       TSK 0939466                         *
+.*           Added RETURN                                                    *
+.* V11.05.01 08/05/2025 Peter Vela       TSK 0939466                         *
+.*          Created include                                                  *
+.*****************************************************************************
+CLWEBDVD  MOVE      SP70,WBDDCLID
+          MOVE      SP70,WBDDRPTC
+          MOVE      SP70,WBDDCLBP
+          MOVE      SP70,WBDDCLCA
+          MOVE      SP70,WBDDSRVP
+          MOVE      SP70,WBDDSTAT
+          MOVE      SP70,WBDDTRID
+          MOVE      SP70,WBDDMSID
+          MOVE      SP70,WBDDRKEY
+          MOVE      SP70,WBDDCUID
+          MOVE      SP70,WBDDCDAT
+          MOVE      SP70,WBDDCTIM
+          MOVE      SP70,WBDDUUID
+          MOVE      SP70,WBDDUDAT
+          MOVE      SP70,WBDDUTIM
+          PACK      WBDDSPAR,SP70,SP70
+.
+          RETURN

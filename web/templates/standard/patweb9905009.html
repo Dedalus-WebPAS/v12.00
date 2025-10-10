@@ -1,0 +1,30 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src=../js/patweb99.js>  </script>
+<script type="text/javascript">  
+function updateParent(prac_name,prac_code,prac_cntr) {
+ parent.parent.ReturnName.value=prac_name;
+ parent.parent.ReturnPrac.value=prac_code;
+ parent.parent.ReturnCntr.value=prac_cntr;
+ if (typeof(parent.parent.ReturnFunction) == 'function') {
+      parent.parent.ReturnFunction()  }
+  DFrameExit();
+}
+
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);">
+<table cellspacing=0 colspan=4 border=1 width=100%>
+%PATWEB99.05.107
+</table>
+<table width=100% bgcolor=#CCCCCC><tr>
+  <td align=center>
+  <input type=button value="<< Previous" class="button"
+   onclick='location.href="%PATWEB99.05.103.009"'>
+  <input type=button value="Next >>" class="button"
+   onclick='location.href="%PATWEB99.05.102.009"'>
+</td></tr>
+</table>

@@ -1,0 +1,39 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Patient System 
+                      On Hold Transaction History 
+  
+TABLE NAME         :  patonhaf
+=====================================================================
+PTONVISN    char        8     1   Visit Number  
+PTONVAVL    char        2     9   System Type  
+                                   3=Inpatients  
+PTONTDAT    char        8    11   Transaction Date (CCYYMMDD)  
+PTONTTIM    char        8    19   Transaction Time (hh:mm:ss)  
+PTONURID    char       10    27   User ID Performing Transaction  
+PTONREAH    char        3    37   Reason for Hold (Cat. rh)  
+PTONDESC    char       80    40   Free Text Description for Hold  
+PTONHACT    char        1   120   Action - Valid Values  
+                                   A=Added Hold for Visit  
+                                   T=Updated Hold for Visit  
+                                   R=Removed Hold for Visit  
+                                   F=Added Hold for Health Fund  
+                                   U=Updated by Health Fund  
+                                   D=Deleted by Health Fund  
+                                   C=Added Hold for Claim Code  
+                                   G=Update by Claim Code  
+                                   H=Deleted by Claim Code  
+                                   L=Updated by HL7 receiver  
+                                   M=Deleted by HL7 receiver  
+PTONCLCD    char        3   121   Claim Code (Cat. CL)  
+PTONHLFU    char        6   124   Health Fund Code  
+PTONHLIN    char        8   130   Hold Invoice from Date  
+PTONSPAR    char      100   138   Spare Variable  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+PTONVISN
+PTONTDAT
+PTONTTIM
+  
+=====================================================================

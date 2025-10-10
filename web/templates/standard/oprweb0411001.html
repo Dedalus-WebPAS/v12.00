@@ -1,0 +1,105 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src=../js/TableSortNew.js></script>
+<script type="text/javascript">
+function UpdatePrefItem(doctcode,prefcode,oprdd001,oprdd002,oprdd003,hospcode) {
+ doctcode=doctcode.replace(/ /g,"+");
+ prefcode=prefcode.replace(/ /g,"+");
+ oprdd001=oprdd001.replace(/ /g,"+");
+ oprdd002=oprdd002.replace(/ /g,"+");
+ oprdd003=oprdd003.replace(/ /g,"+");
+ hospcode=hospcode.replace(/ /g,"+");
+ LinkUrl="oprweb04.pbl?reportno=11&template=3&doctcode="+doctcode+
+                                            "&prefcode="+prefcode+
+                                            "&oprdd001="+oprdd001+
+                                            "&oprdd002="+oprdd002+
+                                            "&oprdd003="+oprdd003+
+                                            "&hospcode="+hospcode;
+ DFrameLink(LinkUrl,100,150,900,250);
+}
+function AddItem(doctcode,prefcode,hospcode) {
+ doctcode=doctcode.replace(/ /g,"+");
+ LinkUrl="oprweb04.pbl?reportno=11&template=2&doctcode="+doctcode+
+                                            "&prefcode="+prefcode+
+                                            "&hospcode="+hospcode;
+ DFrameLink(LinkUrl,100,150,900,500);
+}
+//----------------------------------------------------------------------------
+// Create New Table Object
+// Border, Cellspacing, Cellpadding, Width, Align, Heading Height, Row Height
+//----------------------------------------------------------------------------
+// Add Columns in Order Required
+// Heading,Type,Display Column,Sort Column, Align, Icon, Link Column
+// Columns Available
+//  0 - HTML Link  
+//  1 - Class 
+//  2 - Type 
+//  3 - Item 
+//  4 - Qty 
+//---------------------------------------------------------------------------
+function InitTable(TableView) {
+switch (TableView) {
+case 0: {
+ t = new Table(1,0,2,"100%","center",25,25);
+ t.addColumn("Class","String",1,1,"left","EditIcon.gif","0",100)
+ t.addColumn("Type","String",2,2,"left","","",80)
+ t.addColumn("Item","String",3,3,"left","","",80)
+ t.addColumn("Quantity","Number",4,4,"right","","",80)
+ AddTableRows()
+ TableOutput(0,1);    // Order Column,Asc Dsc
+ break; }
+ }
+}
+function ShowHeading() {
+  f = document.ListForm;
+  if (f.ibcnmhos.value==1) {
+    document.getElementById('MultHospHeading').style.display = "";
+    document.getElementById('SingleHospHeading').style.display = "none";
+  }
+  else {
+    document.getElementById('MultHospHeading').style.display = "none";
+    document.getElementById('SingleHospHeading').style.display = "";
+  }
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);InitTable(0);ShowHeading();">
+<div id=HeadingSection>
+<form name=ListForm method="get" style="margin:0">
+<input type=hidden name=ibcnmhos id=ibcnmhos
+  value="%STANDARD.01.025.000.043.1.1">
+
+<table cellspacing=0 border=0 cellpadding=0 width=100% bgcolor=#cccccc>
+<tr>
+<td id=MultHospHeading>
+<b>&nbsp;Operating Preferences for %OPRWEB04.11.002
+&nbsp;&nbsp;&nbsp;Operation: %OPRWEB04.11.103
+&nbsp;&nbsp;&nbsp;Hospital: %OPRWEB04.11.109.0</b>
+</td>
+<td id=SingleHospHeading>
+<b>&nbsp;Operating Preferences for %OPRWEB04.11.002
+&nbsp;&nbsp;&nbsp;Operation: %OPRWEB04.11.103</b>
+</td>
+<td align=right>
+<input type=button class="button" value="Operations"
+ onclick='location.href="%OPRWEB04.11.001.oprweb04.10.001";'>
+<input type=button class="button" value="Add"
+ onclick='AddItem("%OPRWEB04.11.101",
+                  "%OPRWEB04.11.102",
+                  "%OPRWEB04.11.109.1");'>
+</td>
+</tr>
+</table>
+</form>
+</div>
+
+<div id=TableLocation></div>
+
+<script type="text/javascript">
+function AddTableRows() {
+%OPRWEB04.11.207
+}
+</script>

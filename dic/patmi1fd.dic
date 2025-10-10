@@ -1,0 +1,185 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Definition include for * 
+                      NEW PATIENT ADMISSIONS FILE 
+  
+TABLE NAME         :  patmi1af
+=====================================================================
+DAADMNO     char        8     1   PATIENT ADMISSION NO.  
+AURNO       char        8     9   PATIENT U.R NO.  
+ADATE       char        8    17   Admission Date (CCYYMMDD)  
+ATIME       char        8    25   PATIENT ADMISSION TIME  
+DASTAT      char        1    33   ADMISSION STATUS  
+                                   1 = PRE-ADMISSION  
+                                   2 = CURRENT ADMISSION  
+                                   3 = DISCHARGED  
+                                   4 = ON LEAVE  
+                                   5 = CANCELLED  
+APORT       char        2    34   CURRENT PORT USING THIS RECORD  
+ATRANNO     decimal     3    36   NEXT TRANSACTION NUMBER  
+AINVPRT     decimal     3    39   NUMBER OF INVOICES PRINTED  
+ALACDTE     char        8    42   last accom date invd (CCYYMMDD)  
+ACANCEL     char        3    50   REASON PRE-ADMISS CANCELATION  
+AWARD       char        3    53   PATIENT WARD NO.  
+ABED        char        3    56   PATIENT BED NO.  
+ADOCTR      char        6    59   DOCTOR REFERRED BY.  
+ADOCTA      char        6    65   DOCTOR ATTENDING PATIENT.  
+ADOCTL      char       30    71   LOCAL DOCTOR  
+ASRCE       char        3   101   PATIENT ADMISSIONS SOURCE (CAT S )  
+ATYPE       char        3   104   PATIENT ADMISSIONS TYPE (CAT A )  
+ACLSS       char        3   107   PATIENT ADMISSIONS CLASS (CAT P )  
+ACARE       char        3   110   PATIENT CARE CLASS (CAT CC)  
+AFUNDH      char        6   113   PATIENT HEALTH FUND  
+AFNDTB      char        8   119   PATIENT FUND TABLE  
+AFNDMM      char       19   127   PATIENT FUND MEMBERSHIP NO  
+AELIG       decimal     1   146   PATIENT ELIGIBILITY FOR GOV'T  
+                                   REBATE. 1 = YES 2 = NO  
+                                   STH - DISCHARGE DIAG.PRINTED  
+                                   NZ NMDS FLAG  
+                                   0=Not Submitted  
+                                   1=Submitted  
+                                   2=Warning Resubmit next extract  
+                                   3=General Resubmit next extract  
+                                   4=Visit Data Updated  
+                                   5=Coding Data Updated  
+AVISIT      decimal     1   148   PATIENT RELIGIOUS VISIT  
+                                   1 = YES, 2 = NO, 3 = UNK  
+AALERG      decimal     1   150   PATIENT ALLERGIES (Y/N)  
+                                   1 = YES, 2 = NO  
+AILLN       decimal     1   152   PRE-EXISTING ILLNESS  
+                                   1 = YES, 2 = NO  
+ADIAG1      char       80   154   PATIENTS ADMITTING DIAG 1  
+ADIAG2      char       80   234   " " " " " 2  
+ADISC       decimal    8,2  314   PATIENT DISCOUNT PERCENTAGE  
+ADOCTT      char        6   319   TREATING DOCTOR  
+ACLSSFT     char        3   325   DEPARTMENT CODE (Cat AC)  
+AALLOW      char        2   328   PATIENT ALLOWANCE CODE  
+AMBS        char        9   330   ADMITTING MBS CODE  
+ACLAIM      char        3   339   CLAIM CODE (CAT CL)  
+ADIET       char        3   342   DIET CODE (CAT DC)  
+APLOCCR     char        3   345   PLACE OF OCCR (CATEGORY PO)  
+ASTAY       decimal     3   348   EXPECTED LENGTH OF STAY (DAYS)  
+ADYHOSP     decimal     4   351   No OF DAYS OF HOSPITALIZATION  
+AMEMB       decimal     1   354   DIAMOND VALLEY MEMBERSHIP  
+                                   1 = YES, 2 = NO  
+AMEMBNO     decimal     6   356   MEMBERSHIP NUMBER  
+ACOMM1      char       40   360   COMMENTS FIELD 1  
+ACOMM2      char       30   400   COMMENTS FIELD 2  
+APLUR       decimal     1   430   PLURALITY OF BABY (0=NORMAL)  
+APURGE      decimal     1   432   PURGE INDICATOR  
+                                   OTHER = NO PURGE  
+                                   1 = PARTIAL  
+                                   2 = FULLY  
+AUSR1       char        3   434   USER DEFINED FIELD 1 (CAT U1)  
+AUSR2       char        3   437   USER DEFINED FIELD 2 (CAT U2)  
+AUSR3       char        3   440   USER DEFINED FIELD 3 (CAT U3)  
+AUSR4       char        3   443   USER DEFINED FIELD 4 (CAT U4)  
+AUSR5       char        3   446   USER DEFINED FIELD 5 (CAT U5)  
+AUSR6       char        3   449   USER DEFINED FIELD 6 (CAT U6)  
+                                   - Clinic Unit No. for Publics  
+AUSR7       char        3   452   USER DEFINED FIELD 7 (CAT U7)  
+                                   - Coding status for Publics  
+ADSCHI      decimal     1   455   DISCHARGE INVOICE INDICATOR  
+                                   0 = Discharge inv not printed  
+                                   1 = Have printed discharge inv  
+ARDRNAM     char       22   457   FREE FORMAT REFERRING DOCTOR  
+AFNDYY      char        2   479   YRS OF FUND MEMBERSHIP (JR,DE)  
+AFNDCG      char        6   481   fund cover change (CCYYMM)  
+AOCCDTE     char        8   487   DATE OF OCCURRENCE (CCYYMMDD)  
+ACODDTE     char        8   495   DATE CODING COMPLETED  
+ARETDTE     char        8   503   EXPECTED RETURN DATE FROM LVE  
+AMUMADM     decimal     8   511   MOTHERS ADMSS NUMBER(IF BABY)  
+DPTMIPVI    char        3   516   No of prev. visits charged  
+ABWGHT      char        6   519   Baby's /Admission weight  
+PTMSRFGP    char        8   525   Referring GP.  
+PTMSGPPC    char        6   533   GP Practice Code  
+PTMSFHAN    char       20   539   eAdmission ID  
+PTMSECRA    char       20   559   ECR Approval Number  
+PTMSMGIN    char        3   579   Management Intent (CAT MI)  
+DPTMIDDI    char        1   582   Discharged diagnosis printed?  
+PTMIGPPT    char        2   583   GP Practice count  
+PTMIDOFR    char        3   585   District of Residence (Cat DA)  
+PTMIREFD    char        8   588   Date of Referral (EDI nz)  
+PTMIDFCN    char        8   596   Date of 1st consultation (EDI nz)  
+PTMIPHPU    char        3   604   Principal Health Service Purchaser  
+                                   (EDI nz) (CAT HP)  
+PTMIAGNC    char        3   607   Health Agency (EDI nz) (CAT HA)  
+PTMIESSF    char        1   610   Event Summary supress flag Y/N(EDI nz)  
+                                   "Y" = Suppress event summary  
+                                   "N" = Don't supress  
+PTMIUSR8    char        3   611   User defined field 8 (CAT U8)  
+PTMIUSR9    char        3   614   User defined field 9 (CAT U9)  
+PTMIUSR0    char        3   617   User defined field 0 (CAT U0)  
+PTMIPDRG    char        4   620   Provisional DRG  
+PTMIOPER    char        4   624   Operator who pre-admitted patient  
+PTMIXWRD    char        3   628   Expected Ward for Pre-Admission  
+PTMIADOC    char        6   631   Associated Doctor  
+PTMIREGS    char        6   637   Registrar  
+PTMIUYN1    decimal     1   643   User Defined Y/N Field (1=Yes, 0=No)  
+PTMIUYN2    decimal     1   645   User Defined Y/N Field (1=Yes, 0=No)  
+PTMIPANO    char        8   647   Previous admission number  
+PTMIPADT    char        8   655   Previous admission date (ccyymmdd)  
+PTMIPCMX    char        9   663   Casemix Code (Provisional MBS/DRG)  
+PTMIGSTA    char        1   672   Is GST applicable to this event  
+                                   Y=Yes, N/Space=No, U=Unknown  
+PTMICMXP    char        1   673   Casemix Payment (Y/N)  
+                                   NZ Billing - FFS has been charged(Y/N)  
+PTMIEBED    char        3   674   Expected Bed  
+PTMIDMOV    char        1   677   Pre-admission movement indicator  
+PTMIDFAS    char        8   678   Date Patient First Aware of Symptoms  
+PTMICRCD    char        1   686   Credit Card Details on File (1=Yes)  
+PTMIFINV    char        1   687   Follow-up for implant invoicing(1=Yes)  
+PTMICONB    char        1   688   Continuous Billing Event (1=Yes)  
+PTMIDATC    char        8   689   Date Created CCYYMMDD  
+PTMITIMC    char        8   697   Time Created hh:mm:ss  
+PTMIWEBC    char       10   705   Web user Id Created  
+PTMIDATU    char        8   715   Date Updated CCYYMMDD  
+PTMITIMU    char        8   723   Time Updated hh:mm:ss  
+PTMIWEBU    char       10   731   Web user Id Updated  
+PTMI3BDY    char        4   741   3B certificate days  
+PTMI3BAD    char        8   745   3B certificate admission date  
+PTMILSDN    char        8   753   Linked Statistical Discharge Number  
+PTMIOGNO    char        8   761   Original Admission Number  
+PTMSSPAR    char       63   769   Spare Variable  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+DAADMNO
+  
+UNIQUE INDEX 2
+DASTAT
+DAADMNO
+  
+UNIQUE INDEX 3
+ADATE
+DAADMNO
+  
+UNIQUE INDEX 4
+ACODDTE
+DAADMNO
+  
+UNIQUE INDEX 5
+DASTAT
+ADOCTA
+AWARD
+ABED
+DAADMNO
+  
+UNIQUE INDEX 6
+DASTAT
+AWARD
+ADATE
+DAADMNO
+  
+UNIQUE INDEX 7
+ADOCTA
+DASTAT
+ACODDTE
+DAADMNO
+  
+UNIQUE INDEX 8
+AURNO
+DASTAT
+DAADMNO
+  
+=====================================================================

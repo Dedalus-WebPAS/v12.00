@@ -1,0 +1,1125 @@
+.*****************************************************************************
+.* System    :   Billing                                                     *
+.* Program   :   IBAHMS86                                                    *
+.* Desc      :   Print Independence Services Statements                      *
+.*****************************************************************************
+.* Date      :   28/07/2025                                                  *
+.* Author    :   J.Tan                                                       *
+.* Function  :   This program will generate Independence Services Statements *
+.* Mods      :                                                               *
+.*---------------------------------------------------------------------------*
+.*V12.00.00 28/07/2025  J.Tan           TSK 0953349                          *
+.*          Create program                                                   *
+.*****************************************************************************
+.
+          INC       STD001FD
+          INC       IBASEQFD/INC                 * Sequential Numbers File
+          INC       TFILEVAR/INC                 * Generate Temp File Name
+          INC       WEBERRFD/INC                 * Web Server Error Logging
+          INC       PATCOMM/INC
+.
+          INC       PATCONFD/INC
+          INC       PATCODFD/INC
+          INC       PATMA1FD/INC
+          INC       PMSPX2FD/INC
+          INC       PATWR1FD/INC
+          INC       PATMI1FD/INC
+          INC       PMSVX1FD/INC
+          INC       PATDSCFD/INC
+          INC       PATDTRFD/INC
+          INC       PATTRNFD/INC
+          INC       PATINVFD/INC
+          INC       RCPDTEFD/INC
+          INC       RCPBNKFD/INC
+          INC       PMSIVBFD/INC
+.
+.
+.   Work Variables
+.
+TEMPFILE  IFILE     SQL, FIXED=68, KEY="U1-8,9-16,17-24"
+.
+.Name    Type     Size    Physical   Start     Description
+.----    ----     ----    --------   -----     -----------
+XURNUMBR   DIM       8       8         1       U/R number
+XINVDATE   DIM       8       8         9       Invoice Date
+XINVNUMB   DIM       8       8         17      Invoice Number
+XINVFDAT   DIM       8       8         25      Invoice from
+XINVTDAT   DIM       8       8         33      Invoice to
+XINVAMNT   FORM     12.2     8         41      Invoice amount
+XINVALOC   FORM     12.2     8         49      Amount Allocated
+XINVOSTD   FORM     12.2     8         57      Outstanding amount
+XINVSPAR   DIM       3       3         65      Spare
+.EOR                                   68
+.
+.       CSV output
+.
+CSVOFILE  FILE      ASCII, FIXED=120
+.
+CSVFNAME  DIM       8
+CDYSDAYS  FORM      6                       * CALCDAYS number of days
+CDYSFDTE  DIM       8                       * CALCDAYS from date
+CDYSTDTE  DIM       8                       * CALCDAYS to date
+CDYSYEAR  FORM      2                       * CALCDAYS year
+CODE      DIM       2
+CMDLINE   DIM       127
+INVFDATE  DIM       8
+INVTDATE  DIM       8
+DIM12     DIM       12
+DIM15     DIM       15
+.
+DOLLAR    INIT      "$"
+DPYAMNT   DIM       17
+DATFIELD  DATE      8
+RECFLAG   FORM      1
+SAVURNUM  DIM       8
+SAVKEY24  DIM       24
+.
+FORM12P2  FORM      12.2
+FNAMEA    DIM       8
+FNAMEB    DIM       8
+FROMDATE  DIM       8
+TODATE    DIM       8
+HUNDRED2  FORM      "102"
+.
+TOTIAMNT  FORM      12.2             * total invoice amount
+TOTAAMNT  FORM      12.2             * total amount allocated
+TOTOAMNT  FORM      12.2             * total outstanding amount
+.
+RSCNROD   DIM       60       67       Report Output Directory
+SKEY24    DIM       24
+STRCLAIM  DIM       3
+ENDCLAIM  DIM       3
+
+KEYURNUM  DIM       8
+KEYNWARD  DIM       3
+EXCCNOTE  FORM      1
+EXPORTFL  FORM      1
+ZDOLLAR   INIT      "$-"
+.
+.-----------------------------------------------------------------------
+PRGID     INIT      "IBAHMS86"
+PRGNAM    INIT      "Print Independence Service Statements"
+VERSION   INIT      "V12.00.00"
+.-----------------------------------------------------------------------
++
+.**************************************************************************
+.*                              ML0000                                    *
+.*                      Controlling Logic (Mainline code)                 *
+.**************************************************************************
+.
+ML0000    CALL      DISPHEAD
+          CALL      INIT0000               * initialisation and open files
+.
+ML1000    CALL      OPTN0000               * select options
+          BRANCH    EXIT,ML9999
+.
+          CALL      KEYU0000               * Keyin U/R Number
+          CALL      GDAT0000               * Keyin Date range
+          CALL      KWRD0000               * Keyin Ward/House
+          CALL      KCLM0000               * Keyin Claim code
+          CALL      KECR0000               * Exclude Credit Note ?
+          CALL      CRTX0000               * Create Export File for Excel
+.
+          CALL      CONTQST                  * Ok to continue ?
+          BRANCH    CEXIT,ML2000,ML1000
+          GOTO      ML9999
+.
+ML2000    CALL      PROC0000               * Invoice pending List 
+.
+ML9999    CHAIN     PGM                    * chain back to program
++
+.****************************************************************************
+.*                                INIT0000             Called by: ML0000    *
+.*                             initialisation                               *
+.*  The initialisation routine is used to display headings and open files.  *
+.****************************************************************************
+INIT0000  CALL      DISPHEAD                  * display heading
+          CALL      IBACLOCK
+.
+          OPEN      PATMA1A1,"patma1af"
+          DISPLAY   *P64:24,"patma1af";
+.
+          OPEN      PATMX1A1,"patmx1af"
+          DISPLAY   *P64:24,"patmx1af";
+.
+          OPEN      PMSPX2A1,"pmspx2af"
+          DISPLAY   *P64:24,"pmspx2af";
+.
+          OPEN      PATWR1A1,"patwr1af"
+          OPEN      PATWR1A3,"patwr1af"
+          OPEN      PATMI1A1,"patmi1af"
+          OPEN      PATDSCH1,"patdschf"
+          OPEN      PMSVX1A1,"pmsvx1af"
+          OPEN      PATCODE1,"patcodes"
+          OPEN      PATDTRA5,"patdtraf"
+          OPEN      PATTRAN2,"pattranf"
+          OPEN      PATINVR1,"patinvrf"
+          OPEN      PATINVR2,"patinvrf"
+          OPEN      PATINVR5,"patinvrf"
+          OPEN      RCPDTEA3,"rcpdteaf"
+          OPEN      RCPBNKA1,"rcpbnkaf"
+          OPEN      PMSIVBA1,"pmsivbaf"
+.
+          DISPLAY   *P60:24,"opening controlf"
+          OPEN      CONTROLF,"controlf"
+          READ      CONTROLF,HUNDRED2;*67,RSCNROD
+.
+          CALL      TFILENAM                * Get temp file name
+          MOVE      TFILNAME,FNAMEA
+.
+          CALL      TFILENAM                * Get temp file name
+          MOVE      TFILNAME,FNAMEB
+.
+          RETURN
++
+.****************************************************************************
+.*                                OPTN0000             Called by: ML0000    *
+.*                        get user options or exit                          *
+.*                                                                          *
+.*    Returns:  EXIT    = FALSE (0)  Run clean up                           *
+.*                        TRUE  (1)  Exit option selected                   *
+.****************************************************************************
+.
+OPTN0000  HLINE     *G37,2,50,80
+          DISPLAY   *P1:3,*EF:
+                    *P2:4,*V2LON,ZERO,*HOFF," = Exit":
+                    *P2:5,*V2LON,ONE,*HOFF," = Print Statement"
+.
+OPTN0500  KEYIN     *P1:15,*EL,"Select Option : ":
+                    *P17:15,*V2LON,COPTION
+.
+          COMPARE   ZERO,COPTION                 * exit selected ?
+          GOTO      OPTN9500 IF EQUAL            * yes
+.
+          BRANCH    COPTION,OPTN9000
+          BEEP
+          GOTO      OPTN0500
+.
+OPTN9000  MOVE      ZERO,EXIT
+          GOTO      OPTN9999
+.
+OPTN9500  MOVE      ONE,EXIT
+OPTN9999  RETURN
++
+.**************************************************************************
+.*                  KEYU0000                                              *
+.*        Keyin U/R number                                                *
+.**************************************************************************
+KEYU0000  DISPLAY   *P1:3,*EF:
+                    *P1:4,"U/R Number   :"
+.
+          MOVE      SP70,KEYURNUM
+          MOVE      TEN6,CCOL                * column for keyin
+          MOVE      FOUR,CVERT               * row for keyin
+.
+          KEYIN     *P16:4,*V2LON,*JR,PURNO
+          RESET     PURNO
+          GOTO      KEYU9999 IF EOS
+.
+          MOVE      PURNO,KEY8
+          CALL      RDMAST1
+          BRANCH    OVRCD,KEYU8000           * invalid U/R number
+.
+          CALL      RDPMPX21
+          BRANCH    OVRCD,KEYU8000
+.
+          MOVE      PURNO,KEYURNUM           * selected U/R number
+          MOVE      ZERO,EXIT
+          GOTO      KEYU9999
+.
+KEYU8000  DISPLAY   *P1:24,*EL,*B,*V2LON:
+                    "** U/R Number does not exist **    ";
+          CALL      HITENTER
+          GOTO      KEYU0000
+.
+KEYU9999  RETURN
++
+.**************************************************************************
+.*                  GDAT0000                                              *
+.*        Date Range                                                      *
+.**************************************************************************
+GDAT0000  DISPLAY   *P1:6,"Start Date : ":
+                    *P1:7,"End   Date : ";
+.
+          UNPACK    SP20,FROMDATE,TODATE
+          MOVE      CCC,CCENT
+          MOVE      ONE,CCANLDTE
+          MOVE      ZERO,CHIGHLT
+          MOVE      "14",CCOL
+.
+GDAT4000  MOVE      "6",CVERT
+          DISPLAY   *P14:6,*EL,*P14:7,*EF;
+          MOVE      ZERO,EXIT
+.
+          UNPACK    SP20,CDAY,CMON,CCENT,CYEAR
+          CALL      KEYDATE
+.         BRANCH    OVRCD,GDAT9999
+          PACK      FROMDATE,CCENT,CYEAR,CMON,CDAY
+.
+GDAT5000  MATCH     SP70,FROMDATE
+          IF        !@EQUAL
+            UNPACK    FROMDATE,CCENT,CYEAR,CMON,CDAY
+          ELSE
+            PACK      KEY8,CCC,CYY,CMM,CDD
+            REP       " 0",KEY8
+            UNPACK    KEY8,CCENT,CYEAR,CMON,CDAY
+          ENDIF
+          MOVE      "7",CVERT
+          CALL      KEYDATE
+          PACK      TODATE,CCENT,CYEAR,CMON,CDAY
+.
+          REP       " 0",FROMDATE
+          REP       " 0",TODATE
+.
+          MATCH     FROMDATE,TODATE
+          GOTO      GDAT9999 IF NOT LESS
+.
+          DISPLAY   *P1:24,*EL,*B,*V2LON:
+                    "** End Date must be greater than or = Start Date **    ";
+          CALL      HITENTER
+          GOTO      GDAT5000
+.
+GDAT9999  RETURN
++
+.**************************************************************************
+.*                KWRD0000                                                *
+.*      Keyin Ward/House                                                  *
+.**************************************************************************
+KWRD0000  DISPLAY   *P1:9,"Ward  : "
+.
+          MOVE      SP70,KEYNWARD
+          MOVE      TWENTY3,ECOL
+          MOVE      NINE,EVERT
+          MOVE      SP70,CKYIDEF3
+          CALL      PATWRDKY
+.         BRANCH    EXIT,KWRD9999
+          PACK      KEYNWARD,WWARD,SP70
+.
+          MATCH     SP70,KEYNWARD
+          GOTO      KWRD9999 IF EQUAL
+.
+          PACK      KEY6 WITH KEYNWARD,SP6
+          CALL      RDWARD1
+          BRANCH    OVRCD OF KWRD8000
+.
+          DISPLAY   *P40:9,*V2LON,WBDESC;
+          MOVE      ZERO,EXIT
+          GOTO      KWRD9999
+.
+KWRD8000  DISPLAY   *P30:9,*EL,*B,*V2LON:
+                    "*** Ward does not exist ***",*W2;
+          GOTO      KWRD0000
+.
+KWRD9999  RETURN
++
+.**************************************************************************
+.*                  KCLM0000                                              *
+.*                keyin range of claim codes                              *
+.**************************************************************************
+KCLM0000  MOVE       ZERO,EXIT
+          MOVE       SP20,STRCLAIM
+          MOVE       SP20,ENDCLAIM
+.
+          DISPLAY    *P1:12,*EF,"From Claim Code   :":
+                         *P1:13,"To   Claim Code   :";
+.
+          MOVE      "12",EVERT
+          MOVE      "20",ECOL               * keyin position
+          MOVE      "CL",CODE
+          MOVE      SP3,ACODE
+          CALL      KEYINCOD                * keyin code
+.         BRANCH    EXIT,KCLM9999,KCLM2000
+.
+          PACK      STRCLAIM,ACODE,SP70
+          MATCH     SP70,STRCLAIM
+          GOTO      KCLM2000 IF EQUAL
+.
+          DISPLAY   *P24:12,*V2LON,TDESC;
+          GOTO      KCLM3000
+.
+KCLM2000  DISPLAY   *P24:12,*EL,"Start"
+.
+KCLM3000  MOVE      "13",EVERT
+          MOVE      SP3,ACODE
+          CALL      KEYINCOD                * keyin code
+.         BRANCH    EXIT,KCLM0000,KCLM4000
+.
+          PACK      ENDCLAIM,ACODE,SP70
+          MATCH     SP70,ENDCLAIM
+          GOTO      KCLM4000 IF EQUAL
+.
+          DISPLAY   *P24:13,*V2LON,TDESC;
+          GOTO      KCLM9999
+.
+KCLM4000  DISPLAY   *P24:13,*EL,"End"
+          GOTO      KCLM9999
+.
+KCLM9999  RETURN
++
+.**************************************************************************
+.*                  KECR0000                                              *
+.*        Exclude Credit Note                                             *
+.**************************************************************************
+KECR0000  MOVE      ZERO,EXIT
+          MOVE      ONE,EXCCNOTE                  * Exclude Credit note
+          DISPLAY   *P1:15,"Exclude Fully Credited Invoices : "
+          KEYIN     *P36:15,*V2LON,*RV,KEY1:
+                    *P36:15,*DV,KEY1
+          REP       UPPLOW,KEY1
+          DISPLAY   *P36:15,*V2LON,KEY1
+          MATCH     "Y",KEY1
+          GOTO      KECR9999 IF EQUAL
+          MOVE      ZERO,EXCCNOTE
+.
+KECR9999  RETURN
++
+.****************************************************************************
+.*                  CRTX0000                                                *
+.*        Create export file for excel                                      *
+.****************************************************************************
+CRTX0000  MOVE      ZERO,EXIT
+          MOVE      ZERO,EXPORTFL                  * No to create export file
+          DISPLAY   *P1:17,"Create Export file for Excel : "
+          KEYIN     *P32:17,*V2LON,*RV,KEY1:
+                    *P32:17,*DV,KEY1
+          REP       UPPLOW,KEY1
+          DISPLAY   *P32:17,*V2LON,KEY1
+          MATCH     "Y",KEY1
+          GOTO      CRTX9999 IF NOT EQUAL
+          MOVE      ONE,EXPORTFL
+          MOVE      SPLFILE,CSVFNAME
+.
+CRTX9999  RETURN
++
+.**************************************************************************
+.*                               PROC0000              Called by: ML1000  *
+.**************************************************************************
+PROC0000  DISPLAY   *P10:24,*V2LON,"- Processing...";
+.
+          MOVE      ZERO,TOTIAMNT
+          MOVE      ZERO,TOTAAMNT
+          MOVE      ZERO,TOTOAMNT
+          MOVE      ZERO,RECFLAG
+          CALL      CTMP0000                * Create tempfile
+.
+          MATCH     SP70,KEYURNUM
+          GOTO      PROC2000 IF EQUAL
+.
+.         By U/R number
+.
+          MOVE      KEYURNUM,KEY8
+          CALL      RDMAST1
+          BRANCH    OVRCD,PROC9999          * missing Master record
+.
+          PACK      KEY32,KEYURNUM,SP70     * position on the U/R number
+          CALL      RDSINV5
+PROC1100  CALL      RDKINV5
+          BRANCH    OVRCD,PROC4000
+.
+          MATCH     KEYURNUM,PINVUR         * Same U/R number ?
+          GOTO      PROC4000 IF NOT EQUAL
+.
+          MOVE      PINVADM,KEY8
+          CALL      RDMISS1
+          BRANCH    OVRCD,PROC1100
+.
+          CALL      VALD0000                * validation
+          BRANCH    EXIT,PROC1100
+.
+          CALL      WREC0000                * Write to tempfile
+          MOVE      ONE,RECFLAG
+          GOTO      PROC1100
+.
+.         Invoice date range
+.
+PROC2000  PACK      KEY16,FROMDATE,SP70
+          CALL      RDSINV2
+PROC2200  CALL      RDKINV2
+          BRANCH    OVRCD,PROC4000
+.
+          MATCH     SP70,TODATE
+          IF        !@EQUAL
+            MATCH     PINVDTE,TODATE        * check End date
+            GOTO      PROC4000 IF LESS
+          ENDIF
+.
+          MOVE      PINVUR,KEY8
+          CALL      RDMAST1
+          BRANCH    OVRCD,PROC2200
+.
+          MOVE      PINVADM,KEY8
+          CALL      RDMISS1
+          BRANCH    OVRCD,PROC2200
+.
+          CALL      VALD0000              * validation
+          BRANCH    EXIT,PROC2200
+.
+          CALL      WREC0000              * Write to tempfile
+          MOVE      ONE,RECFLAG
+          GOTO      PROC2200
+.
+.         Loop through tempfile and statement for each U/R number
+.
+PROC4000  COMPARE   ZERO,RECFLAG
+          GOTO      PROC9000 IF EQUAL
+. 
+          CALL      GTOT0000              * Generate total balance for each U/R
+          CALL      GENS0000              * Generate statement
+.
+PROC9000  CALL      KTMP0000              * kill tempfile
+.
+PROC9999  RETURN
++
+.------------------------------------------------------------
+.      Validation
+.------------------------------------------------------------
+VALD0000  COMPARE   THREE,PINVSYS
+          GOTO      VALD9000 IF NOT EQUAL   * NOT Inpatient invoice
+.
+          MOVE      PINVNO,KEY8
+          CALL      RDPMIVB1
+          BRANCH    OVRCD,VALD9000          * not an Independence service inv.
+.
+          IF        ASTAT=3
+            MOVE      PINVADM,KEY8
+            CALL      RDDSCH1
+            BRANCH    OVRCD,VALD9000        * missing discharge record
+          ENDIF
+.
+.         Check Exclude Fully credited invoices
+.
+          IF        EXCCNOTE=1
+            MATCH     "1",PTINCRST
+            GOTO      VALD9000 IF EQUAL     * Fully Credited
+          ENDIF
+.
+          MATCH     SP70,KEYURNUM           * selected U/R ?
+          IF        !@EQUAL
+            MATCH     PINVUR,KEYURNUM
+            GOTO      VALD9000 IF NOT EQUAL
+          ENDIF
+.
+.         Check House/Admission Ward
+.
+          MATCH     SP70,KEYNWARD
+          GOTO      VALD3000 IF EQUAL
+.
+.         Check Admission Ward
+.
+          PACK      KEY30,PINVADM,SP70
+          CALL      RDSTRAN2
+          CALL      RDKTRAN2
+          BRANCH    OVRCD,VALD9000
+.
+          MATCH     DPINVADM,DTADMN           * same visit number ?
+          GOTO      VALD9000 IF NOT EQUAL
+.
+          MATCH     "A",TMOVE
+          GOTO      VALD9000 IF NOT EQUAL     * missing 'A' record
+.
+          MATCH     TWARD,KEYNWARD            * same ward ?
+          GOTO      VALD9000 IF NOT EQUAL
+.
+.         Check range of Compensable status/Claim codes
+.
+VALD3000  MATCH     SP70,STRCLAIM
+          IF        !@EQUAL
+            MATCH     STRCLAIM,ACLAIM
+            GOTO      VALD9000 IF LESS
+          ENDIF
+.
+          MATCH     SP70,ENDCLAIM
+          IF        !@EQUAL
+            MATCH     ACLAIM,ENDCLAIM
+            GOTO      VALD9000 IF LESS
+          ENDIF
+.
+          MOVE      ZERO,EXIT
+          GOTO      VALD9999
+.
+VALD9000  MOVE      ONE,EXIT
+VALD9999  RETURN
++
+.------------------------------------------------------------
+.        Write to tempfile
+.------------------------------------------------------------
+WREC0000  CALL      INTV0000           * Initialise variables
+.
+          ADD       PINVJOUR,XINVALOC  * add Journal to Allocated amount
+          ADD       PTINCRTT,XINVALOC  * add Credit note amt to Allocated amount
+.
+          MOVE      PINVDTE,XINVDATE   * Invoice Date
+          MOVE      PINVNO,XINVNUMB    * Invoice Number
+          CALL      INVD0000           * Invoice from and to date
+          BRANCH    EXIT,WREC9999
+.
+          MOVE      PINVUR,XURNUMBR    * U/R number
+          MOVE      PINVAMT,XINVAMNT   * Invoice amount
+          MOVE      PINVAMT,XINVOSTD
+          CALL      GCSH0000           * invoice payment
+          ADD       FORM12P2,XINVALOC  * add payment to Allocated amount
+.
+          MOVE      PINVAMT,XINVOSTD   * outstanding amount for Adm.
+          ADD       PINVJOUR,XINVOSTD  * journal
+          ADD       PTINGSTJ,XINVOSTD
+          ADD       PTINCRTT,XINVOSTD  * credit note
+          ADD       FORM12P2,XINVOSTD  * payment
+.
+          ADD       XINVAMNT,TOTIAMNT   * total invoice amount
+          ADD       XINVALOC,TOTAAMNT   * total amount allocated
+          ADD       XINVOSTD,TOTOAMNT   * total outstanding amount
+.
+          PACK      KEY24,XURNUMBR,XINVDATE,XINVNUMB,SP70
+          CALL      RATM0000
+          IF        OVRCD=1
+            CALL      WRTM0000         * write to tempfile
+          ENDIF
+  
+WREC9999 RETURN
++
+.------------------------------------------------------------
+.        Invoice From and To date
+.------------------------------------------------------------
+INVD0000  MOVE      SP70,INVFDATE        * Bill from period
+          MOVE      SP70,INVTDATE        * Bill to period
+.
+          PACK      KEY23,PINVNO,SP70
+          CALL      RDSDTRN5
+INVD1000  CALL      RDKDTRN5
+          BRANCH    OVRCD,INVD9000
+.
+          MATCH     TREF,PINVNO              * Same invoice number ?
+          GOTO      INVD9000 IF NOT EQUAL
+.
+          PACK      INVFDATE,DTFCENT,DTFYEAR,DTFMONTH,DTFDAY,SP70
+          REP       " 0",INVFDATE            * Bill from
+.
+          MATCH     "3",DTRECTYP
+          GOTO      INVD2000 IF NOT EQUAL
+.
+          COMPARE   ONE,PTDTCCU              * item from Regime ?
+          GOTO      INVD1000 IF NOT EQUAL
+.
+          MOVE      INVFDATE,DATFIELD
+          ADD       TSERVS,DATFIELD
+          MOVE      DATFIELD,INVTDATE      * set the Bill to period
+.
+          GOTO      INVD5000
+.
+INVD2000  MATCH     "1",DTRECTYP            * Accommodation record
+          GOTO      INVD1000 IF NOT EQUAL
+.
+          PACK      INVTDATE,TTCENT,TTYEAR,TTMONTH,TTDAY,SP70
+          REP       " 0",INVTDATE           * Bill to
+.
+.         Set the Period from and to date
+.
+INVD5000  MATCH    SP70,XINVFDAT
+          IF       @EQUAL
+            MOVE     INVFDATE,XINVFDAT      * Bill from
+          ELSE
+            MATCH    XINVFDAT,INVFDATE
+            IF       @LESS
+              MOVE     INVFDATE,XINVFDAT
+            ENDIF
+          ENDIF
+.
+          MATCH    SP70,XINVTDAT
+          IF       @EQUAL
+            MOVE     INVTDATE,XINVTDAT      * Bill to
+          ELSE
+            MATCH    INVTDATE,XINVTDAT
+            IF       @LESS
+              MOVE     INVTDATE,XINVTDAT
+            ENDIF
+          ENDIF
+          GOTO     INVD1000
+.
+INVD9000  MATCH    SP70,INVFDATE
+          GOTO     INVD9200 IF EQUAL
+.
+          MATCH    SP70,XINVFDAT
+          IF       @EQUAL
+            MOVE     INVFDATE,XINVFDAT       * Set Bill Period From
+          ENDIF
+.
+          MATCH    SP70,XINVTDAT
+          IF       @EQUAL
+            MOVE     XINVFDAT,XINVTDAT       * Set Bill Period To
+          ENDIF
+.
+          GOTO     INVD9999
+.
+INVD9200  MOVE     ONE,EXIT
+INVD9999  RETURN
++
+.------------------------------------------------------------
+.         Get all payment for this invoice
+.------------------------------------------------------------
+GCSH0000  MOVE      ZERO,FORM12P2           * amount payment for an invoice
+          PACK      DIM12,SP4,PINVNO        * invoice number
+          PACK      KEY29,DIM12,SP70
+          CALL      RSRCDTE3
+GCSH1000  CALL      RKRCDTE3
+          BRANCH    OVRCD,GCSH9999
+.
+          MATCH     DIM12,RCDTINVN
+          GOTO      GCSH9999 IF NOT EQUAL
+.
+          MATCH     PINVUR,RCDTURNO         * Same U/R number ?
+          GOTO      GCSH1000 IF NOT EQUAL
+.
+          PACK      KEY12,RCDTRECN
+          CALL      RDRCBNK1
+          BRANCH    OVRCD,GCSH1000
+          MATCH     "1",RCBNSTAT            * check if cancelled
+          GOTO      GCSH1000 IF EQUAL
+.
+          MULT      "-1",RCDTAMNT
+          ADD       RCDTAMNT,FORM12P2
+          GOTO      GCSH1000
+.
+GCSH9999  RETURN
++
+.------------------------------------------------------------
+.        Generate total balance for each U/R
+.------------------------------------------------------------
+GTOT0000  MOVE      ZERO,TOTIAMNT
+          MOVE      ZERO,TOTAAMNT
+          MOVE      ZERO,TOTOAMNT
+          MOVE      SP70,INVFDATE
+          MOVE      SP70,INVTDATE
+          MOVE      SP70,SAVKEY24
+          MOVE      SP70,SKEY24
+.
+          MOVE      SP70,SAVURNUM
+          PACK      KEY24,SP70
+          CALL      RSTM0000
+GTOT1000  CALL      RKTM0000
+          BRANCH    OVRCD,GTOT8000
+.
+          MATCH     SP70,SAVURNUM
+          GOTO      GTOT2000 IF EQUAL
+.
+          MATCH     XURNUMBR,SAVURNUM
+          GOTO      GTOT2200 IF EQUAL      * same U/R number
+.
+          PACK      SKEY24,XURNUMBR,XINVDATE,XINVNUMB,SP70   * save key
+          CALL      FINV0000               * Check for Final invoice of the U/R
+.
+.         Write total to tempfile with blank Invoice date and number
+.
+          CALL      INTV0000               * Initialise variables
+          MOVE      "99999999",XINVDATE    * header record
+          MOVE      "99999999",XINVNUMB
+          PACK      KEY24,SAVURNUM,XINVDATE,XINVNUMB
+          CALL      RATM0000
+          IF        OVRCD=1
+            MOVE      SAVURNUM,XURNUMBR    * U/R number
+            MOVE      TOTIAMNT,XINVAMNT    * Invoice amount
+            MOVE      TOTAAMNT,XINVALOC    * amount allocated
+            MOVE      TOTOAMNT,XINVOSTD    * Outstanding amount
+            MOVE      INVFDATE,XINVFDAT
+            MOVE      INVTDATE,XINVTDAT
+            CALL      WRTM0000             * write to tempfile
+          ENDIF
+. 
+          MOVE      ZERO,TOTIAMNT
+          MOVE      ZERO,TOTAAMNT
+          MOVE      ZERO,TOTOAMNT
+          MOVE      SP70,INVFDATE
+          MOVE      SP70,INVTDATE
+.
+          MOVE      SKEY24,KEY24
+          CALL      RDTM0000              * Reposition
+.
+GTOT2000  MOVE      XURNUMBR,SAVURNUM
+.
+GTOT2200  ADD       XINVAMNT,TOTIAMNT           * total invoice amount
+          ADD       XINVALOC,TOTAAMNT           * total amount allocated
+          ADD       XINVOSTD,TOTOAMNT           * total outstanding amount
+          MOVE      XINVFDAT,INVFDATE
+          MOVE      XINVTDAT,INVTDATE
+.
+          PACK      SAVKEY24,XURNUMBR,XINVDATE,XINVNUMB,SP70   * save key
+          GOTO      GTOT1000
+.
+.         Check for Final invoice of the U/R
+.
+GTOT8000  COMPARE   ZERO,TOTIAMNT
+          GOTO      GTOT9999 IF EQUAL
+.
+          MOVE      SP70,SKEY24
+          CALL      FINV0000               * Check for Final invoice of the U/R
+.
+          CALL      INTV0000               * Initialise variables
+          MOVE      "99999999",XINVDATE    * header record
+          MOVE      "99999999",XINVNUMB
+          PACK      KEY24,SAVURNUM,XINVDATE,XINVNUMB
+          CALL      RATM0000
+          IF        OVRCD=1
+            MOVE      SAVURNUM,XURNUMBR    * U/R number
+            MOVE      TOTIAMNT,XINVAMNT    * Invoice amount
+            MOVE      TOTAAMNT,XINVALOC    * amount allocated
+            MOVE      TOTOAMNT,XINVOSTD    * Outstanding amount
+            MOVE      INVFDATE,XINVFDAT
+            MOVE      INVTDATE,XINVTDAT
+            CALL      WRTM0000             * write to tempfile
+          ENDIF
+.
+GTOT9999  RETURN
++
+.------------------------------------------------------------
+.         Check for Final invoice of the U/R
+.------------------------------------------------------------
+FINV0000  COMPARE   THREE,ASTAT
+          GOTO      FINV2000 IF NOT EQUAL
+.
+          MOVE      DDATE,INVTDATE         * Use Discharged date
+          GOTO      FINV9000
+.
+.         if less than 14 days, use Current date
+.         otherwise add 14 days to the Invoice to date
+.
+FINV2000  MOVE      INVTDATE,CDYSFDTE
+          REP       " 0",CDYSFDTE
+          PACK      CDYSTDTE,CCC,CYY,CMM,CDD
+          REP       " 0",CDYSTDTE
+          CALL      CALCDAYS               * number of days
+          SUB       ONE,CDYSDAYS           * get difference
+          IF        CDYSDAYS<14
+            MOVE      CDYSTDTE,INVTDATE    * Use Current date
+          ELSE
+            MOVE      INVTDATE,DATFIELD
+            ADD       "14",DATFIELD
+            MOVE      DATFIELD,INVTDATE    * set the Bill to period
+          ENDIF
+FINV9000  REP       " 0",INVTDATE
+.
+          MOVE      SAVKEY24,KEY24
+          CALL      RDTM0000
+          IF        OVRCD=0
+            MOVE      INVTDATE,XINVTDAT
+            CALL      UPTM0000             * Update last invoice to date
+          ENDIF
+.
+          MATCH     SP70,SKEY24
+          IF        !@EQUAL
+            MOVE      SKEY24,KEY24
+            CALL      RDTM0000             * Reposition
+          ENDIF
+.
+FINV9999  RETURN
++
+.------------------------------------------------------------
+.        Initialise tempfile variables
+.------------------------------------------------------------
+INTV0000  MOVE      SP70,XURNUMBR   * U/R number
+          MOVE      SP70,XINVDATE   * Invoice Date
+          MOVE      SP70,XINVNUMB   * Invoice Number
+          MOVE      SP70,XINVFDAT   * Invoice from
+          MOVE      SP70,XINVTDAT   * Invoice to
+          MOVE      ZERO,XINVAMNT   * Invoice amount
+          MOVE      ZERO,XINVALOC   * Payment
+          MOVE      ZERO,XINVOSTD   * Outstanding amount
+          MOVE      SP70,XINVSPAR   * Spare
+INTV9999  RETURN
++
+.------------------------------------------------------------
+.        Generate statement
+.------------------------------------------------------------
+GENS0000  PACK      KEY24,Z70
+          CALL      RSTM0000
+GENS1000  CALL      RPTM0000
+          BRANCH    OVRCD,GENS8000
+.
+          MATCH     "99999999",XINVDATE
+          GOTO      GENS4000 IF NOT EQUAL     * Header record
+.
+          MOVE      XURNUMBR,KEY8
+          CALL      RDMAST1
+          BRANCH    OVRCD,GENS1000
+.
+          MOVE      XINVAMNT,TOTIAMNT  * Invoice amount
+          MOVE      XINVALOC,TOTAAMNT  * amount allocated
+          MOVE      XINVOSTD,TOTOAMNT  * Outstanding amount
+          CALL      PRHD0000           * print header
+          GOTO      GENS1000
+.
+GENS4000  CALL      PRLN0000           * Print statement
+          GOTO      GENS1000           * next invoice
+.
+GENS8000  COMPARE   ONE,EXPORTFL       * Export file ?
+          GOTO      GENS9999 IF NOT EQUAL
+.
+          STRIP     RSCNROD                 * output directory
+          RESET     FNAMEB
+          SQUEEZE   FNAMEB
+          CLEAR     CMDLINE
+          APPEND    "cp ",CMDLINE
+          APPEND    FNAMEB,CMDLINE
+          APPEND    ".txt",CMDLINE
+          APPEND    SP1,CMDLINE
+          APPEND    RSCNROD,CMDLINE
+          APPEND    CSVFNAME,CMDLINE
+          APPEND    ".csv",CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+          STRIP     RSCNROD
+          PRINT     *N,*1,"Generated CSV File is : ",CSVFNAME,".csv"
+.
+GENS9999  RETURN
++
+.------------------------------------------------------------
+.      Print header
+.------------------------------------------------------------
+PRHD0000  PACK      PACFNAME,SP70,SP70
+          MOVE      ONE,PACFRMT     * format as Title,Given name,Surname
+          MOVE      PSNAME,PACSNAME
+          MOVE      PGNAME,PACGNAME
+          MOVE      PTITL,PACTITLE
+          CALL      PACNAME
+.
+          PACK      KEY8,CCC,CYY,CMM,CDD       * set to current date
+          MATCH     SP70,TODATE
+          IF        !@EQUAL
+            MOVE      TODATE,KEY8
+          ENDIF
+          UNPACK    KEY8,CCENT,CYEAR,CMON,CDAY
+          REP       " 0",KEY8
+          CALL      PACDATE
+.
+          PRINT     *F,*1,"@CMPPLPSTM1@":        * Line 1
+                    *N,*1,PACFNAME:              * Line 2
+                    *N,*1,"Statement of Account as of":
+                    *33,CPCDATE                  * Line 3
+.
+          IF        EXPORTFL=1
+            WRITE     CSVOFILE,SEQ;*+,"@CMPPLPSTMT@",COMMA
+.
+            STRIP     PACFNAME
+            WRITE     CSVOFILE,SEQ;*+,PACFNAME,COMMA
+.
+            WRITE     CSVOFILE,SEQ;*+,"Statement of Account as of",COMMA:
+                                      CPCDATE,COMMA
+          ENDIF
+.
+          PRINT     *1,"Total Balance:":
+                    *70,"$",TOTAAMNT:
+                    *90,"$",TOTOAMNT             * Line 4
+.
+          IF        EXPORTFL=1
+            WRITE     CSVOFILE,SEQ;*+,"Total Balance:",COMMA;
+.
+            MOVE      TOTAAMNT,FORM12P2       * Total amount allocated
+            CALL      SAMT0000                * Set up amount field
+            WRITE     CSVOFILE,SEQ;*+,DPYAMNT,COMMA;
+.
+            MOVE      TOTOAMNT,FORM12P2       * Total outstanding
+            CALL      SAMT0000                * Set up amount field
+            WRITE     CSVOFILE,SEQ;*+,DPYAMNT,COMMA
+          ENDIF
+.
+          PRINT     *1,"Invoice Date":
+                    *14,"Invoice No.":
+                    *25,"Period Billed":
+                    *51,"Amount Invoiced":
+                    *70,"Amount Allocated":
+                    *90,"Amount Outstanding"
+.
+          IF        EXPORTFL=1
+            WRITE     CSVOFILE,SEQ;*+,"Invoice Date",COMMA,"Invoice No.",COMMA:
+                           "Period Billed",COMMA,"Amount Invoiced",COMMA:
+                           "Amount Allocated",COMMA,"Amount Outstanding",COMMA
+          ENDIF
+.
+PRHD9999  RETURN
++
+.------------------------------------------------------------
+.      Print invoice details
+.------------------------------------------------------------
+PRLN0000  UNPACK    XINVDATE,CCENT,CYEAR,CMON,CDAY
+          REP       " 0",XINVDATE
+          CALL      PACDATE
+.
+          PRINT     *1,CPCDATE:             * invoice date
+                    *14,XINVNUMB;           * invoice number
+.
+          IF        EXPORTFL=1
+            SQUEEZE   XINVNUMB
+            WRITE     CSVOFILE,SEQ;*+,CPCDATE,COMMA,XINVNUMB,COMMA;
+          ENDIF
+.
+          UNPACK    XINVFDAT,CCENT,CYEAR,CMON,CDAY
+          REP       " 0",XINVFDAT
+          CALL      PACDATE
+          MOVE      CPCDATE,KEY10              * save date
+          PRINT     *25,CPCDATE;               * Period Billed from
+.
+          UNPACK    XINVTDAT,CCENT,CYEAR,CMON,CDAY
+          REP       " 0",XINVTDAT
+          CALL      PACDATE
+          PRINT     *35," to ",CPCDATE;        * Period Billed to
+.
+          IF        EXPORTFL=1
+            CLEAR     KEY100
+            APPEND    KEY10,KEY100
+            APPEND    " to ",KEY100
+            APPEND    CPCDATE,KEY100
+            APPEND    SP70,KEY100
+            RESET     KEY100
+            STRIP     KEY100
+.
+            WRITE     CSVOFILE,SEQ;*+,KEY100,COMMA;
+          ENDIF
+.
+          PRINT     *51,"$",XINVAMNT:          * invoice amount
+                    *70,"$",XINVALOC:          * allocated amount
+                    *90,"$",XINVOSTD           * Outstanding amount
+.
+          IF        EXPORTFL=1
+            MOVE      XINVAMNT,FORM12P2       * invoice amount
+            CALL      SAMT0000                * Set up amount field
+            WRITE     CSVOFILE,SEQ;*+,DPYAMNT,COMMA;
+.
+            MOVE      XINVALOC,FORM12P2       * allocated amount
+            CALL      SAMT0000                * Set up amount field
+            WRITE     CSVOFILE,SEQ;*+,DPYAMNT,COMMA;
+.
+            MOVE      XINVOSTD,FORM12P2       * outstanding amount
+            CALL      SAMT0000                * Set up amount field
+            WRITE     CSVOFILE,SEQ;*+,DPYAMNT,COMMA
+          ENDIF
+.
+PRLN9999  RETURN
++
+.******************************************************************************
+.*                                  SAMT0000                                  *
+.*                  Set up the format for amount                              *
+.******************************************************************************
+SAMT0000  COMPARE   ZERO,FORM12P2
+          GOTO      SAMT2000 IF EQUAL           * zero amount
+.
+          MOVE      FORM12P2,DIM15
+          SQUEEZE   DIM15
+          IF        FORM12P2<0
+            MULT      "-1",FORM12P2
+            MOVE      FORM12P2,DIM15
+            SQUEEZE   DIM15
+            MOVE      "-",KEY1
+            PACK      DPYAMNT,KEY1,DOLLAR,DIM15,SP70  * format -$99999.99
+          ELSE
+            PACK      DPYAMNT,DOLLAR,DIM15,SP70       * format $99999.99
+          ENDIF
+          GOTO      SAMT9000
+.
+SAMT2000  PACK      DPYAMNT,ZDOLLAR,SP70              * format $-
+.
+SAMT9000  STRIP     DPYAMNT
+SAMT9999  RETURN
++
+.------------------------------------------------------------
+.      Create and open temp file
+.------------------------------------------------------------
+CTMP0000  CALL      KTMP0000                     * delete temp file
+.
+          CLEAR     CMDLINE
+          APPEND    "isbuild ",CMDLINE
+          APPEND    FNAMEA,CMDLINE
+          APPEND    " 68 U1-8,9-16,17-24 U9-16,17-24,1-8",CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+          OPEN      TEMPFILE,FNAMEA
+.
+          COMPARE   ONE,EXPORTFL
+          GOTO      CTMP9999 IF NOT EQUAL
+.
+          PREP      CSVOFILE,FNAMEB              * Create CSV format file
+.
+CTMP9999  RETURN
++
+.------------------------------------------------------------
+.      Delete temp file
+.------------------------------------------------------------
+KTMP0000  CLOSE     TEMPFILE
+.
+          CLEAR     CMDLINE
+          APPEND    "iserase ",CMDLINE
+          APPEND    FNAMEA,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+          CLOSE     CSVOFILE,DELETE
+.
+KTMP9999  RETURN
++
+.------------------------------------------------------------
+.      IO tempfile
+.------------------------------------------------------------
+WRTM0000  WRITE     TEMPFILE,KEY24;XURNUMBR,XINVDATE,XINVNUMB,XINVFDAT,XINVTDAT:
+                                   XINVAMNT,XINVALOC,XINVOSTD,XINVSPAR
+          RETURN
+
+RSTM0000  RESET     KEY24
+          READ      TEMPFILE,KEY24;;
+          RETURN
+.
+RKTM0000  MOVE      ZERO,OVRCD
+          READKS    TEMPFILE;XURNUMBR,XINVDATE,XINVNUMB,XINVFDAT,XINVTDAT:
+                             XINVAMNT,XINVALOC,XINVOSTD,XINVSPAR
+          GOTO      OVERCOND IF OVER
+          RETURN
+.
+RPTM0000  MOVE      ZERO,OVRCD
+          READKP    TEMPFILE;XURNUMBR,XINVDATE,XINVNUMB,XINVFDAT,XINVTDAT:
+                             XINVAMNT,XINVALOC,XINVOSTD,XINVSPAR
+          GOTO      OVERCOND IF OVER
+          RETURN
+.
+RDTM0000  MOVE      ZERO,OVRCD
+          RESET     KEY24
+          READ      TEMPFILE,KEY24;XURNUMBR,XINVDATE,XINVNUMB,XINVFDAT,XINVTDAT:
+                                   XINVAMNT,XINVALOC,XINVOSTD,XINVSPAR
+          GOTO      OVERCOND IF OVER
+          RETURN
++
+RATM0000  MOVE      ZERO,OVRCD
+          RESET     KEY24
+          READ      TEMPFILE,KEY24;ANS
+          GOTO      OVERCOND IF OVER
+          RETURN
+.
+UPTM0000  MOVE      ZERO,OVRCD
+          UPDATE    TEMPFILE;XURNUMBR,XINVDATE,XINVNUMB,XINVFDAT,XINVTDAT:
+                             XINVAMNT,XINVALOC,XINVOSTD,XINVSPAR
+
+          RETURN
++
+.******************************************************************************
+.
+          INC       STD001IO
+.
+          INC       TFILENAM                * Generate Temp File Name
+          INC       IBASEQIO/INC            * Sequential Numbers File
+          INC       WEBERRIO/INC            * Web Server Error Logging
+.
+          INC       KEYINCOD
+          INC       PATDSCOD
+          INC       PATWRDKY
+          INC       CALCDAYS
+.
+          INC       PATCODIO/INC
+          INC       PATMA1IO/INC
+          INC       PMSPX2IO/INC
+          INC       PATMI1IO/INC
+          INC       PMSVX1IO/INC
+          INC       PATDSCIO/INC
+          INC       PATWR1IO/INC
+          INC       PATDTRIO/INC
+          INC       PATTRNIO/INC
+          INC       PATINVIO/INC
+          INC       RCPDTEIO/INC
+          INC       RCPBNKIO/INC
+          INC       PMSIVBIO/INC
+.

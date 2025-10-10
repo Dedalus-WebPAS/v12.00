@@ -1,0 +1,18 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  Fees Estimate Text * 
+                      
+  
+TABLE NAME         :  pmsfetaf
+=====================================================================
+PMFETYPE    char        3     1   Fees Estimate Text Type (Cat FE)  
+PMFELINE    char        3     4   Comment Line Count  
+PMFETEXT    char       80     7   Comment Text Line  
+PMFESPAR    char       30    87   Spare Variable  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+PMFETYPE
+PMFELINE
+  
+=====================================================================

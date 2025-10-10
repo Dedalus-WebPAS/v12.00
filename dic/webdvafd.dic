@@ -1,0 +1,70 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Web System Table 
+                      WebServices DVAW Audit History 
+  
+TABLE NAME         :  webdvaaf
+=====================================================================
+WBDAINVN    char        8     1   Invoice Number  
+WBDADATE    char        8     9   Date of Transaction (ccyymmdd)  
+WBDATIME    char        8    17   Time of Transaction (hh:mm:ss)  
+WBDABATN    char        8    25   Batch Number  
+WBDASTAT    decimal     2    33   Status (see webdvaaf.WBDWFLAG)  
+WBDATYPE    char        2    35   Type  
+                                   0 = Not Applicable  
+                                   1 = Report Request  
+                                   2 = Report Request Response  
+                                   3 = Viewed  
+                                   4 = Data Error Response  
+                                   5 = Transmission Error Response  
+WBDAOPER    char       10    37   Web User Id (websecaf)  
+WBDATRID    char       24    47   Transaction Id  
+WBDAEROR    char        4    71   Hub Error Code  
+WBDAEROT    char      100    75   Hub Error Explanaton Text  
+WBDAMODL    char        1   175   webPAS Module  
+                                   1 = Emergency  
+                                   2 = Private Practice  
+                                   3 = Outpatient  
+WBDAMSID    char       36   176   Message ID  
+WBDASPAR    char      100   212   Spare Variable  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+WBDAINVN
+WBDADATE
+WBDATIME
+WBDATYPE
+WBDAMODL
+  
+UNIQUE INDEX 2
+WBDADATE
+WBDATIME
+WBDATYPE
+WBDAINVN
+WBDAMODL
+  
+UNIQUE INDEX 3
+WBDAINVN
+WBDABATN
+WBDADATE
+WBDATIME
+WBDATYPE
+WBDAMODL
+  
+UNIQUE INDEX 4
+WBDATRID
+WBDAINVN
+WBDADATE
+WBDATIME
+WBDATYPE
+WBDAMODL
+  
+UNIQUE INDEX 5
+WBDAMSID
+WBDAINVN
+WBDADATE
+WBDATIME
+WBDATYPE
+WBDAMODL
+  
+=====================================================================

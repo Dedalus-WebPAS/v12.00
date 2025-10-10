@@ -1,0 +1,17 @@
+.---------------------------------------------------------------------------
+. Include Name : CLOPRTRB.PBL
+. Function     : Clear function for OPRTRBFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.04.01  15/02/2024  Thanh T          TSK 0923560
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLOPRTRB  MOVE      SP70,OPTDCODE      . Tray Code     
+          MOVE      SP70,OPTDITEM      . Item Code     
+          MOVE      ZERO,OPTDQTY       . Quantity      
+          MOVE      SP70,OPTDHOSP      . Hospital ID (pathspaf)    
+          MOVE      SP70,OPTDSPAR      . Spare Variable     
+.
+          RETURN

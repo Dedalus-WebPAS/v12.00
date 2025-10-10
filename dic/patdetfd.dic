@@ -1,0 +1,58 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Patient System 
+                      Patient Debt Registration file 
+  
+TABLE NAME         :  patdetaf
+=====================================================================
+PTDETYPE    char        1     1   Patient Debt Type  
+                                   1=Patient Only  
+                                   2=Payment Plan  
+                                   3=Debt Collection  
+                                   4=Payment Plan by Admission Number  
+PTDEINVN    char        8     2   Invoice Number/Admission Number  
+                                   (when PTDETYPE = 4)  
+PTDEAGNT    char        3    10   Debt Collection Agency (Cat dc)  
+PTDEDTCL    char        8    13   Date Debt Cleared  
+PTDECDAT    char        8    21   Date Record Created (CCYYMMDD)  
+PTDECTIM    char        8    29   Time Record Created (HH:MM:SS)  
+PTDECUID    char       10    37   WEB User ID Created (websecaf)  
+PTDEUDAT    char        8    47   Date Record Updated (CCYYMMDD)  
+PTDEUTIM    char        8    55   Time Record Updated (HH:MM:SS)  
+PTDEUUID    char       10    63   WEB User ID Updated (websecaf)  
+PTDEURNO    char        8    73   UR Number  
+PTDESYST    char        1    81   System  
+                                   1 = A & E  
+                                   2 = Outpatient  
+                                   3 = Inpatient  
+                                   4 = Private Practice  
+PTDERPAY    decimal   14,2   82   Amount to be repaid per period  
+PTDEFREQ    char        3    90   Frequency of Payment (Cat FP)  
+                                   eg.Daily,Weekly,Fortnightly,Monthly,Q  
+                                   uaterly  
+PTDESDAT    char        8    93   Payment Start Date (CCYYMMDD)  
+PTDEEDAT    char        8   101   Payment End Date (CCYYMMDD)  
+PTDENOFP    decimal    7,2  109   No. of payments  
+PTDEDAT1    char        8   114   Date field 1 (CCYYMMDD)  
+PTDEDAT2    char        8   122   Date field 2 (CCYYMMDD)  
+PTDETIM1    char        8   130   Time Field 1 (HH:MM:SS)  
+PTDETIM2    char        8   138   Time Field 2 (HH:MM:SS)  
+PTDECOD1    char        3   146   Code Field 1  
+PTDECOD2    char        3   149   Code Field 2  
+PTDETXT1    char       80   152   Text Field 1  
+PTDETXT2    char       80   232   Text Field 2  
+PTDESPAR    char       50   312   Spare  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+PTDETYPE
+PTDEINVN
+PTDESYST
+  
+UNIQUE INDEX 2
+PTDEURNO
+PTDETYPE
+PTDEINVN
+PTDESYST
+  
+=====================================================================

@@ -1,0 +1,82 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName"    content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/TableSort.js"></script>
+<script type="text/javascript" src="../js/patweb87.js"></script>
+<script type="text/javascript">
+function cancelHFH() {
+  DFrameExitRefresh();
+}
+
+function deleteAudit(healthFund, fundType, effDate) {
+  if(confirm("Are you sure you want to delete?")) {
+    document.remAudit.ptddh001.value = healthFund;
+    document.remAudit.ptddh002.value = fundType;
+    document.remAudit.ptddh003.value = effDate;
+    document.remAudit.submit();
+  }
+}
+</script>
+</head>
+%START.OF.PAGE
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon"
+ src="../images/ExitIcon.gif" onclick="DFrameExitRefresh();">
+<script type="text/javascript">document.write(self.document.title);</script>
+</span>
+<div id=PageBodySection style="overflow: auto;">
+<body onload="PageLoad(event);">
+<table width=100% border=0 cellspacing=0 bgcolor="#3e97b5">
+  <form name=filtVals action=patweb87.pbl method=get style="margin:0">
+  <input type=hidden name=reportno value=53>
+  <input type=hidden name=template value=001>
+  <input type=hidden name=updttype value=" ">
+  <input type=hidden name=hfund001 value="%PATWEB87.53.103">
+    <tr><td><b style="color: white;">Health Fund Field</b>
+      <select name=hffldtyp id=hffldtyp title="Health Fund Field"
+              onchange="filtVals.submit(this)">
+        <option value="  ">All</option>
+        <option value="01">HCP Equivalent</option>
+        <option value="02">Health Fund Group</option> 
+        <option value="03">Theatre Charging Indicator</option>
+      </select>
+    </td></tr>
+  </form>
+</table>
+
+<table width=100% cellpadding=0 cellspacing=0 border=1 id=hftblval>
+  <form name=remAudit action=patweb87.pbl method=get style="margin:0">
+  <input type=hidden name=reportno value=53>
+  <input type=hidden name=template value=001>
+  <input type=hidden name=updttype value="D">
+  <input type=hidden name=hfund001 value="%PATWEB87.53.103">
+  <input type=hidden name=ptddh001>
+  <input type=hidden name=ptddh002>
+  <input type=hidden name=ptddh003>
+  </form>
+  <tr>
+    <td class=HeadingCell>Health Fund Field Type</td>
+    <td class=HeadingCell>Effective To</td>
+    <td class=HeadingCell>Value</td>
+  </tr>
+  <tbody>
+    %PATWEB87.53.106
+  </tbody>
+</table>
+
+<table width=100% cellpadding=0 cellspacing=0 border=1>
+  <tr><td align=center>
+    <input type=button value="Exit" class="button"
+     onclick='cancelHFH()'>
+  </td></tr>
+</table>
+
+<form name=PatientLinks method=get>
+<input type=hidden name=reportno value=53>
+<input type=hidden name=template value=001>
+</form>
+
+<script>
+document.getElementById('hffldtyp').value = "%PATWEB87.53.110";
+</script>

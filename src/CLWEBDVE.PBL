@@ -1,0 +1,25 @@
+.*****************************************************************************
+.* Clear WEBDVEFD variables                                                  *
+.*****************************************************************************
+.* V12.00.01 19/06/2025 Peter Vela       TSK 0939466                         *
+.*           Added RETURN                                                    *
+.* V11.05.01 08/05/2025 Peter Vela       TSK 0939466                         *
+.*           Created include                                                 *
+.*****************************************************************************
+CLWEBDVE  MOVE      SP70,WBDECLID
+          MOVE      SP70,WBDERPTC
+          MOVE      SP70,WBDEMEVC
+          MOVE      SP70,WBDEEVDT
+          MOVE      SP70,WBDEEVID
+          MOVE      SP70,WBDEPTSC
+          MOVE      SP70,WBDEPTST
+          MOVE      SP70,WBDEPTMN
+          MOVE      SP70,WBDEPTMR
+          MOVE      SP70,WBDEPTFN
+          MOVE      SP70,WBDEPTGN
+          MOVE      SP70,WBDETRID
+          MOVE      SP70,WBDEMSID
+          MOVE      SP70,WBDERKEY
+          MOVE      WBDESPAR,SP70,SP70
+.
+          RETURN

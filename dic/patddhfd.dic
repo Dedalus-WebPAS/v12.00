@@ -1,0 +1,36 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Patient System 
+                      Health Fund History Dates 
+  
+TABLE NAME         :  patddhaf
+=====================================================================
+PTDDFUND    char        6     1   Health Fund  
+PTDDFTYP    char        2     7   Field Type  
+                                   01 - HCP Equivalent  
+                                   02 - Health Fund Group  
+                                   03 - Theatre Charging Indicator  
+PTDDDTTO    char        8     9   Effective Date To  
+PTDDFLD1    char       80    17   Field 1  
+PTDDFLD2    char       80    97   Field 2  
+PTDDCFD1    char       10   177   Coded Field 1  
+PTDDCFD2    char       10   187   Coded Field 2  
+PTDDFVL1    decimal   14,2  197   Form Value 1  
+PTDDFVL2    decimal   14,2  205   Form Value 2  
+PTDDCRBY    char       10   213   Created By  
+PTDDCRDT    char        8   223   Created Date  
+PTDDCRTM    char        8   231   Created Time  
+PTDDUPBY    char       10   239   Updated By  
+PTDDUPDT    char        8   249   Updated Date  
+PTDDUPTM    char        8   257   Updated Time  
+PTDDDLEN    char        1   265   Deleted Entry = 1  
+PTDDSPAR    char       50   266   Spare  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+PTDDFUND
+PTDDFTYP
+PTDDDTTO
+PTDDDLEN
+  
+=====================================================================

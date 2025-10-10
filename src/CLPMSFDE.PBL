@@ -1,0 +1,28 @@
+. *----------------------------------------------------------------------
+. * Include Name  :   CLPMSFDE.PBL
+. *
+. * Function      :   Clear Financial Summary Detail.
+. *
+. * V11.05.01 07/01/2025  J.Tan          TSK 0955356
+. *                       Created Include
+. *----------------------------------------------------------------------
+.
+CLPMSFDE  MOVE       SP70,PMFEHOSP  * Hospital Id                        
+          MOVE       SP70,PMFESYST  * System Indicator                   
+          MOVE       SP70,PMFEYEAR  * Financial Year                     
+          MOVE       SP70,PMFEPERD  * Period (1 to 14) 14 for Last Year  
+          MOVE       SP70,PMFEFTYP  * Financial Type                     
+          MOVE       SP70,PMFEINVN  * Invoice Number                     
+          MOVE       SP70,PMFERTYP  * Record Type                        
+          MOVE       SP70,PMFETRNO  * Transaction Number                 
+          MOVE       SP70,PMFECODE  * Financial Code                     
+          MOVE       SP70,PMFEINVD  * Invoice date (ccyymmdd)            
+          MOVE       SP70,PMFEURNO  * U/R Number                         
+          MOVE       SP70,PMFEADMN  * Admission Number                   
+          MOVE       SP70,PMFESITE  * Outpatient Site                    
+          MOVE       ZERO,PMFEAMNT  * Transaction Amount                 
+          MOVE       SP70,PMFECUID  * Web User Id Created (websecaf)     
+          MOVE       SP70,PMFECDAT  * Date Record Created (ccyymmdd)     
+          MOVE       SP70,PMFECTIM  * Time Record Created (hh:mm:ss)     
+          MOVE       SP70,PMFESPRE  * Spare variable                     
+          RETURN

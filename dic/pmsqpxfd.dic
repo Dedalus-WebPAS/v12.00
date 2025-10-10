@@ -1,0 +1,40 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Patient System 
+                      Queuing Patient Details Message Ext 
+  
+TABLE NAME         :  pmsqpxaf
+=====================================================================
+DPMQXMES    char       20     1   Message Id  
+PMPXUDT1    char        8    21   User Defined Date 1 (ccyymmdd)  
+PMPXUTM1    char        8    29   User Defined Time 1 (hh:mm:ss)  
+PMPXUDT2    char        8    37   User Defined Date 2 (ccyymmdd)  
+PMPXUTM2    char        8    45   User Defined Time 2 (hh:mm:ss)  
+PMPXUDT3    char        8    53   User Defined Date 3 (ccyymmdd)  
+PMPXUTM3    char        8    61   User Defined Time 3 (hh:mm:ss)  
+PMPXUDT4    char        8    69   User Defined Date 4 (ccyymmdd)  
+PMPXUTM4    char        8    77   User Defined Time 4 (hh:mm:ss)  
+PMPXUDT5    char        8    85   User Defined Date 5 (ccyymmdd)  
+PMPXUTM5    char        8    93   User Defined Time 5 (hh:mm:ss)  
+PMPXAHC1    char       10   101   Additional HCP 1  
+PMPXAHG1    char       10   111   Additional HCP Group 1  
+PMPXAGC1    char        2   121   Additional HCP Group Count 1  
+PMPXAHC2    char       10   123   Additional HCP 2  
+PMPXAHG2    char       10   133   Additional HCP Group 2  
+PMPXAGC2    char        2   143   Additional HCP Group Count 2  
+PMPXATF1    char       80   145   Identifying Gender Free Text  
+PMPXATF2    char       80   225   Identifying Pronoun Free Text  
+PMPXATF3    char       80   305   Additional Text Field 3  
+PMPXATF4    char       80   385   Additional Text Field 4  
+PMPXATF5    char       80   465   Additional Text Field 5  
+PMPXETH1    char        3   545   Ancestry/Ethnicity 1  
+PMPXETH2    char        3   548   Ancestry/Ethnicity 2  
+PMPXLAN1    char        3   551   Main Language Spoken at Home 1  
+PMPXLAN2    char        3   554   Main Language Spoken at Home 2  
+PMQXSPAR    char      100   557   Spare Variable  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+DPMQXMES
+  
+=====================================================================

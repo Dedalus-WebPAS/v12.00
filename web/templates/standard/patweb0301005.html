@@ -1,0 +1,599 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName"    content="NoContextSet.html">
+<meta name="CrossBrowser"    content="true">
+<script>
+function submitHistory() {
+  
+  //Check if mandatory field completed
+  if (document.AddForm.prbdat01.value.length>0 || 
+      document.AddForm.prbtim01.value.length>0 ||
+      document.AddForm.prbtyp01.value.length>0 ||
+      document.AddForm.prbdes01.value.length>0 ||
+      document.AddForm.prbcod01.value.length>0) {
+    if (!validateEntry("01")) {
+      return;
+    }
+
+    //Set the value for Status
+    if (document.AddForm.prbsta01.value.substr(3,1)=="I"){
+      document.AddForm.prbact01.value="1";
+    } else {
+      document.AddForm.prbact01.value="0";
+    }
+  }
+
+  //Check if mandatory field completed
+  if (document.AddForm.prbdat02.value.length>0  || 
+      document.AddForm.prbtim02.value.length>0  ||
+      document.AddForm.prbtyp02.value.length>0  ||
+      document.AddForm.prbdes02.value.length>0  ||
+      document.AddForm.prbcod02.value.length>0) {
+    if (!validateEntry("02")) {
+      return;
+    } else if (!validatePrevious(document.AddForm.prbdat01.value.length)) {
+      document.AddForm.prbdat01.focus();
+      return;
+    }
+
+    //Set the value for Status
+    if (document.AddForm.prbsta02.value.substr(3,1)=="I"){
+      document.AddForm.prbact02.value="1";
+    } else {
+      document.AddForm.prbact02.value="0";
+    }
+  }
+
+  //Check if mandatory field completed
+  if (document.AddForm.prbdat03.value.length>0  || 
+      document.AddForm.prbtim03.value.length>0  ||
+      document.AddForm.prbtyp03.value.length>0  ||
+      document.AddForm.prbdes03.value.length>0  ||
+      document.AddForm.prbcod03.value.length>0) {
+    if (!validateEntry("03")) {
+      return;
+    } else if (!validatePrevious(document.AddForm.prbdat01.value.length)) {
+      document.AddForm.prbdat01.focus();
+      return;
+    } else if (!validatePrevious(document.AddForm.prbdat02.value.length)) {
+      document.AddForm.prbdat02.focus();
+      return;
+    }
+
+    //Set the value for Status
+    if (document.AddForm.prbsta03.value.substr(3,1)=="I"){
+      document.AddForm.prbact03.value="1";
+    } else {
+      document.AddForm.prbact03.value="0";
+    }
+  }
+
+  //Check if mandatory field completed
+  if (document.AddForm.prbdat04.value.length>0  || 
+      document.AddForm.prbtim04.value.length>0  ||
+      document.AddForm.prbtyp04.value.length>0  ||
+      document.AddForm.prbdes04.value.length>0  ||
+      document.AddForm.prbcod04.value.length>0) {
+    if (!validateEntry("04")) {
+      return;
+    } else if (!validatePrevious(document.AddForm.prbdat01.value.length)) {
+      document.AddForm.prbdat01.focus();
+      return;
+    } else if (!validatePrevious(document.AddForm.prbdat02.value.length)) {
+      document.AddForm.prbdat02.focus();
+      return;
+    } else if (!validatePrevious(document.AddForm.prbdat03.value.length)) {
+      document.AddForm.prbdat03.focus();
+      return;
+    }
+
+    //Set the value for Status
+    if (document.AddForm.prbsta04.value.substr(3,1)=="I"){
+      document.AddForm.prbact04.value="1";
+    } else {
+      document.AddForm.prbact04.value="0";
+    }
+  }
+
+  //Check if mandatory field completed
+  if (document.AddForm.prbdat05.value.length>0  || 
+      document.AddForm.prbtim05.value.length>0  ||
+      document.AddForm.prbtyp05.value.length>0  ||
+      document.AddForm.prbdes05.value.length>0  ||
+      document.AddForm.prbcod05.value.length>0) {
+    if (!validateEntry("05")) {
+      return;
+    } else if (!validatePrevious(document.AddForm.prbdat01.value.length)) {
+      document.AddForm.prbdat01.focus();
+      return;
+    } else if (!validatePrevious(document.AddForm.prbdat02.value.length)) {
+      document.AddForm.prbdat02.focus();
+      return;
+    } else if (!validatePrevious(document.AddForm.prbdat03.value.length)) {
+      document.AddForm.prbdat03.focus();
+      return;
+    } else if (!validatePrevious(document.AddForm.prbdat04.value.length)) {
+      document.AddForm.prbdat04.focus();
+      return;
+    }
+
+    //Set the value for Status
+    if (document.AddForm.prbsta05.value.substr(3,1)=="I"){
+      document.AddForm.prbact05.value="1";
+    } else {
+      document.AddForm.prbact05.value="0";
+    }
+  }
+
+  //Check if mandatory field completed
+  if (document.AddForm.prbdat06.value.length>0  || 
+      document.AddForm.prbtim06.value.length>0  ||
+      document.AddForm.prbtyp06.value.length>0  ||
+      document.AddForm.prbdes06.value.length>0  ||
+      document.AddForm.prbcod06.value.length>0) {
+    if (!validateEntry("06")) {
+      return;
+    } else if (!validatePrevious(document.AddForm.prbdat01.value.length)) {
+      document.AddForm.prbdat01.focus();
+      return;
+    } else if (!validatePrevious(document.AddForm.prbdat02.value.length)) {
+      document.AddForm.prbdat02.focus();
+      return;
+    } else if (!validatePrevious(document.AddForm.prbdat03.value.length)) {
+      document.AddForm.prbdat03.focus();
+      return;
+    } else if (!validatePrevious(document.AddForm.prbdat04.value.length)) {
+      document.AddForm.prbdat04.focus();
+      return;
+    } else if (!validatePrevious(document.AddForm.prbdat05.value.length)) {
+      document.AddForm.prbdat05.focus();
+      return;
+    }
+    //Set the value for Status
+    if (document.AddForm.prbsta06.value.substr(3,1)=="I"){
+      document.AddForm.prbact06.value="1";
+    } else {
+      document.AddForm.prbact06.value="0";
+    }
+  }
+  AddForm.submit();
+}
+
+function validateEntry(entNum) {
+
+  mandDate = document.getElementById("prbdat"+entNum);
+  mandTime = document.getElementById("prbtim"+entNum);
+  mandType = document.getElementById("prbtyp"+entNum);
+
+  if (mandDate.value.length==0) {
+    alert("Established Date is Mandatory");
+    mandDate.focus();
+    return false;
+  }
+
+  if (mandTime.value.length==0) {
+    alert("Established Time is Mandatory");
+    mandTime.focus();
+    return false;
+  }
+
+  if (mandType.value.length==0) {
+    alert("Type is Mandatory");
+    mandType.focus();
+    return false;
+  }
+  return true;
+}
+
+function validatePrevious(entry) {
+
+  if(entry == 0) {
+    alert("Please complete the previous entries first")
+    return false;
+  }
+
+  return true;
+}
+
+function ProcessReturn01(){
+  var diagFulldesc=document.getElementById('prbdes01').value;
+  document.getElementById('prbdes07').value='';
+  if(diagFulldesc.length>50){
+     var diagdesc=diagFulldesc.substring(0,50);
+     var diag_desc = diagFulldesc.substring(0, diagdesc.lastIndexOf(' '));
+     document.getElementById('prbdes01').value=diag_desc;
+
+     var diagFulldesCon = trim(diagFulldesc.substring(diagdesc.lastIndexOf(' '),
+                       diagFulldesc.length));
+     var diagdesCont = diagFulldesCon.substring(0,50);
+     document.getElementById('prbdes07').value=diagdesCont;
+  }
+}
+
+function ProcessReturn02(){
+  var diagFulldesc=document.getElementById('prbdes02').value;
+  document.getElementById('prbdes08').value='';
+  if(diagFulldesc.length>50){
+     var diagdesc=diagFulldesc.substring(0,50);
+     var diag_desc = diagFulldesc.substring(0, diagdesc.lastIndexOf(' '));
+     document.getElementById('prbdes02').value=diag_desc;
+
+     var diagFulldesCon = trim(diagFulldesc.substring(diagdesc.lastIndexOf(' '),
+                       diagFulldesc.length));
+     var diagdesCont = diagFulldesCon.substring(0,50);
+     document.getElementById('prbdes08').value=diagdesCont;
+  }
+}
+
+function ProcessReturn03(){
+  var diagFulldesc=document.getElementById('prbdes03').value;
+  document.getElementById('prbdes09').value='';
+  if(diagFulldesc.length>50){
+     var diagdesc=diagFulldesc.substring(0,50);
+     var diag_desc = diagFulldesc.substring(0, diagdesc.lastIndexOf(' '));
+     document.getElementById('prbdes03').value=diag_desc;
+
+     var diagFulldesCon = trim(diagFulldesc.substring(diagdesc.lastIndexOf(' '),
+                       diagFulldesc.length));
+     var diagdesCont = diagFulldesCon.substring(0,50);
+     document.getElementById('prbdes09').value=diagdesCont;
+  }
+}
+
+function ProcessReturn04(){
+  var diagFulldesc=document.getElementById('prbdes04').value;
+  document.getElementById('prbdes10').value='';
+  if(diagFulldesc.length>50){
+     var diagdesc=diagFulldesc.substring(0,50);
+     var diag_desc = diagFulldesc.substring(0, diagdesc.lastIndexOf(' '));
+     document.getElementById('prbdes04').value=diag_desc;
+
+     var diagFulldesCon = trim(diagFulldesc.substring(diagdesc.lastIndexOf(' '),
+                       diagFulldesc.length));
+     var diagdesCont = diagFulldesCon.substring(0,50);
+     document.getElementById('prbdes10').value=diagdesCont;
+  }
+}
+
+function ProcessReturn05(){
+  var diagFulldesc=document.getElementById('prbdes05').value;
+  document.getElementById('prbdes11').value='';
+  if(diagFulldesc.length>50){
+     var diagdesc=diagFulldesc.substring(0,50);
+     var diag_desc = diagFulldesc.substring(0, diagdesc.lastIndexOf(' '));
+     document.getElementById('prbdes05').value=diag_desc;
+
+     var diagFulldesCon = trim(diagFulldesc.substring(diagdesc.lastIndexOf(' '),
+                       diagFulldesc.length));
+     var diagdesCont = diagFulldesCon.substring(0,50);
+     document.getElementById('prbdes11').value=diagdesCont;
+  }
+}
+
+function ProcessReturn06(){
+  var diagFulldesc=document.getElementById('prbdes06').value;
+  document.getElementById('prbdes12').value='';
+  if(diagFulldesc.length>50){
+     var diagdesc=diagFulldesc.substring(0,50);
+     var diag_desc = diagFulldesc.substring(0, diagdesc.lastIndexOf(' '));
+     document.getElementById('prbdes06').value=diag_desc;
+
+     var diagFulldesCon = trim(diagFulldesc.substring(diagdesc.lastIndexOf(' '),
+                       diagFulldesc.length));
+     var diagdesCont = diagFulldesCon.substring(0,50);
+     document.getElementById('prbdes12').value=diagdesCont;
+  }
+}
+
+function validateTime(input,textnum) {
+// function to retain just HH:MM
+    var timeValue=input;
+     if (timeValue.length > 6) {
+            timeValue = timeValue.slice(0,5);
+        }
+    document.getElementById(textnum).value=timeValue;
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onLoad=PageLoad(event);>
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon" 
+ src="../images/ExitIcon.gif" onclick="DFrameExit();">
+Add Patient Problem History
+</span>
+<form name=AddForm action="patweb03.pbl" method=post >
+<input type=hidden name=reportno value=1>
+<input type=hidden name=template value=2>
+<input type=hidden name=updttype value="A">
+<input type=hidden name=urnumber value="%PATWEB03.01.003">
+
+<table width=100% border=0 cellspacing=0>
+<tr><td class=HeadingCell>Established</td>
+    <td class=HeadingCell>Type</td>
+    <td class=HeadingCell>Problem</td>
+    <td class=HeadingCell>Status</td></tr>
+
+<tr><td>
+       <input type="text" size="12" name=prbdat01 id=prbdat01
+         class=Mandatory title="Date">
+        <img src=../images/DateLookup.gif class=Icon hspace=4
+         align=absmiddle onclick="DateLookupFrame(AddForm.prbdat01);"
+         date=AddForm.prbdat01 />
+        <input type="text" size="12" name=prbtim01 id=prbtim01 class=Mandatory
+         title="Time" maxlength="5" onblur="validateTime(this.value, 'prbtim01');">
+        <img src=../images/DateTimeStamp.gif class=Icon date=AddForm.prbdat01
+         time=AddForm.prbtim01 />
+        <img src=../images/TimeLookup.gif class=Icon time=AddForm.prbtim01 />
+    </td>
+    <td><select name=prbtyp01 class=Mandatory title="Problem Type" id=prbtyp01>
+        <option></option>
+        %STANDARD.01.007.wy
+        </select></td>
+    <td>
+    <input type=hidden size=9 name=prbcod01 title="Code">
+    <input type=hidden size=1 name=prbact01 title="Code" value="0">
+    <input type=text size=52 maxlength=50 name=prbdes01 title="Diagnosis"
+     id=prbdes01>
+    <img src=../images/DiagnosisSearchIcon.gif class=Icon alt="Diagnosis Search"
+     onclick='Icd10DisSearchFrame(AddForm.prbcod01,
+                      AddForm.prbdes01,ProcessReturn01);'>
+    <img src=../images/ProcedureSearchIcon.gif class=Icon alt="Procedure Search"
+     onclick='Icd10ProSearchFrame(AddForm.prbcod01,
+                      AddForm.prbdes01,ProcessReturn01);'>
+    <img src=../images/LookupIcon.gif class=Icon alt="Lookup Problems"
+     onclick='clrFields(AddForm.prbcod01,AddForm.prbdes01,prbdes07);
+LookupPage(AddForm.prbcod01,AddForm.prbdes01,"Lookup_PROBLEMS_000");'>
+    <img src=../images/ClearIcon.gif class=Icon alt="Clear Fields"
+     onclick='clrFields(AddForm.prbcod01,AddForm.prbdes01,prbdes07);'>
+    </td>
+    <td><select name=prbsta01 class=Mandatory title="Problem Status">
+        <option></option>
+        %STANDARD.01.007.wx
+        </select></td></tr>
+<tr><td></td>
+    <td></td>
+    <td><input type=text size=52 maxlength=50 name="prbdes07" id="prbdes07"
+         title="Diagnosis continued">
+    </td>
+    <td></td>
+</tr>
+
+<tr><td>
+       <input type="text" size="12" name=prbdat02 id=prbdat02
+         class=Mandatory title="Date">
+        <img src=../images/DateLookup.gif class=Icon hspace=4
+         align=absmiddle onclick="DateLookupFrame(AddForm.prbdat02);"
+         date=AddForm.prbdat02 />
+        <input type="text" size="12" name=prbtim02 id=prbtim02 class=Mandatory
+         title="Time" maxlength="5" onblur="validateTime(this.value, 'prbtim02');">
+        <img src=../images/DateTimeStamp.gif class=Icon date=AddForm.prbdat02
+         time=AddForm.prbtim02 />
+        <img src=../images/TimeLookup.gif class=Icon time=AddForm.prbtim02 />
+    </td>
+    <td><select name=prbtyp02 class=Mandatory title="Problem Type" id=prbtyp02>
+        <option></option>
+        %STANDARD.01.007.wy
+        </select></td>
+    <td>
+    <input type=hidden size=9 name=prbcod02 title="Code">
+    <input type=hidden size=1 name=prbact02 title="Code" value="0">
+    <input type=text size=52 maxlength=50 name=prbdes02 title="Diagnosis"
+     id="prbdes02">
+    <img src=../images/DiagnosisSearchIcon.gif class=Icon alt="Diagnosis Search"
+     onclick='Icd10DisSearchFrame(AddForm.prbcod02,
+                      AddForm.prbdes02,ProcessReturn02);'>
+    <img src=../images/ProcedureSearchIcon.gif class=Icon alt="Procedure Search"
+     onclick='Icd10ProSearchFrame(AddForm.prbcod02,
+                      AddForm.prbdes02,ProcessReturn02);'>
+    <img src=../images/LookupIcon.gif class=Icon alt="Lookup Problems"
+     onclick='clrFields(AddForm.prbcod02,AddForm.prbdes02,prbdes08);
+LookupPage(AddForm.prbcod02,AddForm.prbdes02,"Lookup_PROBLEMS_000");'>
+    <img src=../images/ClearIcon.gif class=Icon alt="Clear Fields"
+     onclick='clrFields(AddForm.prbcod02,AddForm.prbdes02,prbdes08);'>
+    </td>
+    <td><select name=prbsta02 class=Mandatory title="Problem Status">
+        <option></option>
+        %STANDARD.01.007.wx
+        </select></td></tr>
+
+<tr><td></td>
+    <td></td>
+    <td><input type=text size=52 maxlength=50 name="prbdes08" id="prbdes08"
+         title="Diagnosis continued">
+    </td>
+    <td></td>
+</tr>
+
+<tr><td>
+       <input type="text" size="12" name=prbdat03 id=prbdat03
+         class=Mandatory title="Date">
+        <img src=../images/DateLookup.gif class=Icon hspace=4
+         align=absmiddle onclick="DateLookupFrame(AddForm.prbdat03);"
+          date=AddForm.prbdat03 />
+        <input type="text" size="12" name=prbtim03 id=prbtim03 class=Mandatory
+          title="Time" maxlength="5" onblur="validateTime(this.value, 'prbtim03');">
+        <img src=../images/DateTimeStamp.gif class=Icon date=AddForm.prbdat03
+         time=AddForm.prbtim03 />
+        <img src=../images/TimeLookup.gif class=Icon time=AddForm.prbtim03 />
+    </td>
+    <td><select name=prbtyp03 class=Mandatory title="Problem Type" id=prbtyp03>
+        <option></option>
+        %STANDARD.01.007.wy
+        </select></td>
+    <td>
+    <input type=hidden size=9 name=prbcod03 title="Code">
+    <input type=hidden size=1 name=prbact03 title="Code" value="0">
+    <input type=text size=52 maxlength=50 name=prbdes03 title="Diagnosis"
+     id=prbdes03>
+    <img src=../images/DiagnosisSearchIcon.gif class=Icon alt="Diagnosis Search"
+     onclick='Icd10DisSearchFrame(AddForm.prbcod03,
+                      AddForm.prbdes03,ProcessReturn03);'>
+    <img src=../images/ProcedureSearchIcon.gif class=Icon alt="Procedure Search"
+     onclick='Icd10ProSearchFrame(AddForm.prbcod03,
+                      AddForm.prbdes03,ProcessReturn03);'>
+    <img src=../images/LookupIcon.gif class=Icon alt="Lookup Problems"
+     onclick='clrFields(AddForm.prbcod03,AddForm.prbdes03,prbdes09);
+LookupPage(AddForm.prbcod03,AddForm.prbdes03,"Lookup_PROBLEMS_000");'>
+    <img src=../images/ClearIcon.gif class=Icon alt="Clear Fields"
+     onclick='clrFields(AddForm.prbcod03,AddForm.prbdes03,prbdes09);'>
+    </td>
+    <td><select name=prbsta03 class=Mandatory title="Problem Status">
+        <option></option>
+        %STANDARD.01.007.wx
+        </select></td></tr>
+
+<tr><td></td>
+    <td></td>
+    <td><input type=text size=52 maxlength=50 name="prbdes09" id="prbdes09"
+         title="Diagnosis continued">
+    </td>
+    <td></td>
+</tr>
+
+<tr><td>
+        <input type="text" size="12" name=prbdat04 id=prbdat04
+         class=Mandatory title="Date">
+        <img src=../images/DateLookup.gif class=Icon hspace=4
+         align=absmiddle onclick="DateLookupFrame(AddForm.prbdat04);"
+         date=AddForm.prbdat04 />
+        <input type="text" size="12" name=prbtim04 id=prbtim04 class=Mandatory
+         title="Time" maxlength="5" onblur="validateTime(this.value, 'prbtim04');">
+        <img src=../images/DateTimeStamp.gif class=Icon date=AddForm.prbdat04
+         time=AddForm.prbtim04 />
+        <img src=../images/TimeLookup.gif class=Icon time=AddForm.prbtim04 />
+    </td>
+    <td><select name=prbtyp04 class=Mandatory title="Problem Type" id=prbtyp04>
+        <option></option>
+        %STANDARD.01.007.wy
+        </select></td>
+    <td>
+    <input type=hidden size=9 name=prbcod04 title="Code">
+    <input type=hidden size=1 name=prbact04 title="Code" value="0">
+    <input type=text size=52 maxlength=50 name=prbdes04 title="Diagnosis"
+     id="prbdes04">
+    <img src=../images/DiagnosisSearchIcon.gif class=Icon alt="Diagnosis Search"
+     onclick='Icd10DisSearchFrame(AddForm.prbcod04,
+                      AddForm.prbdes04,ProcessReturn04);'>
+    <img src=../images/ProcedureSearchIcon.gif class=Icon alt="Procedure Search"
+     onclick='Icd10ProSearchFrame(AddForm.prbcod04,
+                      AddForm.prbdes04,ProcessReturn04);'>
+    <img src=../images/LookupIcon.gif class=Icon alt="Lookup Problems"
+     onclick='clrFields(AddForm.prbcod04,AddForm.prbdes04,prbdes10);
+LookupPage(AddForm.prbcod04,AddForm.prbdes04,"Lookup_PROBLEMS_000");'>
+    <img src=../images/ClearIcon.gif class=Icon alt="Clear Fields"
+     onclick='clrFields(AddForm.prbcod04,AddForm.prbdes04,prbdes10);'>
+    </td>
+    <td><select name=prbsta04 class=Mandatory title="Problem Status">
+        <option></option>
+        %STANDARD.01.007.wx
+        </select></td></tr>
+
+<tr><td></td>
+    <td></td>
+    <td><input type=text size=52 maxlength=50 name="prbdes10" id="prbdes10"
+         title="Diagnosis continued">
+    </td>
+    <td></td>
+</tr>
+
+<tr><td>
+        <input type="text" size="12" name=prbdat05 id=prbdat05
+         class=Mandatory title="Date">
+        <img src=../images/DateLookup.gif class=Icon hspace=4
+         align=absmiddle onclick="DateLookupFrame(AddForm.prbdat05);"
+         date=AddForm.prbdat05 />
+        <input type="text" size="12" name=prbtim05 id=prbtim05 class=Mandatory
+          title="Time" maxlength="5" onblur="validateTime(this.value, 'prbtim05');">
+        <img src=../images/DateTimeStamp.gif class=Icon date=AddForm.prbdat05
+         time=AddForm.prbtim05 />
+        <img src=../images/TimeLookup.gif class=Icon time=AddForm.prbtim05 />
+    </td>
+    <td><select name=prbtyp05 class=Mandatory title="Problem Type" id=prbtyp05>
+        <option></option>
+        %STANDARD.01.007.wy
+        </select></td>
+    <td>
+    <input type=hidden size=9 name=prbcod05 title="Code">
+    <input type=hidden size=1 name=prbact05 title="Code" value="0">
+    <input type=text size=52 maxlength=50 name=prbdes05 title="Diagnosis"
+     id=prbdes05>
+    <img src=../images/DiagnosisSearchIcon.gif class=Icon alt="Diagnosis Search"
+     onclick='Icd10DisSearchFrame(AddForm.prbcod05,
+                      AddForm.prbdes05,ProcessReturn05);'>
+    <img src=../images/ProcedureSearchIcon.gif class=Icon alt="Procedure Search"
+     onclick='Icd10ProSearchFrame(AddForm.prbcod05,
+                      AddForm.prbdes05,ProcessReturn05);'>
+    <img src=../images/LookupIcon.gif class=Icon alt="Lookup Problems"
+     onclick='clrFields(AddForm.prbcod05,AddForm.prbdes05,prbdes11);
+LookupPage(AddForm.prbcod05,AddForm.prbdes05,"Lookup_PROBLEMS_000");'>
+    <img src=../images/ClearIcon.gif class=Icon alt="Clear Fields"
+     onclick='clrFields(AddForm.prbcod05,AddForm.prbdes05,prbdes11);'>
+    </td>
+    <td><select name=prbsta05 class=Mandatory title="Problem Status">
+        <option></option>
+        %STANDARD.01.007.wx
+        </select></td></tr>
+
+<tr><td></td>
+    <td></td>
+    <td><input type=text size=52 maxlength=50 name="prbdes11" id="prbdes11"
+         title="Diagnosis continued">
+    </td>
+    <td></td>
+</tr>
+
+<tr name="hisEnt06"><td>
+        <input type="text" size="12" name=prbdat06 id=prbdat06
+         class=Mandatory title="Date">
+        <img src=../images/DateLookup.gif class=Icon hspace=4
+         align=absmiddle onclick="DateLookupFrame(AddForm.prbdat06);"
+         date=AddForm.prbdat06 />
+        <input type="text" size="12" name=prbtim06 id=prbtim06 class=Mandatory
+         title="Time" maxlength="5" onblur="validateTime(this.value, 'prbtim06');">
+        <img src=../images/DateTimeStamp.gif class=Icon date=AddForm.prbdat06
+         time=AddForm.prbtim06 />
+        <img src=../images/TimeLookup.gif class=Icon time=AddForm.prbtim06 />
+    </td>
+    <td><select name=prbtyp06 class=Mandatory title="Problem Type" id=prbtyp06>
+        <option></option>
+        %STANDARD.01.007.wy
+        </select></td>
+    <td>
+    <input type=hidden size=9 name=prbcod06 title="Code">
+    <input type=hidden size=1 name=prbact06 title="Code" value="0">
+    <input type=text size=52 maxlength=50 name=prbdes06 title="Diagnosis"
+     id=prbdes06>
+    <img src=../images/DiagnosisSearchIcon.gif class=Icon alt="Diagnosis Search"
+     onclick='Icd10DisSearchFrame(AddForm.prbcod06,
+                      AddForm.prbdes06,ProcessReturn06);'>
+    <img src=../images/ProcedureSearchIcon.gif class=Icon alt="Procedure Search"
+     onclick='Icd10ProSearchFrame(AddForm.prbcod06,
+                      AddForm.prbdes06,ProcessReturn06);'>
+    <img src=../images/LookupIcon.gif class=Icon alt="Lookup Problems"
+     onclick='clrFields(AddForm.prbcod06,AddForm.prbdes06,prbdes12);
+LookupPage(AddForm.prbcod06,AddForm.prbdes06,"Lookup_PROBLEMS_000");'>
+    <img src=../images/ClearIcon.gif class=Icon alt="Clear Fields"
+     onclick='clrFields(AddForm.prbcod06,AddForm.prbdes06,prbdes12);'>
+    </td>
+    <td><select name=prbsta06 class=Mandatory title="Problem Status">
+        <option></option>
+        %STANDARD.01.007.wx
+        </select></td></tr>
+
+<tr><td></td>
+    <td></td>
+    <td><input type=text size=52 maxlength=50 name="prbdes12" id="prbdes12"
+         title="Diagnosis continued">
+    </td>
+    <td></td>
+</tr>
+
+
+<tr><td colspan=4 align=center>
+    <input type=button class="button" value="Add" onclick='submitHistory()'>
+    <input type=button value="Close" class="button" onclick='DFrameExitRefresh()'>
+</td></tr>
+</table>
+</form>
+

@@ -1,0 +1,169 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript">
+function PostForm() {
+  if(document.UpdateForm.d_mrtcn053.checked==false) {
+     document.UpdateForm.mrtcn053.value="0";
+  } else {
+     document.UpdateForm.mrtcn053.value="1";
+  }
+  if(document.UpdateForm.d_mrtcn061.checked==false) {
+     document.UpdateForm.mrtcn061.value="0";
+  } else {
+     document.UpdateForm.mrtcn061.value="1";
+  }
+  if(document.UpdateForm.d_mrtcn062.checked==false) {
+     document.UpdateForm.mrtcn062.value="0";
+  } else {
+     document.UpdateForm.mrtcn062.value="1";
+  }
+  if(document.UpdateForm.d_mrtcn063.checked==false) {
+     document.UpdateForm.mrtcn063.value="0";
+  } else {
+     document.UpdateForm.mrtcn063.value="1";
+  }
+  if(document.UpdateForm.d_mrtcn064.checked==false) {
+     document.UpdateForm.mrtcn064.value="0";
+  } else {
+     document.UpdateForm.mrtcn064.value="1";
+  }
+
+  setFormactn('U');
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);">
+<form name=UpdateForm method=post action=comweb98.pbl>
+<input type=hidden name=reportno value="11">
+<input type=hidden name=template value="004">
+<input type=hidden name=redirect value="comweb98.pbl?reportno=11&template=001">
+<input type=hidden name=nextpage value="1">
+<input type=hidden name=updttype value=" ">
+<input type=hidden name=mrtcn053 value=" ">
+<input type=hidden name=mrtcn061 value=" ">
+<input type=hidden name=mrtcn062 value=" ">
+<input type=hidden name=mrtcn063 value=" ">
+<input type=hidden name=mrtcn064 value=" ">
+
+<table align=center width=100% border=0 cellspacing=0 cellpadding=0>
+<tr><td class=HeadingCell align=center>
+     Medical Records Parameter Maintenance - Hospital Controlled 2
+    </td>
+    </tr>
+<tr><td>
+</table>
+<table align=center width=95% border=0 cellspacing=0 cellpadding=0>
+
+<tr><td colspan=2 align=center><hr width=100%></td></tr>
+
+<tr><td class=DataLabel>Prompt to copy codes from the last discharge
+                        private/mrtweb0201001.html</td>
+    <td><input type=checkbox name=d_mrtcn053 value="1">
+    </td></tr>
+<tr><td class=DataLabel>Enable Attestation Coding Audit</td>
+    <td><select name=mrtcn056 >
+        <option value="0">Disabled</option>
+        <option value="1">Attestation Functionality</option>
+        <option value="2">Attestation and Coding Audit Functionality</option>
+        </select>
+    </td></tr>
+<tr><td class=DataLabel>Send Separation Mode from what field in webPAS
+                        Category D/DD to 3M Codefinder</td>
+    <td><select name=mrtcn058 >
+        <option value="0">User Defined Field 3 if populated otherwise Indicator 5</option>
+        <option value="1">Indicator 5 Only</option>
+        </select>
+    </td></tr>
+<tr><td class=DataLabel>Send Separation Mode from what field in webPAS
+                        Category D/DD to 3M CGS</td>
+    <td><select name=mrtcn059 >
+        <option value="0">User Defined Field 3 if populated otherwise Indicator 5</option>
+        <option value="1">Indicator 5 only</option>
+        </select>
+    </td></tr>
+
+<tr><td class=DataLabe>Include Coding Comments on Coding templates</td>
+    <td><select name=mrtcn060 >
+        <option value="0">No</option>
+        <option value="1">Yes - Free Text Comments</option>
+        <option value="2">Yes - User, Date and Time stamped Comments</option>
+        </select>
+    </td>
+</tr>
+<tr><td class=DataLabel>Allow User, Date and Time stamped Coding Comments to be deleted by another user</td>
+    <td><input type=checkbox name=d_mrtcn061 value="1">
+    </td>
+</tr>
+<tr><td class=DataLabel>Send the CTYPE (Care Type) Tag to Solventum Codefinder
+    </td>
+    <td><input type=checkbox name=d_mrtcn062 value="1">
+    </td>
+</tr>
+<tr><td class=DataLabel>Send the Procedure Prefix Code 'I' to Grouping Products
+    </td>
+    <td><input type=checkbox name=d_mrtcn063 value="1">
+    </td>
+</tr>
+<tr><td class=DataLabel>Using Diagnosis Cluster Identifier (DCID)
+    </td>
+    <td><input type=checkbox name=d_mrtcn064 value="1">
+    </td>
+</tr>
+
+<tr><td width=10% class=DataLable>&nbsp;</td>
+    <td width=10% class=DataItem>&nbsp;</td>
+    </tr>
+    
+<tr><td colspan=2 align=center><hr width=100%></td></tr>
+
+<tr><td colspan=2 align=center>
+   <input type=button value="Update" class="button" onclick="PostForm();">
+   <input type=button onclick='history.go(-1)' value=Cancel class="button">
+</td></tr>
+</table>
+
+</form>
+
+<script type="text/javascript">
+if("%COMWEB98.11.153"=="1") {
+  document.UpdateForm.d_mrtcn053.checked=1;
+}
+MRCNEACA="%COMWEB98.11.156";
+document.UpdateForm.mrtcn056.selectedIndex=MRCNEACA;
+MRCNWPCD="%COMWEB98.11.158";
+for (var i=0; i<document.UpdateForm.mrtcn058.length; i++) {
+  if (document.UpdateForm.mrtcn058.options[i].value==MRCNWPCD) {
+     document.UpdateForm.mrtcn058.selectedIndex=i;
+  }
+}
+MRCNWPCG="%COMWEB98.11.159";
+for (var i=0; i<document.UpdateForm.mrtcn059.length; i++) {
+  if (document.UpdateForm.mrtcn059.options[i].value==MRCNWPCG) {
+     document.UpdateForm.mrtcn059.selectedIndex=i;
+  }
+}
+MRCNICCT="%COMWEB98.11.160";
+if (isWhitespace(MRCNICCT)) {
+  MRCNICCT = 0;
+}
+for (var i=0; i<document.UpdateForm.mrtcn060.length; i++) {
+  if (document.UpdateForm.mrtcn060.options[i].value==MRCNICCT) {
+     document.UpdateForm.mrtcn060.selectedIndex=i;
+  }
+}
+if ("%COMWEB98.11.161"=="1") {
+  document.UpdateForm.d_mrtcn061.checked=1;
+}
+if ("%COMWEB98.11.162"=="1") {
+  document.UpdateForm.d_mrtcn062.checked=1;
+}
+if ("%COMWEB98.11.163"=="1") {
+  document.UpdateForm.d_mrtcn063.checked=1;
+}
+if ("%COMWEB98.11.164"=="1") {
+  document.UpdateForm.d_mrtcn064.checked=1;
+}
+</script>

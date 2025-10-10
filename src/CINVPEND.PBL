@@ -1,0 +1,77 @@
+.***************************************************************************
+.* System    :   Inpatients                                                *
+.* Program   :   CINVPEND                                                  *
+.* Desc      :   Routine to check Invoice pending (patipenf) for Public Hosp*
+.***************************************************************************
+.* Date      :   15/02/2016                                                *
+.* Author    :   J.Tan                                                     *
+.* Function  :   This program will add record to patipenf file if still    *
+.*               to be invoiced                                            *
+.* Modification:                                                           *
+.*               V11.05.01 27/11/2024 J.Tan    Task 0946342                *
+.*               Mod to update Pooling table for Type 018                  *
+.***************************************************************************
+.
+CINVP000  OPEN      CONTROLF,"controlf"
+          READ      CONTROLF,SEVENTY9;*248,PTCNIPEN
+.
+          COMPARE   ZERO,PTCNIPEN
+          GOTO      CINVP9999 IF NOT EQUAL
+.
+          PACK      PENDSDAT,PENDSDAT,SP70
+          MATCH     SP70,PENDSDAT
+          IF        @EQUAL
+            MOVE      ADATE,PENDSDAT   * default to admission date
+          ENDIF
+          PACK      KEY40,PENDSDAT,PTIPRSTA,SP70  * As at date
+          MOVE      "014",KEY3            * Checking invoice pending
+          CALL      WIPOL000              * write to pooling table
+.
+CINVP999  RETURN
++
+.*******************************************************************************
+.         Type 018 - Generate tobe invoice amount & update Visit Extra data file
+.*******************************************************************************
+CINVX000  PACK      KEY40,WBSEUID,SP70    * user id
+          MOVE      "018",KEY3            * Checking invoice pending
+          CALL      WIPOL000              * write to pooling table
+CINVX999  RETURN
++
+.***************************************************************************
+.         Write to Pooling table
+.***************************************************************************
+WIPOL000  OPEN      IBAPOLA1,"ibapolaf"
+.
+          MOVE      ZERO,FORM10
+          PACK      KEY10,Z70
+          CALL      RSIBPOL1
+          CALL      RPIBPOL1
+          BRANCH    OVRCD,WIPOL100
+.
+          MOVE      IBPLUNIQ,FORM10
+WIPOL100  ADD       ONE,FORM10
+.
+          MOVE      FORM10,IBPLUNIQ
+          MOVE      KEY3,IBPLTYPE      * Checking invoice pending
+          MOVE      AURNO,IBPLURNO
+          MOVE      AADMNO,IBPLVISN
+.
+          PACK      IBPLSKEY,KEY40,SP70
+          MOVE      SP70,IBPLSPAR
+.
+          MOVE      FORM10,KEY10
+          CALL      RAIBPOL1
+          IF        OVRCD=1
+            MOVE      ZERO,OVRCD
+            TRAP      OVERCOND IF IO
+            CALL      WRIBPOL1
+            TRAPCLR   IO
+            BRANCH    OVRCD,WIPOL100
+          ELSE
+            GOTO      WIPOL100
+          ENDIF
+.
+          CLOSE     IBAPOLA1
+.
+WIPOL999  RETURN
++

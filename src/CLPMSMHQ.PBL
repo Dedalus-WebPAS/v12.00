@@ -1,0 +1,38 @@
+.------------------------------------------------------------------------------
+. Include        : CLPMSMHQ
+.
+. Modifications  :
+.------------------------------------------------------------------------------
+. V11.04.01  22/01/2024 Peter Vela    Task 0939978
+.                       Created include
+.------------------------------------------------------------
+. Clear NIHC IHI Upload MyHR Request Detail Variables
+.------------------------------------------------------------
+CLPMSMHQ  MOVE      SP70,PMMQRTYP
+          MOVE      SP70,PMMQCODE
+          MOVE      SP70,PMMQRDAT
+          MOVE      SP70,PMMQRTIM
+          MOVE      SP70,PMMQRUID
+          MOVE      SP70,PMMQHOSP
+          MOVE      SP70,PMMQEPID
+          MOVE      SP70,PMMQADAT
+          PACK      PMMQREAS,SP70,SP70,SP70
+          MOVE      SP70,PMMQETYP
+          MOVE      SP70,PMMQELCY
+          MOVE      SP70,PMMQCONS
+          MOVE      SP70,PMMQAUTH
+          MOVE      SP70,PMMQRHCP
+          PACK      PMMQB64P,SP70,SP70,SP70
+          MOVE      SP70,PMMQMIME
+          MOVE      SP70,PMMQFLNM
+          MOVE      SP70,PMMQSUBJ
+          MOVE      SP70,PMMQURNO
+          MOVE      SP70,PMMQCDAT
+          MOVE      SP70,PMMQCTIM
+          MOVE      SP70,PMMQCUID
+          MOVE      SP70,PMMQUDAT
+          MOVE      SP70,PMMQUTIM
+          MOVE      SP70,PMMQUUID
+          PACK      PMMQSPAR,SP70,SP70,SP70
+.
+          RETURN

@@ -1,0 +1,23 @@
+#!/bin/sh
+
+###     IBAWEB21 Upload ICWA from ASCII
+
+        DateName=`date +%y%m%d-%H%M`
+        FileName="$1"
+
+###     Fetch File here
+
+###     Modify the upload table
+###
+        cat $FileName | sed 's///' > $FileName.unix
+        mv $FileName.unix $FileName
+
+ex -e - $FileName <<EOF
+        :%s/^	//
+        :%s/,/|/g
+        :%s/$/||||/g
+        :%s/[$]//g
+        :%s/'//g
+        :%s/"//g
+        :wq!
+EOF

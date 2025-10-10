@@ -1,0 +1,258 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<link rel="stylesheet" href="../html/WardWhiteboard.css" type="text/css">
+<script type="text/javascript" src="../js/WardConditionalFields.js"></script>
+%START.OF.PAGE
+<script type="text/javascript">
+function ConfirmDateChanged() {
+  f = document.PatCondPopup;
+  if (f.d_ptmis039.checked) {
+    f.pmswo005.className="Mandatory";     
+    f.pmswo006.className="Mandatory";
+  }
+  else {
+    f.pmswo005.className="";
+    f.pmswo006.className="";
+  }
+}
+function ExpDischargeDateChanged() {
+  f = document.PatCondPopup;
+  if (isWhitespace(f.pmswo005.value)) {
+    ReasonDischDateSpan.innerHTML = hideReasonDischDateSpan.innerHTML;
+    f.ptmis040.className="";
+    return;
+  }
+  if (f.pmswo005.defaultValue == f.pmswo005.value) {
+    ReasonDischDateSpan.innerHTML = hideReasonDischDateSpan.innerHTML; 
+    f.ptmis040.className="";
+    return;
+  }
+  if (f.ptcnexdd.value!="1") {
+    ReasonDischDateSpan.innerHTML = hideReasonDischDateSpan.innerHTML;
+    f.ptmis040.className="";
+    return;
+  }
+
+  ReasonDischDateSpan.innerHTML = showReasonDischDateSpan.innerHTML; 
+  f.ptmis040.value="";
+
+  var ChkDate1=SetDateYYYYMMDD(f.pmswo005.defaultValue);
+  var ChkDate2=SetDateYYYYMMDD(f.pmswo005.value);
+  if (ChkDate1 != ChkDate2) {
+    f.ptmis040.className="Mandatory";
+  }
+  else
+  {
+    f.ptmis040.className="";
+  }
+}
+</script>
+</head>
+<body onload="PageLoad(event);
+              ConfirmDateChanged();
+              ">
+<div id=PatientHeading></div>
+<script type="text/javascript">
+PatientURN="%PATWEB93.05.003";
+PatientVIS="%PATWEB93.05.081";
+PatientNAM="%PATWEB93.05.002";
+PatientSTA="%PATWEB93.05.086.078";
+PatientALT="%PATWEB93.05.084";
+PatientSEX="%PATWEB93.05.019";
+PatientDOB="%PATWEB93.05.020";
+PatientAGE="%PATWEB93.05.021";
+PatientLOC="%PATWEB93.05.083";
+PatientPRI="%PATWEB93.05.086.066.1";
+PatientUNT="%PATWEB93.05.066.0";
+DoctorCOD="%PATWEB93.05.082.003";
+DoctorNAM="%PATWEB93.05.082.002";
+PatientAID="%PATWEB93.05.086.090";
+PatientIND="%PATWEB93.05.086.091";
+PatientCUR="%PATWEB93.05.086.092";
+PatientCLC="%PATWEB93.05.086.093.1";
+PatientCLH="%STANDARD.01.017.CL";
+PatientHFT="%PATWEB93.05.086.094";
+PatientCDM="%PATWEB93.05.086.095";
+PatientVDH="%PATWEB93.05.086.099.015";
+InsertPatientHeader()
+</script>
+<div id=PatientMenu></div>
+
+<div id=PageBodySection>
+<form name=PatCondPopup style="margin:0" method=post %PATWEB93.05.101 
+<input type=hidden name=nextpage value="1">
+<input type=hidden name=nextpatn value="patweb98.pbl?reportno=01&template=001">
+<input type=hidden name=frompatn value="1">
+<input type=hidden name=ptrgm001 value="%PATWEB93.05.114">
+<input type=hidden name=ptrgm002 value="%PATWEB93.05.115">
+<input type=hidden name=ptrgm003 value="%PATWEB93.05.116">
+<input type=hidden name=dummy value="">
+<input type=hidden name=urnumber value="%PATWEB93.05.003">
+<input type=hidden name=admissno value="%PATWEB93.05.081">
+<input type=hidden name=ptmis039 value="%PATWEB93.05.130.001">
+<input type=hidden name=currdate id=currdate value="%STANDARD.01.015">
+<input type=hidden name=currdate id=currdate value="%STANDARD.01.015">
+<input type=hidden name=ptcnexdd id=ptcnexdd
+ value="%STANDARD.01.025.125.236.1.1">
+
+<table border=0 colspan=1 width=100% cellspacing=1 cellpadding=1 >
+<tr><td class=HeadingCell align=center>
+Update Condition - %PATWEB93.05.002
+</td><tr>
+</table>
+
+<table border=0 align=center width=98%>
+<tr colspan=4>
+    <td class=DataLabel width=16%>Last Update</td>
+    <td><input type=text name=patconup id=patconup
+         class=readonly readonly size=20 tabindex=1
+         value="%PATWEB93.05.108"></td>
+</tr>
+<tr><td class=DataLabel>Condition </td>
+    <td><select name=patconcd id=patconcd tabindex=10>
+        <option value="   "></option>
+        %PATWEB93.05.102
+        </select>
+    </td>
+</tr>
+
+<tr><td class=DataLabel>Ambulatory Status</td>
+    <td><select name=patconam id=patconam tabindex=11
+         title="Ambulatory Status">
+        <option value="   "></option>
+        %PATWEB93.05.107
+        </select>
+    </td> 
+</tr>
+
+<tr><td class=DataLabel>Visitors Allowed ?</td>
+    <td><input name=patconva type=checkbox value=1 tabindex=12>                
+    </td></tr>
+<tr><td class=DataLabel>Phone Calls Allowed ?</td>
+    <td><input name=patconpa type=checkbox value=1 tabindex=13>              
+    </td></tr>
+<tr id=VITableRow><td class=DataLabel>%STANDARD.01.017.vi</td>
+    <td><select name=pmswo007 id=pmswo007 tabindex=44
+         title="%STANDARD.01.017.vi">
+        <option value="   "></option>
+        %PATWEB93.05.214.2
+        </select>
+    </td></tr>
+</table>
+
+<table border=0 align=center width=98%>
+<tr><td class=DataLabel width=16%>Expected Discharge Date</td>
+    <td class=DataLabel width=30%>
+        <input type=text name=pmswo005 id=pmswo005 size=12 tabindex=31
+         value="%PATWEB93.05.205"
+         title="Expected Discharge Date"
+         onchange="ExpDischargeDateChanged();">
+        <img notab src="../images/DateLookup.gif" class=Icon
+         onclick="DateLookupFrame(PatCondPopup.pmswo005,
+                                  ExpDischargeDateChanged);">
+        Time &nbsp;
+        <input type=text name=pmswo006 id=pmswo006 size=8 tabindex=32
+         title="Expected Discharge Time"
+         value="%PATWEB93.05.213">
+        <img notab src="../images/DateTimeStamp.gif" class=Icon 
+         onclick="SetCurrentDateTime(PatCondPopup.pmswo005,
+                                     PatCondPopup.pmswo006);
+                                     ExpDischargeDateChanged();">
+        <img notab src="../images/TimeLookup.gif" class=Icon
+         onclick="TimeLookupFrame(PatCondPopup.pmswo006);">
+    </td>
+    <td class=DataLabel width=18%> 
+        Confirm D/C ?
+        <input name=d_ptmis039 id=d_ptmis039 type=checkbox value=0
+         tabindex=33
+         onclick="ConfirmDateChanged();">
+    </td>
+    <td class=DataLabel width=40%><span id=ReasonDischDateSpan></span></td>
+</tr>
+</table>
+
+
+<table border=0 align=center width=98%>
+
+<tr><td class=DataLabel width="16%">Comments</td>
+    <td><input name=patconds id=patconds size=35 maxlength=35 tabindex=45
+         title="Comments" value="%PATWEB93.05.103"
+         onblur="validateFreeTextFields(this);">
+    </td></tr>
+</table>
+
+<table border=0 align=center width=100%>
+<tr><td align=center colspan=2>
+<input type=button value="Update" class=button id=btnUpdate tabindex=90
+       onclick='tempDisable(this);SaveForm()'>
+<input type=button value="Cancel" class=button tabindex=91
+       onclick='PatientLinkTo("patweb98.pbl",1,1,0,0,0);'>
+</td></tr>
+
+</table>
+</form>
+</div>
+ 
+<script type="text/javascript">
+f = document.PatCondPopup;
+
+if ("%PATWEB93.05.106.1" == "1") {
+  document.PatCondPopup.patconva.checked="1";
+}
+if ("%PATWEB93.05.106.2" == "1") {
+  document.PatCondPopup.patconpa.checked="1";
+}
+if (f.ptmis039.value == "1") {
+  f.d_ptmis039.checked="1";
+}
+
+function SaveForm() {
+  f = document.PatCondPopup;
+  if (f.d_ptmis039.checked) {
+    f.ptmis039.value = "1";
+  }
+  else {
+    f.ptmis039.value = "0";
+  }
+
+  if (!validateMandatory(f)) {
+    return;
+  }
+
+  document.PatCondPopup.submit();
+}
+function validateFreeTextFields(textfieldvar) {
+  textfieldvar.value=textfieldvar.value.replace(/</g,"< ");
+  textfieldvar.value=textfieldvar.value.replace(/"/g,"'");
+  textfieldvar.value=textfieldvar.value.replace(/\\/g,"/");
+}
+</script>
+
+<form name="PatientLinks" method="get">
+<input type="hidden" name="reportno" value="1">
+<input type="hidden" name="template" value="004">
+<input type="hidden" name="urnumber" value="%PATWEB93.05.003">
+<input type="hidden" name="admissno" value="%PATWEB93.05.081">
+<input type="hidden" name="MenuType" value="%PATWEB93.05.088">
+<input type="hidden" name="nextpage" value="4">
+</form>
+
+<span id=showReasonDischDateSpan style="display:none">
+    <td>
+        Reason for Discharge Date Change
+        <select name=ptmis040 id=ptmis040 tabindex=34
+         title="Reason for Discharge Date Change">
+        <option value="   "></option>
+         %PATWEB93.05.131.001.2
+        </select>
+    </td>
+</span>
+<span id=hideReasonDischDateSpan style="display:none">
+    <td>
+        <input type=hidden name=ptmis040 id=ptmis040
+         value="%PATWEB93.05.131.001.1">
+    </td>
+</span>
+

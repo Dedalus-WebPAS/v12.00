@@ -1,0 +1,26 @@
+.---------------------------------------------------------------------------
+. Include Name : CLPRIFAC
+. Function     : Clear function for Private Practice Future Action
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.04.01 27/11/2023 Thanh T         TSK 0916369
+.           Initial Version 
+.---------------------------------------------------------------------------
+.
+CLPRIFAC  MOVE      SP70,PRFADATE      . Future Action Date
+          MOVE      SP70,PRFADEBT      . Debtor Number
+          MOVE      SP70,DPRFASCN      . Scan Flag
+          MOVE      SP70,PRFAACTN      . Future Action Code
+          MOVE      SP70,PRFACOMM      . Comments
+          MOVE      SP70,PRFAMPRA      . Medical Practice
+          MOVE      SP70,PRFADTCP      . Date Action Completed (CCYYMMDD)
+          MOVE      SP70,PRFACDAT      . Date Record Created (CCYYMMDD)
+          MOVE      SP70,PRFACTIM      . Time Record Created (HH:MM:SS)
+          MOVE      SP70,PRFACUID      . WEB User ID Created (websecaf)
+          MOVE      SP70,PRFAUDAT      . Date Record Updated (CCYYMMDD)
+          MOVE      SP70,PRFAUTIM      . Time Record Updated (HH:MM:SS)
+          MOVE      SP70,PRFAUUID      . WEB User ID Updated (websecaf)
+          MOVE      SP70,PRFASPAR      . Spare Variable
+.
+          RETURN

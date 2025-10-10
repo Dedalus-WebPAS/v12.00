@@ -1,0 +1,60 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/patweb99.js"> </script>
+<script type="text/javascript">
+function CheckEnquiry() {
+  f = document.SelectCode;
+  if(f.menuflag.value=="1") {
+    f.btnAdd.disabled = true;
+    f.btnEdit.disabled = true;
+  }
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);CheckEnquiry();">
+<form name=SelectCode action=patweb99.pbl method=get style=margin:0>
+<input type=hidden name=reportno value=5>
+<input type=hidden name=template value=1>
+<input type=hidden name=pmhcg001 value="">
+<input type=hidden name=pmhcg002 value="">
+<input type=hidden name=menuflag value="%PATWEB99.05.115">
+<table border=1 width=100% cellspacing=0 cellpadding=0>
+<tr>
+  <td>
+  <table width="100%" cellpadding=0 cellspacing=0 border=0 bgcolor=#CCCCCC>
+  <tr><td class=MaintenanceHeading>
+      HCP Practice Maintenance </td>
+      <td align=right>Practice&nbsp;
+         <input type=text name=startkey size=10 maxlength=10>
+         Count&nbsp;
+         <input type=text name=startke1 size=3 maxlength=2>
+         <input type=button value=Edit name=btnEdit id=btnEdit class=button
+          onclick="EditLookup05()">
+         <input type=submit value=Goto class=button
+          onclick="SetStartKey05()">
+      </td>
+  </tr>
+  </table>
+  </td>
+</tr>
+</table>
+<table cellspacing=0 colspan=4 border=1 width=100%>
+%PATWEB99.05.101.patweb99.05.003
+</table>
+
+<table width=100% bgcolor=#CCCCCC>
+<tr>
+  <td align=center>
+  <input type=button value="<< Previous" class=button
+   onclick='location.href="%PATWEB99.05.103.001"'>
+  <input type=button value="Add" class=button name=btnAdd id=btnAdd
+   onclick="ShowDetail05('patweb99.pbl?reportno=05&template=002');">  
+  <input type=button value="Next >>" class=button
+   onclick='location.href="%PATWEB99.05.102.001"'>
+  </td>
+</tr>
+</table>
+</form>

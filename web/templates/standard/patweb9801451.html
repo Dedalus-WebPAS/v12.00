@@ -1,0 +1,216 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" charset="UTF-8" 
+ src="../js/JsBarcode/JsBarcode.all.min.js"></script>
+<style type=text/css>
+ body {
+        width: 210mm;
+        margin: 0mm 0mm 0mm 0mm;   /* top right bottom left */
+        }
+ .label{
+       /* LabelMax LM5148 labels - 99.1mm X 38.1mm. 2 Wide 7 rows  */
+       /* Printer using A4 page size.                              */
+     width: 96.1mm;               /* plus left and right padding   */
+     height: 34.1mm;              /* plus top and bottom padding   */
+     padding: 3mm 4.0mm 0mm 2mm;  /* top right bottom left         */
+     margin: 1mm 0mm 1mm 0mm;     /* top right bottom left         */
+     float: left;
+     text-align: center;
+     overflow: hidden;
+ /*  outline: 1px dotted;           outline each label for layout print */
+ }
+ .rhslabel{
+     padding: 3mm 2mm 0mm 4.0mm;  /* top right bottom left */
+ }
+ .page-break  {
+     clear: left;
+     display:block;
+     page-break-after:always;
+ }
+ .MasterTable {                  /* Master label table */
+     table-layout: fixed; 
+     white-space: nowrap;
+     overflow: hidden;
+ }
+ .LineLeft {                     /* Master label row left cell */
+     width: 70%
+ }
+ .LineRight {                    /* Master label row right cell */
+     width: 30%
+ }
+ .LineLeft {                     /* Master label row left barcode cell */
+     width: 55%
+ }
+ .LineRightBC {                  /* Master label row right barcode cell */
+     width: 45%
+ }
+ .AddressLine {                  /* Address line */
+     font-size:7pt;
+ }
+ .NameLine {                     /* Name line */
+     font-size:12pt;
+ }
+ @page{
+ size: A4 portrait;             /* A4 size, portrait orientation */
+ margin: 16mm 0mm 0mm 5mm;     /* top right bottom left  */
+}
+</style>
+<script type="text/javascript">
+function ShowLabels() {
+  if(isWhitespace(document.getElementById("admissno").value)) {
+    alert("No visit in context. Please select a visit to proceed.");
+    DFrameExit();  
+  }
+  VISBarcode();
+  var master = document.getElementById("Master").innerHTML;
+  document.getElementById("1R").innerHTML=master;
+  document.getElementById("2L").innerHTML=master;
+  document.getElementById("2R").innerHTML=master;
+  document.getElementById("3L").innerHTML=master;
+  document.getElementById("3R").innerHTML=master;
+  document.getElementById("4L").innerHTML=master;
+  document.getElementById("4R").innerHTML=master;
+  document.getElementById("5L").innerHTML=master;
+  document.getElementById("5R").innerHTML=master;
+  document.getElementById("6L").innerHTML=master;
+  document.getElementById("6R").innerHTML=master;
+  document.getElementById("7L").innerHTML=master;
+  document.getElementById("7R").innerHTML=master;
+  print();
+}
+function VISBarcode() {
+  vis = document.getElementById("admissno");
+  JsBarcode("#barcode2", vis.value, {
+  format: "code128",
+  displayValue: true,
+  fontSize: 7,
+  textPosition: "top",
+  textMargin: 1,
+  textAlign: "center",
+  width: 1.4,
+  height: 29,
+  text: "VISIT:" + vis.value,
+  fontOptions: "bold",
+  lineColor: "#000",
+  margin: 1,
+  });
+}
+
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);ShowLabels();"
+ onafterprint="DFrameExitRefresh();">
+<input type="hidden" name="urnumber" id="urnumber"
+ value="%PATWEB98.01.003" />
+<input type="hidden" name="admissno" id="admissno"
+ value="%PATWEB98.01.081" />
+
+<!-- Master Label -->
+<div id="Master" class="label">
+<script type=text/javascript>
+ surname="<b>" + trim("%PATWEB98.01.009") + "</b>";
+ gname="<b>" + trim("%PATWEB98.01.010") + ", " +
+       trim("%PATWEB98.01.005.0") + "</b>";
+ sexatbirth="%PATWEB98.01.019"; 
+ sexatbirthind="%PATWEB98.01.799.061.3"; 
+ if(!isWhitespace(sexatbirthind.substr(39,6))) {
+     sexatbirth = sexatbirthind.substr(39,6);
+ }
+ sexatbirth="&nbsp;<b>SEX: </b>" + sexatbirth;
+ dob_format="%PATWEB98.01.020";
+            if(!isWhitespace("%PATWEB98.01.020")) {
+              dob_ccyymmdd=SetDateYYYYMMDD("%PATWEB98.01.020");
+              dob_format=dob_ccyymmdd.substr(6,2) + "/" +
+                         dob_ccyymmdd.substr(4,2) + "/" +
+                         dob_ccyymmdd.substr(0,4);
+            }
+ dob="<b>DOB: </b>" + dob_format + " <b>AGE:</b>%PATWEB98.01.021";;
+ address1="<b>ADD: </b>%PATWEB98.01.012 %PATWEB98.01.013";
+ urval="<b>UR: %PATWEB98.01.003</b>";
+ address2=trim("%PATWEB98.01.014") + ", %PATWEB98.01.015 %PATWEB98.01.016";
+ medicare_exp="%PATWEB98.01.716";
+            if(!isWhitespace("%PATWEB98.01.716")) {
+              exp_ccyymmdd=SetDateYYYYMMDD("%PATWEB98.01.716");
+              medicare_exp=exp_ccyymmdd.substr(4,2) + "/" +
+                         exp_ccyymmdd.substr(0,4)
+            }
+ medicare="<b>MCARE: </b>%PATWEB98.01.027<b> REF: </b>%PATWEB98.01.549 " +
+          " <b>EXP: </b>" + medicare_exp;
+ hfund="<b>HEALTH FUND:</b>%PATWEB98.01.114.0";
+ admdoctor="<b>ADM DR: </b>%PATWEB98.01.108.002";
+ vistval="<b>VISIT:</b>%PATWEB98.01.081";
+ provnumb="&nbsp;";
+</script>
+
+<table width=100% border=0 cellspacing=0 cellpadding=0 class=MasterTable>
+<tr><td class="LineLeft NameLine"><script type=text/javascript>
+        document.write(surname);
+        </script></td>
+    <td class="LineRight NameLine"><script type=text/javascript>
+        document.write(urval);
+        </script>
+    </td></tr>
+<tr><td colspan=2 class="NameLine"><script type=text/javascript>
+        document.write(gname);
+        </script>
+    </tr>
+<tr><td colspan=2><script type=text/javascript>
+        document.write(dob);
+        document.write(sexatbirth);
+        </script>
+    </tr>
+<tr><td colspan=2 class=AddressLine><script type=text/javascript>
+        document.write(address1);
+        </script>
+    </tr>
+<tr><td colspan=2 class=AddressLine><script type=text/javascript>
+        document.write(address2);
+        </script>
+    </td></tr>
+<tr><td colspan=2><script type=text/javascript>
+        document.write(medicare);
+        </script>
+    </td>
+    </tr>
+<tr><td colspan=2>
+<table width=100% border=0 cellspacing=0 cellpadding=0>
+<tr><td class=LineLeftBC><script type=text/javascript>
+        document.write(hfund);
+        </script>
+    </td>
+    <td class=LineRightBC rowspan=3 valign=top
+    align=right><svg id="barcode2"></svg></td>
+    </tr>
+<tr><td><script type=text/javascript>
+        document.write(admdoctor);
+        </script>
+    </td>
+    <td></td></tr>
+<tr><td><script type=text/javascript>
+        document.write(provnumb);
+        </script>
+    </td>
+    <td></td></tr>
+   </table></td></tr>
+
+</table>
+</div>
+<!-- End Master Label -->
+
+<div id="1R" class="label rhslabel"></div>
+<div id="2L" class="label"></div>
+<div id="2R" class="label rhslabel"></div>
+<div id="3L" class="label"></div>
+<div id="3R" class="label rhslabel"></div>
+<div id="4L" class="label"></div>
+<div id="4R" class="label rhslabel"></div>
+<div id="5L" class="label"></div>
+<div id="5R" class="label rhslabel"></div>
+<div id="6L" class="label"></div>
+<div id="6R" class="label rhslabel"></div>
+<div id="7L" class="label"></div>
+<div id="7R" class="label rhslabel"></div>
+<div class="page-break"></div>

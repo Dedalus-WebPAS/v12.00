@@ -1,0 +1,25 @@
+Version Control
+---------------
+
+Server Name   : PATWEB61
+Option Name   : 02
+Template      : 004
+
+Creation Date : 07.05.2003
+
+Version   Date        Responsible/Changes Made
+--------  ----------  ------------------------
+V11.00.02 14/10/2020  Darren Zhang   Task 0892294
+                      Cross browser compatability changes
+V11.00.01 19/03/2020  J.Tan          TSK 0838262
+                      Added Effective date to patitemn file
+V9.09.01  18.07.2007  Peter Vela         142173
+                      Modified Claim Code tag
+V9.04.01  03.11.2004  Peter Vela         54145
+                      Replaced CMBS Class with STANDARD tag
+V9.03.02  04.09.2003  Tracey Nguyen      40940
+                      Changed heading "Admission Type" to "CMBS Class"
+V9.03.01  11.08.2003  Tracey Nguyen      41889
+                      Included "Item" in heading. Fixed tabindex issue
+V9.03.00  07.05.2003  Tracey Nguyen      36499
+                      New Template - Global Deletion of MBS Exploding Charges

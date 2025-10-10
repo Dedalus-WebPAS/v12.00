@@ -1,0 +1,27 @@
+.---------------------------------------------------------------------------
+. Include Name : CLPMSCHA.PBL
+. Function     : Clear function for PMSCHAFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.05.01  16/01/2025  Thanh T          TSK 0884838
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLPMSCHA  MOVE      SP70,PMCHADMN      . Admission Number     
+          MOVE      SP70,PMCHTDAT      . Transfer Date (CCYYMMDD)    
+          MOVE      SP70,PMCHTTIM      . Transfer Time (hh:mm:ss)    
+          MOVE      SP70,PMCHTWAR      . Transfer Ward     
+          MOVE      SP70,PMCHTBED      . Transfer Bed     
+          MOVE      SP70,PMCHCDAT      . Change Date (CCYYMMDD)    
+          MOVE      SP70,PMCHCTIM      . Change Time (hh:mm:ss)    
+          MOVE      SP70,PMCHCTYP      . Type of change    
+          MOVE      SP70,PMCHREAS      . Reason for change (Cat IZ)  
+          PACK      PMCHOVAL,SP70,SP70 . Old value     
+          PACK      PMCHNVAL,SP70,SP70 . New value     
+          MOVE      SP70,PMCHWEBC      . User id created (websecaf)   
+          MOVE      SP70,PMCHDATC      . Date created (CCYYMMDD)    
+          MOVE      SP70,PMCHTIMC      . Time created (hh:mm:ss)    
+          PACK      PMCHSPAR,SP70,SP70 . Spare      
+.
+          RETURN

@@ -1,0 +1,1493 @@
+.  V11.05.01 11/02/2025  Peter Vela 0953169
+.            Fixed Practitioner id display on Appointment id includes
+.  V11.04.01 15/10/2024  Peter Vela Orbis Outpatient Workflow 0953169
+.            Added FHRDIS00 - FHIR API Outpatient Discharge
+.            10/10/2024  Peter Vela Orbis Outpatient Workflow
+.            Added FHRATT00 - FHIR API Outpatient Attendance
+.            04/10/2024  Peter Vela Orbis Outpatient Workflow
+.            Added Claim Type, Source of Referral, URNumber to Outpatient
+.            Appointment Resource
+.  V11.03.01 02/06/2023  Peter Vela 0927262
+.            ClinicalAide FHIR api
+.            Added Subject include FHRSUBIN functionality
+.            Added Participant include FHRPARIN functionality
+.            Added Location include FHRLOCIN functionality
+.  V11.02.01 09/09/2022  Peter Vela         
+.            Added comma validation in FHROCD00
+.  V11.00.01 03/03/2020  J.Tan          TSK 0838262
+.            Added Effective from and to date to MBS Item file
+.------------------------------------------------------------
+. Add Resource to Bundle
+.------------------------------------------------------------
+FHROUT00  IF        DISNUMB>0
+            WRITE     HTMLFILE;*+,",";
+          ENDIF
+          PACK      KEY28,OBASITE,OBACLIN,OBADATE,OBASTRT,OBASLOT,SP70
+          MOVE      KEY28,FHRAPPID
+          REP       " -",KEY28
+          ADD       ONE,DISNUMB
+.
+          MATCH     "1",FHIRREMB
+          IF        !@EQUAL
+            WRITE     HTMLFILE;*+," {":
+                                  " #"fullUrl#": #"%BASEURL/Appointment/OUT-",KEY28,"#",":
+                                    " #"resource#": ";
+          ENDIF
+.
+          CALL      RESOUT00
+.
+          MATCH     "1",FHIRREMB
+          IF        !@EQUAL 
+            WRITE     HTMLFILE;*+,"}";
+          ELSE
+            GOTO      FHRATT99
+          ENDIF
+.
+          IF        FHRSUBIN=1
+.
+            PACK      FHRPATID,URNUMBER
+            SQUEEZE   FHRPATID
+.
+            WRITE     HTMLFILE;*+,",{":
+                                  " #"fullUrl#": #"%BASEURL/Patient/",FHRPATID,"#",":
+                                    " #"resource#": ";
+.
+            CALL      RESPAT00
+.
+            WRITE     HTMLFILE;*+,"}"
+          ENDIF
+.
+          IF        FHRPARIN=1
+.
+            MATCH     SP70,OCADOCT
+            IF        !@EQUAL & !@EOS
+.
+              PACK      KEY6,OCADOCT,SP70
+              CALL      RDDOCT1
+              IF        OVRCD=0
+.
+                WRITE     HTMLFILE;*+,",{":
+                                      " #"fullUrl#": #"%BASEURL/Practitioner/HCP-",DCODE,"#",":
+                                        " #"resource#": ";
+.
+                CALL      RESPRA00
+.
+                WRITE     HTMLFILE;*+,"}"
+.
+              ENDIF
+.
+            ENDIF
+.
+          ENDIF
+.
+          IF        FHRLOCIN=1
+.
+                WRITE     HTMLFILE;*+,",{":
+                                      " #"fullUrl#": #"%BASEURL/Location/Clinic-",OTHELTYP,"#",":
+                                        " #"resource#": ";
+.
+                CALL      RESLCO00
+.
+                WRITE     HTMLFILE;*+,"}"
+.
+          ENDIF
+.UPTOHERE
+.
+FHROUT99  RETURN
+.------------------------------------------------------------
+. Appointment FHIR Resource Output for Outpatient Appointments     
+.------------------------------------------------------------
+RESOUT00  PACK      KEY8,DOBAOUTN,SP70
+          CALL      RDBOKB1
+          IF        OVRCD=1
+            CALL      CLOUTBB1
+          ENDIF
+.
+          CALL      FHROST00
+.
+          MOVE      OBAURNO,FHRPATID
+          SQUEEZE   FHRPATID
+          MOVE      "CV",CATEGORY           * Visit Type
+          MOVE      OBAVISIT,CODE
+          CALL      GETCOD00
+          MOVE      TDESC,CVDESC
+.
+          MOVE      "ST",CATEGORY           * Type
+          MOVE      OPDAUNIT,CODE
+          CALL      GETCOD00
+          MOVE      TDESC,STDESC
+          MATCH     SP70,CODE
+          IF        @EQUAL
+            MOVE      "n/a",STDESC
+          ENDIF
+.
+          MOVE      "CT",CATEGORY           * Location
+          MOVE      OTHELTYP,CODE
+          CALL      GETCOD00
+          MOVE      TDESC,CTDESC
+.
+          UNPACK    OBADATE,CCENT,CYEAR,CMON,CDAY
+          PACK      KEY9,ANST,OBATIME,COLON,ZERO,ZERO
+          PACK      FHRSTRDT,CCENT,CYEAR,FHRDASH,CMON,FHRDASH,CDAY,KEY9,TIMEZONE
+          PACK      KEY9,ANST,ENDTIME,COLON,ZERO,ZERO
+          PACK      FHRENDDT,CCENT,CYEAR,FHRDASH,CMON,FHRDASH,CDAY,KEY9,TIMEZONE
+          PACK      KEY28,OBASITE,OBACLIN,OBADATE,OBASTRT,OBASLOT,SP70
+.
+          MOVE      SP70,CTDESC
+          MOVE      "CT",CATEGORY
+          MOVE      OTHELTYP,CODE
+          PACK      KEY5,CATEGORY,CODE,SP70
+          CALL      RDCODE1
+          IF        OVRCD=0
+            MOVE      TDESC,CTDESC
+          ENDIF
+.
+          MOVE      SP70,CLDESC
+          MATCH     SP70,OBACOMP
+          IF        !@EQUAL
+            MOVE      "CL",CATEGORY
+            MOVE      OBACOMP,CODE
+            PACK      KEY5,CATEGORY,CODE,SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              MOVE      TDESC,CLDESC
+            ENDIF
+          ENDIF
+.
+          MOVE      SP70,SRDESC
+          MATCH     SP70,OBASRCR
+          IF        !@EQUAL
+            MOVE      "S ",CATEGORY
+            MOVE      OBASRCR,CODE
+            PACK      KEY5,CATEGORY,CODE,SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              MOVE      TDESC,SRDESC
+            ENDIF
+          ENDIF
+.
+          WRITE     HTMLFILE;*+,"{ #"resourceType#": #"Appointment#",":
+                    " #"id#" : #"OUT-",KEY28,"#",":
+                    " #"extension#": [":
+                    " { #"url#":#"%BASEURL/extension/webPASService#"":
+                        " ,#"valueString#":#"",PRGID,SP1,PRGNAM,SP1,VERSION,"#"},":
+                    " { #"url#":#"%BASEURL/extension/webPASTemplate#"":
+                        " ,#"valueString#":#"%TEMPLATEHOME/",WBTPFIL," %TEMPLATEVERSION#"},":
+                    " { #"url#":#"%BASEURL/extension/VisitNo#"":
+                        " ,#"valueString#":#"",DOBAOUTN,"#"}";
+.
+.         Extension UR Number
+.         ---------------------
+.
+          MATCH     SP70,OBAURNO
+          IF        !@EQUAL & !@EOS
+.
+            MATCH     "       0",OBAURNO
+            IF        !@EQUAL
+              WRITE     HTMLFILE;*+,", { #"url#":#"%BASEURL/extension/URNumber#"":
+                        " ,#"valueString#":#"",OBAURNO,"#"}";
+            ENDIF
+.
+          ENDIF
+.
+.         Extension Claim Type
+.         ---------------------
+.
+          MATCH     SP70,OBACOMP
+          IF        !@EQUAL & !@EOS
+.
+            WRITE     HTMLFILE;"       ,{  #"url#" : #"%BASEURL/extension/dxc-hc-claimtype-code#",";
+            WRITE     HTMLFILE;"           #"valueCodeableConcept#" : {";
+            WRITE     HTMLFILE;"                #"coding#": [ {";
+            WRITE     HTMLFILE;"                  #"system#": #"%BASEURL/ValueSet/Category-",ANSC,ANSL,"#", ";
+            WRITE     HTMLFILE;"                  #"code#": #"",OBACOMP,"#" ";
+.
+            MATCH     SP70,CLDESC
+            IF        !@EQUAL & !@EOS
+              WRITE     HTMLFILE;"                  ,#"display#": #"",CLDESC,"#"";
+            ENDIF
+.
+            WRITE     HTMLFILE;"                 } ]";
+            WRITE     HTMLFILE;"            }";
+            WRITE     HTMLFILE;"        }";
+
+
+.
+.            WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-claimtype-code#"":
+.                        " ,#"valueString#":#"",OBACOMP,"#"}";
+..
+.            MATCH     SP70,CLDESC
+.            IF        !@EQUAL & !@EOS
+..
+.              WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-claimtype-description#"":
+.                        " ,#"valueString#":#"",CLDESC,"#"}";
+..
+.            ENDIF
+.
+          ENDIF
+.
+.         Extension Source of Referral
+.         -----------------------------
+.
+          MATCH     SP70,OBASRCR
+          IF        !@EQUAL & !@EOS
+.
+            WRITE     HTMLFILE;"       ,{  #"url#" : #"%BASEURL/extension/dxc-hc-sourceofref-code#",";
+            WRITE     HTMLFILE;"           #"valueCodeableConcept#" : {";
+            WRITE     HTMLFILE;"                #"coding#": [ {";
+            WRITE     HTMLFILE;"                  #"system#": #"%BASEURL/ValueSet/Category-",ANSS,"-#", ";
+            WRITE     HTMLFILE;"                  #"code#": #"",OBASRCR,"#" ";
+.
+            MATCH     SP70,SRDESC
+            IF        !@EQUAL & !@EOS
+              WRITE     HTMLFILE;"                  ,#"display#": #"",SRDESC,"#"";
+            ENDIF
+.
+            WRITE     HTMLFILE;"                 } ]";
+            WRITE     HTMLFILE;"            }";
+            WRITE     HTMLFILE;"        }";
+
+.
+.            WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-sourceofref-code#"":
+.                        " ,#"valueString#":#"",OBASRCR,"#"}";
+..
+.            MATCH     SP70,SRDESC
+.            IF        !@EQUAL & !@EOS
+..
+.              WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-sourceofref-description#"":
+.                        " ,#"valueString#":#"",SRDESC,"#"}";
+..
+.            ENDIF
+..
+          ENDIF
+.
+          WRITE     HTMLFILE;*+," ],":
+                    " #"status#" : #"",FHRSTAT,"#",":
+                    " #"supportingInformation#" : [":
+                    "   { #"reference#"   : #"Location/Clinic-",OTHELTYP,"#", ":
+                    "     #"display#"   : #"",CTDESC,"#" } ":
+                    "   ] ,":
+                    " #"reason#":  [ { ":
+                    "  #"text#" : #"",PMVXUDF1,PMVXUDF2,PMVXUDF3,"#"  ";
+          CALL      FHROCD00
+          WRITE     HTMLFILE;*+,"  } ],":
+                    " #"appointmentType#":  {  ":
+                    "  #"coding#" : [":
+                    "   { #"code#"      : #"CLINIC#",":
+                    "     #"display#"   : #"Ourpatient Clinic#" } ":
+                    "  ] },":
+                    " #"serviceType#": [ { ":
+                    "  #"coding#" : [":
+                    "   { #"system#"    : #"%BASEURL/ValueSet/Category-CV#",":
+                    "     #"code#"      : #"",OBAVISIT,"#",":
+                    "     #"display#"   : #"",CVDESC,"#" } ":
+                    "  ] } ],":
+                    " #"start#" : #"",FHRSTRDT,"#",":
+                    " #"end#" : #"",FHRENDDT,"#",":
+                    " #"participant#" : [ ";
+
+          MATCH     SP70,OBAURNO
+          IF        !@EQUAL
+            WRITE     HTMLFILE;*+," {":
+                    "  #"type#":  [ {":
+                    "  #"text#" : #"Patient#",":
+                    "  #"coding#" : [":
+                    "   { #"code#"      : #"PART#",":
+                    "     #"display#"   : #"Participation#" } ":
+                    "  ] } ],":
+                    "  #"status#" : #"accepted#",":
+                    "  #"actor#" : {":
+                    "    #"display#" : #"",PATFNAME,"#", ":
+                    "    #"reference#" : #"Patient/",FHRPATID,"#"}":
+                    "   }   ";
+          ENDIF
+.
+          MATCH     SP70,OCADOCT
+          IF        !@EQUAL
+            PACK      KEY6,OCADOCT,SP70
+            CALL      RDDOCT1
+            IF        OVRCD=0
+              MOVE      DTITL,FMTTITLE          * For Formatting Doctor's Name
+              MOVE      DGNAME,FMTGNAME
+              MOVE      DSNAME,FMTSNAME
+              CALL      DOCNM000
+              STRIP     DOCFNAME
+              WRITE     HTMLFILE;*+,", {":
+                        "  #"type#":  [ { #"text#" : #"Clinic Doctor#" } ],":
+                        "  #"status#" : #"accepted#",":
+                        "  #"actor#" : {":
+                        "     #"reference#" : #"Practitioner/HCP-",OCADOCT,"#",":
+                        "     #"display#" : #"",DOCFNAME,"#" ":
+                        "   } } ";
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,OCACCONS
+          IF        !@EQUAL
+            PACK      KEY6,OCACCONS,SP70
+            CALL      RDDOCT1
+            IF        OVRCD=0
+              MOVE      DTITL,FMTTITLE          * For Formatting Doctor's Name
+              MOVE      DGNAME,FMTGNAME
+              MOVE      DSNAME,FMTSNAME
+              CALL      DOCNM000
+              STRIP     DOCFNAME
+              WRITE     HTMLFILE;*+,", {":
+                        "  #"type#":  [ { #"text#" : #"Clinic Consultant#" } ],":
+                        "  #"status#" : #"accepted#",":
+                        "  #"actor#" : {":
+                        "     #"reference#" : #"Practitioner/HCP-",KEY6,"#",":
+                        "     #"display#" : #"",DOCFNAME,"#" ":
+                        "   } } ";
+            ENDIF
+          ENDIF
+.
+          MOVE      OBADOCT,KEY10
+          MATCH     OBADOCT,OTBBADCS Doctor Seen
+          IF        !@EQUAL
+            MOVE      OTBBADCS,KEY10
+          ENDIF
+          MATCH     SP70,KEY10
+          IF        !@EQUAL
+            PACK      KEY6,KEY10,SP70
+            CALL      RDDOCT1
+            IF        OVRCD=0
+              MOVE      DTITL,FMTTITLE          * For Formatting Doctor's Name
+              MOVE      DGNAME,FMTGNAME
+              MOVE      DSNAME,FMTSNAME
+              CALL      DOCNM000
+              STRIP     DOCFNAME
+              WRITE     HTMLFILE;*+,", {":
+                        "  #"type#":  [ { #"text#" : #"Doctor Seen#" } ],":
+                        "  #"status#" : #"accepted#",":
+                        "  #"actor#" : {":
+                        "     #"reference#" : #"Practitioner/HCP-",KEY6,"#",":
+                        "     #"display#" : #"",DOCFNAME,"#" ":
+                        "   } } ";
+            ENDIF
+          ENDIF
+.
+.
+. Service Type Not Implemented yet? Category OY?
+. Need to clarifiy requirements
+. 
+.          MOVE      "OY",CATEGORY           
+.          MOVE      OPDATYPE,CODE
+.          CALL      GETCOD00
+.          MOVE      TDESC,OYDESC
+.          MATCH     SP70,CODE
+.          IF        @EQUAL
+.            MOVE      "n/a",OYDESC
+.          ENDIF
+.
+.                    " #"serviceCategory#":  {  ":
+.                    "  #"coding#" : [":
+.                    "   { #"system#"    : #"%BASEURL/ValueSet/Category-OY#",":
+.                    "     #"code#"      : #"",OPDATYPE,"#",":
+.                    "     #"display#"   : #"",OYDESC,"#" } ":
+.                    "  ] },":
+.
+          WRITE     HTMLFILE;*+," ] }"
+.
+RESOUT99  RETURN
+.
+FHROCD00  PACK      KEY8,DOBAOUTN,SP70
+          CALL      RDDIAG1
+          BRANCH    OVRCD,FHROCD99
+.
+          WRITE     HTMLFILE;*+,",  #"coding#" : [";
+          MATCH     SP70,OPDICODE
+          IF        !@EQUAL
+            WRITE     HTMLFILE;*+," { #"code#"      : #"",OPDICODE,"#",":
+                               "     #"display#"   : #"",OPDIDESC,"#" } ";
+.
+            MATCH   SP70,OPDICOD2
+            GOTO    FHROCD05 IF NOT EQUAL
+            MATCH   SP70,OPDICOD3
+            GOTO    FHROCD05 IF NOT EQUAL
+            MATCH   SP70,OPDICOD4
+            GOTO    FHROCD05 IF NOT EQUAL
+            MATCH   SP70,OPDICOD5
+            GOTO    FHROCD05 IF NOT EQUAL
+            GOTO    FHROCD10
+.
+FHROCD05    WRITE   HTMLFILE;*+,",";
+.
+          ENDIF
+.
+FHROCD10  MATCH     SP70,OPDICOD2
+          IF        !@EQUAL
+            WRITE     HTMLFILE;*+,"{ #"code#"      : #"",OPDICOD2,"#",":
+                               "     #"display#"   : #"",OPDIDES2,"#" } ";
+.
+            MATCH   SP70,OPDICOD3
+            GOTO    FHROCD15 IF NOT EQUAL
+            MATCH   SP70,OPDICOD4
+            GOTO    FHROCD15 IF NOT EQUAL
+            MATCH   SP70,OPDICOD5
+            GOTO    FHROCD15 IF NOT EQUAL
+            GOTO    FHROCD20
+.
+FHROCD15    WRITE   HTMLFILE;*+,","
+.
+          ENDIF
+.
+FHROCD20  MATCH     SP70,OPDICOD3
+          IF        !@EQUAL
+            WRITE     HTMLFILE;*+,"{ #"code#"      : #"",OPDICOD3,"#",":
+                               "     #"display#"   : #"",OPDIDES3,"#" } ";
+.
+            MATCH   SP70,OPDICOD4
+            GOTO    FHROCD25 IF NOT EQUAL
+            MATCH   SP70,OPDICOD5
+            GOTO    FHROCD25 IF NOT EQUAL
+            GOTO    FHROCD30
+.
+FHROCD25    WRITE   HTMLFILE;*+,",";
+.
+          ENDIF
+.
+FHROCD30  MATCH     SP70,OPDICOD4
+          IF        !@EQUAL
+            WRITE     HTMLFILE;*+,"{ #"code#"      : #"",OPDICOD4,"#",":
+                               "     #"display#"   : #"",OPDIDES4,"#" } ";
+.
+            MATCH   SP70,OPDICOD5
+            GOTO    FHROCD35 IF NOT EQUAL
+            GOTO    FHROCD40
+.
+FHROCD35    WRITE   HTMLFILE;*+,",";
+.
+          ENDIF
+.
+FHROCD40  MATCH     SP70,OPDICOD5
+          IF        !@EQUAL
+            WRITE     HTMLFILE;*+,"{ #"code#"      : #"",OPDICOD5,"#",":
+                               "     #"display#"   : #"",OPDIDES5,"#" } ";
+          ENDIF
+          WRITE     HTMLFILE;*+," ] ";
+FHROCD99  RETURN
+.
+ADDOCD00  MATCH     SP70,KEY9
+          GOTO      ADDOCD99 IF EQUAL
+          MOVE      SP70,IDESC
+          IF        OPCNCODE=1
+            PACK      KEY17,KEY9,SP70
+            CALL      PATITMRD       * Read MBS code file
+            BRANCH    OVRCD,ADDOCD99
+            WRITE     HTMLFILE;*+,",{ #"code#"      : #"",KEY9,"#",":
+                      "     #"display#"   : #"",PTITDESC,"#" } ";
+          ELSE
+            CALL      RDPTICO1       * Read ICD operation file
+            BRANCH    OVRCD,ADDOCD99
+            WRITE     HTMLFILE;*+,",{ #"code#"      : #"",KEY9,"#",":
+                      "     #"display#"   : #"",ODESC,"#" } ";
+          ENDIF
+ADDOCD99  RETURN
+.
+.------------------------------------------------------------
+. Outpatient Attendance Logical ID
+.------------------------------------------------------------
+FHRATT00  IF        DISNUMB>0
+            WRITE     HTMLFILE;*+,",";
+          ENDIF
+          PACK      KEY28,OBASITE,OBACLIN,OBADATE,OBASTRT,OBASLOT,SP70
+          MOVE      KEY28,FHRAPPID
+          REP       " -",KEY28
+          ADD       ONE,DISNUMB
+.
+          MATCH     "1",FHIRREMB
+          IF        !@EQUAL
+            WRITE     HTMLFILE;*+," {":
+                                  " #"fullUrl#": #"%BASEURL/Appointment/ATT-",KEY28,"#",":
+                                    " #"resource#": ";
+          ENDIF
+.
+          CALL      RESATT00
+.
+          MATCH     "1",FHIRREMB
+          IF        !@EQUAL
+            WRITE     HTMLFILE;*+,"}";
+          ELSE
+            GOTO      FHROUT99
+          ENDIF
+.
+          IF        FHRSUBIN=1
+.
+            PACK      FHRPATID,URNUMBER
+            SQUEEZE   FHRPATID
+.
+            WRITE     HTMLFILE;*+,",{":
+                                  " #"fullUrl#": #"%BASEURL/Patient/",FHRPATID,"#",":
+                                    " #"resource#": ";
+.
+            CALL      RESPAT00
+.
+            WRITE     HTMLFILE;*+,"}"
+          ENDIF
+.
+          IF        FHRPARIN=1
+.
+            MATCH     SP70,OCADOCT
+            IF        !@EQUAL & !@EOS
+.
+              PACK      KEY6,OCADOCT,SP70
+              CALL      RDDOCT1
+              IF        OVRCD=0
+.
+                WRITE     HTMLFILE;*+,",{":
+                                      " #"fullUrl#": #"%BASEURL/Practitioner/HCP-",DCODE,"#",":
+                                        " #"resource#": ";
+.
+                CALL      RESPRA00
+.
+                WRITE     HTMLFILE;*+,"}"
+.
+              ENDIF
+.
+            ENDIF
+.
+          ENDIF
+.
+          IF        FHRLOCIN=1
+.
+                WRITE     HTMLFILE;*+,",{":
+                                      " #"fullUrl#": #"%BASEURL/Location/Clinic-",OTHELTYP,"#",":
+                                        " #"resource#": ";
+.
+                CALL      RESLCO00
+.
+                WRITE     HTMLFILE;*+,"}"
+.
+          ENDIF
+.
+FHRATT99  RETURN
++
+.------------------------------------------------------------
+. Appointment FHIR Resource Output for Outpatient Attendance
+.------------------------------------------------------------
+RESATT00  PACK      KEY8,DOBAOUTN,SP70
+          CALL      RDBOKB1
+          IF        OVRCD=1
+            CALL      CLOUTBB1
+          ENDIF
+.
+          CALL      FHROST00
+.
+          MOVE      OBAURNO,FHRPATID
+          SQUEEZE   FHRPATID
+          MOVE      "CV",CATEGORY           * Visit Type
+          MOVE      OBAVISIT,CODE
+          CALL      GETCOD00
+          MOVE      TDESC,CVDESC
+.
+          MOVE      "ST",CATEGORY           * Type
+          MOVE      OPDAUNIT,CODE
+          CALL      GETCOD00
+          MOVE      TDESC,STDESC
+          MATCH     SP70,CODE
+          IF        @EQUAL
+            MOVE      "n/a",STDESC
+          ENDIF
+.
+          MOVE      "CT",CATEGORY           * Location
+          MOVE      OTHELTYP,CODE
+          CALL      GETCOD00
+          MOVE      TDESC,CTDESC
+.
+          UNPACK    OBADATE,CCENT,CYEAR,CMON,CDAY
+          PACK      KEY9,ANST,OBATIME,COLON,ZERO,ZERO
+          PACK      FHRSTRDT,CCENT,CYEAR,FHRDASH,CMON,FHRDASH,CDAY,KEY9,TIMEZONE
+          PACK      KEY9,ANST,ENDTIME,COLON,ZERO,ZERO
+          PACK      FHRENDDT,CCENT,CYEAR,FHRDASH,CMON,FHRDASH,CDAY,KEY9,TIMEZONE
+          PACK      KEY28,OBASITE,OBACLIN,OBADATE,OBASTRT,OBASLOT,SP70
+.
+          MOVE      SP70,CTDESC
+          MOVE      "CT",CATEGORY
+          MOVE      OTHELTYP,CODE
+          PACK      KEY5,CATEGORY,CODE,SP70
+          CALL      RDCODE1
+          IF        OVRCD=0
+            MOVE      TDESC,CTDESC
+          ENDIF
+.
+          MOVE      SP70,CLDESC
+          MATCH     SP70,OBACOMP
+          IF        !@EQUAL
+            MOVE      "CL",CATEGORY
+            MOVE      OBACOMP,CODE
+            PACK      KEY5,CATEGORY,CODE,SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              MOVE      TDESC,CLDESC
+            ENDIF
+          ENDIF
+.
+          MOVE      SP70,SRDESC
+          MATCH     SP70,OBASRCR
+          IF        !@EQUAL
+            MOVE      "S ",CATEGORY
+            MOVE      OBASRCR,CODE
+            PACK      KEY5,CATEGORY,CODE,SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              MOVE      TDESC,SRDESC
+            ENDIF
+          ENDIF
+.
+          WRITE     HTMLFILE;*+,"{ #"resourceType#": #"Appointment#",":
+                    " #"id#" : #"ATT-",KEY28,"#",":
+                    " #"extension#": [":
+                    " { #"url#":#"%BASEURL/extension/webPASService#"":
+                        " ,#"valueString#":#"",PRGID,SP1,PRGNAM,SP1,VERSION,"#"},":
+                    " { #"url#":#"%BASEURL/extension/webPASTemplate#"":
+                        " ,#"valueString#":#"%TEMPLATEHOME/",WBTPFIL," %TEMPLATEVERSION#"},":
+                    " { #"url#":#"%BASEURL/extension/VisitNo#"":
+                        " ,#"valueString#":#"",DOBAOUTN,"#"}";
+.
+.         Extension UR Number
+.         ---------------------
+.
+          MATCH     SP70,OBAURNO
+          IF        !@EQUAL & !@EOS
+.
+            MATCH     "       0",OBAURNO
+            IF        !@EQUAL
+              WRITE     HTMLFILE;*+,", { #"url#":#"%BASEURL/extension/URNumber#"":
+                        " ,#"valueString#":#"",OBAURNO,"#"}";
+            ENDIF
+.
+          ENDIF
+.
+.         Extension Claim Type
+.         ---------------------
+.
+          MATCH     SP70,OBACOMP
+          IF        !@EQUAL & !@EOS
+.
+            WRITE     HTMLFILE;"       ,{  #"url#" : #"%BASEURL/extension/dxc-hc-claimtype-code#",";
+            WRITE     HTMLFILE;"           #"valueCodeableConcept#" : {";
+            WRITE     HTMLFILE;"                #"coding#": [ {";
+            WRITE     HTMLFILE;"                  #"system#": #"%BASEURL/ValueSet/Category-",ANSC,ANSL,"#", ";
+            WRITE     HTMLFILE;"                  #"code#": #"",OBACOMP,"#" ";
+.
+            MATCH     SP70,CLDESC
+            IF        !@EQUAL & !@EOS
+              WRITE     HTMLFILE;"                  ,#"display#": #"",CLDESC,"#"";
+            ENDIF
+.
+            WRITE     HTMLFILE;"                 } ]";
+            WRITE     HTMLFILE;"            }";
+            WRITE     HTMLFILE;"        }";
+
+
+.
+.            WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-claimtype-code#"":
+.                        " ,#"valueString#":#"",OBACOMP,"#"}";
+..
+.            MATCH     SP70,CLDESC
+.            IF        !@EQUAL & !@EOS
+..
+.              WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-claimtype-description#"":
+.                        " ,#"valueString#":#"",CLDESC,"#"}";
+..
+.            ENDIF
+.
+          ENDIF
+.
+.         Extension Source of Referral
+.         -----------------------------
+.
+          MATCH     SP70,OBASRCR
+          IF        !@EQUAL & !@EOS
+.
+            WRITE     HTMLFILE;"       ,{  #"url#" : #"%BASEURL/extension/dxc-hc-sourceofref-code#",";
+            WRITE     HTMLFILE;"           #"valueCodeableConcept#" : {";
+            WRITE     HTMLFILE;"                #"coding#": [ {";
+            WRITE     HTMLFILE;"                  #"system#": #"%BASEURL/ValueSet/Category-",ANSS,"-#", ";
+            WRITE     HTMLFILE;"                  #"code#": #"",OBASRCR,"#" ";
+.
+            MATCH     SP70,SRDESC
+            IF        !@EQUAL & !@EOS
+              WRITE     HTMLFILE;"                  ,#"display#": #"",SRDESC,"#"";
+            ENDIF
+.
+            WRITE     HTMLFILE;"                 } ]";
+            WRITE     HTMLFILE;"            }";
+            WRITE     HTMLFILE;"        }";
+
+.
+.            WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-sourceofref-code#"":
+.                        " ,#"valueString#":#"",OBASRCR,"#"}";
+..
+.            MATCH     SP70,SRDESC
+.            IF        !@EQUAL & !@EOS
+..
+.              WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-sourceofref-description#"":
+.                        " ,#"valueString#":#"",SRDESC,"#"}";
+..
+.            ENDIF
+..
+          ENDIF
+.
+.         Extension Check In Time
+.         -----------------------
+.
+          MATCH     SP70,OTBBCITM
+          IF        !@EQUAL & !@EOS
+.
+            PACK      KEY8,OTBBCITM,COLON,ZERO,ZERO
+            WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-checkintime#"":
+                        " ,#"valueTime#":#"",KEY8,"#"}";
+.
+          ENDIF
+.
+.         Extension Time Seen
+.         -----------------------
+.
+          MATCH     SP70,OTBBASTM
+          IF        !@EQUAL & !@EOS
+.
+            PACK      KEY8,OTBBASTM,COLON,ZERO,ZERO
+            WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-timeseen#"":
+                        " ,#"valueTime#":#"",KEY8,"#"}";
+.
+          ENDIF
+.
+.         Extension Time of Departure
+.         ---------------------------
+.
+          MATCH     SP70,OTBBDPTM
+          IF        !@EQUAL & !@EOS
+.
+            PACK      KEY8,OTBBDPTM,COLON,ZERO,ZERO
+            WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-timeofdeparture#"":
+                        " ,#"valueTime#":#"",KEY8,"#"}";
+.
+          ENDIF
+.
+.         Extension Outcome
+.         -----------------------------
+.
+          MATCH     SP70,OTBBOUTC
+          IF        !@EQUAL & !@EOS
+.
+            WRITE     HTMLFILE;"       ,{  #"url#" : #"%BASEURL/extension/dxc-hc-outcome-code#",";
+            WRITE     HTMLFILE;"           #"valueCodeableConcept#" : {";
+            WRITE     HTMLFILE;"                #"coding#": [ {";
+            WRITE     HTMLFILE;"                  #"system#": #"%BASEURL/ValueSet/Category-",ANSO,ANSZ,"#", ";
+            WRITE     HTMLFILE;"                  #"code#": #"",OTBBOUTC,"#" ";
+.
+            PACK      KEY5,ANSO,ANSZ,OTBBOUTC,SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              MATCH     SP70,TDESC
+              IF        !@EQUAL & !@EOS
+                WRITE     HTMLFILE;"                  ,#"display#": #"",TDESC,"#"";
+              ENDIF
+            ENDIF
+.
+            WRITE     HTMLFILE;"                 } ]";
+            WRITE     HTMLFILE;"            }";
+            WRITE     HTMLFILE;"        }";
+.
+          ENDIF
+.
+.         Extension Unit
+.         --------------
+.
+          MATCH     SP70,OTBBDEPT
+          IF        !@EQUAL & !@EOS
+.
+            WRITE     HTMLFILE;"       ,{  #"url#" : #"%BASEURL/extension/dxc-hc-unit-code#",";
+            WRITE     HTMLFILE;"           #"valueCodeableConcept#" : {";
+            WRITE     HTMLFILE;"                #"coding#": [ {";
+            WRITE     HTMLFILE;"                  #"system#": #"%BASEURL/ValueSet/Category-",ANSA,ANSC,"#", ";
+            WRITE     HTMLFILE;"                  #"code#": #"",OTBBDEPT,"#" ";
+.
+            PACK      KEY5,ANSA,ANSC,OTBBDEPT,SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              MATCH     SP70,TDESC
+              IF        !@EQUAL & !@EOS
+                WRITE     HTMLFILE;"                  ,#"display#": #"",TDESC,"#"";
+              ENDIF
+            ENDIF
+.
+            WRITE     HTMLFILE;"                 } ]";
+            WRITE     HTMLFILE;"            }";
+            WRITE     HTMLFILE;"        }";
+.
+          ENDIF
+.
+.         Extension Doctor Seen (for easier access during PUT parsing)
+.         --------------------------------------------------------------
+.
+          MOVE      OBADOCT,KEY10
+          MATCH     OBADOCT,OTBBADCS Doctor Seen
+          IF        !@EQUAL
+            MOVE      OTBBADCS,KEY10
+          ENDIF
+          MATCH     SP70,KEY10
+          IF        !@EQUAL
+            PACK      KEY6,KEY10,SP70
+            CALL      RDDOCT1
+            IF        OVRCD=0
+              WRITE     HTMLFILE;"       ,{  #"url#" : #"%BASEURL/extension/dxc-hc-doctor-seen#",";
+              WRITE     HTMLFILE;"                  #"valueString#": #"",KEY10,"#" ";
+              WRITE     HTMLFILE;"        }";
+.
+            ENDIF
+          ENDIF
+.
+          WRITE     HTMLFILE;*+," ],":
+                    " #"status#" : #"",FHRSTAT,"#",":
+                    " #"supportingInformation#" : [":
+                    "   { #"reference#"   : #"Location/Clinic-",OTHELTYP,"#", ":
+                    "     #"display#"   : #"",CTDESC,"#" } ":
+                    "   ] ,":
+                    " #"reason#":  [ { ":
+                    "  #"text#" : #"",PMVXUDF1,PMVXUDF2,PMVXUDF3,"#"  ";
+          CALL      FHROCD00
+          WRITE     HTMLFILE;*+,"  } ],":
+                    " #"appointmentType#":  {  ":
+                    "  #"coding#" : [":
+                    "   { #"code#"      : #"CLINIC#",":
+                    "     #"display#"   : #"Ourpatient Clinic#" } ":
+                    "  ] },":
+                    " #"serviceType#": [ { ":
+                    "  #"coding#" : [":
+                    "   { #"system#"    : #"%BASEURL/ValueSet/Category-CV#",":
+                    "     #"code#"      : #"",OBAVISIT,"#",":
+                    "     #"display#"   : #"",CVDESC,"#" } ":
+                    "  ] } ],":
+                    " #"start#" : #"",FHRSTRDT,"#",":
+                    " #"end#" : #"",FHRENDDT,"#",":
+                    " #"participant#" : [ ";
+
+          MATCH     SP70,OBAURNO
+          IF        !@EQUAL
+            WRITE     HTMLFILE;*+," {":
+                    "  #"type#":  [ {":
+                    "  #"text#" : #"Patient#",":
+                    "  #"coding#" : [":
+                    "   { #"code#"      : #"PART#",":
+                    "     #"display#"   : #"Participation#" } ":
+                    "  ] } ],":
+                    "  #"status#" : #"accepted#",":
+                    "  #"actor#" : {":
+                    "    #"display#" : #"",PATFNAME,"#", ":
+                    "    #"reference#" : #"Patient/",FHRPATID,"#"}":
+                    "   }   ";
+          ENDIF
+.
+          MATCH     SP70,OCADOCT
+          IF        !@EQUAL
+            PACK      KEY6,OCADOCT,SP70
+            CALL      RDDOCT1
+            IF        OVRCD=0
+              MOVE      DTITL,FMTTITLE          * For Formatting Doctor's Name
+              MOVE      DGNAME,FMTGNAME
+              MOVE      DSNAME,FMTSNAME
+              CALL      DOCNM000
+              STRIP     DOCFNAME
+              WRITE     HTMLFILE;*+,", {":
+                        "  #"type#":  [ { #"text#" : #"Clinic Doctor#" } ],":
+                        "  #"status#" : #"accepted#",":
+                        "  #"actor#" : {":
+                        "     #"reference#" : #"Practitioner/HCP-",OCADOCT,"#",":
+                        "     #"display#" : #"",DOCFNAME,"#" ":
+                        "   } } ";
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,OCACCONS
+          IF        !@EQUAL
+            PACK      KEY6,OCACCONS,SP70
+            CALL      RDDOCT1
+            IF        OVRCD=0
+              MOVE      DTITL,FMTTITLE          * For Formatting Doctor's Name
+              MOVE      DGNAME,FMTGNAME
+              MOVE      DSNAME,FMTSNAME
+              CALL      DOCNM000
+              STRIP     DOCFNAME
+              WRITE     HTMLFILE;*+,", {":
+                        "  #"type#":  [ { #"text#" : #"Clinic Consultant#" } ],":
+                        "  #"status#" : #"accepted#",":
+                        "  #"actor#" : {":
+                        "     #"reference#" : #"Practitioner/HCP-",KEY6,"#",":
+                        "     #"display#" : #"",DOCFNAME,"#" ":
+                        "   } } ";
+            ENDIF
+          ENDIF
+.
+          MOVE      OBADOCT,KEY10
+          MATCH     OBADOCT,OTBBADCS Doctor Seen
+          IF        !@EQUAL
+            MOVE      OTBBADCS,KEY10
+          ENDIF
+          MATCH     SP70,KEY10
+          IF        !@EQUAL
+            PACK      KEY6,KEY10,SP70
+            CALL      RDDOCT1
+            IF        OVRCD=0
+              MOVE      DTITL,FMTTITLE          * For Formatting Doctor's Name
+              MOVE      DGNAME,FMTGNAME
+              MOVE      DSNAME,FMTSNAME
+              CALL      DOCNM000
+              STRIP     DOCFNAME
+              WRITE     HTMLFILE;*+,", {":
+                        "  #"type#":  [ { #"text#" : #"Doctor Seen#" } ],":
+                        "  #"status#" : #"accepted#",":
+                        "  #"actor#" : {":
+                        "     #"reference#" : #"Practitioner/HCP-",KEY6,"#",":
+                        "     #"display#" : #"",DOCFNAME,"#" ":
+                        "   } } ";
+            ENDIF
+          ENDIF
+.
+.
+. Service Type Not Implemented yet? Category OY?
+. Need to clarifiy requirements
+.
+.          MOVE      "OY",CATEGORY
+.          MOVE      OPDATYPE,CODE
+.          CALL      GETCOD00
+.          MOVE      TDESC,OYDESC
+.          MATCH     SP70,CODE
+.          IF        @EQUAL
+.            MOVE      "n/a",OYDESC
+.          ENDIF
+.
+.                    " #"serviceCategory#":  {  ":
+.                    "  #"coding#" : [":
+.                    "   { #"system#"    : #"%BASEURL/ValueSet/Category-OY#",":
+.                    "     #"code#"      : #"",OPDATYPE,"#",":
+.                    "     #"display#"   : #"",OYDESC,"#" } ":
+.                    "  ] },":
+.
+          WRITE     HTMLFILE;*+," ] }"
+.
+RESATT99  RETURN
++
+.------------------------------------------------------------
+. Outpatient Discharge Logical ID
+.------------------------------------------------------------
+FHRDIS00  IF        DISNUMB>0
+            WRITE     HTMLFILE;*+,",";
+          ENDIF
+          PACK      KEY28,OBASITE,OBACLIN,OBADATE,OBASTRT,OBASLOT,SP70
+          MOVE      KEY28,FHRAPPID
+          REP       " -",KEY28
+          ADD       ONE,DISNUMB
+.
+          MATCH     "1",FHIRREMB
+          IF        !@EQUAL
+            WRITE     HTMLFILE;*+," {":
+                                  " #"fullUrl#": #"%BASEURL/Appointment/DIS-",KEY28,"#",":
+                                    " #"resource#": ";
+          ENDIF
+.
+          CALL      RESDIS00
+.
+          MATCH     "1",FHIRREMB
+          IF        !@EQUAL
+            WRITE     HTMLFILE;*+,"}";
+          ELSE
+            GOTO      FHROUT99
+          ENDIF
+.
+          IF        FHRSUBIN=1
+.
+            PACK      FHRPATID,URNUMBER
+            SQUEEZE   FHRPATID
+.
+            WRITE     HTMLFILE;*+,",{":
+                                  " #"fullUrl#": #"%BASEURL/Patient/",FHRPATID,"#",":
+                                    " #"resource#": ";
+.
+            CALL      RESPAT00
+.
+            WRITE     HTMLFILE;*+,"}"
+          ENDIF
+.
+          IF        FHRPARIN=1
+.
+            MATCH     SP70,OCADOCT
+            IF        !@EQUAL & !@EOS
+.
+              PACK      KEY6,OCADOCT,SP70
+              CALL      RDDOCT1
+              IF        OVRCD=0
+.
+                WRITE     HTMLFILE;*+,",{":
+                                      " #"fullUrl#": #"%BASEURL/Practitioner/HCP-",DCODE,"#",":
+                                        " #"resource#": ";
+.
+                CALL      RESPRA00
+.
+                WRITE     HTMLFILE;*+,"}"
+.
+              ENDIF
+.
+            ENDIF
+.
+          ENDIF
+.
+          IF        FHRLOCIN=1
+.
+                WRITE     HTMLFILE;*+,",{":
+                                      " #"fullUrl#": #"%BASEURL/Location/Clinic-",OTHELTYP,"#",":
+                                        " #"resource#": ";
+.
+                CALL      RESLCO00
+.
+                WRITE     HTMLFILE;*+,"}"
+.
+          ENDIF
+.
+FHRDIS99  RETURN
++
+.------------------------------------------------------------
+. Appointment FHIR Resource Output for Outpatient Discharge
+.------------------------------------------------------------
+RESDIS00  PACK      KEY8,DOBAOUTN,SP70
+          CALL      RDBOKB1
+          IF        OVRCD=1
+            CALL      CLOUTBB1
+          ENDIF
+.
+          CALL      FHROST00
+.
+          MOVE      OBAURNO,FHRPATID
+          SQUEEZE   FHRPATID
+          MOVE      "CV",CATEGORY           * Visit Type
+          MOVE      OBAVISIT,CODE
+          CALL      GETCOD00
+          MOVE      TDESC,CVDESC
+.
+          MOVE      "ST",CATEGORY           * Type
+          MOVE      OPDAUNIT,CODE
+          CALL      GETCOD00
+          MOVE      TDESC,STDESC
+          MATCH     SP70,CODE
+          IF        @EQUAL
+            MOVE      "n/a",STDESC
+          ENDIF
+.
+          MOVE      "CT",CATEGORY           * Location
+          MOVE      OTHELTYP,CODE
+          CALL      GETCOD00
+          MOVE      TDESC,CTDESC
+.
+          UNPACK    OBADATE,CCENT,CYEAR,CMON,CDAY
+          PACK      KEY9,ANST,OBATIME,COLON,ZERO,ZERO
+          PACK      FHRSTRDT,CCENT,CYEAR,FHRDASH,CMON,FHRDASH,CDAY,KEY9,TIMEZONE
+          PACK      KEY9,ANST,ENDTIME,COLON,ZERO,ZERO
+          PACK      FHRENDDT,CCENT,CYEAR,FHRDASH,CMON,FHRDASH,CDAY,KEY9,TIMEZONE
+          PACK      KEY28,OBASITE,OBACLIN,OBADATE,OBASTRT,OBASLOT,SP70
+.
+          MOVE      SP70,CTDESC
+          MOVE      "CT",CATEGORY
+          MOVE      OTHELTYP,CODE
+          PACK      KEY5,CATEGORY,CODE,SP70
+          CALL      RDCODE1
+          IF        OVRCD=0
+            MOVE      TDESC,CTDESC
+          ENDIF
+.
+          MOVE      SP70,CLDESC
+          MATCH     SP70,OBACOMP
+          IF        !@EQUAL
+            MOVE      "CL",CATEGORY
+            MOVE      OBACOMP,CODE
+            PACK      KEY5,CATEGORY,CODE,SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              MOVE      TDESC,CLDESC
+            ENDIF
+          ENDIF
+.
+          MOVE      SP70,SRDESC
+          MATCH     SP70,OBASRCR
+          IF        !@EQUAL
+            MOVE      "S ",CATEGORY
+            MOVE      OBASRCR,CODE
+            PACK      KEY5,CATEGORY,CODE,SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              MOVE      TDESC,SRDESC
+            ENDIF
+          ENDIF
+.
+          WRITE     HTMLFILE;*+,"{ #"resourceType#": #"Appointment#",":
+                    " #"id#" : #"DIS-",KEY28,"#",":
+                    " #"extension#": [":
+                    " { #"url#":#"%BASEURL/extension/webPASService#"":
+                        " ,#"valueString#":#"",PRGID,SP1,PRGNAM,SP1,VERSION,"#"},":
+                    " { #"url#":#"%BASEURL/extension/webPASTemplate#"":
+                        " ,#"valueString#":#"%TEMPLATEHOME/",WBTPFIL," %TEMPLATEVERSION#"},":
+                    " { #"url#":#"%BASEURL/extension/VisitNo#"":
+                        " ,#"valueString#":#"",DOBAOUTN,"#"}";
+.
+.         Extension UR Number
+.         ---------------------
+.
+          MATCH     SP70,OBAURNO
+          IF        !@EQUAL & !@EOS
+.
+            MATCH     "       0",OBAURNO
+            IF        !@EQUAL
+              WRITE     HTMLFILE;*+,", { #"url#":#"%BASEURL/extension/URNumber#"":
+                        " ,#"valueString#":#"",OBAURNO,"#"}";
+            ENDIF
+.
+          ENDIF
+.
+.         Extension Claim Type
+.         ---------------------
+.
+          MATCH     SP70,OBACOMP
+          IF        !@EQUAL & !@EOS
+.
+            WRITE     HTMLFILE;"       ,{  #"url#" : #"%BASEURL/extension/dxc-hc-claimtype-code#",";
+            WRITE     HTMLFILE;"           #"valueCodeableConcept#" : {";
+            WRITE     HTMLFILE;"                #"coding#": [ {";
+            WRITE     HTMLFILE;"                  #"system#": #"%BASEURL/ValueSet/Category-",ANSC,ANSL,"#", ";
+            WRITE     HTMLFILE;"                  #"code#": #"",OBACOMP,"#" ";
+.
+            MATCH     SP70,CLDESC
+            IF        !@EQUAL & !@EOS
+              WRITE     HTMLFILE;"                  ,#"display#": #"",CLDESC,"#"";
+            ENDIF
+.
+            WRITE     HTMLFILE;"                 } ]";
+            WRITE     HTMLFILE;"            }";
+            WRITE     HTMLFILE;"        }";
+
+
+.
+.            WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-claimtype-code#"":
+.                        " ,#"valueString#":#"",OBACOMP,"#"}";
+..
+.            MATCH     SP70,CLDESC
+.            IF        !@EQUAL & !@EOS
+..
+.              WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-claimtype-description#"":
+.                        " ,#"valueString#":#"",CLDESC,"#"}";
+..
+.            ENDIF
+.
+          ENDIF
+.
+.         Extension Source of Referral
+.         -----------------------------
+.
+          MATCH     SP70,OBASRCR
+          IF        !@EQUAL & !@EOS
+.
+            WRITE     HTMLFILE;"       ,{  #"url#" : #"%BASEURL/extension/dxc-hc-sourceofref-code#",";
+            WRITE     HTMLFILE;"           #"valueCodeableConcept#" : {";
+            WRITE     HTMLFILE;"                #"coding#": [ {";
+            WRITE     HTMLFILE;"                  #"system#": #"%BASEURL/ValueSet/Category-",ANSS,"-#", ";
+            WRITE     HTMLFILE;"                  #"code#": #"",OBASRCR,"#" ";
+.
+            MATCH     SP70,SRDESC
+            IF        !@EQUAL & !@EOS
+              WRITE     HTMLFILE;"                  ,#"display#": #"",SRDESC,"#"";
+            ENDIF
+.
+            WRITE     HTMLFILE;"                 } ]";
+            WRITE     HTMLFILE;"            }";
+            WRITE     HTMLFILE;"        }";
+
+.
+.            WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-sourceofref-code#"":
+.                        " ,#"valueString#":#"",OBASRCR,"#"}";
+..
+.            MATCH     SP70,SRDESC
+.            IF        !@EQUAL & !@EOS
+..
+.              WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-sourceofref-description#"":
+.                        " ,#"valueString#":#"",SRDESC,"#"}";
+..
+.            ENDIF
+..
+          ENDIF
+.
+.         Extension Check In Time
+.         -----------------------
+.
+.          MATCH     SP70,OTBBCITM
+.          IF        !@EQUAL & !@EOS
+..
+.            PACK      KEY8,OTBBCITM,COLON,ZERO,ZERO
+.            WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-checkintime#"":
+.                        " ,#"valueTime#":#"",KEY8,"#"}";
+..
+.          ENDIF
+.
+.         Extension Time Seen
+.         -----------------------
+.
+.          MATCH     SP70,OTBBASTM
+.          IF        !@EQUAL & !@EOS
+..
+.            PACK      KEY8,OTBBASTM,COLON,ZERO,ZERO
+.            WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-timeseen#"":
+.                        " ,#"valueTime#":#"",KEY8,"#"}";
+..
+.          ENDIF
+.
+.         Extension Time of Departure
+.         ---------------------------
+.
+          MATCH     SP70,OTBBDPTM
+          IF        !@EQUAL & !@EOS
+.
+            PACK      KEY8,OTBBDPTM,COLON,ZERO,ZERO
+            WRITE     HTMLFILE;*+,",{ #"url#":#"%BASEURL/extension/dxc-hc-timeofdeparture#"":
+                        " ,#"valueTime#":#"",KEY8,"#"}";
+.
+          ENDIF
+.
+.         Extension Outcome
+.         -----------------------------
+.
+          MATCH     SP70,OTBBOUTC
+          IF        !@EQUAL & !@EOS
+.
+            WRITE     HTMLFILE;"       ,{  #"url#" : #"%BASEURL/extension/dxc-hc-outcome-code#",";
+            WRITE     HTMLFILE;"           #"valueCodeableConcept#" : {";
+            WRITE     HTMLFILE;"                #"coding#": [ {";
+            WRITE     HTMLFILE;"                  #"system#": #"%BASEURL/ValueSet/Category-",ANSO,ANSZ,"#", ";
+            WRITE     HTMLFILE;"                  #"code#": #"",OTBBOUTC,"#" ";
+.
+            PACK      KEY5,ANSO,ANSZ,OTBBOUTC,SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              MATCH     SP70,TDESC
+              IF        !@EQUAL & !@EOS
+                WRITE     HTMLFILE;"                  ,#"display#": #"",TDESC,"#"";
+              ENDIF
+            ENDIF
+.
+            WRITE     HTMLFILE;"                 } ]";
+            WRITE     HTMLFILE;"            }";
+            WRITE     HTMLFILE;"        }";
+.
+          ENDIF
+.
+.         Extension Unit
+.         --------------
+.
+          MATCH     SP70,OTBBDEPT
+          IF        !@EQUAL & !@EOS
+.
+            WRITE     HTMLFILE;"       ,{  #"url#" : #"%BASEURL/extension/dxc-hc-unit-code#",";
+            WRITE     HTMLFILE;"           #"valueCodeableConcept#" : {";
+            WRITE     HTMLFILE;"                #"coding#": [ {";
+            WRITE     HTMLFILE;"                  #"system#": #"%BASEURL/ValueSet/Category-",ANSA,ANSC,"#", ";
+            WRITE     HTMLFILE;"                  #"code#": #"",OTBBDEPT,"#" ";
+.
+            PACK      KEY5,ANSA,ANSC,OTBBDEPT,SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              MATCH     SP70,TDESC
+              IF        !@EQUAL & !@EOS
+                WRITE     HTMLFILE;"                  ,#"display#": #"",TDESC,"#"";
+              ENDIF
+            ENDIF
+.
+            WRITE     HTMLFILE;"                 } ]";
+            WRITE     HTMLFILE;"            }";
+            WRITE     HTMLFILE;"        }";
+.
+          ENDIF
+.
+.         Extension Doctor Seen (for easier access during PUT parsing)
+.         --------------------------------------------------------------
+.
+          MOVE      OBADOCT,KEY10
+          MATCH     OBADOCT,OTBBADCS Doctor Seen
+          IF        !@EQUAL
+            MOVE      OTBBADCS,KEY10
+          ENDIF
+          MATCH     SP70,KEY10
+          IF        !@EQUAL
+            PACK      KEY6,KEY10,SP70
+            CALL      RDDOCT1
+            IF        OVRCD=0
+              WRITE     HTMLFILE;"       ,{  #"url#" : #"%BASEURL/extension/dxc-hc-doctor-seen#",";
+              WRITE     HTMLFILE;"                  #"valueString#": #"",KEY10,"#" ";
+              WRITE     HTMLFILE;"        }";
+.
+            ENDIF
+          ENDIF
+.
+.         Extension Discharge Status
+.         -----------------------------
+.
+          MATCH     SP70,OBADISCH
+          IF        !@EQUAL & !@EOS
+.
+            WRITE     HTMLFILE;"       ,{  #"url#" : #"%BASEURL/extension/dxc-hc-dischargestatus-code#",";
+            WRITE     HTMLFILE;"           #"valueCodeableConcept#" : {";
+            WRITE     HTMLFILE;"                #"coding#": [ {";
+            WRITE     HTMLFILE;"                  #"system#": #"%BASEURL/ValueSet/Category-",ANSD,ANSO,"#", ";
+            WRITE     HTMLFILE;"                  #"code#": #"",OBADISCH,"#" ";
+.
+            PACK      KEY5,ANSD,ANSO,OBADISCH,SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              MATCH     SP70,TDESC
+              IF        !@EQUAL & !@EOS
+                WRITE     HTMLFILE;"                  ,#"display#": #"",TDESC,"#"";
+              ENDIF
+            ENDIF
+.
+            WRITE     HTMLFILE;"                 } ]";
+            WRITE     HTMLFILE;"            }";
+            WRITE     HTMLFILE;"        }";
+.
+          ENDIF
+.
+          WRITE     HTMLFILE;*+," ],":
+                    " #"status#" : #"",FHRSTAT,"#",":
+                    " #"supportingInformation#" : [":
+                    "   { #"reference#"   : #"Location/Clinic-",OTHELTYP,"#", ":
+                    "     #"display#"   : #"",CTDESC,"#" } ":
+                    "   ] ,":
+                    " #"reason#":  [ { ":
+                    "  #"text#" : #"",PMVXUDF1,PMVXUDF2,PMVXUDF3,"#"  ";
+          CALL      FHROCD00
+          WRITE     HTMLFILE;*+,"  } ],":
+                    " #"appointmentType#":  {  ":
+                    "  #"coding#" : [":
+                    "   { #"code#"      : #"CLINIC#",":
+                    "     #"display#"   : #"Ourpatient Clinic#" } ":
+                    "  ] },":
+                    " #"serviceType#": [ { ":
+                    "  #"coding#" : [":
+                    "   { #"system#"    : #"%BASEURL/ValueSet/Category-CV#",":
+                    "     #"code#"      : #"",OBAVISIT,"#",":
+                    "     #"display#"   : #"",CVDESC,"#" } ":
+                    "  ] } ],":
+                    " #"start#" : #"",FHRSTRDT,"#",":
+                    " #"end#" : #"",FHRENDDT,"#",":
+                    " #"participant#" : [ ";
+
+          MATCH     SP70,OBAURNO
+          IF        !@EQUAL
+            WRITE     HTMLFILE;*+," {":
+                    "  #"type#":  [ {":
+                    "  #"text#" : #"Patient#",":
+                    "  #"coding#" : [":
+                    "   { #"code#"      : #"PART#",":
+                    "     #"display#"   : #"Participation#" } ":
+                    "  ] } ],":
+                    "  #"status#" : #"accepted#",":
+                    "  #"actor#" : {":
+                    "    #"display#" : #"",PATFNAME,"#", ":
+                    "    #"reference#" : #"Patient/",FHRPATID,"#"}":
+                    "   }   ";
+          ENDIF
+.
+          MATCH     SP70,OCADOCT
+          IF        !@EQUAL
+            PACK      KEY6,OCADOCT,SP70
+            CALL      RDDOCT1
+            IF        OVRCD=0
+              MOVE      DTITL,FMTTITLE          * For Formatting Doctor's Name
+              MOVE      DGNAME,FMTGNAME
+              MOVE      DSNAME,FMTSNAME
+              CALL      DOCNM000
+              STRIP     DOCFNAME
+              WRITE     HTMLFILE;*+,", {":
+                        "  #"type#":  [ { #"text#" : #"Clinic Doctor#" } ],":
+                        "  #"status#" : #"accepted#",":
+                        "  #"actor#" : {":
+                        "     #"reference#" : #"Practitioner/HCP-",OCADOCT,"#",":
+                        "     #"display#" : #"",DOCFNAME,"#" ":
+                        "   } } ";
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,OCACCONS
+          IF        !@EQUAL
+            PACK      KEY6,OCACCONS,SP70
+            CALL      RDDOCT1
+            IF        OVRCD=0
+              MOVE      DTITL,FMTTITLE          * For Formatting Doctor's Name
+              MOVE      DGNAME,FMTGNAME
+              MOVE      DSNAME,FMTSNAME
+              CALL      DOCNM000
+              STRIP     DOCFNAME
+              WRITE     HTMLFILE;*+,", {":
+                        "  #"type#":  [ { #"text#" : #"Clinic Consultant#" } ],":
+                        "  #"status#" : #"accepted#",":
+                        "  #"actor#" : {":
+                        "     #"reference#" : #"Practitioner/HCP-",KEY6,"#",":
+                        "     #"display#" : #"",DOCFNAME,"#" ":
+                        "   } } ";
+            ENDIF
+          ENDIF
+.
+          MOVE      OBADOCT,KEY10
+          MATCH     OBADOCT,OTBBADCS Doctor Seen
+          IF        !@EQUAL
+            MOVE      OTBBADCS,KEY10
+          ENDIF
+          MATCH     SP70,KEY10
+          IF        !@EQUAL
+            PACK      KEY6,KEY10,SP70
+            CALL      RDDOCT1
+            IF        OVRCD=0
+              MOVE      DTITL,FMTTITLE          * For Formatting Doctor's Name
+              MOVE      DGNAME,FMTGNAME
+              MOVE      DSNAME,FMTSNAME
+              CALL      DOCNM000
+              STRIP     DOCFNAME
+              WRITE     HTMLFILE;*+,", {":
+                        "  #"type#":  [ { #"text#" : #"Doctor Seen#" } ],":
+                        "  #"status#" : #"accepted#",":
+                        "  #"actor#" : {":
+                        "     #"reference#" : #"Practitioner/HCP-",KEY6,"#",":
+                        "     #"display#" : #"",DOCFNAME,"#" ":
+                        "   } } ";
+            ENDIF
+          ENDIF
+.
+.
+. Service Type Not Implemented yet? Category OY?
+. Need to clarifiy requirements
+.
+.          MOVE      "OY",CATEGORY
+.          MOVE      OPDATYPE,CODE
+.          CALL      GETCOD00
+.          MOVE      TDESC,OYDESC
+.          MATCH     SP70,CODE
+.          IF        @EQUAL
+.            MOVE      "n/a",OYDESC
+.          ENDIF
+.
+.                    " #"serviceCategory#":  {  ":
+.                    "  #"coding#" : [":
+.                    "   { #"system#"    : #"%BASEURL/ValueSet/Category-OY#",":
+.                    "     #"code#"      : #"",OPDATYPE,"#",":
+.                    "     #"display#"   : #"",OYDESC,"#" } ":
+.                    "  ] },":
+.
+          WRITE     HTMLFILE;*+," ] }"
+.
+RESDIS99  RETURN
++
+.------------------------------------------------------------
+. Get FHRSTAT for Outpatient Appointments andAttendances
+.------------------------------------------------------------
+FHROST00  MOVE      SP70,FHRSTAT
+.
+          LOAD      FHRSTAT,OBASTAT,FHIROST1,FHIROST2,FHIROST3,FHIROST4,FHIROST5:
+                                    FHIROST6,FHIROST7,SP70,FHIROST9
+.
+FHROST99  RETURN

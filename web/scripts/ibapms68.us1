@@ -1,0 +1,45 @@
+#!/bin/sh
+
+###     IBAPMS68 Upload Surgical Preferences from ASCII
+
+        DateName=`date +%y%m%d-%H%M`
+        FileName="$1"
+        OutFName="$2"
+
+        TabFileF=$OutFName
+        DocFileF=${TabFileF}_${DateName}.unl
+        ExtractIndex=${approot}/extracts/doctorpref/doctorprefindex.html
+
+###     Lets do an unload for backup
+###
+        /opt/iba/tbl/ismod -u ${TabFileF}.unl $TabFileF ;
+        mv ${TabFileF}.unl ${approot}/extracts/doctorpref/${DocFileF} ;
+
+echo "<br><font size=3> Input File           "                >>pms68.tmp
+date                                                          >>pms68.tmp
+echo "<a href=$DocFileF>$DocFileF</a></font><br>"             >>pms68.tmp
+
+ex -e - $ExtractIndex <<EOF
+:/INSERTION-POINT-MARKER
+:r pms68.tmp
+:wq!
+EOF
+
+###     Now we can modify the upload table
+###
+        cat $FileName | sed 's///' > $FileName.unix
+        mv $FileName.unix $FileName
+
+ex -e - $FileName <<EOF
+        /commence data input on next row/
+        :1,.d
+        :%s/^	//
+        :%s/	/|/g
+        :%s/$/||||/g
+        :%s/[$]//g
+        :%s/,//g
+        :%s/'//g
+        :%s/"//g
+        :wq!
+EOF
+

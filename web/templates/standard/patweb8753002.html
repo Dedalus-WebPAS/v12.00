@@ -1,0 +1,112 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName"    content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/patweb87.js"></script>
+<script type="text/javascript">
+function updateHFH() {
+  document.AddForm.ptddh003.value = 
+  SetDateYYYYMMDD(document.AddForm.effetodt.value);
+//  if (document.AddForm.ptddh002.value == "01") {
+//    document.AddForm.ptddh004.value = document.AddForm.fldvalue.value;
+//  } else {
+    document.AddForm.ptddh006.value = document.AddForm.fldvalue.value;
+//  }
+  SubmitForm();
+}
+
+function cancelHFH() {
+  DFrameCloseRefresh();
+}
+
+function checkEffectiveDate(dateVal) {
+  var urlLink;
+  if (isWhitespace(dateVal)) {
+    return;
+  }
+//  if (document.AddForm.ptddh002.value == "01") {
+//    urlLink = "&ptddh004=";
+//  } else {
+    urlLink = "&ptddh006=";
+//  }
+  serverURL="../cgi-bin/patweb87.pbl?reportno=54&ptddh003="+
+  SetDateYYYYMMDD(dateVal)+urlLink+document.AddForm.fldvalue.value+
+              "&hffldtyp="+document.AddForm.ptddh002.value+"&hfund001="+
+              document.AddForm.ptddh001.value;
+  var returnVal = RSExecute(serverURL);
+  if (returnVal.status == 0) {
+    //0 if nothing, 1 if found value with later date
+    ReturnValue = returnVal.return_value;
+    if (ReturnValue == 1) {
+      var ans = confirm("A record with a future 'Effective To' date exists." +
+              " Please delete the later record first.");
+      if (ans) {
+        parent.HFHist();
+      } else {
+        document.AddForm.effetodt.value = "";
+        document.AddForm.effetodt.focus();
+        return;
+      }
+    } else if (ReturnValue == 2) {
+        alert("A record with a duplicate 'Effective To' date exists.");
+        document.AddForm.effetodt.value = "";
+        document.AddForm.effetodt.focus();
+        return;
+    } else {
+      return;
+    }
+  }
+}
+</script>
+</head>
+%START.OF.PAGE
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon"
+ src="../images/ExitIcon.gif" onclick="DFrameExitRefresh();">
+<script type="text/javascript">document.write(self.document.title);</script>
+</span>
+<div id=PageBodySection style="overflow: auto;">
+<body onload="PageLoad(event);">
+<form name=AddForm action=patweb87.pbl method=post style="margin:0">
+<input type=hidden name=reportno value=53>
+<input type=hidden name=template value=2>
+<input type=hidden name=updttype value=A>
+<input type=hidden name=ptddh001 value="%PATWEB87.53.103">
+<input type=hidden name=ptddh002 value="%PATWEB87.53.101">
+<input type=hidden name=ptddh003>
+<input type=hidden name=ptddh004>
+<input type=hidden name=ptddh006>
+<input type=hidden name=hfund006 value="%PATWEB87.53.107">
+<input type=hidden name=hfund009 value="%PATWEB87.53.108">
+<input type=hidden name=hfund010 value="%PATWEB87.53.109">
+
+<table width=100% border=0 cellspacing=0>
+    <tr><td class=DataLabel>Health Fund Field Type</td>
+    <td class=DataField>
+      <input type=text name=hffldtyp
+       value="%PATWEB87.53.102" disabled>
+    </td></tr>
+    <tr><td class=DateLabel>Value</td>
+    <td class=DataField>
+      <input type=text name=fldvalue
+       value="%PATWEB87.53.105" disabled>
+    </td></tr>
+    <tr><td class=DateLabel>Effective To Date</td>
+    <td class=DataField>
+      <input type=text name=effetodt 
+             onblur="checkDate(this,'Date');checkEffectiveDate(this.value)"
+             class="Mandatory">
+      <img notab="" src="../images/DateLookup.gif" class="Icon" 
+           onclick="DateLookupFrame(effetodt);">
+    </td></tr>
+</table> 
+
+<table width=100% border=0 cellspacing=0>
+  <tr><td align=center>
+    <input type=button value="Add" class="button"
+     onclick='updateHFH()'>
+    <input type=button value="Exit" class="button"
+     onclick='cancelHFH()'>
+  </td></tr>
+</table>
+</form>

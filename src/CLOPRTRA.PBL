@@ -1,0 +1,16 @@
+.---------------------------------------------------------------------------
+. Include Name : CLOPRTRA.PBL
+. Function     : Clear function for OPRTRAFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.04.01  15/02/2024  Thanh T          TSK 0923560
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLOPRTRA  MOVE      SP70,OPTHCODE      . Tray Code     
+          MOVE      SP70,OPTHDESC      . Description      
+          MOVE      SP70,OPTHHOSP      . Hospital ID (pathspaf)    
+          MOVE      SP70,OPTHSPAR      . Spare Vairable     
+.
+          RETURN

@@ -1,0 +1,30 @@
+.---------------------------------------------------------------------------
+. Include Name : CLPRIDOC.PBL
+. Function     : Clear function for PRIDOCFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.04.01  12/12/2023  Thanh T       TSK 0932089
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLPRIDOC  MOVE      SP70,PRDOPRAC      . Medical Practice Code    
+          MOVE      SP70,PRDODOCT      . Associated Doctor Code    
+          MOVE      SP70,PRDOCLAM      . Claim Code (Category CL)   
+          MOVE      SP70,PRDOPIND      . Patient Indicator (Category GI)   
+          MOVE      ZERO,PRDOCOMM      . Associated Doctor % Commission   
+          MOVE      ZERO,PRDOFEEP      . % of Schedule Fee Charged  
+          MOVE      ZERO,PRDOSTAT      . Associated Doctor Status    
+          MOVE      SP70,PRDOCRCD      . Creditor Code     
+          MOVE      SP70,PRDOABNN      . ABN Number     
+          MOVE      ZERO,PRDOGSTR      . GST Register (0=No, 1=Yes)   
+          MOVE      SP70,PRDOPROV      . Service Provider     
+          MOVE      SP70,PRDOHRSN      . Reason for Hold Code (Cat rh) 
+          PACK      PRDOFTXT,SP70,SP70 . Reason for Hold Free Text  
+          MOVE      SP70,PRDOHIFD      . Hold Invoices From Date (ccyymmdd)  
+          MOVE      SP70,PRDOHLDT      . On Hold Last Update Date (ccyymmdd) 
+          MOVE      SP70,PRDOHLTI      . On Hold Last Update Time (hh:mm:ss) 
+          MOVE      SP70,PRDOHLUI      . On Hold Last Update User ID 
+          MOVE      SP70,PRDOSPAR      . Spare Variable     
+.
+          RETURN

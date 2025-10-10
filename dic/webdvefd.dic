@@ -1,0 +1,51 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Web System Table 
+                      WebServices DVEW Ass Med Evt Rep 
+  
+TABLE NAME         :  webdveaf
+=====================================================================
+WBDECLID    char        6     1   Claim ID  
+WBDERPTC    char        3     7   Report counter (right just.)  
+WBDEMEVC    char        2    10   Medical Event counter (right just.)  
+WBDEEVDT    char        8    12   Event Date  
+WBDEEVID    char        2    20   Event Id  
+WBDEPTSC    char        4    22   Patient Status Code  
+WBDEPTST    char      500    26   Patient Status Text  
+WBDEPTMN    char       10   526   Patient Veteran Number  
+WBDEPTMR    char        1   536   Patient Member Reference  
+WBDEPTFN    char       40   537   Patient Family Name  
+WBDEPTGN    char       40   577   Patient Given Name  
+WBDETRID    char       24   617   Transaction Id  
+WBDEMSID    char       36   641   Message Id  
+WBDERKEY    char       24   677   Report Retrieval Key  
+WBDESPAR    char      100   701   Spare Variable  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+WBDECLID
+WBDERPTC
+WBDEMEVC
+WBDERKEY
+  
+UNIQUE INDEX 2
+WBDETRID
+WBDECLID
+WBDERPTC
+WBDEMEVC
+WBDERKEY
+  
+UNIQUE INDEX 3
+WBDEMSID
+WBDECLID
+WBDERPTC
+WBDEMEVC
+WBDERKEY
+  
+UNIQUE INDEX 4
+WBDERKEY
+WBDECLID
+WBDERPTC
+WBDEMEVC
+  
+=====================================================================

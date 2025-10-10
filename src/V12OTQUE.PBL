@@ -1,0 +1,1192 @@
+.*****************************************************************************
+. Program      : V12OTQUE
+. Description  : Conversion outqueaf to new File layout
+.*****************************************************************************
+. Modifications:
+.*****************************************************************************
+. V12.00.00  08/05/2025 Thanh T       TSK 0955096
+.            Initial Version
+.*****************************************************************************
+.
+.  using vi Global change command      :%s/FromString/ToString/g
+.
+.  Global change V12OTQUE  eg F57PTDOC
+.  Global change v12otque  eg f57ptdoc
+.  Global change OUTQUEFD  eg PATDOCFD (new layout)
+.  Global change outqueaf  eg patdoctf
+.  Global change OUTQUEA1  eg PATDOCT1
+.  Global change KEY20     eg KEY20
+.  Global change KEY20     eg KEY9
+.  Global change WROTQUE1  eg WRDOCT1
+.  Global change soutquef  eg sptdoctf
+.
+.  Global Change answeryn  to Yes
+.  Global change RSOTQUE1  eg RSPTDOC1
+.  Global change RKOTQUE1  eg RKPTDOC1
+.  Global change UPOTQUE1  eg UPPTDOC1
+.
+.  Global changes if Oracle Option is NOT required -
+
+.  Global Change answeryn  to No
+.  Global change RSOTQUE1  to OFDUMYIO
+.  Global change RKOTQUE1  to OFDUMYIO
+.  Global change UPOTQUE1  to OFDUMYIO
+.
+          INC       STD001FD
+.
+FINDFILE  FILE      ASCII, FIXED=256
+LOGFILE   FILE      ASCII, FIXED=256
+.
+. Enter the first or the shortest index from the original FD and rename
+. the index OLDFILE1
+.
+.                                     ******** copy the old FD here *******
+.                                     * comment out all continuing fields and
+.                                     * prefix changing fields with "OLD" -
+.                                     * remove old Indexes and Redefines     
+.
+..OLDFILE1  IFILE     SQL, FIXED=xxx, KEY="Uxx-xx"
+OLDFILE1   IFILE    SQL, FIXED=1581, KEY="U1-20" 
+.
+.Name      Type   Length Physical Start Description
+.----      ----   ------ -------- ----- -----------
+.DOTQUMES   DIM      20      20       1   Message Id
+.
+.         OUTBOAFD variables
+.
+.OBASITE   DIM       6       6      21   SITE ID
+.OBACLIN   DIM       6       6      27   CLINIC ID
+.OBADATE   DIM       8       8      33   DATE (CCYYMMDD)
+.OBASTRT   DIM       5       5      41   START TIME (HH:MM)
+.OBASLOT   FORM      3       3      46   SLOT NUMBER
+.OBATIME   DIM       5       5      49   SLOT TIME  (HH:MM)
+.OBACTYP   DIM       6       6      54   CLINIC TYPE
+.OBAVISIT  DIM       3       3      60   VISIT TYPE (N,R,S)(CV)
+OOBAOUTN  FORM      8       5      63   OUTPATIENT NUMBER
+.OBASESST  DIM       3       3      68   SESSION STATUS CODE (CS)
+.
+.          OUTBB1FD variables
+.
+.OBASRCR   DIM       3       3      71   Source of Referral (S)
+.OBACOMP   DIM       3       3      74   Compensation Eligibility (CL)
+.OBACLASS  DIM       3       3      77   Patient Classification (A )
+.OBAINS    DIM       3       3      80   Insurance Status (U1)
+.OBAATTN   DIM       3       3      83   Attendance Code (CA)
+.OBADOCT   DIM       6       6      86   Doctor's Code
+.OBACOMM   DIM      25      25      92   Comments
+.OTBBFUND  DIM       6       6     117   Health fund code
+.OTBBTBLE  DIM       8       8     123   Health fund table
+.OTBBPVIS  FORM      3       3     131   No. of prev. visits charged
+.OTBBCLAL  DIM       3       3     134   Clinic Allocation (OX) (Anne Caudle)
+.OTBBSPAR  DIM       4       4     137   Spare variable
+.OBACAT    DIM       3       3     141   Patient Category (P )
+.OBAPRTY   DIM       3       3     144   Priority Code (PR)
+.OBARSCHD  DIM       3       3     147   Reason for Reschedule (RR)
+.OBBBOOK   DIM       1       1     150   Non-booked attendee flag
+.                                            " " = Booked attendee
+.                                            "N" = Non-booked attendee, no slot
+.                                            "S" = Non-booked attendee with slot
+.OBOUSR1   DIM       3       3     151   User Defined Field 1 (O1)
+.OBOUSR2   DIM       3       3     154   User Defined Field 2 (O2)
+.OBOUSR3   DIM       3       3     157   User Defined Field 3 (O3)
+.OBOUSR4   DIM       3       3     160   User Defined Field 4 (O4)
+.OBALADMN  DIM       8       8     163   Linked Outpatient Visit Number
+.                                          from re-appointments module
+.OTBBDEPT  DIM       3       3     171   Department code (Cat AC)
+.OTBBTRAN  DIM       3       3     174   Transport Allocation (Cat OB)
+.OTBBLNGI  DIM       3       3     177   Language of Interpreter (Cat OL)
+.OTBBTMFS  DIM       8       8     180   Time First Seen
+.OTBBTMBO  DIM       8       8     188   Time Booked Out
+.OTBBGPFA  DIM      20      20     196   GPFH Approval Number
+.OTBBECRA  DIM      20      20     216   ECR Approval Number
+.OTBBRFGP  DIM      10      10     236   Referring GP
+.OTBBGPPC  DIM      10      10     246   GP Practice Code
+.OTBBADCS  DIM      10      10     256   Actual Doctor Seen
+.OTBBCITM  DIM       5       5     266   Check In Time
+.OTBBASTM  DIM       5       5     271   Time Actually Seen
+.OTBBDPTM  DIM       5       5     276   Time of Departure
+.OTBBOUTC  DIM       3       3     281   Outcome    (CAT OZ)
+.OTBBSNDL  DIM       1       1     284   Send Letter (Notify GP) (Y/N)
+.OTBBGPPT  DIM       2       2     285   GP Practice count
+.OTBBDOFR  DIM       3       3     287   District of Residence (Cat DA)
+.OBOUSR5   DIM       3       3     290   User Defined Field 5 (O5)
+.OBOUSR6   DIM       3       3     293   User Defined Field 6 (O6)
+.OBOUSR7   DIM       3       3     296   User Defined Field 7 (O7)
+.OBOUSR8   DIM       3       3     299   User Defined Field 8 (O8)
+.OTBBRANK  DIM       6       6     302   Patient Rank
+.OTBBSPCA  DIM       3       3     308   Special Arrangements
+.OTBBCIND  DIM       3       3     311   Clinic Indicator (CI) M=MEDICAL
+.                                                              N=NON-MEDICAL
+.OTBBFLUP  DIM       1       1     314   Follow Up App. Made Flag 1=Yes
+.OTBBSCAR  DIM       1       1     315   Send Correspondence to Carer
+.                                           0=No 1=Yes
+.OTBBGLDT  DIM       8       8     316   Generate Letter Date (ccyymmdd)
+.OTBBSNGL  DIM       1       1     324   Send Generate Letter (Y/N)
+.                                           0=No, 1=Yes, 2=N/A
+.OTBBNMDS  DIM       3       3     325   NMDS Code (Category NM)
+.OTBBCART  DIM       3       3     328   Care Type (Category CC)
+.OTBBSRVD  DIM       3       3     331   Service Delivery Mode(Cat sd)
+.OTBBCLHR  DIM       1       1     334   Clinical High Risk
+.                                           0=No, 1=Yes
+.OTBBCONT  DIM       3       3     335   Contract Code (Cat gb)
+.OTBBTCOD  DIM       3       3     338   Tier 2 Code (category NC)
+.
+.          OUTRSHFD variables
+.
+.OPRSSITE  DIM       6       6     341   Site of booking
+.OPRSCLIN  DIM       6       6     347   Original clinic of booking
+.OPRSDATE  DIM       8       8     353   Original date of booking
+.OPRSSTRT  DIM       5       5     361   Original session start time
+.OPRSSLOT  FORM      3       3     366   Original session slot number
+.OPRSTIME  DIM       5       5     369   Original session slot time
+OOPRSOUT  FORM      8       5     374   Outpatient number rescheduled
+.OPRSREAS  DIM       3       3     379   Reason for reschedule (RR)
+.OPRSNCLI  DIM       6       6     382   New clinic of booking
+.OPRSNDAT  DIM       8       8     388   New date of booking
+.OPRSNSTR  DIM       5       5     396   New session start time
+.OPRSNSLO  FORM      3       3     401   New session slot number
+.OPRSNTIM  DIM       5       5     404   New session slot time
+.
+.OPRSNVIS  DIM       3       3     409   New Visit Type  (Cat CV)
+.OPRSNTYP  DIM       6       6     412   New Clinic Type
+.OPRSVIST  DIM       3       3     418   Old Visit Type  (Cat CV)
+.OPRSCTYP  DIM       6       6     421   Old Clinic Type
+.
+.          OUTCANFD variables
+.
+.OPCNSITE  DIM       6       6     427   Site of cancelled booking
+.OPCNCLIN  DIM       6       6     433   Clinic of cancelled booking
+.OPCNDATE  DIM       8       8     439   Date of cancelled booking
+.OPCNSTRT  DIM       5       5     447   Cancelled session start time
+.OPCNSLOT  FORM      3       3     452   Cancelled session slot number
+.OPCNTIME  DIM       5       5     455   Cancelled session slot time
+OOPCNOUT  FORM      8       5     460   Outpatient number cancelled
+.OPCNREAS  DIM       3       3     465   Reason for cancellation (CB)
+.OPCNVTYP  DIM       3       3     468   Visit Type of Booking (CV)
+.
+.          OUTMA1FD variables
+.
+.OTMALTYP  DIM       3       3     471   Location Type (Category CT)
+.
+.OBASTAT   FORM      1       2     474   Booking Status
+.OTBBPURC  DIM       3       3     476   Health Purchaser (Cat HP)
+.OTBBBKOV  DIM       3       3     479   Referral Override (Cat ro)
+.OTBBBKPR  DIM       3       3     482   Referral Period (Cat RF)
+.OTBBBKPM  DIM       2       2     485   Referral Period Months (1-98)
+.OTBBBKBA  DIM       1       1     487   Benefit Assignment Authorised
+.                                         0 or Blank - No
+.                                         1 - Yes
+.OTBBRDAT  DIM       8       8     488   Date of Referral (CCYYMMDD)
+.
+.          OUTTHIFD variables
+.
+.OTTHSTAT  DIM       3      3      496   Telehealth Status (Category OM)
+.OTTHRSIT  DIM       255    255    499   Telehealth Receiving Site Name
+.OTTHRCOD  DIM       10     10     754   Telehealth Receiving Code
+.OTTHRADD  DIM       512    512    764   Telehealth Receiving Address
+.OTTHWURL  DIM       255    255    1276  Telehealth Waiting Room URL
+.OTTHE164  DIM       20     20     1531  Telehealth Receiving E164
+.
+OOTQUSPA   DIM      30      30     1551  Spare Variable
+.
+. End of Record                    1581
+.
+.                                     ******** copy the new FD here *******
+.
+.
+OUTQUEA1   IFILE SQL, FIXED=1581, KEY="U1-20"
+.
+.Name      Type   Length Physical Start Description
+.----      ----   ------ -------- ----- -----------
+DOTQUMES   DIM      20      20       1   Message Id
+.
+.         OUTBOAFD variables
+.
+OBASITE   DIM       6       6      21   SITE ID
+OBACLIN   DIM       6       6      27   CLINIC ID
+OBADATE   DIM       8       8      33   DATE (CCYYMMDD)
+OBASTRT   DIM       5       5      41   START TIME (HH:MM)
+OBASLOT   FORM      3       3      46   SLOT NUMBER
+OBATIME   DIM       5       5      49   SLOT TIME  (HH:MM)
+OBACTYP   DIM       6       6      54   CLINIC TYPE
+OBAVISIT  DIM       3       3      60   VISIT TYPE (N,R,S)(CV)
+OBAOUTNO  DIM       8       8      63   OUTPATIENT NUMBER
+OBASESST  DIM       3       3      71   SESSION STATUS CODE (CS)
+.
+.          OUTBB1FD variables
+.
+OBASRCR   DIM       3       3      74   Source of Referral (S)
+OBACOMP   DIM       3       3      77   Compensation Eligibility (CL)
+OBACLASS  DIM       3       3      80   Patient Classification (A )
+OBAINS    DIM       3       3      83   Insurance Status (U1)
+OBAATTN   DIM       3       3      86   Attendance Code (CA)
+OBADOCT   DIM       6       6      89   Doctor's Code
+OBACOMM   DIM      25      25      95   Comments
+OTBBFUND  DIM       6       6     120   Health fund code
+OTBBTBLE  DIM       8       8     126   Health fund table
+OTBBPVIS  FORM      3       3     134   No. of prev. visits charged
+OTBBCLAL  DIM       3       3     137   Clinic Allocation (OX) (Anne Caudle)
+OTBBSPAR  DIM       4       4     140   Spare variable
+OBACAT    DIM       3       3     144   Patient Category (P )
+OBAPRTY   DIM       3       3     147   Priority Code (PR)
+OBARSCHD  DIM       3       3     150   Reason for Reschedule (RR)
+OBBBOOK   DIM       1       1     153   Non-booked attendee flag
+.                                            " " = Booked attendee
+.                                            "N" = Non-booked attendee, no slot
+.                                            "S" = Non-booked attendee with slot
+OBOUSR1   DIM       3       3     154   User Defined Field 1 (O1)
+OBOUSR2   DIM       3       3     157   User Defined Field 2 (O2)
+OBOUSR3   DIM       3       3     160   User Defined Field 3 (O3)
+OBOUSR4   DIM       3       3     163   User Defined Field 4 (O4)
+OBALADMN  DIM       8       8     166   Linked Outpatient Visit Number
+.                                          from re-appointments module
+OTBBDEPT  DIM       3       3     174   Department code (Cat AC)
+OTBBTRAN  DIM       3       3     177   Transport Allocation (Cat OB)
+OTBBLNGI  DIM       3       3     180   Language of Interpreter (Cat OL)
+OTBBTMFS  DIM       8       8     183   Time First Seen
+OTBBTMBO  DIM       8       8     191   Time Booked Out
+OTBBGPFA  DIM      20      20     199   GPFH Approval Number
+OTBBECRA  DIM      20      20     219   ECR Approval Number
+OTBBRFGP  DIM      10      10     239   Referring GP
+OTBBGPPC  DIM      10      10     249   GP Practice Code
+OTBBADCS  DIM      10      10     259   Actual Doctor Seen
+OTBBCITM  DIM       5       5     269   Check In Time
+OTBBASTM  DIM       5       5     274   Time Actually Seen
+OTBBDPTM  DIM       5       5     279   Time of Departure
+OTBBOUTC  DIM       3       3     284   Outcome    (CAT OZ)
+OTBBSNDL  DIM       1       1     287   Send Letter (Notify GP) (Y/N)
+OTBBGPPT  DIM       2       2     288   GP Practice count
+OTBBDOFR  DIM       3       3     290   District of Residence (Cat DA)
+OBOUSR5   DIM       3       3     293   User Defined Field 5 (O5)
+OBOUSR6   DIM       3       3     296   User Defined Field 6 (O6)
+OBOUSR7   DIM       3       3     299   User Defined Field 7 (O7)
+OBOUSR8   DIM       3       3     302   User Defined Field 8 (O8)
+OTBBRANK  DIM       6       6     305   Patient Rank
+OTBBSPCA  DIM       3       3     311   Special Arrangements
+OTBBCIND  DIM       3       3     314   Clinic Indicator (CI) M=MEDICAL
+.                                                              N=NON-MEDICAL
+OTBBFLUP  DIM       1       1     317   Follow Up App. Made Flag 1=Yes
+OTBBSCAR  DIM       1       1     318   Send Correspondence to Carer
+.                                           0=No 1=Yes
+OTBBGLDT  DIM       8       8     319   Generate Letter Date (ccyymmdd)
+OTBBSNGL  DIM       1       1     327   Send Generate Letter (Y/N)
+.                                           0=No, 1=Yes, 2=N/A
+OTBBNMDS  DIM       3       3     328   NMDS Code (Category NM)
+OTBBCART  DIM       3       3     331   Care Type (Category CC)
+OTBBSRVD  DIM       3       3     334   Service Delivery Mode(Cat sd)
+OTBBCLHR  DIM       1       1     337   Clinical High Risk
+.                                           0=No, 1=Yes
+OTBBCONT  DIM       3       3     338   Contract Code (Cat gb)
+OTBBTCOD  DIM       3       3     341   Tier 2 Code (category NC)
+.
+.          OUTRSHFD variables
+.
+OPRSSITE  DIM       6       6     344   Site of booking
+OPRSCLIN  DIM       6       6     350   Original clinic of booking
+OPRSDATE  DIM       8       8     356   Original date of booking
+OPRSSTRT  DIM       5       5     364   Original session start time
+OPRSSLOT  FORM      3       3     369   Original session slot number
+OPRSTIME  DIM       5       5     372   Original session slot time
+OPRSOUTN  DIM       8       8     377   Outpatient number rescheduled
+OPRSREAS  DIM       3       3     385   Reason for reschedule (RR)
+OPRSNCLI  DIM       6       6     388   New clinic of booking
+OPRSNDAT  DIM       8       8     394   New date of booking
+OPRSNSTR  DIM       5       5     402   New session start time
+OPRSNSLO  FORM      3       3     407   New session slot number
+OPRSNTIM  DIM       5       5     410   New session slot time
+.
+OPRSNVIS  DIM       3       3     415   New Visit Type  (Cat CV)
+OPRSNTYP  DIM       6       6     418   New Clinic Type
+OPRSVIST  DIM       3       3     424   Old Visit Type  (Cat CV)
+OPRSCTYP  DIM       6       6     427   Old Clinic Type
+.
+.          OUTCANFD variables
+.
+OPCNSITE  DIM       6       6     433   Site of cancelled booking
+OPCNCLIN  DIM       6       6     439   Clinic of cancelled booking
+OPCNDATE  DIM       8       8     445   Date of cancelled booking
+OPCNSTRT  DIM       5       5     453   Cancelled session start time
+OPCNSLOT  FORM      3       3     458   Cancelled session slot number
+OPCNTIME  DIM       5       5     461   Cancelled session slot time
+OPCNOUTN  DIM       8       8     466   Outpatient number cancelled
+OPCNREAS  DIM       3       3     474   Reason for cancellation (CB)
+OPCNVTYP  DIM       3       3     477   Visit Type of Booking (CV)
+.
+.          OUTMA1FD variables
+.
+OTMALTYP  DIM       3       3     480   Location Type (Category CT)
+.
+OBASTAT   FORM      1       2     483   Booking Status
+OTBBPURC  DIM       3       3     485   Health Purchaser (Cat HP)
+OTBBBKOV  DIM       3       3     488   Referral Override (Cat ro)
+OTBBBKPR  DIM       3       3     491   Referral Period (Cat RF)
+OTBBBKPM  DIM       2       2     494   Referral Period Months (1-98)
+OTBBBKBA  DIM       1       1     496   Benefit Assignment Authorised
+.                                         0 or Blank - No
+.                                         1 - Yes
+OTBBRDAT  DIM       8       8     497   Date of Referral (CCYYMMDD)
+.
+.          OUTTHIFD variables
+.
+OTTHSTAT  DIM       3      3      505   Telehealth Status (Category OM)
+OTTHRSIT  DIM       255    255    508   Telehealth Receiving Site Name
+OTTHRCOD  DIM       10     10     763   Telehealth Receiving Code
+OTTHRADD  DIM       512    512    773   Telehealth Receiving Address
+OTTHWURL  DIM       255    255    1285  Telehealth Waiting Room URL
+OTTHE164  DIM       20     20     1540  Telehealth Receiving E164
+.
+OTQUSPAR   DIM      21     21     1560  Spare Variable
+.
+.End of Record                    1581
+.
+. LOCAL VARIABLES
+. ---------------
+CMDLINE   DIM       200
+.
+DEFPATH   DIM       60
+DIM60     DIM       60
+DISNUM    FORM      4
+.
+ERORTEXT  DIM       80
+.
+INPFILE   DIM       8
+.
+MINUS3    FORM      "-3"
+.
+NEWFILE   DIM       60
+NEWPATH   DIM       60
+.
+OLDPATH   DIM       60
+.
+RECNUM    FORM      8
+.
+SAVEFLG   FORM      1
+.
+USINGORC  DIM       1
+.
+.
+. PROGRAM CONSTANTS
+. -----------------
+CREATEXT  INIT    "Log file created "
+DASHLINE  INIT    "--------------------------------------------------":
+                  "------------------------------"
+ENDGTEXT  INIT    "Ending   fixit (Option "
+OPENTEXT  INIT    "Log file opened "
+SP60      INIT    "                                                            "
+STARTTXT  INIT    "Starting fixit (Option "
+.
+.
+.
+PRGNAM    INIT      "CONVERSION OUTQUEFD"
+PRGID     INIT      "V12OTQUE"
+VERSION   INIT      "V12.00.00"
++
+.*****************************************************************************
+.*                             MAIN0000                                      *
+.*                         Program Mainline                                  *
+.*****************************************************************************
+.
+MAIN0000  CALL      INIT0000                      * init and open files
+.
+          CALL      OLOG0000                      * create/open log file
+MAIN0500  CALL      OPTN0000                      * get option
+          BRANCH    COPTION,MAIN1000:             * run c-isam fixit
+                            MAIN2000              * run oracle fixit
+          GOTO      MAIN9999                      * exit selected
+.
+MAIN1000  CALL      KDIR0000                      * Keyin directory
+          BRANCH    EXIT,MAIN9000
+.
+MAIN2000  CALL      CONTQST                       * Ok to continue ?
+          BRANCH    CEXIT,MAIN5000:               * yes
+                          MAIN0500:               * no
+                          MAIN9000                * cancel
+.
+MAIN5000  BRANCH    COPTION,MAIN6000:             * c-isam fixit
+                            MAIN7000              * oracle fixit
+.
+.         Running c-isam fix
+.
+MAIN6000  CALL      PREP0000                      * preparing files
+          BRANCH    EXIT,MAIN9000
+.
+          CALL      READ0000                      * read old records and write
+          CALL      ENDP0000                      * save/zip saved file
+          GOTO      MAIN9000
+.
+.         Running oracle fix
+.
+MAIN7000  CALL      OFIX0000                      * run oracle fix
+.
+MAIN9000  CALL      CLOG0000                      * close log file
+.
+MAIN9999  CHAIN     PGM
++
+.********************************************************************
+.*                          INIT0000                                *
+.*  Display heading and check that the files needed exist&open them *
+.********************************************************************
+.
+INIT0000  CALL      DISPHEAD
+          MOVE      ZERO,RECNUM
+          MOVE      ZERO,DISNUM
+          
+INIT9999  RETURN
++
+.*****************************************************************************
+.*                                OPTN0000             Called by: MAIN0000   *
+.*                        Get user options or exit                           *
+.*    Returns:  EXIT    = FALSE (0)  Ok to proceed                           *
+.*                        TRUE  (1)  Exit option selected                    *
+.*              COPTION - option selected                                    *
+.*****************************************************************************
+.
+OPTN0000  MOVE      "No",USINGORC
+          REP       "yYnN",USINGORC
+          MOVE      USINGORC,KEY1
+          REP       "Y-N-",KEY1
+          MATCH     "-",KEY1
+          GOTO      OPTN9200 IF NOT EQUAL
+.
+          DISPLAY   *P1:3,*EF,*P1:4,*V2LON,ZERO,*HOFF,". Exit":
+                    *P1:5,*V2LON,ONE,*HOFF,". Run Fixit (c-isam only)"
+          MATCH     "Y",USINGORC
+          IF        @EQUAL
+            DISPLAY   *P1:6,*V2LON,TWO,*HOFF,". Run Fixit (Oracle only)"
+          ENDIF
+.
+OPTN0500  KEYIN     *P1:8,*EL,"Select Option : ":
+                    *P17:8,*V2LON,COPTION
+.
+          COMPARE   ZERO,COPTION                 * exit selected ?
+          GOTO      OPTN9500 IF EQUAL            * yes
+.
+          BRANCH    COPTION,OPTN9000:            * run c-isam fixit
+                            OPTN9000             * run oracle fixit
+.
+          BEEP
+          GOTO      OPTN0500
+.
+OPTN9000  MOVE      ZERO,EXIT
+          GOTO      OPTN9999
+.
+OPTN9200  DISPLAY   *P1:3,*EF,*P1:4," Oracle Option has not been set up ":
+                          "correctly":
+                    *P1:6," Program will terminate    - ";
+          MOVE      "Oracle Option has not been set up correctly",ERORTEXT
+          WRITE     LOGFILE,SEQ;*+,ERORTEXT
+          CALL      HITENTER
+.
+OPTN9500  MOVE      ONE,EXIT
+.
+OPTN9999  RETURN
++
+.********************************************************************
+.*                          KDIR0000                                *
+.*  Keyin directories                                               *
+.********************************************************************
+.
+KDIR0000  MOVE      ONE,SAVEFLG        * Default to keep file
+          KEYIN     *P1:10,*EL,"Do you want to save the original file (Y/N) ? ":
+                    ANS;
+          REP       "yYnN",ANS
+          CMATCH    "Y",ANS
+          GOTO      KDIR1000 IF EQUAL
+          MOVE      ZERO,SAVEFLG       * not to keep file
+          CMATCH    "N",ANS
+          GOTO      KDIR1000 IF EQUAL
+          BEEP
+          GOTO      KDIR0000
+.
+KDIR1000  CALL      DEFT0000                * Get the default path
+          BRANCH    EXIT,KDIR9999
+          MOVE      SP60,OLDPATH
+.
+          DISPLAY   *P1:24,*EL,"The directory path must end with a slash (/) ";
+.
+.
+          MOVE      DEFPATH,OLDPATH
+          BRANCH    SAVEFLG,KDIR2000
+.
+.         Keyin the path for the original file
+.
+          KEYIN     *P1:12,*EL,"Keyin path for temporarily saving original ":
+                    "file: ":
+                    *P10:13,*EL,*DV,*RV,OLDPATH:
+                    *P10:13,OLDPATH;
+          GOTO      KDIR3000
+.
+KDIR2000  KEYIN     *P1:12,*EL,"Keyin path for saving original file: ":
+                    *P10:13,*EL,*DV,*RV,OLDPATH:
+                    *P10:13,OLDPATH;
+.
+KDIR3000  ENDSET    OLDPATH
+          APPEND    SP60,OLDPATH
+          RESET     OLDPATH
+.
+          MATCH     SP60,OLDPATH
+          IF        @EQUAL
+            PACK      OLDPATH,DEFPATH      * use the default
+            DISPLAY   *P10:13,*EL,*V2LON,OLDPATH;
+          ENDIF
+.
+          SQUEEZE   OLDPATH
+          CMATCH    EXITCHAR,OLDPATH
+          GOTO      KDIR9000 IF EQUAL
+.
+          PACK      DIM60,OLDPATH,SP60
+          CALL      VALD0000         * check if it's a valid directory
+          BRANCH    EXIT,KDIR1000
+.
+.         Keyin the path for the new file
+.
+KDIR5000  MOVE      SP60,NEWPATH
+          MOVE      DEFPATH,NEWPATH
+          KEYIN     *P1:15,*EL,"Keyin path for the new file: ":
+                    *P10:16,*EL,*DV,*RV,NEWPATH:
+                    *P10:16,NEWPATH;
+          ENDSET    NEWPATH
+          APPEND    SP60,NEWPATH
+          RESET     NEWPATH
+.
+          MATCH     SP60,NEWPATH
+          IF        @EQUAL
+            PACK      NEWPATH,DEFPATH      * use the default
+            DISPLAY   *P10:16,*V2LON,NEWPATH;
+          ENDIF
+.
+          SQUEEZE   NEWPATH
+          CMATCH    EXITCHAR,NEWPATH
+          GOTO      KDIR9000 IF EQUAL
+.
+          PACK      DIM60,NEWPATH,SP60
+          CALL      VALD0000         * check if it's a valid directory
+          BRANCH    EXIT,KDIR5000
+          GOTO      KDIR9999
+.
+KDIR9000  MOVE      ONE,EXIT
+.
+KDIR9999  DISPLAY   *P1:24,*EL;
+          RETURN
++
+.********************************************************************
+.*                          PREP0000                                *
+.*  Preparing files                                                 *
+.********************************************************************
+.
+PREP0000  CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P1:18,"Started : ",CDATE,SP1,CTIMEIS:
+                    *P1:20,"Record : "
+.
+          CALL      SLOG0000                      * write start to log file
+.
+          MOVE      "outqueaf",INPFILE
+          CALL      CHEK0000             * check file exists or has been changed
+          BRANCH    EXIT,PREP9000
+.
+          CLOSE     OLDFILE1
+          DISPLAY   *P1:24,*EL,"Copying files ... Please wait !! ";
+.
+.         Copy old file to the keyin directory
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "cp `ldat outqueaf.dat` ",CMDLINE
+          APPEND    OLDPATH,CMDLINE
+          APPEND    "soutquef.dat",CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            GOTO      PREP8000
+          ENDIF
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "cp `ldat outqueaf.idx` ",CMDLINE
+          APPEND    OLDPATH,CMDLINE
+          APPEND    "soutquef.idx",CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            GOTO      PREP8000
+          ENDIF
+.
+.         Remove the original files
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "iserase ",CMDLINE
+          APPEND    DEFPATH,CMDLINE
+          APPEND    "outqueaf",CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            MOVE      "Unable to remove the original file.  ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      PREP9000
+          ENDIF
+.
+.         Opening old file after being copied
+.
+          MOVE      SP60,DIM60
+          CLEAR     DIM60
+          APPEND    OLDPATH,DIM60
+          APPEND    "soutquef",DIM60
+          APPEND    SP60,DIM60
+          RESET     DIM60
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      OLDFILE1,DIM60
+          TRAPCLR   IO
+          IF        OVRCD = 1
+            MOVE      "Unable to open saved original file.  ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      PREP9000
+          ENDIF
+.
+.         Create the new file
+.
+          DISPLAY   *P1:24,*EL,"Creating new files ... Please wait !! ";
+          PACK      NEWFILE,SP60
+          CLEAR     NEWFILE
+          APPEND    NEWPATH,NEWFILE
+          APPEND    "outqueaf",NEWFILE
+          APPEND    SP60,NEWFILE
+          RESET     NEWFILE
+          SQUEEZE   NEWFILE
+.
+PREP1000  PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "isbuild ",CMDLINE
+          APPEND    NEWFILE,CMDLINE
+.
+.  The files new record length and unique key must be written here
+.      eg    APPEND    " 195 UC9-16",CMDLINE
+.
+. Index 1
+          APPEND    " 1581 UC1-20",CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+.  If the file has more than one index, this piece of code below has 
+.  to be repeated with for each individual index
+.
+.
+          OPEN      OUTQUEA1,NEWFILE
+.
+          DISPLAY   *P1:24,*EL;
+          MOVE      ZERO,EXIT
+          GOTO      PREP9999
+.
+PREP5000  MOVE      "Old file not found.  ",ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+          CALL      HITENTER
+          GOTO      PREP9000
+.
+PREP8000  MOVE      "Unable to copy original file.  (Error: ",ERORTEXT
+          ENDSET    ERORTEXT
+          APPEND    TASKID,ERORTEXT
+          APPEND    ")  ",ERORTEXT
+          RESET     ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+          CALL      HITENTER
+.
+PREP9000  MOVE      ONE,EXIT
+.
+PREP9999  RETURN
++
+.********************************************************************
+.*                          CHEK0000                                *
+.*  Check if file exists, or has already been converted             *
+.********************************************************************
+.
+CHEK0000  MOVE      ZERO,EXIT
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND GIVING DIM60 IF IO
+          OPEN      OLDFILE1,INPFILE
+          TRAPCLR   IO
+          BRANCH    OVRCD,CHEK2000       * Original file does not exist
+          CLOSE     OLDFILE1
+          GOTO      CHEK9999
+.
+CHEK2000  RESET     DIM60
+          SCAN      "I * I",DIM60
+          DISPLAY   *P1:23,*EF,"File '",INPFILE,"' ";
+          IF        @EQUAL
+            DISPLAY   "does not exist - ";
+            MOVE      "File does not exist",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+          ELSE
+            RESET     DIM60
+            SCAN      "I * L",DIM60
+            IF        @EQUAL
+              DISPLAY   "has already been converted - ";
+              MOVE      "File has already been converted",ERORTEXT
+              WRITE     LOGFILE,SEQ;ERORTEXT
+            ELSE
+              DISPLAY   "has caused an IO error - ";
+              MOVE      "File has caused an IO Error",ERORTEXT
+              WRITE     LOGFILE,SEQ;ERORTEXT
+            ENDIF
+          ENDIF
+          MOVE      "File will be bypassed",ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *+,ERORTEXT
+.
+          CALL      HITENTER
+          DISPLAY   *P1:23,*EF;
+.
+CHEK9000  MOVE      ONE,EXIT
+.
+CHEK9999  RETURN
++
+.**********************************************************************
+.*                               READ0000                             *
+.*             loop thru old file and write each record               *
+.**********************************************************************
+.
+READ0000  DISPLAY   *P1:20,*EL,"Record No. : ";
+.
+          PACK      KEY20,SP60
+          CALL      READSOLD                      * position at start
+READ1000  CALL      READKOLD                      * read next record
+          BRANCH    OVRCD,READ6000                * no more records
+.
+          ADD       ONE,RECNUM                    * update record counter
+          ADD       ONE,DISNUM                    * Display counter
+.
+          IF        DISNUM = 5000  | RECNUM = 1
+            MOVE      ZERO,DISNUM
+            DISPLAY   *P15:20,*V2LON,RECNUM
+          ENDIF
+.
+.  All necessary changes to the files field lengths, date changes
+.  or any other sort of modification must be made here
+.
+.    eg    PACK      DSPARE,SP70
+.          PACK      PTDSDMDC,SP10
+.          PACK      PTDSDDRG,SP10
+.
+          MOVE      OOBAOUTN,OBAOUTNO
+          MOVE      OOPRSOUT,OPRSOUTN
+          MOVE      OOPCNOUT,OPCNOUTN
+          MOVE      SP70,OTQUSPAR
+.                                               * Pack key here
+          PACK      KEY20,DOTQUMES,SP70
+          CALL      WROTQUE1                    * write to new file
+.
+          GOTO      READ1000                      * get next record
+.
+READ6000  CLOSE     OUTQUEA1                      * close new file
+          CLOSE     OLDFILE1                      * close old file
+.
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P15:20,*V2LON,RECNUM,*HOFF:
+                    *P1:22,"Ended  : ",CDATE,SP1,CTIMEIS:
+                    *P1:24;
+.
+READ9999  RETURN
++
+.**********************************************************************
+.*                               VALD0000                             *
+.*        Check if it a valid directory                               *
+.**********************************************************************
+.
+VALD0000  MOVE      ZERO,EXIT
+.
+          SQUEEZE   DIM60
+          ENDSET    DIM60
+          CMATCH    SLASH,DIM60
+          IF        !@EQUAL
+            MOVE      "Directory path must end with a slash (/) ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      VALD9000
+          ENDIF
+          RESET     DIM60
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "cd ",CMDLINE
+          APPEND    DIM60,CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID      * check if exists
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            MOVE      "Directory does not exist ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      VALD9000
+          ENDIF
+          GOTO      VALD9999
+.
+VALD9000  MOVE      ONE,EXIT            * Not valid
+.
+VALD9999  RETURN
++
+.**********************************************************************
+.*                               ENDP0000                             *
+.*        Remove or zip save file                                     *
+.**********************************************************************
+.
+ENDP0000  MOVE      SP60,DIM60
+          CLEAR     DIM60
+          APPEND    OLDPATH,DIM60        * set up the saved file with path
+          APPEND    "soutquef*",DIM60
+          APPEND    SP60,DIM60
+          RESET     DIM60
+          SQUEEZE   DIM60
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          IF        SAVEFLG = 1
+            APPEND    "gzip -f ",CMDLINE
+            APPEND    DIM60,CMDLINE
+            APPEND    SP60,CMDLINE
+            RESET     CMDLINE
+            DISPLAY   *P1:24,*EL,"Compressing original file.. ":
+                      "Please wait !!  ";
+          ELSE
+            APPEND    "rm ",CMDLINE
+            APPEND    DIM60,CMDLINE
+            APPEND    SP60,CMDLINE
+            RESET     CMDLINE
+            DISPLAY   *P1:24,*EL,"Removing original file.. Please wait !!  ";
+          ENDIF
+          EXECUTE   CMDLINE,TASKID      * check if exists
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            MOVE      "Saved file not zipped or removed.  ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      ENDP9999
+          ENDIF
+.
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P1:24,*EL,*B,"Finished processing  ",CDATE,SP1,CTIMEIS:
+                    ".  ";
+          CALL      HITENTER
+.
+          CALL      ELOG0000                     * write an end log entry
+.
+ENDP9999  RETURN
++
+.**********************************************************************
+.*        DEFT0000 -  Get the default directory                       *
+.**********************************************************************
+.
+DEFT0000  EXECUTE   "ldat outqueaf.dat > temp.txt",TASKID
+.
+          PACK      DEFPATH,SP30,SP30
+          CLOSE     FINDFILE
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      FINDFILE,"temp"
+          TRAPCLR   IO
+          BRANCH    OVRCD,DEFT3000
+.
+          READ      FINDFILE,SEQ;DEFPATH
+          GOTO      DEFT3000 IF OVER
+.
+          ENDSET    DEFPATH
+DEFT1000  CMATCH    "/",DEFPATH
+          GOTO      DEFT2000 IF EQUAL
+.
+          BUMP      DEFPATH,-1
+          GOTO      DEFT1000 IF NOT EOS
+          GOTO      DEFT3000
+.
+DEFT2000  LENSET    DEFPATH
+          RESET     DEFPATH
+.
+          PACK      DEFPATH,DEFPATH,SP30,SP30,SP30,SP30
+          STRIP     DEFPATH
+          ENDSET    DEFPATH
+          RESET     DEFPATH
+          CLOSE     FINDFILE
+          MOVE      ZERO,EXIT
+          GOTO      DEFT9999
+.
+DEFT3000  MOVE      "Error finding 'outqueaf'.  ",ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+          CALL      HITENTER
+          CLOSE     FINDFILE
+          MOVE      ONE,EXIT
+.
+DEFT9999  RETURN
++
+.*****************************************************************************
+.*                            OLOG0000                                       *
+.*                    Open the log file                                      *
+.*****************************************************************************
+.
+OLOG0000  CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      LOGFILE,"v12otque.log"       * open log file
+          TRAPCLR   IO
+          IF        OVRCD = 1
+            PREP      LOGFILE,"v12otque.log"     * create and open log file
+            WRITE     LOGFILE,MINUS3;DASHLINE
+            WRITE     LOGFILE,SEQ;CREATEXT,CDATE,SP1,CTIMEIS
+          ELSE
+            WRITE     LOGFILE,MINUS3;DASHLINE
+            WRITE     LOGFILE,SEQ;OPENTEXT,CDATE,SP1,CTIMEIS
+          ENDIF
+.
+OLOG9999  RETURN
++
+.*****************************************************************************
+.*                            CLOG0000                                       *
+.*                    Close the log file                                     *
+.*****************************************************************************
+.
+CLOG0000  CLOSE     LOGFILE
+.
+CLOG9999  RETURN
++
+.*****************************************************************************
+.*                            SLOG0000                                       *
+.*                    Write a start log to the log file                      *
+.*****************************************************************************
+.
+SLOG0000  WRITE     LOGFILE,SEQ;DASHLINE
+          WRITE     LOGFILE,SEQ;STARTTXT,COPTION,RBRACK,SP1,CDATE,SP1:
+                                   CTIMEIS
+.
+SLOG9999  RETURN
++
+.*****************************************************************************
+.*                            ELOG0000                                       *
+.*                    Write an end log to the log file                       *
+.*****************************************************************************
+.
+ELOG0000  WRITE     LOGFILE,SEQ;ENDGTEXT,COPTION,RBRACK,SP1,CDATE,SP1:
+                                   CTIMEIS
+ELOG9999  RETURN
++
+.*****************************************************************************
+.*                            OFIX0000                                       *
+.*                    Oracle fix to "OUTQUEFD"                               *
+.*****************************************************************************
+.
+OFIX0000  DISPLAY   *P1:24,*EL;
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P1:18,"Started : ",CDATE,SP1,CTIMEIS:
+                    *P1:20,*EL,"Record No. :";
+.
+          CALL      SLOG0000                      * write start to log file
+.
+          OPEN      OUTQUEA1,"outqueaf"
+.
+          PACK      KEY20,SP70
+          CALL      RSOTQUE1                      * position at start of file
+OFIV1200  CALL      RKOTQUE1                      * read next record
+          BRANCH    OVRCD,OFIX9000                * eof - finished
+.
+          ADD       ONE,RECNUM                    * increment record counter
+          ADD       ONE,DISNUM                    * Display counter
+.         
+          IF        DISNUM = 5000  | RECNUM = 1
+            MOVE      ZERO,DISNUM 
+            DISPLAY   *P15:20,*V2LON,RECNUM
+          ENDIF
+.
+.>>>>>>>  Add code here to populate/update variables
+.
+          CALL      UPOTQUE1
+.
+          GOTO      OFIV1200                     * get next record
+.         
+OFIX9000  CLOSE     OUTQUEA1
+.
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P15:20,*V2LON,RECNUM,*HOFF:
+                    *P1:22,"Update completed ",CDATE,SP1,CTIMEIS:
+                    *P1:24;
+          CALL      HITENTER
+.
+          CALL      ELOG0000                     * write an end log entry
+.
+OFIX9999  RETURN
+.
+OFDUMYIO  RETURN
++
+.*****************************************************************************
+.*        I/O Routines                                                       *
+.*****************************************************************************
+.
+.                  ******************************    OLD IO ROUTINES
+.                  Copy the Positional Read (RS or RDS) from original I/O file,
+.                  - change Label to READSOLD and the index name to OLDFILE1
+.
+READSOLD  MOVE      ZERO,OVRCD
+          READ      OLDFILE1,KEY20;;
+          RETURN
+.
+.                  Copy the Read Next (RK or RDK) from the original I/O file
+.                  - change Label to READKOLD and the index name to OLDFILE1
+.                  - change any fields that are changing to a prefix of OLD,
+.                    eg. PTEDSPAR becomes OLDDSPAR
+.
+READKOLD  MOVE      ZERO,OVRCD
+          READKS    OLDFILE1;DOTQUMES,OBASITE,OBACLIN,OBADATE,OBASTRT:
+                             OBASLOT,OBATIME,OBACTYP,OBAVISIT,OOBAOUTN:
+                             OBASESST,OBASRCR,OBACOMP,OBACLASS,OBAINS:
+                             OBAATTN,OBADOCT,OBACOMM,OTBBFUND,OTBBTBLE:
+                             OTBBPVIS,OTBBCLAL,OTBBSPAR,OBACAT,OBAPRTY:
+                             OBARSCHD,OBBBOOK,OBOUSR1,OBOUSR2,OBOUSR3:
+                             OBOUSR4,OBALADMN,OTBBDEPT,OTBBTRAN,OTBBLNGI:
+                             OTBBTMFS,OTBBTMBO,OTBBGPFA,OTBBECRA,OTBBRFGP:
+                             OTBBGPPC,OTBBADCS,OTBBCITM,OTBBASTM,OTBBDPTM:
+                             OTBBOUTC,OTBBSNDL,OTBBGPPT,OTBBDOFR,OBOUSR5:
+                             OBOUSR6,OBOUSR7,OBOUSR8,OTBBRANK,OTBBSPCA:
+                             OTBBCIND,OTBBFLUP,OTBBSCAR,OTBBGLDT,OTBBSNGL:
+                             OTBBNMDS,OTBBCART,OTBBSRVD,OTBBCLHR,OTBBCONT:
+                             OTBBTCOD:
+                             OPRSSITE,OPRSCLIN,OPRSDATE,OPRSSTRT,OPRSSLOT:
+                             OPRSTIME,OOPRSOUT,OPRSREAS,OPRSNCLI,OPRSNDAT:
+                             OPRSNSTR,OPRSNSLO,OPRSNTIM,OPRSNVIS,OPRSNTYP:
+                             OPRSVIST,OPRSCTYP,OPCNSITE,OPCNCLIN,OPCNDATE:
+                             OPCNSTRT,OPCNSLOT,OPCNTIME,OOPCNOUT,OPCNREAS:
+                             OPCNVTYP,OTMALTYP,OBASTAT,OTBBPURC,OTBBBKOV:
+                             OTBBBKPR,OTBBBKPM,OTBBBKBA,OTBBRDAT,OTTHSTAT:
+                             OTTHRSIT,OTTHRCOD,OTTHRADD,OTTHWURL,OTTHE164:
+                             OOTQUSPA
+         GOTO      OVERCOND IF OVER
+.
+         RETURN
+.
+.                  ******************************    NEW IO ROUTINES
+.                  Copy the Write statement from the new I/O file           
+.                  (no changes are needed to this routine)               
+.
+.                  For Oracle fixits, you will probably also need to copy
+.                  the RS.., RK.... & UP.... I/O routines for the new FD.
+.
+RSOTQUE1  RESET     KEY20
+          READ      OUTQUEA1,KEY20;;
+          RETURN
+.
+RKOTQUE1  MOVE      ZERO,OVRCD
+          READKS    OUTQUEA1;DOTQUMES,OBASITE,OBACLIN,OBADATE,OBASTRT:
+                             OBASLOT,OBATIME,OBACTYP,OBAVISIT,OBAOUTNO:
+                             OBASESST,OBASRCR,OBACOMP,OBACLASS,OBAINS:
+                             OBAATTN,OBADOCT,OBACOMM,OTBBFUND,OTBBTBLE:
+                             OTBBPVIS,OTBBCLAL,OTBBSPAR,OBACAT,OBAPRTY:
+                             OBARSCHD,OBBBOOK,OBOUSR1,OBOUSR2,OBOUSR3:
+                             OBOUSR4,OBALADMN,OTBBDEPT,OTBBTRAN,OTBBLNGI:
+                             OTBBTMFS,OTBBTMBO,OTBBGPFA,OTBBECRA,OTBBRFGP:
+                             OTBBGPPC,OTBBADCS,OTBBCITM,OTBBASTM,OTBBDPTM:
+                             OTBBOUTC,OTBBSNDL,OTBBGPPT,OTBBDOFR,OBOUSR5:
+                             OBOUSR6,OBOUSR7,OBOUSR8,OTBBRANK,OTBBSPCA:
+                             OTBBCIND,OTBBFLUP,OTBBSCAR,OTBBGLDT,OTBBSNGL:
+                             OTBBNMDS,OTBBCART,OTBBSRVD,OTBBCLHR,OTBBCONT:
+                             OTBBTCOD:
+                             OPRSSITE,OPRSCLIN,OPRSDATE,OPRSSTRT,OPRSSLOT:
+                             OPRSTIME,OPRSOUTN,OPRSREAS,OPRSNCLI,OPRSNDAT:
+                             OPRSNSTR,OPRSNSLO,OPRSNTIM,OPRSNVIS,OPRSNTYP:
+                             OPRSVIST,OPRSCTYP,OPCNSITE,OPCNCLIN,OPCNDATE:
+                             OPCNSTRT,OPCNSLOT,OPCNTIME,OPCNOUTN,OPCNREAS:
+                             OPCNVTYP,OTMALTYP,OBASTAT,OTBBPURC,OTBBBKOV:
+                             OTBBBKPR,OTBBBKPM,OTBBBKBA,OTBBRDAT,OTTHSTAT:
+                             OTTHRSIT,OTTHRCOD,OTTHRADD,OTTHWURL,OTTHE164:
+                             OTQUSPAR
+.
+          GOTO      OVERCOND IF OVER
+.
+          RETURN
+.
+UPOTQUE1  MOVE      ZERO,OVRCD 
+          UPDATE    OUTQUEA1;DOTQUMES,OBASITE,OBACLIN,OBADATE,OBASTRT:
+                             OBASLOT,OBATIME,OBACTYP,OBAVISIT,OBAOUTNO:
+                             OBASESST,OBASRCR,OBACOMP,OBACLASS,OBAINS:
+                             OBAATTN,OBADOCT,OBACOMM,OTBBFUND,OTBBTBLE:
+                             OTBBPVIS,OTBBCLAL,OTBBSPAR,OBACAT,OBAPRTY:
+                             OBARSCHD,OBBBOOK,OBOUSR1,OBOUSR2,OBOUSR3:
+                             OBOUSR4,OBALADMN,OTBBDEPT,OTBBTRAN,OTBBLNGI:
+                             OTBBTMFS,OTBBTMBO,OTBBGPFA,OTBBECRA,OTBBRFGP:
+                             OTBBGPPC,OTBBADCS,OTBBCITM,OTBBASTM,OTBBDPTM:
+                             OTBBOUTC,OTBBSNDL,OTBBGPPT,OTBBDOFR,OBOUSR5:
+                             OBOUSR6,OBOUSR7,OBOUSR8,OTBBRANK,OTBBSPCA:
+                             OTBBCIND,OTBBFLUP,OTBBSCAR,OTBBGLDT,OTBBSNGL:
+                             OTBBNMDS,OTBBCART,OTBBSRVD,OTBBCLHR,OTBBCONT:
+                             OTBBTCOD:
+                             OPRSSITE,OPRSCLIN,OPRSDATE,OPRSSTRT,OPRSSLOT:
+                             OPRSTIME,OPRSOUTN,OPRSREAS,OPRSNCLI,OPRSNDAT:
+                             OPRSNSTR,OPRSNSLO,OPRSNTIM,OPRSNVIS,OPRSNTYP:
+                             OPRSVIST,OPRSCTYP,OPCNSITE,OPCNCLIN,OPCNDATE:
+                             OPCNSTRT,OPCNSLOT,OPCNTIME,OPCNOUTN,OPCNREAS:
+                             OPCNVTYP,OTMALTYP,OBASTAT,OTBBPURC,OTBBBKOV:
+                             OTBBBKPR,OTBBBKPM,OTBBBKBA,OTBBRDAT,OTTHSTAT:
+                             OTTHRSIT,OTTHRCOD,OTTHRADD,OTTHWURL,OTTHE164:
+                             OTQUSPAR
+          RETURN
+.
+WROTQUE1  RESET     KEY20
+          MOVE      ZERO,OVRCD
+.
+          WRITE     OUTQUEA1,KEY20;DOTQUMES,OBASITE,OBACLIN,OBADATE,OBASTRT:
+                                   OBASLOT,OBATIME,OBACTYP,OBAVISIT,OBAOUTNO:
+                                   OBASESST,OBASRCR,OBACOMP,OBACLASS,OBAINS:
+                                   OBAATTN,OBADOCT,OBACOMM,OTBBFUND,OTBBTBLE:
+                                   OTBBPVIS,OTBBCLAL,OTBBSPAR,OBACAT,OBAPRTY:
+                                   OBARSCHD,OBBBOOK,OBOUSR1,OBOUSR2,OBOUSR3:
+                                   OBOUSR4,OBALADMN,OTBBDEPT,OTBBTRAN,OTBBLNGI:
+                                   OTBBTMFS,OTBBTMBO,OTBBGPFA,OTBBECRA,OTBBRFGP:
+                                   OTBBGPPC,OTBBADCS,OTBBCITM,OTBBASTM,OTBBDPTM:
+                                   OTBBOUTC,OTBBSNDL,OTBBGPPT,OTBBDOFR,OBOUSR5:
+                                   OBOUSR6,OBOUSR7,OBOUSR8,OTBBRANK,OTBBSPCA:
+                                   OTBBCIND,OTBBFLUP,OTBBSCAR,OTBBGLDT,OTBBSNGL:
+                                   OTBBNMDS,OTBBCART,OTBBSRVD,OTBBCLHR,OTBBCONT:
+                                   OTBBTCOD:
+                                   OPRSSITE,OPRSCLIN,OPRSDATE,OPRSSTRT,OPRSSLOT:
+                                   OPRSTIME,OPRSOUTN,OPRSREAS,OPRSNCLI,OPRSNDAT:
+                                   OPRSNSTR,OPRSNSLO,OPRSNTIM,OPRSNVIS,OPRSNTYP:
+                                   OPRSVIST,OPRSCTYP,OPCNSITE,OPCNCLIN,OPCNDATE:
+                                   OPCNSTRT,OPCNSLOT,OPCNTIME,OPCNOUTN,OPCNREAS:
+                                   OPCNVTYP,OTMALTYP,OBASTAT,OTBBPURC,OTBBBKOV:
+                                   OTBBBKPR,OTBBBKPM,OTBBBKBA,OTBBRDAT,OTTHSTAT:
+                                   OTTHRSIT,OTTHRCOD,OTTHRADD,OTTHWURL,OTTHE164:
+                                   OTQUSPAR
+.
+          RETURN
+.
+          INC       STD001IO

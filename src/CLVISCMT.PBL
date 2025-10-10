@@ -1,0 +1,18 @@
+.---------------------------------------------------------------------------
+. Include Name : CLVISCMT.PBL
+. Function     : Clear function for VISCMTFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.04.00  15/04/2024  Thanh T        TSK 0931173
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLVISCMT  MOVE      SP70,VSCTVIST      . Visit      
+          MOVE      SP70,VSCTTYPE      . Comment Type     
+          MOVE      SP70,VSCTLINE      . Line No     
+          PACK      VSCTDATA,SP70,SP70 . Line      
+          MOVE      SP70,VSCTUKEY      . Update Key (date/time/user id)   
+          MOVE      SP70,VSCTSPAR      . Spare Variable     
+.
+          RETURN

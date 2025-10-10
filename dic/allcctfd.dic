@@ -1,0 +1,27 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Allied Health 
+                      Department Contract Codes 
+  
+TABLE NAME         :  allcctaf
+=====================================================================
+ALCCDEPT    char        3     1   Department (alldepaf)  
+ALCCCONT    char        3     4   Contract Code/Subtype (Cat gb/ZX)  
+ALCCCDAT    char        8     7   Date Record Created (ccyymmdd)  
+ALCCCTIM    char        8    15   Time Record Created (hh:mm:ss)  
+ALCCCUID    char       10    23   Web User Id Created (websecaf)  
+ALCCUDAT    char        8    33   Date Record Updated (ccyymmdd)  
+ALCCUTIM    char        8    41   Time Record Updated (hh:mm:ss)  
+ALCCUUID    char       10    49   Web User Id Updated (websecaf)  
+ALCCTYPE    char        2    59   Department Type  
+                                   Cat gb - Department Contract Cat  
+                                   Cat ZX - Department Subservice Cat  
+ALCCSPAR    char       48    61   Spare Variable  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+ALCCDEPT
+ALCCTYPE
+ALCCCONT
+  
+=====================================================================

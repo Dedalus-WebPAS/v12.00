@@ -1,0 +1,20 @@
+.---------------------------------------------------------------------------
+. Include Name : CLMRTVIS.PBL
+. Function     : Clear function for MRTVISFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.04.01  01/12/2023  Thanh T       TSK 0932689
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLMRTVIS  MOVE      SP70,MRVSVSNO      . Visit Number     
+          MOVE      SP70,MRVSMKEY      . Medical Record Unique Key   
+          MOVE      SP70,MRVSXKY1      . Additional Medical Record Key 1  
+          MOVE      SP70,MRVSXKY2      . Additional Medical Record Key 2  
+          MOVE      SP70,MRVSXKY3      . Additional Medical Record Key 3  
+          MOVE      SP70,MRVSXKY4      . Additional Medical Record Key 4  
+          MOVE      SP70,MRVSXKY5      . Additional Medical Record Key 5  
+          MOVE      SP70,MRVSSPAR      . Spare      
+.
+          RETURN

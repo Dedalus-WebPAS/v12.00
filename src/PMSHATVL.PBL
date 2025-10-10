@@ -1,0 +1,99 @@
+.******************************************************************************
+.*                                  PMSHATVL                                  *
+.* Validate effective from and to dates for overlaps for Hospital Attribute   *
+.*                                                                            *
+.* Requires:   KEY39 populated with -                                         *
+.*                      - Hospital Id (pathspaf)                              *
+.*                      - Type of Attribute (KEY3)                            *
+.*                      - Key value                                           *
+.*                      - Date (defaults to current date)                     *
+.*                                                                            *
+.* Returns:    EXIT  0 = valid record                                         *
+.*                   1 = not valid                                            *
+.*                                                                            *
+.* Modifications:                                                             *
+.* V11.05.00  03/02/2025  J.Tan           TSK 0946490                         *
+.*            Created include                                                 *
+.******************************************************************************
+.
+PMSHATVL
+.
+VHAT0000  MOVE      KEY39,KEY31
+          UNPACK    KEY39,WKHATHOS,WKHTTYPE,WKHTKVAL,WKHTDATE
+.
+          CALL      RDPMHAT1                * Record on file so must be an
+          BRANCH    OVRCD,VHAT5000          * update
+.
+          MATCH     VALTDATE,PMHTEDAT       * change in effective from/to date?
+          GOTO      VHAT5000 IF NOT EQUAL
+.
+          MATCH     PMHTIND1,PMHAT014
+          GOTO      VHAT8000 IF EQUAL       * No changed of Active/Inactive
+.
+.         Check for Overlap if the status changed to Active
+.
+          MATCH     "1",PMHAT014            * Changed to Inactive ?
+          GOTO      VHAT8000 IF NOT EQUAL
+.
+VHAT5000  CALL      RSPMHAT1                * Check for previous record
+VHAT5200  CALL      RPPMHAT1                * with an earlier effective from
+          BRANCH    OVRCD,VHAT6000          * date
+.
+          PACK      KEY31A,PMHTHOSP,PMHTTYPE,PMHTKVAL,SP70
+          MATCH     KEY31,KEY31A
+          GOTO      VHAT6000 IF NOT EQUAL
+.
+          MATCH     "1",PMHTIND1            * Active ?
+          GOTO      VHAT5200 IF NOT EQUAL
+.
+          MATCH     SP70,PMHTEDAT           * No effective to date on previous
+          GOTO      VHAT9200 IF EQUAL       * record
+.
+          MATCH     VALFDATE,PMHTEDAT
+          IF        !@LESS
+            GOTO      VHAT9000              * Effective from date overlap
+          ENDIF
+.
+          MATCH     SP70,VALTDATE           * Blank effective to date
+          GOTO      VHAT6000 IF EQUAL
+.
+          MATCH     VALTDATE,PMHTEDAT
+          IF        !@LESS
+            GOTO      VHAT9000              * Effective to date overlap
+          ENDIF
+.
+VHAT6000  CALL      RSPMHAT1                * Check next record
+VHAT6200  CALL      RKPMHAT1                * with next effective from
+          BRANCH    OVRCD,VHAT8000          * date
+.
+          PACK      KEY31A,PMHTHOSP,PMHTTYPE,PMHTKVAL,SP70
+          MATCH     KEY31,KEY31A
+          GOTO      VHAT8000 IF NOT EQUAL
+.
+          MATCH     "1",PMHTIND1            * Active ?
+          GOTO      VHAT6200 IF NOT EQUAL
+.
+          MATCH     SP70,VALTDATE           * Blank effective to date
+          GOTO      VHAT9000 IF EQUAL
+.
+          MATCH     PMHTSDAT,VALFDATE
+          IF        !@LESS
+            GOTO      VHAT9000              * Effective from date overlap
+          ENDIF
+.
+          MATCH     PMHTSDAT,VALTDATE
+          IF        !@LESS
+            GOTO      VHAT9000              * Effective to date overlap
+          ENDIF
+.
+VHAT8000  MOVE      ZERO,EXIT
+          GOTO      VHAT9999
+.
+VHAT9000  MOVE      ONE,EXIT
+          GOTO      VHAT9999
+.
+VHAT9200  MOVE      TWO,EXIT
+          GOTO      VHAT9999
+.
+VHAT9999  RETURN
+

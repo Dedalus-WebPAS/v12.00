@@ -1,0 +1,37 @@
+.*****************************************************************************
+.* Clear WEBDVWFD variables                                                  *
+.*****************************************************************************
+.* V11.05.01 30/01/2025 Peter Vela       TSK 0939466                         *
+.*          Created include                                                  *
+.*****************************************************************************
+CLWEBDVW  MOVE      SP70,WBDWHOSP
+          MOVE      SP70,DWBDWFLG
+          MOVE      SP70,WBDWMODL
+          MOVE      SP70,WBDWUNIQ
+          MOVE      SP70,WBDWINVN
+          MOVE      SP70,WBDWBATN
+          MOVE      SP70,WBDWURNO
+          MOVE      SP70,WBDWPBAT
+          MOVE      SP70,WBDWNBAT
+          MOVE      SP70,WBDWTRID
+          MOVE      SP70,DWBDWEET
+          MOVE      ZERO,WBDWAMTC
+          MOVE      ZERO,WBDWAMDP
+          MOVE      ZERO,WBDWAMMP
+          MOVE      SP70,WBDWPDAT
+          MOVE      SP70,WBDWSTAT
+          MOVE      SP70,WBDWCLID
+          MOVE      SP70,WBDWRKEY
+          MOVE      SP70,WBDWOKEY
+          MOVE      SP70,WBDWPRAC
+          MOVE      SP70,WBDWPROV
+          MOVE      SP70,WBDWMSID
+          MOVE      SP70,WBDWCTYP
+          MOVE      SP70,WBDWCUID
+          MOVE      SP70,WBDWCDAT
+          MOVE      SP70,WBDWCTIM
+          MOVE      SP70,WBDWUUID
+          MOVE      SP70,WBDWUDAT
+          MOVE      SP70,WBDWUTIM
+          PACK      WBDWSPAR,SP70,SP70
+          RETURN

@@ -1,0 +1,92 @@
+.---------------------------------------------------------------------------
+. Include Name : CLWEBSEC.PBL
+. Function     : Clear function for WEBSECFD
+.---------------------------------------------------------------------------
+. Modifications :
+. V11.05.01 31/01/2025 Thanh T        TSK 0953087 
+.           Added WBSEHCPC to WBSEHCP3 fields    
+. V10.13.00 14/08/2018 Ebon Clements  TSK 0853101
+.           Added WBSEEMAI, WBSELOGN and WBSEGENR*
+.---------------------------------------------------------------------------
+.
+CLWEBSEC  MOVE      SP70,WBSEUID       . WEB User ID    
+          MOVE      SP70,WBSENAM       . User Name     
+          MOVE      SP70,WBSEDOC       . Linked Doctor Code    
+          MOVE      SP70,WBSEPCD       . Passcode      
+          MOVE      SP70,WBSEWRD       . Ward      
+          MOVE      SP70,WBSESIT       . Outpatient Site     
+          MOVE      SP70,WBSECLI       . Outpatient Clinic     
+          MOVE      SP70,WBSEOCG       . Occupational Group (Cat w0)   
+          MOVE      SP70,WBSEDIR       . Log in URL Link   
+          MOVE      SP70,WBSEESC       . Emergency Site Code    
+          MOVE      SP70,WBSEEUC       . Emergency Unit Code    
+          MOVE      SP70,WBSEACT       . Active 0=No 1=Yes    
+          MOVE      SP70,WBSEEXP       . Expiry Date     
+          MOVE      SP70,WBSEPSE       . Post Security Enabled    
+          MOVE      SP70,WBSECNT       . Retry Count     
+          MOVE      SP70,WBSEAUT       . Auto Ageing (Y/N) 1=Yes 0=No  
+          MOVE      SP70,WBSEAGE       . Age by Number of Days  
+          MOVE      SP70,WBSEDFM       . Default Menu     
+          MOVE      SP70,WBSEGPCD      . GP Code     
+          MOVE      SP70,WBSEGPPC      . GP Practice Code    
+          MOVE      SP70,WBSEGPCN      . GP Practice Count    
+          MOVE      SP70,WBSEMESA      . Messages Available (Y/N) 1=Yes 0=No  
+          MOVE      SP70,WBSELACD      . Last Login Date (CCYYMMDD)   
+          MOVE      SP70,WBSELACT      . Last Login Time (HH:MM)   
+          MOVE      SP70,WBSEDEPT      . Printer Department (ibadptaf)    
+          MOVE      SP70,WBSECXA       . Passwork Expiry User Alerted (1=Y)  
+          MOVE      SP70,WBSEDALL      . Allied Health Department Code (CG)  
+          MOVE      SP70,WBSEDTYP      . Document Type (Cat TY)   
+          MOVE      SP70,WBSEHLOC      . MR Home Location    
+          MOVE      SP70,WBSEVWSL      . View Alert Security Level   
+          MOVE      SP70,WBSEADSL      . Add Alert Security Level   
+          MOVE      SP70,WBSEDGSI      . Day/General Surgery Ind (Cat YD)  
+          MOVE      SP70,WBSEFPCD      . Finance Passcode     
+          MOVE      SP70,WBSECASH      . Cashier 1=Yes     
+          MOVE      SP70,WBSEMRTS      . MRT Security Number    
+          MOVE      SP70,WBSEHOSP      . Logged into Hospital ID (pathspaf)  
+          MOVE      SP70,WBSELTYP      . Clinic Location Type (Category CT)  
+          MOVE      SP70,WBSEFDEP      . User Department (Free Format)   
+          MOVE      SP70,WBSENURS      . Nurse Code     
+          MOVE      SP70,WBSECDAT      . Date Record Created (ccyymmdd)   
+          MOVE      SP70,WBSECTIM      . Time Record Created (hh:mm:ss)   
+          MOVE      SP70,WBSECUID      . WEB User Id Rec. Creator (websecaf) 
+          MOVE      SP70,WBSEUDAT      . Last Update Date (ccyymmdd)   
+          MOVE      SP70,WBSEUTIM      . Last Update Time (hh:mm:ss:)   
+          MOVE      SP70,WBSEUUID      . WEB User Id Rec. Update (websecaf) 
+          MOVE      SP70,WBSEBEDV      . Bed Board View Number   
+          MOVE      SP70,WBSEGPAC      . GP Access - blank=all 1=no override 
+          MOVE      SP70,WBSEROLE      . Role      
+          MOVE      SP70,WBSESECT      . Security Id Type 0=User Profile  
+          MOVE      SP70,WBSEVH1L      . View H1 Security Level   
+          MOVE      SP70,WBSEAH1L      . Add H1 Security Level   
+          MOVE      SP70,WBSEVH2L      . View H2 Security Level   
+          MOVE      SP70,WBSEAH2L      . Add H2 Security Level   
+          MOVE      SP70,WBSEVH3L      . View H3 Security Level   
+          MOVE      SP70,WBSEAH3L      . Add H3 Security Level   
+          MOVE      SP70,WBSEVH4L      . View H4 Security Level   
+          MOVE      SP70,WBSEAH4L      . Add H4 Security Level   
+          MOVE      SP70,WBSEVH5L      . View H5 Security Level   
+          MOVE      SP70,WBSEAH5L      . Add H5 Security Level   
+          MOVE      SP70,WBSEVH6L      . View H6 Security Level   
+          MOVE      SP70,WBSEAH6L      . Add H6 Security Level   
+          MOVE      SP70,WBSEVH7L      . View H7 Security Level   
+          MOVE      SP70,WBSEAH7L      . Add H7 Security Level   
+          MOVE      SP70,WBSEVH8L      . View H8 Security Level   
+          MOVE      SP70,WBSEAH8L      . Add H8 Security Level   
+          MOVE      SP70,WBSEVH9L      . View H9 Security Level   
+          MOVE      SP70,WBSEAH9L      . Add H9 Security Level   
+          MOVE      SP70,WBSEHHOS      . MR Home Hospital Id. (pathspaf)  
+          MOVE      SP70,WBSEOPDU      . Outpatient Direct User (Cat Tz)  
+          MOVE      SP70,WBSEUTLH      . Usual Tracking Location Hospital   
+          MOVE      SP70,WBSEUTLC      . Usual Tracking Location    
+          PACK      WBSEEMAI,SP70,SP70 . User Email Address    
+          PACK      WBSELOGN,SP70,SP70 . Long Login Name    
+          MOVE      SP70,WBSEGENR      . Generic User ID (1=Yes,blank/0=No)   
+          MOVE      SP70,WBSEHCPC      . HCP Code     
+          MOVE      SP70,WBSEHCP1      . User Defined HCP Code 1  
+          MOVE      SP70,WBSEHCP2      . User Defined HCP Code 2  
+          MOVE      SP70,WBSEHCP3      . User Defined HCP Code 3  
+          MOVE      SP70,WBSESPAR      . Spare      
+.
+          RETURN

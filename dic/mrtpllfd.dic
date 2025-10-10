@@ -1,0 +1,33 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Medical Records 
+                      Medical Records Pulling List 
+  
+TABLE NAME         :  mrtpllaf
+=====================================================================
+MRPLVISN    char        8     1   Visit Number  
+MRPLMRKY    char       10     9   Medical Record Key  
+MRPLRQST    char        2    19   Request Status  
+                                   01 = Keep  
+                                   02 = Cancelled/Removed from List  
+MRPLCUID    char       10    21   Added By UserID (from websecaf)  
+MRPLCDAT    char        8    31   Date Record Added  
+MRPLCTIM    char        8    39   Time Record Added  
+MRPLUUID    char       10    47   Updated By UserID (from websecaf)  
+MRPLUDAT    char        8    57   Date Record Updated  
+MRPLUTIM    char        8    65   Time Record Updated  
+MRPLUDF1    char       10    73   User Defined Field 1  
+MRPLUDF2    char       10    83   User Defined Field 2  
+MRPLUDC1    char        3    93   User Defined Coded Field 1  
+MRPLUDC2    char        3    96   User Defined Coded Field 2  
+MRPLFTX1    char       80    99   Free text field 1  
+MRPLFTX2    char       80   179   Free Text Field 2  
+MRPLSPAR    char       50   259   Spare  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+MRPLVISN
+MRPLMRKY
+MRPLRQST
+  
+=====================================================================

@@ -1,0 +1,3403 @@
+.******************************************************************************
+.* System   :  BOOKINGS                                                       *
+.* Program  :  IBABOK30                                                       *
+.* Desc     :  ADHOC LETTER PRINTING                                          *
+.******************************************************************************
+.* Date     :  23/05/89                                                       *
+.* Author   :  DIG                                                            *
+.* Comment  :                                                                 *
+.* Mods     :                                                                 *
+.*                                                                            *
+.******************************************************************************
+.* V12.00.02 02/06/2025  Don Nguyen        TSK 0955096                        *
+.*           Alphanumeric visit number changes                                *
+.* V12.00.01 30/05/2025  Don Nguyen        TSK 0955096                        *
+.*           Alphanumeric visit number changes                                *
+.* V11.04.11 06/11/2024  Ebon Clements     TSK 0911895                        *
+.*           Only include medical bookings when all operating units are       *
+.*           selected (No operating unit for a medical booking) - Any         *
+.*           exclude operating unit value will exclude all medical bookings   *
+.*           FLTOPU00                                                         *
+.* V11.04.10 31/10/2024  Ebon Clements     TSK 0911895                        *
+.*           Only include a booking with a blank admission class when all     *
+.*           is selcted - FLTPTT00                                            *
+.*           Only send SMS message if booking status is booked - EXTBOK00     *
+.* V11.04.09 29/10/2024  Jacob Jackson     TSK 0911895                        *
+.*           Fix problem with incorrect operation times appearing             *
+.*           Any blank Admission Class value will be accepted                 *
+.*           Skip filter for operating unit if not theatre booking            *
+.* V11.04.08 18/10/2024  Jacob Jackson     TSK 0911895                        *
+.*           Fix various issues causing issues with matching bookings with    *
+.*           options                                                          *
+.* V11.04.07 07/10/2024  Jacob Jackson     TSK 0911895                        *
+.*           Ensure booking "admitting point" is being checked                * 
+.* V11.04.06 20/09/2024  Jacob Jackson     TSK 0911895                        *
+.*           Fix issues where SMS Bulk Bookings was not going through all     *
+.*           bookings, and fix various problems relating to values not being  *
+.*           properly. Also add more ways for type of hospital to be found    *
+.* V11.04.05 12/09/2024  Jacob Jackson     TSK 0911895                        *
+.*           Add filtering for Operating Unit, if Booking Type is Theatre     *
+.* V11.04.04 04/09/2024  Jacob Jackson     TSK 0911895                        *
+.*           Fix issues with IBABOK30 crashing on single-hopsital & problems  *
+.*           with logic of sending booking SMSes                              *
+.* V11.04.03 16/08/2024  Jacob Jackson     TSK 0911895                        *
+.*           Add functionality to send both ad-hoc and bulk Booking SMS       *
+.*           messages                                                         *
+.* V11.04.02 18/07/2024  Thanh T           TSK 0939648                        *
+.*           Added LCPXSN18/%secraddr - Secure Address                        *
+.*                 LCPXSN19/%verfaddr - Verified Address                      *
+.*                 LCPXSN20/%multbirt - Multiple Birth Indicator              *
+.*                 LCPXSN21/%emailval - Email Validation Flag                 *
+.*                 LCPXSN22/%statusbb - Status Indicator 22                   *
+.*                 LCPXSN23/%statusbc - Status Indicator 23                   *
+.*                 LCPXSN24/%statusbd - Status Indicator 24                   *
+.*                 LCPXSN25/%statusbe - Status Indicator 25                   *
+.*                 LCPXSN26/%statusbf - Status Indicator 26                   *
+.*                 LCPXSN27/%statusbg - Status Indicator 27                   *
+.*                 LCPXSN28/%statusbh - Status Indicator 28                   *
+.*                 LCPXSN29/%statusbi - Status Indicator 29                   *
+.*                 LCPXSN30/%statuscz - Status Indicator 30                   *
+.* V11.04.01 09/05/2024  Nikitha B        TSK 0945225                         *
+.*           Modified COUNT length from FORM 2 to FORM 3 to print more than   *
+.*           99 lines letter.                                                 *
+.* V11.02.01 22/04/2022  Thanh T          TSK 090345                          *
+.*           Added LXPXUCC4, LXUCC4LD, LXPXATF1, LXPXUCC5, LXUCC5LD and       *
+.*           LXPXATF2 fields                                                  *
+.******************************************************************************
+.*        V10.13.01 05/12/2018  Don Nguyen       TSK 0838558                  *
+.*                  Deleted temp file (TEMP1) on program exit                 *
+.*        V10.06.01 17/09/2015   Davin           CAR 313906                   *
+.*                  Added extra contacts to setup of postal address (post0000)*
+.*        V10.04.02 07/07/2014   J.Tan           CAR 261630                   *
+.*                  Removed port number from temp file name                   *
+.*        V10.04.01 05/02/2014  Peter Vela 296699                             *
+.*                  Fixed %addb, added %suburb, %addd                         *
+.*                  Added %prodesc                                            *
+.*        V9.03.01  10/06/2004  Lina Vo  CAR 50424                            *
+.*                  Changed program for use by the web.                       *
+.*        V9.03.00  02/07/2003  Tonii CAR 40346 (THC65)                       *
+.*                  Ported from r5.10                                         *
+.******************************************************************************
+.*        V5.08.01  29/08/2000  Caleb Sharman                                 *
+.*                  Changed Health Fund variables to be 8 chars               *
+.*         V5.07.01   05/03/1999  Jim Stathopoulos                            *
+.*                    Display Changes                                         *
+.*         V5.07.B02  10/12/1998  Jim Stathopoulos                            *
+.*                    CDATE Changes                                           *
+.*                  22/10/1998  Glenn Berry      5.07 changes                 *
+.******************************************************************************
+.*          V5.04.02  11/04/1997  Steve Armstrong    SRF 642798               *
+.*                    Fixed UK bug (not padding out work variable)            *
+.*          V5.04.01  18/02/97 Howellsy     WHT                               *
+.*                    Added Cell Phone, Postal Add1-4, Postal Post Code       *
+.******************************************************************************
+.*             V5.01 05/06/89 M.Ohleiter                                      *
+.*                   Changed BOKMASFD                                         *
+.*          V5.01.01 28/06/89 M.Ohleiter                                      *
+.*                   Updated for release 5.01 (ur, adm, book nos)             *
+.*                   Removed preferred accomodation - SRF 101630              *
+.*                             14/08/89  S. O'Gorman                          *
+.*                             Fix Modify Routine for > 80 Chars              *
+.*          V5.01.02 12/12/89 K.Peak                                          *
+.*                   Recompiled for 5th index in BOKMASFD SRF 103377          *
+.*          V5.01.03 01/03/90 Steve O'Gorman                                  *
+.*                   Reset UPPLOW variale after Scan in case conv.            *
+.*          V5.01.04 24/01/91 Peter Eddey                                     *
+.*                   Changed program to use BOKRC1FD instead of               *
+.*                   BOKMASFD.                                                *
+.*          V5.01.05 03/12/91 J.Tan      SRF 111890                           *
+.*                   Extend field line number in letter file                  *
+.*                                                                            *
+.*                                                                            *
+.******************************************************************************
+          INC       STD001FD
+          INC       IBASEQFD/INC            * Sequential Numbers File
+          INC       TFILEVAR/INC            * Generate Temp File Name
+          INC       WEBERRFD/INC            * Web Server Error Logging
+.
+          INC       BOKRC1FD/INC
+          INC       BOKLETFD/INC
+          INC       BOKLTLFD/INC
+          INC       BOKLTSFD/INC
+          INC       PATDO1FD/INC
+          INC       PATCODFD/INC
+          INC       PATCONFD/INC
+          INC       PATMA1FD/INC
+          INC       PMSPX2FD/INC
+          INC       PATPR1FD/INC
+          INC       PMSCEXFD/INC
+          INC       PATHSPFD/INC
+          INC       WATPROFD/INC
+          INC       OPRDEAFD/INC
+          INC       PMSVX1FD/INC
+          INC       PMSOOSFD/INC       * Opt Out of SMS
+          INC       MLTSECFD/INC
+          INC       WEBSECFD/INC
+          INC       PMSHCPFD/INC
+          INC       PATWR1FD/INC
+          INC       BOKRX1FD/INC
++
+.**********************************************************************
+.                           PROGRAM VARIABLES                         *
+.**********************************************************************
+CLAMCARR  DIM       3[99]    * Claim Code filter array (max 99)
+CLAMCKEY  DIM       2        * Claim Code filter array size (keyin)
+CLAMCSIZ  FORM      2        * Claim Code filter array size
+CLAMCCNT  FORM      2        * Claim Code array counter
+.
+BOKTYARR  DIM       3[99]    * Booking Type filter array (max 99)
+BOKTYKEY  DIM       2        * Booking Type filter array size (keyin)
+BOKTYSIZ  FORM      2        * Booking Type filter array size
+BOKTYCNT  FORM      2        * Booking Type array counter
+.
+SUCONARR  DIM       10[99]   * Surgeon/Consultant filter array (max 99)
+SUCONKEY  DIM       2        * Surgeon/Consultant filter array size (keyin)
+SUCONSIZ  FORM      2        * Surgeon/Consultant filter array size
+SUCONCNT  FORM      2        * Surgeon/Consultant array counter
+.
+ADMPTARR  DIM       3[99]    * Admitting Point filter array (max 99)
+ADMPTKEY  DIM       2        * Admitting Point filter array size (keyin)
+ADMPTSIZ  FORM      2        * Admitting Point filter array size
+ADMPTCNT  FORM      2        * Admitting Point array counter
+.
+PATTYARR  DIM       3[99]    * Patient Type filter array (max 99)
+PATTYKEY  DIM       2        * Patient Type filter array size (keyin)
+PATTYSIZ  FORM      2        * Patient Type filter array size
+PATTYCNT  FORM      2        * Patient Type array counter
+.
+OPEUNARR  DIM       3[99]    * Operating Unit filter array (max 99)
+OPEUNKEY  DIM       2        * Operating Unit filter array size (keyin)
+OPEUNSIZ  FORM      2        * Operating Unit filter array size
+OPEUNCNT  FORM      2        * Operating Unit array counter
+.
+INCXCLAM  DIM       1        * Include/Exclude Claim Code
+INCXBKTP  DIM       1        * Include/Exclude Booking Type
+INCXSUCO  DIM       1        * Include/Exclude Surgeon/Consultant
+INCXADMP  DIM       1        * Include/Exclude Admitting Point
+INCXPTTY  DIM       1        * Include/Exclude Patient Type
+INCXOPUN  DIM       1        * Include/Exclude Operating Unit
+CNTRSENT  FORM      5        * Counter for SMS messages sent
++
+.**********************************************************************
+.                                                                     *
+.**********************************************************************
+.**********************************************************************
+.*                             CONSTANTS                              *
+.**********************************************************************
+CODEBK    INIT      "BK"
+CODEBP    INIT      "BP"
+DEXT1     INIT      "st"
+DEXT2     INIT      "nd"
+DEXT3     INIT      "rd"
+DEXT4     INIT      "th"
+LCADDA    INIT      "%adda"             * Address Line 1      
+LCADDB    INIT      "%addb"             * Address Line 2
+LCADDC    INIT      "%addc"             * Address Line 3
+LCDOB     INIT      "%bdob"             * Date of Birth
+LCBDOC    INIT      "%bdoc"             * Attending Doctor's Name          *5
+LCEXDATE  INIT      "%bedt"             * Confirmed Admission Date
+LCGNAME   INIT      "%bgiv"             * Patient Given Name
+LCBNO     INIT      "%bno"              * Booking Number
+LCSNAME   INIT      "%bsur"             * Patient Surname          
+LCBLTYPE  INIT      "%btype"            * Booking Type                     *10
+LCPHONE   INIT      "%btele"            * Patient Phone Number
+LCDATE    INIT      "%date"             * Today's Date
+LCFNAME   INIT      "%fname"            * Patient Full Name
+LCPCODE   INIT      "%post"             * Patient Post Code
+LCPAGE    INIT      "%page"             * Page Break Variable              *15
+LCCTELE   INIT      "%ctele"            * Cellular Phone Number
+LCPADDA   INIT      "%padda"            * Postal address line 1
+LCPADDB   INIT      "%paddb"            * Postal address line 2
+LCPADDC   INIT      "%paddc"            * Postal address line 3
+LCPADDD   INIT      "%paddd"            * Postal address line 4            *20
+LCPPOST   INIT      "%ppost"            * Postal Post Code       
+LCSUBRB   INIT      "%suburb"           * Suburb
+LCADDD    INIT      "%addd"             * Address Line 4
+LCPRDSC   INIT      "%prodesc"          * Procedure Description           
+LCPXUCC4  INIT      "%idengend"         * Identify Gender Code             *25
+LCUCC4LD  INIT      "%idgendsc"         * Identify Gender Long Description
+LCPXATF1  INIT      "%idgentxt"         * Identify Gender Free Text
+LCPXUCC5  INIT      "%pronoun"          * Identify Pronoun Code
+LCUCC5LD  INIT      "%prondesc"         * Identify Pronoun Long Description
+LCPXATF2  INIT      "%prontext"         * Identify Pronoun Free Text       *30
+LCPXSN18  INIT      "%secraddr"         * Secure Address                   *31
+LCPXSN19  INIT      "%verfaddr"         * Verified Address                 *32
+LCPXSN20  INIT      "%multbirt"         * Multiple Birth Indicator         *33
+LCPXSN21  INIT      "%emailval"         * Email Validation Flag            *34
+LCPXSN22  INIT      "%statusbb"         * Status Indicator 22              *35
+LCPXSN23  INIT      "%statusbc"         * Status Indicator 23              *36
+LCPXSN24  INIT      "%statusbd"         * Status Indicator 24              *36
+LCPXSN25  INIT      "%statusbe"         * Status Indicator 25              *36
+LCPXSN26  INIT      "%statusbf"         * Status Indicator 26              *39
+LCPXSN27  INIT      "%statusbg"         * Status Indicator 27              *40
+LCPXSN28  INIT      "%statusbh"         * Status Indicator 28              *41
+LCPXSN29  INIT      "%statusbi"         * Status Indicator 29              *42
+LCPXSN30  INIT      "%statuscz"         * Status Indicator 30              *43
+LCCFADTM  INIT      "%betm"             * Confirmed Admission Time         *44
+LCTHSEDT  INIT      "%thdt"             * Theatre Session Date             *45
+LCEXSTTM  INIT      "%extm"             * Expected Start Time              *46
+LCSTSETM  INIT      "%sttm"             * Started Time of Session          *47
+.
+LXPAGE    INIT      "  -----              Page Break              -----  "
+LXCELL    INIT      "XXXXXXXXXXXXXXXXXXXX"
+LXPADDA   INIT      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+LXPADDB   INIT      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+LXPADDC   INIT      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+LXPADDD   INIT      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+LXPPOST   INIT      "XXXXXXXX"
+LXUCC4LD  INIT      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+LXUCC5LD  INIT      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+LXXSMSID  INIT      "XXXXXXXXXXXXXXXX"   
+LXSMSCOD  INIT      "XXX"
+LXXSMSKY  INIT      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+LXXSMSPH  INIT      "XXXXXXXXXXXXXXXXXXXX"
+LXXSMSUR  INIT      "XXXXXXXX"
+LXXSMSUS  INIT      "XXXXXXXXXX"
+LXXSMSUN  INIT      "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+.
+CONTPNMS  DIM       200      * Pipe-delimited list of phone numbers
+CONTMSGI  DIM       200      * Pipe-delimited list of msg id's
+CONTTYPS  DIM       200      * Pipe-delimited list of contact types
+MAXCOUNT  INIT      "10"     * Max count for SMS phone numbers
+LEAVPSMS  FORM      1        * Don't send overdue leave SMS to patient
+LEAVFSMS  FORM      1        * First SMS number of not sending to patient
+.
+MONTH1    INIT      "January"
+MONTH2    INIT      "February"
+MONTH3    INIT      "March"
+MONTH4    INIT      "April"
+MONTH5    INIT      "May"
+MONTH6    INIT      "June"
+MONTH7    INIT      "July"
+MONTH8    INIT      "August"
+MONTH9    INIT      "September"
+MONTH10   INIT      "October"
+MONTH11   INIT      "November"
+MONTH12   INIT      "December"
+REPSTR    INIT      "a0b0c0d0e0f0g0h0i0j0k0l0m0n0o0p0q0r0s0t0u0v0w0x0y0z0"
+SPECCHAR  INIT      "%"
+TO        INIT      " TO "
++
+.**********************************************************************
+.                           TEMP FILES                                *
+.**********************************************************************
+CMDLINE   DIM       100
+CFNAMEA   DIM       8
+.**********************************************************************
+.*                       GLOBAL VARIABLES                             *
+.**********************************************************************
+ADMFORM1  FORM      8
+ADMFORM2  FORM      8
+ADMTEST1  DIM       8
+ADMTEST2  DIM       8
+BOOKNUM   DIM       8
+BOOKTYPE  DIM       20
+BOTTMARG  FORM      2
+CODE      DIM       2
+COUNT     FORM      3
+COUNTER   FORM      2
+DATE      DIM       8
+DATELINE  DIM       19
+DEPPAID   DIM       1
+DEXT      DIM       3
+DIM30     DIM       30
+DIM55     DIM       55
+DIM70     DIM       70
+DISPSTRN  DIM       70
+DOCLINE   DIM       33
+DOCTNAM   DIM       33
+DUMMY     DIM       1
+ENDSTR    FORM      2
+FDATE     DIM       19
+FIRSTCH   FORM      1
+FLAGBOOK  FORM      1
+FLAGDATE  FORM      1
+FLAGDEPN  FORM      1
+FLAGDEPY  FORM      1
+FNAMER    DIM       8
+FNAMER2   DIM       8
+FORM3     FORM      3
+FORM3A    FORM      3
+FULLNAME  DIM       52
+IBCNMHOS  FORM      1
+INITIAL   DIM       4
+LEFTMARG  FORM      2
+LETDESC   DIM       25
+LETTER    DIM       3
+LETTFORM  FORM      3
+LINE      DIM       55
+BLETPLEN  FORM      3
+MONTH     DIM       9
+NAMELINE  DIM       52
+PERCPOS   FORM      2
+PHYSPAGE  FORM      3
+POS       FORM      2
+PROCDESC  DIM       80
+PRTSTRNG  DIM       70
+SELECTID  DIM       4
+SRCHNUM   FORM      2
+SRCHVAR   DIM       15
+STARTSTR  FORM      2
+TEMP2     FORM      2
+TEMP3     FORM      3
+TEMP55    DIM       55
+TEMP70    DIM       70
+TESTFORM  FORM      6
+TOPMARG   FORM      2
+URDIM     DIM       8
+VERTPOS   FORM      2
+WOPTION   FORM      1
+XBDATE    DIM       19
+XTHDATE   DIM       19
+XTHTIME   DIM       8
+SENTDATE  DIM       8
+BOKSADMN  DIM       8
+EXSTTIME  DIM       5
+STSETIME  DIM       5
+BOKLCOMM  DIM       1
+FILTHOSP  DIM       3
+SMSLETTR  DIM       3
+LETRCOMM  DIM       1
+FROMDATE  DIM       8
+XCENT1    DIM       2
+XYEAR1    DIM       2
+XMON1     DIM       2
+XDAY1     DIM       2
+XCENT2    DIM       2
+XYEAR2    DIM       2
+XMON2     DIM       2
+XDAY2     DIM       2
+DISPTDTE  DIM       10
+PASTDATE  FORM      1
+CURRDATE  DIM       8
+TODATE    DIM       8
+CNTRNOTS  FORM      5
+ALLHSPAC  FORM      1
+USERID    DIM       10
+LETTDATE  DIM       8
+TSTKEYIN  DIM       5
+BKBLKSMS  DIM       1
+INPBOKNM  DIM       8
+NOSMSFLT  FORM      1
+DOCCODE   DIM       10
+BKFTHOSP  DIM       3
+.
+PRGID     INIT      "IBABOK30"
+PRGNAM    INIT      "Adhoc Letter Printing"
+VERSION   INIT      "V12.00.02"
++
+TEMP1     FILE      ASCII,FIXED=131
+
+. Temp File Definition
+.
+TEMPBK    IFILE     SQL, FIXED=17, KEY="U1-8,9-16"
+.
+.NAME     TYPE      LENGTH  PHYSICAL  START  DESCRIPTION
+.----     ----      ------  --------  -----  -----------
+TEMPURNO  DIM       8       8         1      UR Number
+TEMPBKNO  DIM       8       8         9      Booking Number
+.
+.End of Record                        17
+.
++
+.**********************************************************************
+.*                           MAINLINE                                 *
+.*                      Controlling Logic                             *
+.**********************************************************************
+ML0000    CALL      INIT0000                      * display header,
+          *         initialise files
+          *         and set up port dependant
+          *         temporary file
+.
+ML0200    CALL      CLRP0000                      * clear all input parameters
+          CALL      OPTN0000                      * main option screen
+          BRANCH    EXIT,ML9999
+.
+          BRANCH    OPTION,ML0600,ML0400,ML0800,ML1000
+.
+ML0400    CALL      BOOK0000                      *input single booking numbers
+          BRANCH    EXIT,ML0200
+          OPEN      TEMP1,FNAMER
+          GOTO      ML0700
+.
+ML0600    MATCH     "IBARSH",PGM
+          GOTO      ML5000 IF EQUAL
+.
+          CALL      DISP0000                      * display parameter screen
+          CALL      SEL0000                       * select field or OK
+.                                                    *   to post
+          BRANCH    EXIT,ML0200
+          CALL      EXTR0000                      * extract details
+          BRANCH    EXIT,ML0200
+.
+ML0700    CALL      LSEL0000                      * select general letter
+.                                                   *    for printing
+ML0720    CALL      SET0000                       * set up values for % var's
+          BRANCH    EXIT,ML0750
+.
+          MOVE      SP1,BOKLCOMM
+          MATCH     "1",PTCNSMSN
+          GOTO      ML0745 IF NOT EQUAL
+.
+          MOVE      BLETCOMM,BOKLCOMM
+          MATCH     "1",BOKLCOMM
+          IF        @EQUAL
+            CALL      PRMSGH00                   * Normal SMS header tag
+          ENDIF
+.
+ML0745    CALL      PRIN0000                      * print letters
+          BRANCH    EXIT,ML0700,ML0720
+.
+          MATCH     "1",BOKLCOMM
+          IF        @EQUAL
+            CALL      PRMSGH00
+          ENDIF
+.
+ML0750    CALL      MORE0000                      * any more letters to print
+          BRANCH    EXIT,ML0200,ML0700
+.
+ML0800    MATCH     "1",PTCNSMSN       * Using SMS Notifications?
+          IF        !@EQUAL
+            DISPLAY   *P1:24,*EL,*B,*V2LON,"** 'Using SMS Notifications' ":
+                      "parameter is not enabled ** ";
+            CALL      HITENTER
+            GOTO      ML9999
+          ENDIF
+.
+          MATCH     "1",PTCNNEWC
+          IF        !@EQUAL
+            DISPLAY   *P1:24,*EL,*B,*V2LON,"** 'Using New Contacts' ":
+                      "parameter is not enabled ** ";
+            CALL      HITENTER
+            GOTO      ML9999
+          ENDIF
+.
+          CALL      INBK0000                      * Input search criteria
+          BRANCH    EXIT,ML0200
+.          
+          CALL      CONTQST                       * Ok to Continue ?
+          BRANCH    CEXIT,ML0810:                 * Yes
+                          ML0800:                 * No
+                          ML0200                  * Cancel
+          GOTO      ML9999
+.
+ML0810    CALL      PRBK0000                      * Process bulk bookings (SMS)
+          CALL      KTMP0000
+          GOTO      ML9999
+.
+ML1000    MATCH     "1",PTCNSMSN
+          IF        !@EQUAL
+            DISPLAY   *P1:24,*EL,*B,*V2LON,"** 'Using SMS Notifications' ":
+                      "parameter is not enabled ** ";
+            CALL      HITENTER
+            GOTO      ML9999
+          ENDIF
+.
+          MATCH     "1",PTCNNEWC
+          IF        !@EQUAL
+            DISPLAY   *P1:24,*EL,*B,*V2LON,"** 'Using New Contacts' ":
+                      "parameter is not enabled ** ";
+            CALL      HITENTER
+            GOTO      ML9999
+          ENDIF
+.
+          MOVE      ONE,NOSMSFLT
+.
+          CALL      BOKINP00
+          BRANCH    EXIT,ML9999
+.
+          CALL      PRBK0000
+          CALL      KTMP0000
+.
+          MOVE      SP1,NOSMSFLT
+          GOTO      ML9999
+.
+ML5000    CALL      WOPTN000                      * Display web options
+          BRANCH    EXIT,ML9999
+          BRANCH    WOPTION,ML5100,ML5200
+.
+ML5100    CALL      EXTR0000                      * extract details
+          BRANCH    EXIT,ML0200
+          GOTO      ML9999
+.
+ML5200    CALL      LSEL0000                      * select general letter
+.                                                 *    for printing
+ML5210    CALL      SET0000                       * set up values for % var's
+          BRANCH    EXIT,ML0200
+          CALL      PRIN0000                      * print letters
+          BRANCH    EXIT,ML0200,ML5210
+          GOTO      ML0200
+.
+ML9999    PREP      TEMP1,FNAMER
+          CLOSE     TEMP1,DELETE
+          CHAIN     PGM
++
+.**********************************************************************
+.*                           INIT0000                                 *
+.*                   Display header and open files                    *
+.**********************************************************************
+INIT0000  CALL      DISPHEAD
+          DISPLAY   *P51:24,"Opening  bokrc1af";
+          OPEN      BOKRC1A1,"bokrc1af"
+          OPEN      BOKRC1A4,"bokrc1af"
+          DISPLAY   *P60:24,"bokletrf";
+          OPEN      BOKLETR1,"bokletrf"
+          OPEN      BOKLETR2,"bokletrf"
+          DISPLAY   *P60:24,"patdo1af";
+          OPEN      PATDO1A1,"patdo1af"
+          OPEN      PATCODE1,"patcodes"
+.
+          DISPLAY   *P60:24,"patpramf";
+          OPEN      PATPR1A1,"patpr1af"
+          OPEN      PATPX1A1,"patpx1af"
+.
+          DISPLAY   *P60:24,"patma1af";
+          OPEN      PATMA1A1,"patma1af"
+.
+          DISPLAY   *P60:24,"patmx1af";
+          OPEN      PATMX1A1,"patmx1af"
+.
+          DISPLAY   *P60:24,"pmspx2af";
+          OPEN      PMSPX2A1,"pmspx2af"
+.
+          DISPLAY   *P60:24,"oprdetaf"
+          OPEN      OPRDETA2,"oprdetaf"
+.
+          DISPLAY   *P64:24,"pathspaf"    
+          OPEN      PATHSPA1,"pathspaf"
+.
+          DISPLAY   *P64:24,"pmshcpaf"
+          OPEN      PMSHCPA1,"pmshcpaf"
+.
+          DISPLAY   *P64:24,"pmshcpaf"
+          OPEN      PMSHCPA2,"pmshcpaf"
+.
+          OPEN      CONTROLF,"controlf"
+          READ      CONTROLF,ZERO;*43,IBCNMHOS
+          READ      CONTROLF,HUND18;*138,PTCNNEWC
+          READ      CONTROLF,HUND20;*243,PTCNSMSN
+.
+          MATCH     "1",PTCNSMSN
+          IF        @EQUAL
+            DISPLAY    *P60:24,"pmsoosaf"
+            OPEN       PMSOOSA1,"pmsoosaf"
+          ENDIF
+.
+          MATCH     "1",PTCNNEWC
+          IF        @EQUAL
+            DISPLAY   *P60:24,"pmscexaf";
+            OPEN      PMSCEXA1,"pmscexaf"
+          ENDIF
+.
+          DISPLAY   *P60:24,"pmsvx1af";
+          OPEN      PMSVX1A1,"pmsvx1af"
+.
+          DISPLAY   *P60:24,"mltsecaf";
+          OPEN      MLTSECA1,"mltsecaf"
+.
+          DISPLAY   *P60:24,"websecaf";
+          OPEN      WEBSECA3,"websecaf"
+.
+          CALL      IBACLOCK
+          PACK      CURRDATE,CCC,CYY,CMM,CDD
+          REP       " 0",CURRDATE
+.
+.------ set up port dependant temporary file ------
+.
+          CALL      TFILENAM                * Get temp file name
+          MOVE      TFILNAME,FNAMER
+.
+          CALL      TFILENAM
+          MOVE      TFILNAME,FNAMER2
+.
+          MATCH     "IBARSH",PGM
+          GOTO      INIT9999 IF NOT EQUAL 
+.
+          DISPLAY   *P60:24,"bokltsaf";
+          OPEN      BOKLTSA1,"bokltsaf"
+          DISPLAY   *P60:24,"bokltlaf";
+          OPEN      BOKLTLA1,"bokltlaf"
+.
+          DISPLAY   *P60:24,"watproaf";
+          OPEN      WATPROA1,"watproaf"
+.
+          DISPLAY   *P60:24,"patwr1af"
+          OPEN      PATWR1A1,"patwr1af"
+.
+          DISPLAY   *P60:24,"bokrx1af"
+          OPEN      BOKRX1A1,"bokrx1af"
+.
+INIT9999  RETURN
++
+.**********************************************************************
+.*                           OPTN0000                                 *
+.*                   Display the main option screen                   *
+.*  0 = Exit                                                          *
+.*  1 = Print Letters                                                 *
+.**********************************************************************
+OPTN0000  MOVE      FALSE,EXIT
+          DISPLAY   *P1:4,*EF,*V2LON,"0":
+                    *P1:5,"1":
+                    *P1:6,"2":
+                    *P1:7,"3":
+                    *P1:8,"4":
+                    *P2:4,*HOFF,". Exit":
+                    *P2:5,". Print Letters - Adhoc":
+                    *P2:6,". Print Letters - Individual Bookings":
+                    *P2:7,". SMS - Bulk Booking":
+                    *P2:8,". SMS - Individual";
+.
+OPTN1000  DISPLAY   *P1:9,*EL,"Select Item : ";
+          KEYIN     *P15:9,*V2LON,OPTION;
+          COMPARE   ZERO,OPTION
+          GOTO      OPTN9000 IF EQUAL
+          COMPARE   FIVE,OPTION
+          GOTO      OPTN1000 IF NOT LESS
+          GOTO      OPTN9999
+.
+.------ exit option chosen ------
+.
+OPTN9000  MOVE      TRUE,EXIT
+.
+OPTN9999  RETURN
++
+.**********************************************************************
+.*                           CLRP0000                                 *
+.*                  Clears all input parameters                       *
+.**********************************************************************
+CLRP0000  MOVE      FALSE,FLAGDATE
+          MOVE      FALSE,FLAGDEPN
+          MOVE      FALSE,FLAGDEPY
+          MOVE      FALSE,FLAGBOOK
+          MOVE      SP1,DEPPAID
+          MOVE      SP8,BKREBOOK
+          MOVE      SP6,ADMTEST1
+          MOVE      SP6,ADMTEST2
+.
+CLRP9999  RETURN
++
+.**********************************************************************
+.*                             DISP0000                               *
+.*                    Display letter parameter screen                 *
+.**********************************************************************
+DISP0000  DISPLAY   *P1:4,*EF,*V2LON,ONE:
+                    *P1:5,TWO:
+                    *P2:4,*HOFF,". Bookings With Deposit Paid (":
+                    *V2LON,"Y",*HOFF,"/",*V2LON,"N",*HOFF,") : ":
+                    *P2:5,". Admission Date Range             : ";
+.
+DISP9999  RETURN
++
+.**********************************************************************
+.*                             SEL0000                                *
+.*                Select field to modify or OK to post - General      *
+.**********************************************************************
+SEL0000   MOVE      FALSE,EXIT
+          CALL      MAINQST
+          COMPARE   ZERO,CCITEM                     * zero to post
+          GOTO      SEL9999 IF EQUAL
+          COMPARE   "-1",CCITEM                     * -1 to cancel
+          GOTO      SEL9000 IF EQUAL
+          COMPARE   THREE,CCITEM
+          GOTO      SEL0000 IF NOT LESS             * invalid selection
+          BRANCH    CCITEM,SEL1000,SEL2000
+.
+SEL1000   CALL      DEPS0000                        * input deposit
+          GOTO      SEL0000
+.
+SEL2000   CALL      ADMS0000                        * input admission date
+          GOTO      SEL0000
+.
+.------ cancel option chosen ------
+.
+SEL9000   MOVE      TRUE,EXIT
+.
+SEL9999   RETURN
++
+.**********************************************************************
+.*                             DEPS0000                               *
+.*                   Input deposit paid field                         *
+.**********************************************************************
+DEPS0000  MOVE      TRUE,FLAGDEPY
+          MOVE      FALSE,FLAGDEPN
+          MOVE      SP1,DEPPAID
+          DISPLAY   *P39:4,UNDLN1;
+          KEYIN     *P39:4,*V2LON,*RV,DEPPAID;    * enter if deposits
+          DISPLAY   *P39:4,*V2LON,DEPPAID;        *    are required
+          MATCH     SP1,DEPPAID                   * test for spaces
+          GOTO      DEPS8000 IF EQUAL
+          MATCH     ANSN,DEPPAID                  * test for N entered
+          GOTO      DEPS9000 IF EQUAL
+          MATCH     ANSY,DEPPAID                  * test for Y entered
+          GOTO      DEPS0000 IF NOT EQUAL
+          DISPLAY   *P39:4,*V2LON,*EL,"Yes";
+          GOTO      DEPS9999
+.
+.------ spaces entered ------
+.
+DEPS8000  MOVE      FALSE,FLAGDEPY
+          MOVE      FALSE,FLAGDEPN
+          DISPLAY   *P39:4,*EL;
+          GOTO      DEPS9999
+.
+.------ No Deposits required ------
+.
+DEPS9000  MOVE      FALSE,FLAGDEPY
+          MOVE      TRUE,FLAGDEPN
+          DISPLAY   *P39:4,*V2LON,*EL,"No";
+.
+DEPS9999  RETURN
++
+.**********************************************************************
+.*                             BOOK0000                               *
+.*                    Input a single booking number                   *
+.**********************************************************************
+BOOK0000  MOVE      FALSE,FLAGBOOK
+          PREP      TEMP1,FNAMER
+          MOVE      FALSE,EXIT
+          DISPLAY   *P1:4,*EF,"Booking Number : ";
+.
+BOOK1000  MOVE      ZEROVISN,BKREBOOK
+          DISPLAY   *P18:4,*EL,UNDLN8;
+          KEYIN     *P18:4,*V2LON,*RV,BKREBOOK;
+          DISPLAY   *P18:4,*V2LON,BKREBOOK;
+          MATCH     ZEROVISN,BKREBOOK
+          GOTO      BOOK9900 IF EQUAL
+          MOVE      BKREBOOK,BOKSADMN
+          MOVE      BKREBOOK,KEY8
+          CALL      RDBKREC1
+          BRANCH    OVRCD,BOOK9000
+          CALL      EXTX0000                    * extract relevant details
+          MOVE      TRUE,FLAGBOOK
+          DISPLAY   *P1:24,*EL,"Details extracted ";
+          CALL      HITENTER 
+          DISPLAY   *P1:24,*EL;
+          GOTO      BOOK1000
+.
+.------ invalid booking number entered ------
+.
+BOOK9000  DISPLAY   *P1:24,*EL,*B,"Booking Number not on file ";
+          CALL      HITENTER 
+          DISPLAY   *P1:24,*EL;
+          GOTO      BOOK1000
+.
+BOOK9900  CLOSE     TEMP1
+          BRANCH    FLAGBOOK,BOOK9999
+          MOVE      TRUE,EXIT
+.
+BOOK9999  RETURN
++
+.**********************************************************************
+.                              BOKINP00                               *
+.                  Get booking number for single SMS                  * 
+.**********************************************************************
+BOKINP00  MOVE      ZERO,EXIT
+          MOVE      SP70,INPBOKNM
+          DISPLAY   *P1:11,*EF,"Booking Number : ";
+          DISPLAY   *P18:11,*EL,UNDLN8;
+          KEYIN     *P18:11,*V2LON,*RV,INPBOKNM;
+          DISPLAY   *P18:11,*V2LON,INPBOKNM;
+          MATCH     SP70,INPBOKNM
+          IF        @EQUAL
+            GOTO      BOKINP90
+          ENDIF
+.
+          MOVE      SP3,SMSLETTR
+          DISPLAY   *P1:12,*EF,"SMS Message to Send : ";
+          KEYIN     *P23:12,*DV,UNDLN3,*P23:12,*V2LON,*JR,SMSLETTR;
+.
+          RESET     SMSLETTR
+          MATCH     SP70,SMSLETTR
+          IF        @EQUAL
+            GOTO      BOKINP90
+          ENDIF
+.
+          PACK      KEY6,SMSLETTR,SP1,SP1,ZERO
+          CALL      RDLET1
+          BRANCH    OVRCD,BOKINP90
+.
+          MOVE      DBLETNO,LETTFORM
+.
+          DISPLAY   *P35:12,*V2LON,BLTEXT
+.
+          MATCH     "1",BLETCOMM
+          IF        @EQUAL
+            GOTO      BOKINP99
+          ENDIF
+.
+BOKINP90  MOVE      ONE,EXIT
+.
+BOKINP99  RETURN
++
+.**********************************************************************
+.*                             ADMS0000                               *
+.*                    Input visit date range                          *
+.**********************************************************************
+ADMS0000  MOVE      "39",CCOL
+          MOVE      ZERO,CHIGHLT
+          MOVE      "5",CVERT
+          MOVE      TRUE,FLAGDATE
+          MOVE      SP2,CCENT
+          MOVE      SP2,CDAY
+          MOVE      SP2,CMON
+          MOVE      SP2,CYEAR
+          DISPLAY   *P39:5,*EL;
+          CALL      KEYDATE                        * keyin first date
+          MATCH     SP2,CDAY                       * test for spaces entered
+          GOTO      ADMS6000 IF EQUAL
+          PACK      ADMTEST1,CCENT,CYEAR,CMON,CDAY
+          MOVE      ADMTEST1,ADMFORM1
+          MOVE      "53",CCOL
+          DISPLAY   *P50:5,"To ";
+          MOVE      SP2,CDAY
+          MOVE      SP2,CMON
+          MOVE      SP2,CYEAR
+          MOVE      SP2,CCENT
+          CALL      KEYDATE                        * keyin second date
+          MATCH     SP2,CDAY
+          GOTO      ADMS7000 IF EQUAL              * test for spaces entered
+          PACK      ADMTEST2,CCENT,CYEAR,CMON,CDAY
+          MOVE      ADMTEST2,ADMFORM2
+          COMPARE   ADMFORM1,ADMFORM2              * test date range
+          GOTO      ADMS7000 IF LESS
+          GOTO      ADMS9999
+.
+.------ spaces entered for date ------
+.
+ADMS6000  DISPLAY   *P39:5,*EL;
+          MOVE      FALSE,FLAGDATE
+          GOTO      ADMS9999
+.
+.------ date range not valid ------
+.
+ADMS7000  DISPLAY   *P1:24,*EL,*B,"Invalid entry for date range ";
+          CALL      HITENTER 
+          DISPLAY   *P1:24,*EL;
+          GOTO      ADMS0000
+.
+ADMS9999  RETURN
++
+.**********************************************************************
+.*                           EXTR0000                                 *
+.*         Extracts the required information from various files       *
+.*              for general letters                                   *
+.**********************************************************************
+EXTR0000  MOVE      FALSE,EXIT
+          DISPLAY   *P45:24,"Searching";
+.
+          MATCH     "IBARSH",PGM
+          IF        !@EQUAL
+            PREP      TEMP1,FNAMER                   * sets up temporary file
+          ENDIF
+          MOVE      ONE,COUNT
+          COMPARE   ZERO,FLAGDATE
+          GOTO      EXTR0020 IF EQUAL
+          PACK      KEY16,ADMTEST1,SP8
+          CALL      RSBKREC4
+          CALL      RKBKREC4                     * read booking file
+          BRANCH    OVRCD,EXTR8500
+          MATCH     BKREEDAT,ADMTEST2
+          GOTO      EXTR8500 IF LESS
+          GOTO      EXTR0100
+.
+EXTR0020  MOVE      SP20,KEY16
+          CALL      RSBKREC4                     * read booking file
+          CALL      RKBKREC4
+          BRANCH    OVRCD,EXTR8500
+          GOTO      EXTR0100
+.
+.------ read bookings file ------
+.
+EXTR0050  CALL      RKBKREC4
+          BRANCH    OVRCD,EXTR8000
+          COMPARE   ZERO,FLAGDATE
+          GOTO      EXTR0100 IF EQUAL
+          MATCH     BKREEDAT,ADMTEST2
+          GOTO      EXTR8000 IF LESS
+.
+EXTR0100  MOVE      BKREBOOK,BOOKNUM
+          DISPLAY   *P45:24,"Searching ",*V2LON,BKREBOOK;
+.
+          BRANCH    FLAGDEPY,EXTR1000
+.
+EXTR0110  BRANCH    FLAGDEPN,EXTR2000
+.
+EXTR0140  MATCH     "IBARSH",PGM
+          IF        @EQUAL
+            PACK      KEY12,SELECTID,BOOKNUM,SP70
+            CALL      RDBKLTL1
+            COMPARE   ZERO,OVRCD
+            GOTO      EXTR0050 IF EQUAL
+            MOVE      SELECTID,BKLLSEID
+            MOVE      BOOKNUM,BKLLBOOK
+            MOVE      SP1,BKLLSTAT
+            MOVE      SP70,BKLLSPAR
+            CALL      WRBKLTL1
+          ELSE
+            UNPACK    CDATE,CDAY,DUMMY,CMON,DUMMY,CCENT,CYEAR
+            CALL      FDAT0000                        * format todays date
+            MOVE      DATELINE,FDATE
+            MOVE      "99",CDAY
+            UNPACK    BKREEDAT,CCENT,CYEAR,CMON,CDAY
+            CALL      FDAT0000                        * format expected
+            MOVE      DATELINE,XBDATE                 *   booking date
+            CALL      FNAM0000                        * format patients name
+            MOVE      NAMELINE,FULLNAME
+            MOVE      BKREADOC,KEY6                    *    booking file
+            CALL      FDOC0000                        * format doctors name
+            MOVE      DOCLINE,DOCTNAM
+.
+.------ write formatted variables to temporary file ------
+.
+            WRITE     TEMP1,SEQ;BOOKNUM,FDATE,DOCTNAM,XBDATE,FULLNAME
+          ENDIF
+.
+          DISPLAY   *P66:24,*EL,"Found ",*V2LON,BOOKNUM;
+          ADD       ONE,COUNT
+.
+          GOTO      EXTR0050
+.
+.------ check bookings with deposits paid ------
+.
+EXTR1000  MATCH     DEPPAID,BKREPREA
+          GOTO      EXTR0050 IF NOT EQUAL
+          GOTO      EXTR0140
+.
+.------ check bookings with deposits not paid ------
+.
+EXTR2000  MATCH     DEPPAID,BKREPREA
+          GOTO      EXTR0050 IF NOT EQUAL
+          GOTO      EXTR0140
+.
+.------ all records have been found ------
+.
+EXTR8000  COMPARE   ONE,COUNT
+          GOTO      EXTR8500 IF EQUAL
+          DISPLAY   *P1:24,*EL,*B,"All records have been extracted ";
+          CALL      HITENTER
+.
+          MATCH     "IBARSH",PGM
+          IF        !@EQUAL
+            CLOSE     TEMP1
+            OPEN      TEMP1,FNAMER
+          ENDIF
+          GOTO      EXTR9999
+.
+.------ no records found ------
+.
+EXTR8500  DISPLAY   *P1:24,*EL,*B,"No records available for given parameters ";
+          CALL      HITENTER
+          MATCH     "IBARSH",PGM
+          IF        !@EQUAL
+            CLOSE     TEMP1
+          ENDIF
+          MOVE      TRUE,EXIT
+.
+EXTR9999  RETURN
++
+.**********************************************************************
+.*                               EXTX0000                             *
+.*            Routine to extract details for a given booking number   *
+.**********************************************************************
+EXTX0000  UNPACK    CDATE,CDAY,DUMMY,CMON,DUMMY,CCENT,CYEAR
+          CALL      FDAT0000                        * format todays date
+          MOVE      DATELINE,FDATE
+          MOVE      "99",CDAY
+          UNPACK    BKREEDAT,CCENT,CYEAR,CMON,CDAY
+          CALL      FDAT0000                        * format expected
+          MOVE      DATELINE,XBDATE                 *    booking date
+          CALL      FNAM0000                        * format patients name
+          MOVE      NAMELINE,FULLNAME
+          MOVE      BKREADOC,KEY6                   *    booking file
+          CALL      FDOC0000                        * format doctors name
+          MOVE      DOCLINE,DOCTNAM
+          MOVE      BKREBOOK,BOOKNUM
+.
+.------ write formatted variables to temporary file ------
+.
+          WRITE     TEMP1,SEQ;BOOKNUM,FDATE,DOCTNAM,XBDATE,FULLNAME
+.
+EXTX9999  RETURN
++
+.**********************************************************************
+.*                           FDAT0000                                 *
+.*                 Routine to format the date                         *
+.**********************************************************************
+FDAT0000  CLEAR     DATELINE
+          MATCH     SP2,CDAY
+          GOTO      FDAT7000 IF EQUAL
+          MATCH     "99",CDAY
+          GOTO      FDAT7000 IF EQUAL
+          MOVE      CDAY,FORM2
+.
+.------ add date extension onto the day ------
+.
+          LOAD      DEXT,FORM2,DEXT1,DEXT2,DEXT3,DEXT4,DEXT4,DEXT4,DEXT4:
+                    DEXT4,DEXT4,DEXT4,DEXT4,DEXT4,DEXT4,DEXT4:
+                    DEXT4,DEXT4,DEXT4,DEXT4,DEXT4,DEXT4,DEXT1:
+                    DEXT2,DEXT3,DEXT4,DEXT4,DEXT4,DEXT4,DEXT4:
+                    DEXT4,DEXT4,DEXT1
+          MOVE      CMON,FORM2
+.
+.------ change month into long format ------
+.
+          LOAD      MONTH,FORM2,MONTH1,MONTH2,MONTH3,MONTH4,MONTH5,MONTH6:
+                    MONTH7,MONTH8,MONTH9,MONTH10,MONTH11,MONTH12
+          RESET     CDAY
+          CMATCH    "0",CDAY
+          GOTO      FDAT1000 IF NOT EQUAL
+          BUMP      CDAY
+.
+.------ pack the formatted date ------
+.
+FDAT1000  PACK      DATELINE,CDAY,DEXT,SP1,MONTH,SP1,CCENT,CYEAR
+          MOVE      DATELINE,LINE
+          CALL      COMP0000
+          MOVE      LINE,DATELINE
+          GOTO      FDAT9999
+.
+.------ date does not exist ------
+.
+FDAT7000  MOVE      "99th December 1999",DATELINE
+          GOTO      FDAT9999
+.
+FDAT9999  RETURN
++
+.**********************************************************************
+.*                              FDOC0000                              *
+.*                 Routine to format doctors name                     *
+.**********************************************************************
+FDOC0000  CLEAR     DOCLINE
+          CALL      RDDOCT1                        * read doctor file
+          BRANCH    OVRCD,FDOC7000
+          CLEAR     INITIAL
+          APPEND    SP1,INITIAL
+          MOVE      DGNAME,ANS
+          APPEND    ANS,INITIAL
+          APPEND    ". ",INITIAL
+          RESET     INITIAL
+          PACK      DOCLINE,DTITL,INITIAL,DSNAME   * pack formatted doctors
+          MOVE      DOCLINE,LINE                   *   name
+          CALL      COMP0000                       * compress blanks
+          CALL      CASE0000                       * convert to lower case
+          MOVE      LINE,DOCLINE
+          GOTO      FDOC9999
+.
+.------ doctors name does not exist ------
+.
+FDOC7000  MOVE      "*********************************",DOCLINE
+          GOTO      FDOC9999
+.
+FDOC9999  RETURN
++
+.**********************************************************************
+.*                           FNAM0000                                 *
+.*                 Routine to format patients name                    *
+.**********************************************************************
+FNAM0000  CLEAR     NAMELINE
+          CALL      GPMI0000
+          BRANCH    EXIT,FNAM9999
+.
+          RESET     PTITL
+          MATCH     SP4,PTITL                     * test title for spaces
+          GOTO      FNAM2000 IF EQUAL
+.
+FNAM0500  CMATCH    SP1,PTITL
+          GOTO      FNAM1000 IF EQUAL
+          MOVE      PTITL,ANS                    * append title to nameline
+          APPEND    ANS,NAMELINE
+          BUMP      PTITL
+          GOTO      FNAM1000 IF EOS
+          GOTO      FNAM0500
+.
+FNAM1000  APPEND    DOT,NAMELINE
+          APPEND    SP1,NAMELINE
+          MATCH     SP20,PGNAME                  * test given name for
+          GOTO      FNAM1700 IF EQUAL            *    spaces
+.
+FNAM1500  APPEND    PGNAME,NAMELINE
+          APPEND    SP1,NAMELINE                 * append given name to
+.                                                   *    nameline
+FNAM1700  APPEND    PSNAME,NAMELINE
+          RESET     NAMELINE                     * append surname to
+          MOVE      NAMELINE,LINE                *    nameline
+          CALL      COMP0000                     * compress blanks
+          CALL      CASE0000                     * convert to lower case
+          MOVE      LINE,NAMELINE
+          GOTO      FNAM9999
+.
+FNAM2000  MATCH     SP20,PGNAME                  * test given name for
+          GOTO      FNAM1500 IF NOT EQUAL        *     spaces
+          GOTO      FNAM1700
+.
+FNAM9999  RETURN
++
+.**********************************************************************
+.*                              COMP0000                              *
+.*       Routine to compress excessive blanks in LINE                 *
+.**********************************************************************
+COMP0000  MOVE      LINE,DIM55
+          PACK      TEMP55,SP20,SP20,SP10,SP5
+          MATCH     TEMP55,DIM55                 * test line for spaces
+          GOTO      COMP9999 IF EQUAL
+          CLEAR     LINE
+.
+COMP1000  CMATCH    SP1,DIM55
+          GOTO      COMP5000 IF NOT EQUAL        * compress leading blanks
+          BUMP      DIM55
+          GOTO      COMP1000 IF NOT EOS
+          GOTO      COMP8000
+.
+COMP5000  MOVE      DIM55,TEMP55
+          MOVE      TEMP55,DIM55
+          ENDSET    DIM55
+.
+COMP5100  CMATCH    SP1,DIM55
+          GOTO      COMP7000 IF NOT EQUAL        * compress trailing blanks
+          BUMP      DIM55,-1
+          GOTO      COMP5100
+.
+COMP7000  LENSET    DIM55
+          RESET     DIM55
+.
+COMP7100  MOVE      DIM55,ANS
+          APPEND    ANS,LINE
+          BUMP      DIM55                        * compress multiple blanks
+          GOTO      COMP8000 IF EOS              *   from in-between words
+          CMATCH    SP1,DIM55
+          GOTO      COMP7100 IF NOT EQUAL
+          MOVE      DIM55,ANS
+          APPEND    ANS,LINE
+.
+COMP7200  BUMP      DIM55
+          CMATCH    SP1,DIM55
+          GOTO      COMP7100 IF NOT EQUAL
+          GOTO      COMP7200
+.
+COMP8000  RESET     LINE
+          GOTO      COMP9999
+.
+COMP9999  RETURN
++
+.**********************************************************************
+.*                             CASE0000                               *
+.*  Routine to convert all except first character of each word to     *
+.*        lower case                                                  *
+.**********************************************************************
+CASE0000  MOVE      ONE,FIRSTCH
+          RESET     LINE
+.
+CASE1000  CMATCH    SP1,LINE
+          GOTO      CASE5000 IF EQUAL            * match char to space
+          BRANCH    FIRSTCH,CASE2000
+          MOVE      LINE,ANS
+          RESET     UPPLOW
+          SCAN      ANS,UPPLOW                   * test to see if char is
+          GOTO      CASE1100 IF EQUAL            *   a letter
+          MOVE      ONE,FIRSTCH
+          GOTO      CASE3000                     * any char but a letter
+.                                                *         found
+.
+CASE1100  RESET     UPPLOW
+          OR        040,LINE                     * actual conversion to
+.                                                * lower case (believe it
+.                                                *             or not!!!)
+.
+CASE2000  MOVE      ZERO,FIRSTCH                 * not on first char any
+.                                                   *   more
+CASE3000  BUMP      LINE
+          GOTO      CASE1000 IF NOT EOS          * move to next char
+          RESET     LINE                         * end of line reached
+          GOTO      CASE9999
+.
+CASE5000  MOVE      ONE,FIRSTCH                  * first char was a space
+          GOTO      CASE3000
+.
+CASE9999  RETURN
++
+.**********************************************************************
+.*                              INBK0000                              *
+.*                       Input search criteria                        *
+.**********************************************************************
+INBK0000  MOVE      SP70,FILTHOSP
+.
+          MOVE      SP3,SMSLETTR
+          DISPLAY   *P1:10,*EF,"SMS Message to Send : "
+          KEYIN     *P23:10,*DV,UNDLN3,*P23:10,*V2LON,*JR,SMSLETTR;
+.
+          RESET     SMSLETTR
+          MATCH     SP70,SMSLETTR
+          GOTO      INBK9100 IF EQUAL
+.
+          PACK      KEY6,SMSLETTR,SP1,SP1,ZERO,SP70
+          CALL      RDLET1
+          BRANCH    OVRCD,INBK9200
+.
+          MATCH     DBLETNO,SMSLETTR
+          GOTO      INBK9200 IF NOT EQUAL
+.
+          MOVE      DBLETNO,LETTFORM
+          MOVE      BLETCOMM,LETRCOMM       * Store our Communication Method
+.
+          MATCH     "1",LETRCOMM            * SMS Notification?
+          GOTO      INBK9300 IF NOT EQUAL
+.
+          DISPLAY   *P35:10,*V2LON,BLTEXT
+.
+.         Keyin From Date...
+.
+INBK1000  DISPLAY   *P1:11,*EF,"Keyin From Date     : ";
+          MOVE      "11",CVERT
+          MOVE      "23",CCOL
+          DISPLAY   *P23:11,*EL;
+.
+          UNPACK    SP8,CYEAR,CMON,CDAY
+          MOVE      CCC,CCENT
+          CALL      KEYDATE
+          BRANCH    OVRCD,INBK0000     * nothing entered; go back to start
+.
+          PACK      FROMDATE,CCENT,CYEAR,CMON,CDAY
+          REP       " 0",FROMDATE
+          UNPACK    FROMDATE,XCENT1,XYEAR1,XMON1,XDAY1
+          PACK      DISPTDTE,XDAY1,SLASH,XMON1,SLASH,XCENT1,XYEAR1
+.
+          MATCH     FROMDATE,CURRDATE    * allow current date
+          GOTO      INBK2000 IF EQUAL
+.
+          MATCH     FROMDATE,CURRDATE
+          IF        !@LESS
+            DISPLAY   *P1:24,*EL,*B,*V2LON,"** From Date must be in the Future ** ";
+            CALL      HITENTER
+            GOTO      INBK1000
+          ENDIF
+          GOTO      INBK2000
+.
+.         Keyin To Date
+.
+INBK2000  DISPLAY   *P1:12,"Keyin To Date       : ";
+          MOVE      "12",CVERT
+          MOVE      "23",CCOL
+          DISPLAY   *P23:12,*EL;
+.
+          UNPACK    FROMDATE,CCENT,CYEAR,CMON,CDAY
+          CALL      KEYDATE
+          PACK      TODATE,CCENT,CYEAR,CMON,CDAY
+          REP       " 0",TODATE
+          UNPACK    TODATE,XCENT2,XYEAR2,XMON2,XDAY2
+.
+          MATCH     FROMDATE,TODATE         * To Date must be  >= From Date
+          IF        @LESS
+            DISPLAY   *P1:24,*EL,*B,*V2LON:
+                    "** To Date must be greater than or equal to From Date ** ";
+            CALL      HITENTER
+            GOTO      INBK2000
+          ENDIF
+          GOTO      INBK3000
+.
+.         Hospital
+.
+INBK3000  IF        IBCNMHOS = 1
+            DISPLAY   *P1:13,*EL,"Hospital Id         : ";
+            MOVE      "23",ECOL
+            MOVE      "13",EVERT
+            MOVE      SP3,CKYIDEF3
+            MOVE      ZERO,CKYIMAND
+            CALL      PATHSPKY
+            IF        EXIT = ONE
+              MOVE      SP70,FILTHOSP
+              MOVE      "All Hospitals",PTHSNAME
+              MOVE      SP70,PTHSHOSP
+              DISPLAY   *P23:13,*EL,PTHSNAME;
+            ELSE
+              IF        EXIT = 2
+                MOVE      SP3,FILTHOSP
+                GOTO      INBK9400
+              ELSE
+                MOVE      KEY3,FILTHOSP
+                DISPLAY   *P23:13,*EL,PTHSNAME;
+              ENDIF
+            ENDIF
+          ENDIF
+.
+.         Cat BK (Booking Type)
+.
+INBK3100  DISPLAY   *P1:14,*EL,"Booking Type        : ";
+.
+          KEYIN     *P23:14,*EF,"I(N)clude or (E)xclude : ",INCXBKTP
+          PACK      INCXBKTP,INCXBKTP,SP70
+          MATCH     ANSN,INCXBKTP           * Include
+          IF        !@EQUAL
+            MATCH     ANSE,INCXBKTP         * Exclude
+            IF        !@EQUAL
+              DISPLAY   *P1:24,*EL,*B,*V2LON,"* Invalid I(N)clude (E)xclude":
+                                             " value **";
+              CALL      HITENTER
+              GOTO      INBK3100
+            ENDIF
+          ENDIF
+.
+          MOVE      ZERO,BOKTYCNT      * Booking Type array counter
+          MOVE      ZERO,BOKTYSIZ      * Booking Type array size
+          MOVE      SP10,BOKTYKEY      * Booking Type array size keyin
+.
+          MOVE      ONE,F3
+          WHILE     F3 <= 99
+            PACK      BOKTYARR[F3],SP70 * Clear Admission Type array
+            ADD       ONE,F3
+          DO
+.
+          KEYIN     *P23:14,*EL,"Number of Booking Types : ",BOKTYKEY
+          MATCH     SP70,BOKTYKEY
+          IF        @EOS | @EQUAL
+.
+.           Blank input; i.e. ALL selected
+.
+            DISPLAY   *P23:14,*EL,*V2LON,"All",*HOFF;
+            GOTO      INBK3500
+          ENDIF
+.
+          MOVE      BOKTYKEY,BOKTYSIZ       * Zero Keyins
+          IF        BOKTYSIZ < 1
+            GOTO      INBK3500
+          ENDIF
+.
+          MOVE      ONE,BOKTYCNT
+          DISPLAY   *P23:14,*EL;
+.
+INBK3200  MOVE      "BK",CODE
+          MOVE      SP3,CKYIDEF3
+          MOVE      ZERO,CKYIMAND
+          MOVE      "14",EVERT
+          MOVE      "23",ECOL
+          CALL      PATCODKY
+.
+          IF        EXIT=1
+            MOVE      "All",TDESC
+          ELSE
+            IF        EXIT = 2
+              GOTO      INBK9100
+            ENDIF
+          ENDIF
+          PACK      BOKTYARR[BOKTYCNT],ACODE,SP70
+.
+          DISPLAY   *P26:14,*EL," Added ",*P33:14,*V2LON,TDESC,*HOFF;
+          ADD       ONE,BOKTYCNT
+.
+          COMPARE   BOKTYSIZ,BOKTYCNT
+          GOTO      INBK3200 IF LESS
+          GOTO      INBK3200 IF EQUAL
+.
+.         Keyin Surgeon/Consultant
+.
+INBK3500  DISPLAY   *P1:15,*EF,"Surgeon/Consultant  : "
+.
+          KEYIN     *P23:15,*EF,"I(N)clude or (E)xclude : ",INCXSUCO
+          PACK      INCXSUCO,INCXSUCO,SP70
+          MATCH     ANSN,INCXSUCO           * Include
+          IF        !@EQUAL
+            MATCH     ANSE,INCXSUCO         * Exclude
+            IF        !@EQUAL
+              DISPLAY   *P1:24,*EL,*B,*V2LON,"* Invalid I(N)clude (E)xclude":
+                                             " value **";
+              CALL      HITENTER
+              GOTO      INBK3500
+            ENDIF
+          ENDIF
+.
+          MOVE      ZERO,SUCONCNT      * Surgeon/Consultant array counter
+          MOVE      ZERO,SUCONSIZ      * Surgeon/Consultant array size
+          MOVE      SP10,SUCONKEY      * Surgeon/Consultant array size keyin
+.
+          MOVE      ONE,F3
+          WHILE     F3 <= 99
+            PACK      SUCONARR[F3],SP70 * Clear Suregon/Consultant array
+            ADD       ONE,F3
+          DO
+.
+          KEYIN     *P23:15,*EL,"Number of Surgeon/Consultants : ",SUCONKEY
+          MATCH     SP70,SUCONKEY
+          IF        @EOS | @EQUAL
+.
+.           Blank input; i.e. ALL selected
+.
+            DISPLAY   *P23:15,*EL,*V2LON,"All",*HOFF;
+            GOTO      INBK3700
+          ENDIF
+.
+          MOVE      SUCONKEY,SUCONSIZ       * Zero Keyins
+          IF        SUCONSIZ < 1
+            GOTO      INBK3700
+          ENDIF
+.
+          MOVE      ONE,SUCONCNT
+          DISPLAY   *P23:15,*EL;
+.
+INBK3600  MOVE      SP8,CKYIDEF8
+          MOVE      ZERO,CKYIMAND
+          MOVE      ZERO,CKYINACT
+          MOVE      ZERO,CKYIMODE
+          MOVE      "15",EVERT
+          MOVE      "23",ECOL
+          CALL      PMSHCPKY
+.
+          IF        EXIT=1
+            MOVE      "All",DOCCODE
+          ELSE
+            IF        EXIT = 2
+              GOTO      INBK9100
+            ENDIF
+          ENDIF
+.
+          PACK      SUCONARR[SUCONCNT],PMHCHCPC
+          MOVE      PMHCHCPC,TDESC
+.
+          DISPLAY   *P26:15,*EL," Added ",*P33:15,*V2LON,DOCCODE,*HOFF;
+          ADD       ONE,SUCONCNT
+.
+          COMPARE   SUCONSIZ,SUCONCNT
+          GOTO      INBK3600 IF LESS
+          GOTO      INBK3600 IF EQUAL
+.
+.         Keyin Operating Unit (Cat ST)
+.
+INBK3700  DISPLAY   *P1:16,*EF,"Operating Unit      : "
+.
+          KEYIN     *P23:16,*EF,"I(N)clude, (E)xclude or I(G)nore : ",INCXOPUN
+          PACK      INCXOPUN,INCXOPUN,SP70
+.
+          MATCH     ANSG,INCXOPUN
+          GOTO      INBK4000 IF EQUAL
+.
+          MATCH     ANSN,INCXOPUN           * Include
+          IF        !@EQUAL
+            MATCH     ANSE,INCXOPUN         * Exclude
+            IF        !@EQUAL
+              DISPLAY   *P1:24,*EL,*B,*V2LON,"* Invalid I(N)clude (E)xclude":
+                                             "  I(G)nore value **";
+              CALL      HITENTER
+              GOTO      INBK3700
+            ENDIF
+          ENDIF
+.
+          MOVE      ZERO,OPEUNCNT      * Care Type array counter
+          MOVE      ZERO,OPEUNSIZ      * Care Type array size
+          MOVE      SP10,OPEUNKEY      * Care Type array size keyin
+.
+          MOVE      ONE,F3
+          WHILE     F3 <= 99
+            PACK      OPEUNARR[F3],SP70 * Clear Care Type array
+            ADD       ONE,F3
+          DO
+.
+          KEYIN     *P23:16,*EL,"Number of Operating Units      : ",OPEUNKEY
+          MATCH     SP70,OPEUNKEY
+          IF        @EOS | @EQUAL
+.
+.           Blank input; i.e. ALL selected
+.
+            DISPLAY   *P23:16,*EL,*V2LON,"All",*HOFF;
+            GOTO      INBK4000
+          ENDIF
+.
+          MOVE      OPEUNKEY,OPEUNSIZ       * Zero Keyins
+          IF        OPEUNSIZ < 1
+            GOTO      INBK4000
+          ENDIF
+.
+          MOVE      ONE,OPEUNCNT
+          DISPLAY   *P23:16,*EL;
+.
+INBK3750  MOVE      "ST",CODE
+          MOVE      SP3,CKYIDEF3
+          MOVE      ZERO,CKYIMAND
+          MOVE      "16",EVERT
+          MOVE      "23",ECOL
+          CALL      PATCODKY
+.
+          IF        EXIT=1
+            MOVE      "All",TDESC
+          ELSE
+            IF        EXIT = 2
+              GOTO      INBK9100
+            ENDIF
+          ENDIF
+          PACK      OPEUNARR[OPEUNCNT],ACODE,SP70
+.
+          DISPLAY   *P26:16,*EL," Added ",*P33:16,*V2LON,TDESC,*HOFF;
+          ADD       ONE,OPEUNCNT
+.
+          COMPARE   OPEUNSIZ,OPEUNCNT
+          GOTO      INBK3750 IF LESS
+          GOTO      INBK3750 IF EQUAL
+.
+.         Keyin Claim Type
+.
+INBK4000  DISPLAY   *P1:17,*EF,"Claim Type          : "
+.
+          KEYIN     *P23:17,*EF,"I(N)clude or (E)xclude : ",INCXCLAM
+          PACK      INCXCLAM,INCXCLAM,SP70
+          MATCH     ANSN,INCXCLAM           * Include
+          IF        !@EQUAL
+            MATCH     ANSE,INCXCLAM         * Exclude
+            IF        !@EQUAL
+              DISPLAY   *P1:24,*EL,*B,*V2LON,"* Invalid I(N)clude (E)xclude":
+                                             " value **";
+              CALL      HITENTER
+              GOTO      INBK4000
+            ENDIF
+          ENDIF
+.
+          MOVE      ZERO,CLAMCCNT      * Claim Code array counter
+          MOVE      ZERO,CLAMCSIZ      * Claim Code array size
+          MOVE      SP10,CLAMCKEY      * Claim Code array size keyin
+.
+          MOVE      ONE,F3
+          WHILE     F3 <= 99
+            PACK      CLAMCARR[F3],SP70 * Clear Claim Code array
+            ADD       ONE,F3
+          DO
+.
+          KEYIN     *P23:17,*EL,"Number of Claim Types     : ",CLAMCKEY
+          MATCH     SP70,CLAMCKEY
+          IF        @EOS | @EQUAL
+.
+.           Blank input; i.e. ALL selected
+.
+            DISPLAY   *P23:17,*EL,*V2LON,"All",*HOFF;
+            GOTO      INBK4500
+          ENDIF
+.
+          MOVE      CLAMCKEY,CLAMCSIZ       * Zero Keyins
+          IF        CLAMCSIZ < 1
+            GOTO      INBK4500
+          ENDIF
+.
+          MOVE      ONE,CLAMCCNT
+          DISPLAY   *P23:17,*EL;
+.
+INBK4050  MOVE      "CL",CODE
+          MOVE      SP3,CKYIDEF3
+          MOVE      ZERO,CKYIMAND
+          MOVE      "17",EVERT
+          MOVE      "23",ECOL
+          CALL      PATCODKY
+.
+          IF        EXIT=1
+            MOVE      "All",TDESC
+          ELSE
+            IF        EXIT = 2
+              GOTO      INBK9100
+            ENDIF
+          ENDIF
+          PACK      CLAMCARR[CLAMCCNT],ACODE,SP70
+.
+          DISPLAY   *P26:17,*EL," Added ",*P33:17,*V2LON,TDESC,*HOFF;
+          ADD       ONE,CLAMCCNT
+.
+          COMPARE   CLAMCSIZ,CLAMCCNT
+          GOTO      INBK4050 IF LESS
+          GOTO      INBK4050 IF EQUAL
+.
+.         Admitting Point
+.
+INBK4500  DISPLAY   *P1:18,*EF,"Admitting Point     : "
+.
+          KEYIN     *P23:18,*EF,"I(N)clude or (E)xclude : ",INCXADMP
+          PACK      INCXADMP,INCXADMP,SP70
+          MATCH     ANSN,INCXADMP           * Include
+          IF        !@EQUAL
+            MATCH     ANSE,INCXADMP         * Exclude
+            IF        !@EQUAL
+              DISPLAY   *P1:24,*EL,*B,*V2LON,"* Invalid I(N)clude (E)xclude":
+                                             " value **";
+              CALL      HITENTER
+              GOTO      INBK4500
+            ENDIF
+          ENDIF
+.
+          MOVE      ZERO,ADMPTCNT      * Admitting Point array counter
+          MOVE      ZERO,ADMPTSIZ      * Admitting Point array size
+          MOVE      SP10,ADMPTKEY      * Admitting Point array size keyin
+.
+          MOVE      ONE,F3
+          WHILE     F3 <= 99
+            PACK      ADMPTARR[F3],SP70 * Clear Admitting Point array
+            ADD       ONE,F3
+          DO
+.
+          KEYIN     *P23:18,*EL,"Number of Admitting Points: ",ADMPTKEY
+          MATCH     SP70,ADMPTKEY
+          IF        @EOS | @EQUAL
+.
+.           Blank input; i.e. ALL selected
+.
+            DISPLAY   *P23:18,*EL,*V2LON,"All",*HOFF;
+            GOTO      INBK4600
+          ENDIF
+.
+          MOVE      ADMPTKEY,ADMPTSIZ       * Zero Keyins
+          IF        ADMPTSIZ < 1
+            GOTO      INBK4600
+          ENDIF
+.
+          MOVE      ONE,ADMPTCNT
+          DISPLAY   *P23:18,*EL;
+
+.
+INBK4550  MOVE      "ap",CODE
+          MOVE      SP3,CKYIDEF3
+          MOVE      ZERO,CKYIMAND
+          MOVE      "18",EVERT
+          MOVE      "23",ECOL
+          CALL      PATCODKY
+.
+          IF        EXIT=1
+            MOVE      "All",TDESC
+          ELSE
+            IF        EXIT = 2
+              GOTO      INBK9100
+            ENDIF
+          ENDIF
+          PACK      ADMPTARR[ADMPTCNT],ACODE,SP70
+.
+          DISPLAY   *P26:18,*EL," Added ",*P33:18,*V2LON,TDESC,*HOFF;
+          ADD       ONE,ADMPTCNT
+.
+          COMPARE   ADMPTSIZ,ADMPTCNT
+          GOTO      INBK4550 IF LESS
+          GOTO      INBK4550 IF EQUAL
+.
+.         Patient Type
+.
+INBK4600  DISPLAY   *P1:19,*EF,"Patient Type        : "
+.
+          KEYIN     *P23:19,*EF,"I(N)clude or (E)xclude : ",INCXPTTY
+          PACK      INCXPTTY,INCXPTTY,SP70
+          MATCH     ANSN,INCXPTTY           * Include
+          IF        !@EQUAL
+            MATCH     ANSE,INCXPTTY         * Exclude
+            IF        !@EQUAL
+              DISPLAY   *P1:24,*EL,*B,*V2LON,"* Invalid I(N)clude (E)xclude":
+                                             " value **";
+              CALL      HITENTER
+              GOTO      INBK4600
+            ENDIF
+          ENDIF
+.
+          MOVE      ZERO,PATTYCNT      * Patient Type array counter
+          MOVE      ZERO,PATTYSIZ      * Patient Type array size
+          MOVE      SP10,PATTYKEY      * Patient Type array size keyin
+.
+          MOVE      ONE,F3
+          WHILE     F3 <= 99
+            PACK      PATTYARR[F3],SP70 * Clear Admitting Point array
+            ADD       ONE,F3
+          DO
+.
+          KEYIN     *P23:19,*EL,"Number of Patient Types: ",PATTYKEY
+          MATCH     SP70,PATTYKEY
+          IF        @EOS | @EQUAL
+.
+.           Blank input; i.e. ALL selected
+.
+            DISPLAY   *P23:19,*EL,*V2LON,"All",*HOFF;
+            GOTO      INBK8000
+          ENDIF
+.
+          MOVE      PATTYKEY,PATTYSIZ       * Zero Keyins
+          IF        PATTYSIZ < 1
+            GOTO      INBK8000
+          ENDIF
+.
+          MOVE      ONE,PATTYCNT
+          DISPLAY   *P23:19,*EL;
+.
+INBK4650  MOVE      "P ",CODE
+          MOVE      SP3,CKYIDEF3
+          MOVE      ZERO,CKYIMAND
+          MOVE      "19",EVERT
+          MOVE      "23",ECOL
+          CALL      PATCODKY
+.
+          IF        EXIT=1
+            MOVE      "All",TDESC
+          ELSE
+            IF        EXIT = 2
+              GOTO      INBK9100
+            ENDIF
+          ENDIF
+          PACK      PATTYARR[PATTYCNT],ACODE,SP70
+.
+          DISPLAY   *P26:19,*EL," Added ",*P33:19,*V2LON,TDESC,*HOFF;
+          ADD       ONE,PATTYCNT
+.
+          COMPARE   PATTYSIZ,PATTYCNT
+          GOTO      INBK4650 IF LESS
+          GOTO      INBK4650 IF EQUAL
+.
+INBK8000  CALL      USID0000                * keyin the User Id
+          MOVE      ZERO,EXIT
+          GOTO      INBK9999
+.
+INBK9100  MOVE      ONE,EXIT
+          GOTO      INBK9999
+.
+INBK9200  DISPLAY   *P1:24,*EL,*B,*V2LON,"** Letter Code not found ** ";
+          CALL      HITENTER
+          GOTO      INBK0000
+.
+INBK9300  DISPLAY   *P1:24,*EL,*B,*V2LON,"** Invalid SMS Letter Type ** ";
+          CALL      HITENTER
+          GOTO      INBK0000
+.
+INBK9400  DISPLAY   *P1:24,*EL,*B,*V2LON,"** Invalid Hospital ID ** ";
+          CALL      HITENTER
+          GOTO      INBK3000
+.
+INBK9500  MOVE      ZERO,EXIT
+INBK9999  RETURN
++
+.****************************************************************************
+.         Keyin user id
+.****************************************************************************
+USID0000  KEYIN     *P1:22,*EL,"User Id             : ",USERID;
+          PACK      USERID,USERID,SP70
+.
+          MATCH     SP70,USERID
+          GOTO      USID0000 IF EQUAL
+.
+          CALL      ALHSPA00
+.
+USID9999  RETURN
++
+.------------------------------------------------------------------------------
+. Get user has access to all hospital flag
+.------------------------------------------------------------------------------
+ALHSPA00  MOVE      ZERO,ALLHSPAC
+.
+          PACK      KEY13,USERID,SP70
+          CALL      RDMLSEC1
+          IF        OVRCD=0
+            MOVE     ONE,ALLHSPAC           * user has All hospital access
+          ENDIF
+.
+ALHSPA99  RETURN
++
+.**********************************************************************
+.*                              PRBK0000                              *
+.*                       Bulk send Booking SMS                        *
+.**********************************************************************
+PRBK0000  MOVE      ZERO,EXIT
+.
+          MOVE      "1",BKBLKSMS
+          CALL      EXTBOK00
+          CALL      SEND0000
+          MOVE      SP1,BKBLKSMS
+.
+PRBK9999  RETURN
++
+.******************************************************************************
+.*                           EXTBOK00                 Called by: PROPRE00     *
+.*        Extracts all booking records within the Date Range. Status booked   *
+.*                                                                            *
+.*        Bookings whose UR is NOT in the 'Opt-out of SMS' file will be       *
+.*        written to our temp file for processing.                            *
+.*                                                                            *
+.*        Other (optional) search criteria (Admission Type, Care Type, etc)   *
+.*        will also be used as filters.                                       *
+.******************************************************************************
+EXTBOK00  MOVE      ZERO,EXIT
+          MOVE      ZERO,CNTRNOTS           * reset counter (messages NOT sent)
+.
+          CALL      CTMP0000                * create the tempfile
+          BRANCH    NOSMSFLT,EXTBOK20
+.
+.         Loop all booking file
+.
+          PACK      KEY8,SP70
+          CALL      RSBKREC1
+EXTBOK10  CALL      RKBKREC1
+          BRANCH    OVRCD,EXTBOK99
+.
+          PACK      KEY5,ANSB,ANSK,BKRETYPE,SP70
+          CALL      RDCODE1                 * Read booking type
+          BRANCH    OVRCD,EXTBOK10
+.
+          MATCH     "THE",THCSCOD
+          IF        @EQUAL     
+            MATCH     FROMDATE,BKREADAT     * Admission Date < From Date Range?
+            GOTO      EXTBOK10 IF LESS
+.
+            MATCH     BKREADAT,TODATE       * Admission Date > To Date Range?
+            GOTO      EXTBOK10 IF LESS
+          ELSE
+            MATCH     FROMDATE,BKREEDAT     * Admission Date < From Date Range?
+            GOTO      EXTBOK10 IF LESS
+.
+            MATCH     BKREEDAT,TODATE       * Admission Date > To Date Range?
+            GOTO      EXTBOK10 IF LESS
+          ENDIF
+.
+          PACK      KEY8,DBKREBOO
+          CALL      RDBKREC1
+          BRANCH    OVRCD,EXTBOK10
+.
+          COMPARE   ZERO,BKRESTAT           * Include status of booked only
+          GOTO      EXTBOK10 IF NOT EQUAL
+.
+          CALL      CLAM0000                * Filter Claim Type
+          BRANCH    EXIT,EXTBOK10
+.
+          CALL      FLTBKT00                * Filter Booking Type
+          BRANCH    EXIT,EXTBOK10
+.
+          CALL      FLTOPU00                * Filter Operating Unit
+          BRANCH    EXIT,EXTBOK10
+.
+          CALL      FLTSUC00                * Filter Surgeon/Consultant
+          BRANCH    EXIT,EXTBOK10
+.
+          MOVE      SP70,BKFTHOSP
+.
+          MATCH     SP70,BKREWARD
+          IF        !@EQUAL
+            PACK      KEY6,BKREWARD,SP70
+            CALL      RDSWARD1
+            CALL      RDKWARD1
+            MOVE      PTWDHOSN,BKFTHOSP     * check ward
+            GOTO      EXTBOK15
+          ENDIF
+.
+          PACK      KEY8,DBKREBOO,SP70
+          CALL      RDPMVX11                * check visit
+          COMPARE   ZERO,OVRCD
+          IF        @EQUAL
+            MOVE      PMVXMHOS,BKFTHOSP
+            GOTO      EXTBOK15
+          ENDIF
+.
+          PACK      KEY31,DBKREBOO,SP70
+          CALL      RSOPDEA2
+          CALL      RKOPDEA2                * check operating sessions
+          BRANCH    OVRCD,EXTBOK10
+.
+          MOVE      OPDAHOSP,BKFTHOSP 
+.
+EXTBOK15  IF        IBCNMHOS = 1
+            MATCH     SP70,FILTHOSP         * Hospital Filter
+            IF        !@EQUAL
+              MATCH     BKFTHOSP,FILTHOSP
+              GOTO      EXTBOK10 IF NOT EQUAL
+            ELSE
+              IF        ALLHSPAC = ZERO
+                PACK      KEY13,USERID,PMVXMHOS,SP70  * This hospital access
+                CALL      RDMLSEC1
+                BRANCH    OVRCD,EXTBOK10      * no access to hospital
+              ENDIF
+            ENDIF
+          ENDIF
+.
+          PACK      KEY8,DBKREBOO
+          CALL      RDBKRX11
+          BRANCH    OVRCD,EXTBOK10
+.
+          CALL      ADPT0000                 * Filter Admitting Point
+          BRANCH    EXIT,EXTBOK10
+.
+          CALL      FLTPTT00                 * Filter Patient Type
+          BRANCH    EXIT,EXTBOK10
+.
+          GOTO      EXTBOK30
+.
+EXTBOK20  PACK      KEY8,INPBOKNM,SP70
+          CALL      RDBKREC1
+          BRANCH    OVRCD,EXTBOK99
+.
+.         Check if UR in opt-out file
+.
+EXTBOK30  PACK      KEY8,BKREURNO,SP70
+          CALL      RDPMOOS1           * record exists in 'Opt-out of SMS' file?
+          IF        OVRCD=0
+            BRANCH    NOSMSFLT,EXTBOK99
+            ADD       ONE,CNTRNOTS     * increment NOT sent counter
+            GOTO      EXTBOK10
+          ENDIF
+.
+          COMPARE   ZERO,BKRESTAT           * Include status of booked only
+          GOTO      EXTBOK10 IF NOT EQUAL
+.
+          MOVE      BKREURNO,TEMPURNO
+          MOVE      DBKREBOO,TEMPBKNO
+.
+          CALL      WRTEMP1
+          BRANCH    NOSMSFLT,EXTBOK99
+.
+          GOTO      EXTBOK10
+.
+EXTBOK99  RETURN
++
+.******************************************************************************
+.*                           SEND0000                                         *
+.*        Loops our temp file and formulates an SMS (Booking Type)            *
+.*        for each record (visit).                                            *
+.******************************************************************************
+SEND0000  MOVE      ZERO,CNTRSENT      * Reset counter for messages sent
+.
+          PACK      LETTDATE,CDD,SLASH,CMM,SLASH,CCC,CYY
+.
+          CALL      PRMSGH00           * Print SMS letter header (<messages>)
+.
+          PREP      TEMP1,FNAMER
+.
+          PACK      KEY16,SP70
+          CALL      RSTEMP1
+SEND1000  CALL      RKTEMP1
+          BRANCH    OVRCD,SEND9000
+.
+          MOVE      TEMPBKNO,DBKREBOO
+          CALL      PLET0000           * Print Letter (SMS message)
+.
+          GOTO      SEND1000
+.
+SEND9000  CALL      PRMSGF00           * Print SMS letter footer (</messages>)
+.
+SEND9999  RETURN
++
+.******************************************************************************
+.*                            PLET0000                                        *
+.*                  Print letter (SMS message) for each booking               *
+.******************************************************************************
+PLET0000  MOVE      ZERO,EXIT
+.
+          CALL      SET0000                 * Set the % Variables
+          BRANCH    EXIT,PLET9100
+.
+          CALL      PRIN0000                * Print the actual letter
+          ADD       ONE,CNTRSENT            * Increment sent counter
+.
+PLET9000  MOVE      ZERO,EXIT
+          GOTO      PLET9999
+.
+PLET9100  MOVE      ONE,EXIT
+PLET9999  RETURN
++
+.******************************************************************************
+.* CLAM0000 Check Claim Type (code) exists in filter array                    *
+.*                                                                            *
+.*        Parameter:                                                          *
+.*          CLAMCARR - Care Type(s)                                           *
+.*                                                                            *
+.*        Return:                                                             *
+.*              EXIT : 0 - Exists                                             *
+.*                     1 - Does NOT exist                                     *
+.******************************************************************************
+CLAM0000  IF        CLAMCCNT = 0
+            GOTO      CLAM9000           * ALL Claim Types selected
+          ENDIF
+.
+          IF        CLAMCCNT = 2
+            MATCH     CLAMCARR[ONE],SP70 * ALL Claim Types selected
+            GOTO      CLAM9000 IF EQUAL
+          ENDIF
+.
+          MOVE      ZERO,F3
+CLAM1000  ADD       ONE,F3
+.
+          MATCH     SP70,CLAMCARR[F3]
+          IF        !@EQUAL
+            MATCH     CLAMCARR[F3],BKRECLMT * Do not select blank
+            GOTO      CLAM9000 IF EQUAL     * when all is not selected
+          ENDIF
+.
+          COMPARE   CLAMCCNT,F3
+          GOTO      CLAM1000 IF LESS
+.
+          GOTO      CLAM9100
+.
+CLAM9000  MATCH     ANSE,INCXCLAM    * Exclude
+          IF        @EQUAL
+            MOVE      ONE,EXIT       * Claim Type exists exclude
+          ELSE
+            MOVE      ZERO,EXIT      * Claim Type exists include
+          ENDIF
+          GOTO      CLAM9999
+.
+CLAM9100  MATCH     ANSE,INCXCLAM    * Exclude
+          IF        @EQUAL
+            MOVE      ZERO,EXIT      * Claim Type does NOT exist include
+          ELSE
+            MOVE      ONE,EXIT       * Claim Type does NOT exist exclude
+          ENDIF
+          GOTO      CLAM9999
+.
+CLAM9999  RETURN
++
+.**********************************************************************
+.*                              FLTBKT00                              *
+.*            Check booking type exists in filter array               *
+.*                                                                    *
+.*            Parameter:                                              *
+.*              BOKTYARR - Booking Type(s)                            *
+.*                                                                    *
+.*            Return:                                                 *
+.*                  EXIT : 0 - Exists                                 *
+.*                         1 - Does NOT exist                         *
+.**********************************************************************
+FLTBKT00  IF        BOKTYCNT = 0
+            GOTO      FLTBKT90
+          ENDIF
+.
+          IF        BOKTYCNT = 2
+            MATCH     BOKTYARR[ONE],SP70
+            GOTO      FLTBKT90 IF EQUAL
+          ENDIF
+.
+          MOVE      ZERO,F3
+FLTBKT10  ADD       ONE,F3
+.
+          MATCH     SP70,BOKTYARR[F3]
+          IF        !@EQUAL
+            MATCH     BOKTYARR[F3],BKRETYPE   * Do not select blank
+            GOTO      FLTBKT90 IF EQUAL     * when all is not selected
+          ENDIF
+.
+          COMPARE   BOKTYCNT,F3
+          GOTO      FLTBKT10 IF LESS
+.
+          GOTO      FLTBKT91
+.
+FLTBKT90  MATCH     ANSE,INCXBKTP    * Exclude
+          IF        @EQUAL
+            MOVE      ONE,EXIT       * Booking Type exists exclude
+          ELSE
+            MOVE      ZERO,EXIT      * Booking Type exists include
+          ENDIF
+          GOTO      FLTBKT99
+.
+FLTBKT91  MATCH     ANSE,INCXBKTP    * Exclude
+          IF        @EQUAL
+            MOVE      ZERO,EXIT      * Booking Type does NOT exist include
+          ELSE
+            MOVE      ONE,EXIT       * Booking Type does NOT exist exclude
+          ENDIF
+          GOTO      FLTBKT99
+.
+FLTBKT99  RETURN
++
+.**********************************************************************
+.*                              FLTOPU00                              *
+.*          Check operating unit exists in filter array               *
+.*                                                                    *
+.*            Parameter:                                              *
+.*              OPENUARR - Operating Unit                             *
+.*                                                                    *
+.*            Return:                                                 *
+.*                  EXIT : 0 - Exists                                 *
+.*                         1 - Does NOT exist                         *
+.**********************************************************************
+FLTOPU00  MOVE      ZERO,EXIT
+.
+          MATCH     ANSG,INCXOPUN           * Ignore
+          GOTO      FLTOPU99 IF EQUAL
+.
+          IF        OPEUNCNT = 0
+            GOTO      FLTOPU90
+          ENDIF
+.
+          IF        OPEUNCNT = 2
+            MATCH     OPEUNARR[ONE],SP70
+            GOTO      FLTOPU90 IF EQUAL
+          ENDIF
+.
+          PACK      KEY5,ANSB,ANSK,BKRETYPE,SP70
+          CALL      RDCODE1                 * Read booking type
+          BRANCH    OVRCD,FLTOPU92
+.
+          MATCH     "THE",THCSCOD           * Exclude medical bookings of not
+          GOTO      FLTOPU92 IF NOT EQUAL   * running include all option
+.
+          PACK      KEY31,DBKREBOO,SP70
+          CALL      RSOPDEA2     * get all booking vis numbers
+          CALL      RKOPDEA2     * get first result
+          BRANCH    OVRCD,FLTOPU91
+.
+          MOVE      ZERO,F3
+FLTOPU10  ADD       ONE,F3
+.
+          MATCH     SP70,OPEUNARR[F3]
+          IF        !@EQUAL
+            MATCH     OPEUNARR[F3],OPDAUNIT * Do not select blank
+            GOTO      FLTOPU90 IF EQUAL     * when all is not selected
+          ENDIF
+.
+          COMPARE   OPEUNCNT,F3
+          GOTO      FLTOPU10 IF LESS
+.
+          GOTO      FLTOPU91
+.
+FLTOPU90  MATCH     ANSE,INCXOPUN    * Exclude
+          IF        @EQUAL
+            MOVE      ONE,EXIT       * Operating Unit exists exclude
+          ELSE
+            MOVE      ZERO,EXIT      * Operating Unit exists include
+          ENDIF
+          GOTO      FLTOPU99
+.
+FLTOPU91  MATCH     ANSE,INCXOPUN    * Exclude
+          IF        @EQUAL
+            MOVE      ZERO,EXIT      * Operating Unit does NOT exist include
+          ELSE
+            MOVE      ONE,EXIT       * Operating Unit does NOT exist exclude
+          ENDIF
+          GOTO      FLTOPU99
+.
+FLTOPU92  MOVE      ONE,EXIT         * Exclude record
+          GOTO      FLTOPU99
+.
+FLTOPU99  RETURN
++
+.**********************************************************************
+.*                              FLTSUC00                              *
+.*          Check surgeon/consultant exists in filter array           *
+.*                                                                    *
+.*            Parameter:                                              *
+.*              SUCONARR - Surgeon/Consultant                         *
+.*                                                                    *
+.*            Return:                                                 *
+.*                  EXIT : 0 - Exists                                 *
+.*                         1 - Does NOT exist                         *
+.**********************************************************************
+FLTSUC00  IF        SUCONCNT = 0
+            GOTO      FLTSUC90
+          ENDIF
+.
+          IF        SUCONCNT = 2
+            MATCH     SUCONARR[ONE],SP70
+            GOTO      FLTSUC90 IF EQUAL
+          ENDIF
+.
+          MOVE      ZERO,F3
+FLTSUC10  ADD       ONE,F3 
+.
+          MATCH     SP70,SUCONARR[F3]
+          IF        !@EQUAL
+            MATCH     SUCONARR[F3],BKREADOC   * Do not select blank
+            GOTO      FLTSUC90 IF EQUAL     * when all is not selected
+          ENDIF
+.
+          COMPARE   SUCONCNT,F3
+          GOTO      FLTSUC10 IF LESS
+.
+          GOTO      FLTSUC91
+.
+FLTSUC90  MATCH     ANSE,INCXSUCO    * Exclude
+          IF        @EQUAL
+            MOVE      ONE,EXIT       * Surgeon/Consultant exists exclude
+          ELSE
+            MOVE      ZERO,EXIT      * Surgeon/Consultant exists include
+          ENDIF
+          GOTO      FLTSUC99
+.
+FLTSUC91  MATCH     ANSE,INCXSUCO    * Exclude
+          IF        @EQUAL
+            MOVE      ZERO,EXIT      * Surgeon/Consultant does NOT exist include
+          ELSE
+            MOVE      ONE,EXIT       * Surgeon/Consultant does NOT exist exclude
+          ENDIF
+          GOTO      FLTSUC99
+.
+FLTSUC99  RETURN
++
+.******************************************************************************
+.* ADPT0000 Check Admitting Point (code) exists in filter array               *
+.*                                                                            *
+.*        Parameter:                                                          *
+.*          ADMPTARR - Care Type(s)                                           *
+.*                                                                            *
+.*        Return:                                                             *
+.*              EXIT : 0 - Exists                                             *
+.*                     1 - Does NOT exist                                     *
+.******************************************************************************
+ADPT0000  IF        ADMPTCNT = 0
+            GOTO      ADPT9000           * ALL Admitting Points selected
+          ENDIF
+.
+          IF        ADMPTCNT = 2
+            MATCH     ADMPTARR[ONE],SP70 * ALL Admitting Points selected
+            GOTO      ADPT9000 IF EQUAL
+          ENDIF
+.
+          MOVE      ZERO,F3
+ADPT1000  ADD       ONE,F3
+.
+          MATCH     SP70,ADMPTARR[F3]
+          IF        !@EQUAL
+            MATCH     ADMPTARR[F3],BKRXADWD
+            GOTO      ADPT9000 IF EQUAL          * when all is not selected
+          ENDIF
+.
+          COMPARE   ADMPTCNT,F3
+          GOTO      ADPT1000 IF LESS
+.
+          GOTO      ADPT9100
+.
+ADPT9000  MATCH     ANSE,INCXADMP    * Exclude
+          IF        @EQUAL
+            MOVE      ONE,EXIT       * Admitting Point exists exclude
+          ELSE
+            MOVE      ZERO,EXIT      * Admitting Point exists include
+          ENDIF
+          GOTO      ADPT9999
+.
+ADPT9100  MATCH     ANSE,INCXADMP    * Exclude
+          IF        @EQUAL
+            MOVE      ZERO,EXIT      * Admitting Point does NOT exist include
+          ELSE
+            MOVE      ONE,EXIT       * Admitting Point does NOT exist exclude
+          ENDIF
+          GOTO      ADPT9999
+.
+ADPT9999  RETURN
++
+.*********************************************************************
+.* FLTPTT00 Check Patient Type exists in filter array                *
+.*                                                                   *
+.*      Parameter:                                                   *
+.*          PATTYARR - Care Type(s)                                  *
+.*                                                                   *
+.*        Return:                                                    *
+.*              EXIT : 0 - Exists                                    *
+.*                     1 - Does NOT exist                            *
+.*********************************************************************
+FLTPTT00  IF        PATTYCNT = 0
+            GOTO      FLTPTT90
+          ENDIF
+.
+          IF        PATTYCNT = 2
+            MATCH     PATTYARR[ONE],SP70
+            GOTO      FLTPTT90 IF EQUAL
+          ENDIF
+.
+          MOVE      ZERO,F3
+FLTPTT10  ADD       ONE,F3
+.
+          MATCH     SP70,PATTYARR[F3]
+          IF        !@EQUAL
+            MATCH     PATTYARR[F3],BKRECLSS * Do not select blank
+            GOTO      FLTPTT90 IF EQUAL     * when all is not selected
+          ENDIF
+.
+          COMPARE   PATTYCNT,F3
+          GOTO      FLTPTT10 IF LESS
+.
+          GOTO      FLTPTT91
+.
+FLTPTT90  MATCH     ANSE,INCXPTTY    * Exclude
+          IF        @EQUAL
+            MOVE      ONE,EXIT       * Patient Type exists exclude
+          ELSE
+            MOVE      ZERO,EXIT      * Patient Type exists include
+          ENDIF
+          GOTO      FLTPTT99
+.
+FLTPTT91  MATCH     ANSE,INCXPTTY    * Exclude
+          IF        @EQUAL
+            MOVE      ZERO,EXIT      * Patient Type does NOT exist include
+          ELSE
+            MOVE      ONE,EXIT       * Patient Type does NOT exist exclude
+          ENDIF
+          GOTO      FLTPTT99
+.
+
+FLTPTT99  RETURN
++
+.**********************************************************************
+.*                              LSEL0000                              *
+.*                Select general letter to print                      *
+.**********************************************************************
+LSEL0000  MOVE      FALSE,EXIT
+          MOVE      ZERO,COUNTER
+          DISPLAY   *P1:4,*EF:
+                    *P1:5,"Select Letter to Print : ";
+          MOVE      SP3,LETTER
+          DISPLAY   *P26:5,UNDLN3;
+          KEYIN     *P26:5,*V2LON,*RV,LETTER;       * enter letter code
+          DISPLAY   *P26:5,*V2LON,LETTER;
+          MATCH     SP3,LETTER                      * Check for spaces
+          GOTO      LSEL7000 IF EQUAL
+          MATCH     "0",LETTER                      * check for zero
+          GOTO      LSEL7000 IF EQUAL
+          MATCH     QUEST,LETTER                    * Check for a "?"
+          GOTO      LSEL1000 IF NOT EQUAL
+          GOTO      LSEL5000                        * Display LETTER fields
+.
+.------ LETTER field entered ------
+.
+LSEL1000  MOVE      LETTER,LETTFORM
+          MOVE      ZERO,FORM3
+          PACK      KEY6,LETTFORM,FORM3         * Validate letter is on the
+          CALL      RDLET1                      * letter file
+          COMPARE   ONE,OVRCD
+          GOTO      LSEL1200 IF NOT EQUAL
+.
+.------ letter not on file ------
+.
+          DISPLAY   *P1:24,"LETTER code not on file ";
+          CALL      HITENTER
+          GOTO      LSEL0000                  * return if not found
+.
+LSEL1200  MOVE      BLTEXT,LETDESC
+          DISPLAY   *P31:5,LETDESC;           * Display the description
+          GOTO      LSEL9999
+.
+.------ ? has been entered for LETTER field ------
+.
+LSEL5000  MOVE      SP10,KEY6
+          CALL      RDSLET2
+.
+.         Display Category Heading, and then loop over entries
+.
+          DISPLAY   *P1:4,*EF,*P30:4,*V2LON,*ULON,"EXISTING LETTERS"
+          MOVE      FIVE,CVERT
+          MOVE      ONE,CCOL
+.
+.>>>>>>>  TRAP      LSEL5300 IF F1
+.
+LSEL5100  CALL      RDKLET2
+          BRANCH    OVRCD,LSEL5900
+.
+          COMPARE   ZERO,BLINNO
+          GOTO      LSEL5400 IF NOT EQUAL
+.
+          MOVE      BLTEXT,DIM30
+          DISPLAY   *PCCOL:CVERT,*V2LON,BLETNO,SP2,*HOFF,DIM30;
+          ADD       ONE,CVERT
+          COMPARE   TWENTY3,CVERT
+          GOTO      LSEL5100 IF LESS
+.
+          MOVE      FIVE,CVERT
+          ADD       "40",CCOL
+          COMPARE   "70",CCOL
+          GOTO      LSEL5100 IF LESS
+.
+.>>>>>>>  TRAPCLR   F1
+.
+          KEYIN     *P1:24,*EL," (",*V2LON,"E",*HOFF,")xit, (":
+                    *V2LON,"N",*HOFF,")ext Screen : ",*V2LON,ANS;
+.
+          CMATCH    ANSE,ANS
+          GOTO      LSEL0000 IF EQUAL
+.
+          MOVE      FIVE,CVERT
+          MOVE      ONE,CCOL
+          DISPLAY   *P1:5,*EF
+.
+.>>>>>>>  TRAP      LSEL5300 IF F1
+.
+          GOTO      LSEL5100
+.
+.
+LSEL5300  NORETURN
+.>>>>>>>  TRAPCLR   F1
+.
+.      End of codes
+.
+LSEL5400  DISPLAY   *P1:24,*EL;
+          CALL      HITENTER
+          GOTO      LSEL0000
+.
+LSEL5900  DISPLAY   *P1:24,*EF,"No letters Entered in letter File ";
+          CALL      HITENTER
+          GOTO      LSEL0000
+.
+.------ zero entered for letter code, used as an exit char ------
+.
+LSEL7000  DISPLAY   *P1:24,"Are you sure you want to exit? (",*V2LON,"Y":
+                    *HOFF,"/",*V2LON,"N",*HOFF,")";
+          KEYIN     *P38:24,*V2LON,ANS;
+          TYPE      ANS
+          GOTO      LSEL7000 IF EQUAL
+          REPLACE   "Y1N0",ANS
+          TYPE      ANS
+          GOTO      LSEL7000 IF NOT EQUAL              * invalid option
+          MOVE      ANS,OPTION
+          BRANCH    OPTION,LSEL7500
+          GOTO      LSEL0000                           * re-enter letter code
+.
+.------ user wants to exit, branch back to main menu ------
+.
+LSEL7500  NORETURN
+          GOTO      ML0200
+.
+LSEL9999  RETURN
++
+.**********************************************************************
+.*                              SET0000                               *
+.*             Set up the values for all the "%" variables            *
+.**********************************************************************
+.
+.------ read the temporary file ------
+.
+SET0000   MATCH     "IBARSH",PGM
+          IF        @EQUAL
+            BRANCH    OPTION,SET0010,SET0020,SET0010,SET0010
+          ENDIF
+          GOTO      SET0020 
+.
+SET0010   MATCH     "1",BKBLKSMS
+          IF        @EQUAL
+            MOVE      DBKREBOO,BOOKNUM
+            GOTO      SET0030
+          ELSE 
+            CALL      RKBKLTL1                     
+            BRANCH    OVRCD,SET9000
+            MATCH     SELECTID,BKLLSEID
+            GOTO      SET9000 IF NOT EQUAL
+            MATCH     "1",BKLLSTAT
+            GOTO      SET0010 IF EQUAL
+            MOVE      BKLLBOOK,BOOKNUM
+            GOTO      SET0030
+          ENDIF 
+.
+SET0020   READ      TEMP1,SEQ;BOOKNUM,FDATE,DOCTNAM,XBDATE,FULLNAME
+          GOTO      SET9000 IF OVER
+          GOTO      SET0030
+.
+SET0030   MATCH     "1",PTCNSMSN
+          IF        @EQUAL
+            CALL      CLSM0000
+          ELSE
+            CALL      CLRV0000                             * initialise var's
+          ENDIF
+.
+          DISPLAY   *P60:24,*EL,*V2LON,COUNTER,*HOFF," Printed";
+          MOVE      FALSE,EXIT
+.
+.------ get values of other % variables ------
+.------   not already formatted -------
+.
+          ADD       ONE,COUNTER
+          MOVE      FALSE,EXIT
+          MOVE      BOOKNUM,KEY8
+          CALL      RDBKREC1
+          BRANCH    OVRCD,SET9000
+.
+          MATCH     "IBARSH",PGM
+          IF        @EQUAL
+            BRANCH    OPTION,SET0040,SET0050,SET0040,SET0040
+          ENDIF
+          GOTO      SET0050
+.
+SET0040   UNPACK    CDATE,CDAY,DUMMY,CMON,DUMMY,CCENT,CYEAR
+          CALL      FDAT0000                        * format todays date
+          MOVE      DATELINE,FDATE
+          MOVE      "99",CDAY
+          UNPACK    BKREEDAT,CCENT,CYEAR,CMON,CDAY
+          CALL      FDAT0000                        * format expected
+          MOVE      DATELINE,XBDATE                 *   booking date
+          UNPACK    BKREADAT,CCENT,CYEAR,CMON,CDAY
+          CALL      FDAT0000
+          MOVE      DATELINE,XTHDATE
+.
+          MATCH     "99",XTHDATE
+          IF        @EQUAL
+            MOVE      SP70,XTHDATE
+            SQUEEZE   XTHDATE
+          ENDIF
+.
+          MOVE      BKREATIM,XTHTIME
+          CALL      FNAM0000                        * format patients name
+          MOVE      NAMELINE,FULLNAME
+          MOVE      BKREADOC,KEY6                    *    booking file
+          CALL      FDOC0000                        * format doctors name
+          MOVE      DOCLINE,DOCTNAM
+.
+          MOVE      SP70,EXSTTIME
+          MOVE      SP70,STSETIME
+.
+          MATCH     "1",BKBLKSMS
+          IF        @EQUAL
+            PACK      KEY31,BOOKNUM,SP70
+            CALL      RSOPDEA2     * get all booking vis numbers 
+            CALL      RKOPDEA2     * get first result
+            BRANCH    OVRCD,SET0100
+.
+            MATCH     BOOKNUM,OPDAADMN
+            GOTO      SET0100 IF NOT EQUAL
+.
+            MOVE      OPDAEXPS,EXSTTIME
+            MOVE      OPDATIME,STSETIME
+          ENDIF
+. 
+          GOTO      SET0100
+.
+SET0050   CALL      GPMI0000
+.          GOTO      SET0100
+.
+SET0100   
+.         MATCH     "                         ",PADD1
+.          GOTO      SET0110 IF NOT EQUAL
+.         MOVE      "*************************",PADD1
+.
+.SET0110   MATCH     "                         ",PADD2
+.          GOTO      SET0130 IF NOT EQUAL
+.          MOVE      "*************************",PADD2
+.
+.SET0130   MATCH     "    ",PPOST
+.          GOTO      SET0140 IF NOT EQUAL
+.          MOVE      "****",PPOST
+.
+.SET0140   MATCH     "                         ",PGNAME
+.          GOTO      SET0150 IF NOT EQUAL
+.          MOVE      "*************************",PGNAME
+.
+.SET0150   MATCH     "                   ",PSNAME
+.          GOTO      SET0155 IF NOT EQUAL
+.          MOVE      "*******************",PSNAME
+.
+.SET0155   MATCH     "            ",PTELEP
+.          GOTO      SET0160 IF NOT EQUAL
+.          MOVE      "************",PTELEP
+.
+SET0160   UNPACK    PBDATE,CCENT,CYEAR,CMON,CDAY
+          MATCH     SP2,CDAY
+          GOTO      SET0300 IF NOT EQUAL
+          MOVE      "99",CDAY
+          MOVE      "99",CMON
+          MOVE      "99",CYEAR
+.
+SET0300   PACK      DATE,CDAY,SLASH,CMON,SLASH,CYEAR
+          MATCH     SP3,BKRETYPE
+          GOTO      SET0400 IF EQUAL
+.
+          PACK      KEY5,CODEBK,BKRETYPE
+          CALL      RDCODE1
+          BRANCH    OVRCD,SET0400
+          MOVE      TDESC,BOOKTYPE
+          GOTO      SET0460
+.
+SET0400   MOVE      "                    ",BOOKTYPE
+.
+.     Omitted preferred accomodation 
+.
+.SET0420   MATCH     SP3,BKREACCM
+.          GOTO      SET0450 IF EQUAL
+.          PACK      KEY5,CODEBP,BKREACCM
+.          CALL      RDCODE1
+.          BRANCH    OVRCD,SET0450
+.          MOVE      TDESC,PACCOM
+.          GOTO      SET0500
+.
+.SET0450   MOVE      "********************",PACCOM
+.
+SET0460   MATCH     SP70,BKREPROC   
+          GOTO      SET0490 IF EQUAL
+.
+          PACK      KEY9,BKREPROC,SP70
+          CALL      RDPROA1
+          BRANCH    OVRCD,SET0490
+.
+          MOVE      WPDESC,PROCDESC
+          GOTO      SET0500
+.
+SET0490   PACK      PROCDESC,SP70,SP70
+.
+.------ move all names, addresses etc to LINE and convert to lower case ------
+.
+SET0500   CALL      POST0000                     * set postal address
+          MOVE      PADD1,LINE
+          CALL      CASE0000
+          MOVE      LINE,PADD1
+          MOVE      PADD2,LINE
+          CALL      CASE0000
+          MOVE      LINE,PADD2
+          MOVE      PSUBRB,LINE
+          CALL      CASE0000
+          MOVE      LINE,PSUBRB
+          MOVE      PADD4,LINE
+          CALL      CASE0000
+          MOVE      LINE,PADD4
+          MOVE      PGNAME,LINE
+          CALL      CASE0000
+          MOVE      LINE,PGNAME
+          MOVE      PSNAME,LINE
+          CALL      CASE0000
+          MOVE      LINE,PSNAME
+          MOVE      BOOKTYPE,LINE
+          CALL      CASE0000
+          MOVE      LINE,BOOKTYPE
+          MOVE      PTMXCELL,LINE              * load cellular phone number
+          CALL      CASE0000
+          MOVE      LINE,LXCELL
+          MOVE      PTMXADD1,LINE              * load postal address line 1
+          CALL      CASE0000
+          MOVE      LINE,LXPADDA
+          MOVE      PTMXADD2,LINE              * load postal address line 2
+          CALL      CASE0000
+          MOVE      LINE,LXPADDB
+          MOVE      PTMXADD3,LINE              * load postal address line 3
+          CALL      CASE0000
+          MOVE      LINE,LXPADDC
+          MOVE      PTMXADD4,LINE              * load postal address line 4
+          CALL      CASE0000
+          MOVE      LINE,LXPADDD
+          MOVE      PTMXPOST,LINE              * load postal Post Code     
+          CALL      CASE0000
+          MOVE      LINE,LXPPOST
+.
+          MATCH     SP70,PMPXUCC4
+          IF        !@EQUAL
+            MOVE      "Gi",DIM2
+            PACK      KEY5,DIM2,PMPXUCC4,SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              MOVE      PTCDLDES,LXUCC4LD
+            ENDIF
+          ENDIF
+.
+          MATCH     SP70,PMPXUCC5
+          IF        !@EQUAL
+            MOVE      "Gp",DIM2
+            PACK      KEY5,DIM2,PMPXUCC5,SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              MOVE      PTCDLDES,LXUCC5LD
+            ENDIF
+          ENDIF
+.
+.          MOVE      PACCOM,LINE
+.          CALL      CASE0000
+.          MOVE      LINE,PACCOM
+.
+          MATCH     "1",BKBLKSMS
+          IF        @EQUAL
+            CALL      GSMSID00                        * Get SMS message id
+            MOVE      IBSQNEXT,LXXSMSID               * SMS message id
+            PACK      LXXSMSKY,SP1,ZERO,BOOKNUM,SP70  * SMS message key
+            MOVE      LETTFORM,LXSMSCOD               * SMS Code (Letter Number)
+.
+            PACK      KEY8,TEMPURNO
+            CALL      RDMAST1
+            MOVE      PTMXCELL,LXXSMSPH               * SMS Phone Number
+            STRIP     LXXSMSPH
+.
+            MOVE      TEMPURNO,LXXSMSUR               * SMS U/R
+            MOVE      SP70,LXXSMSUS                   * SMS User
+            MOVE      SP70,LXXSMSUN                   * SMS User name
+.
+            PACK      KEY14,PASSCODE,SP70
+            CALL      RSWBSE3
+            CALL      RKWBSE3
+            IF        OVRCD<>1
+              MATCH      PASSCODE,WBSEPCD
+              IF         @EQUAL
+                MOVE      WBSEUID,LXXSMSUS      * SMS User
+                MOVE      WBSENAM,LXXSMSUN      * SMS User Name
+              ENDIF
+            ENDIF
+          ENDIF
+.
+          GOTO      SET9999
+.
+SET9000   MOVE      TRUE,EXIT
+.
+SET9999   RETURN
++
+.**********************************************************************
+.*                              CLRV0000                              *
+.*      Routine to initialise all unformatted variables to "*"        *
+.**********************************************************************
+CLRV0000  MOVE      "                         ",PADD1
+          MOVE      "                         ",PADD2
+          MOVE      "                         ",PSUBRB
+          MOVE      "                         ",PADD4
+          MOVE      "                         ",PGNAME
+          MOVE      "                    ",PSNAME
+          MOVE      "    ",PPOST
+          MOVE      "            ",PTELEP
+          MOVE      "                    ",LXCELL
+          MOVE      "                                   ",LXPADDA
+          MOVE      "                                   ",LXPADDB
+          MOVE      "                                   ",LXPADDC
+          MOVE      "                                   ",LXPADDD
+          MOVE      "        ",LXPPOST
+          MOVE      SP70,LXUCC4LD
+          MOVE      SP70,LXUCC5LD
+.
+CLRV9999  RETURN
++
+.**********************************************************************
+.                               CLSM0000                              *
+.  Routine to initialise all unformatted variables with single space  *
+.**********************************************************************
+CLSM0000  MOVE      SP1,PADD1
+          MOVE      SP1,PADD2
+          MOVE      SP1,PSUBRB
+          MOVE      SP1,PADD4
+          MOVE      SP1,PGNAME
+          MOVE      SP1,PSNAME
+          MOVE      SP1,PPOST
+          MOVE      SP1,PTELEP
+          MOVE      SP1,LXCELL
+          MOVE      SP1,LXPADDA
+          MOVE      SP1,LXPADDB
+          MOVE      SP1,LXPADDC
+          MOVE      SP1,LXPADDD
+          MOVE      SP1,LXPPOST
+          MOVE      SP1,LXUCC4LD
+          MOVE      SP1,LXUCC5LD
+.
+CLSM9999  RETURN
++
+.**********************************************************************
+.*                              PRIN0000                              *
+.*             Set up and print letter one line at a time             *
+.**********************************************************************
+PRIN0000  MOVE      FALSE,EXIT
+          MOVE      ONE,COUNT
+.
+          MATCH     "1",BKBLKSMS
+          IF        !@EQUAL
+            MOVE      LETTER,LETTFORM    
+          ENDIF
+.
+          MOVE      ZERO,FORM3                   * read letter file header
+          PACK      KEY6,LETTFORM,FORM3          *    record
+          CALL      RDLET1
+.
+          MOVE      BLETPPAG,PHYSPAGE
+          MOVE      BLETPTOP,TOPMARG
+          MOVE      BLETPBOT,BOTTMARG            * set up margins etc.
+          SUB       BLETPBOT,BLETPPAG
+          MOVE      BLETPPAG,BLETPLEN
+          MOVE      BLETPTAB,LEFTMARG
+.
+          MOVE      SP1,BOKLCOMM
+.
+          MATCH     "1",PTCNSMSN                 * Using SMS Notifications?
+          GOTO      PRIN0050 IF NOT EQUAL
+.
+          MOVE      BLETCOMM,BOKLCOMM
+.
+          MATCH     "1",BOKLCOMM
+          IF        @EQUAL
+            MOVE      ONE,TOPMARG           * Default top margin to 1
+            MOVE      ONE,BOTTMARG          * Default bottom margin to 1
+            MOVE      ONE,LEFTMARG          * Default left margin to 1
+.
+            CALL      PRSMSH00              * Print SMS Message XML Header Tag
+            GOTO      PRIN1000              * Skip to print actual letter lines
+          ENDIF
+.
+.------ print top margin ------
+.
+PRIN0050  PRINT     *N;
+          COMPARE   COUNT,TOPMARG
+          GOTO      PRIN1000 IF EQUAL
+          ADD       ONE,COUNT
+          GOTO      PRIN0050
+.
+.------ print letter one line at a time ------
+.
+PRIN1000  CALL      RDKLET1
+          BRANCH    OVRCD,PRIN9000               * end of letter reached
+          COMPARE   LETTFORM,BLETNO
+          GOTO      PRIN9000 IF NOT EQUAL
+          BRANCH    BLVAR,PRIN2000
+          PRINT     *N,*LEFTMARG,BLTEXT;         * print text if no % vars
+          ADD       ONE,COUNT
+.
+          MATCH     "1",BOKLCOMM                 * SMS Notification?
+          GOTO      PRIN1000 IF EQUAL
+.
+          COMPARE   COUNT,BLETPLEN
+          CALL      PAGE0000 IF EQUAL            * page when required
+          GOTO      PRIN1000
+.
+PRIN2000  CALL      MOD0000                      * substitute % var value
+          PRINT     *N,*LEFTMARG,PRTSTRNG;       * print text with % vars
+          ADD       ONE,COUNT
+.
+          MATCH     "1",BOKLCOMM                 * SMS Notification?
+          GOTO      PRIN1000 IF EQUAL
+.
+          COMPARE   COUNT,BLETPLEN
+          CALL      PAGE0000 IF EQUAL            * page when required
+          GOTO      PRIN1000
+.
+PRIN9000  MATCH     "1",BOKLCOMM
+          IF        @EQUAL
+            CALL       PRSMSF00
+            GOTO       PRIN9050
+          ENDIF
+.
+          COMPARE   TOPMARG,COUNT
+          GOTO      PRIN9500 IF EQUAL
+.           
+PRIN9050  DISPLAY   *P60:24,*EL,*V2LON,COUNTER,*HOFF," Printed";
+          MOVE      PHYSPAGE,TEMP3                * set up variables for
+          SUBTRACT  COUNT,PHYSPAGE                *   paging
+          MOVE      ONE,COUNT
+.
+.------ paginate at end of each letter ------
+.
+PRIN9100  PRINT     *N;
+          COMPARE   COUNT,PHYSPAGE
+          GOTO      PRIN9400 IF EQUAL
+          ADD       ONE,COUNT
+          GOTO      PRIN9100
+.
+PRIN9400  MOVE      TEMP3,PHYSPAGE
+          MOVE      TWO,EXIT
+          GOTO      PRIN9999
+.
+.------ letter header is on file but nothing else ------
+.
+PRIN9500  DISPLAY   *P1:24,*EL,"Letter has not been set up yet ";
+          CALL      HITENTER
+          MATCH     "IBARSH",PGM
+          IF        @EQUAL
+            BRANCH    OPTION,PRIN9510
+          ENDIF
+.
+          CLOSE     TEMP1
+          OPEN      TEMP1,FNAMER
+.
+PRIN9510  MOVE      TRUE,EXIT
+.
+PRIN9999  RETURN
++
+.**********************************************************************
+.*                              PAGE0000                              *
+.*        Routine to paginate if a new page is required               *
+.**********************************************************************
+PAGE0000  MOVE      BLETNO,FORM3
+          MOVE      BLINNO,FORM3A
+          CALL      RDKLET1
+          BRANCH    OVRCD,PAGE8000                * check to see that
+          COMPARE   LETTFORM,BLETNO               *  another line of the
+          GOTO      PAGE8000 IF NOT EQUAL         *  letter exists
+          MOVE      TOPMARG,TEMP2
+          ADD       BOTTMARG,TOPMARG
+          MOVE      ONE,COUNT
+.
+.------ loop to paginate ------
+.
+PAGE1000  PRINT     *N;
+          COMPARE   COUNT,TOPMARG
+          GOTO      PAGE9000 IF EQUAL
+          ADD       ONE,COUNT
+          GOTO      PAGE1000
+.
+.------ no need to paginate ------
+.
+PAGE8000  PACK      KEY6,FORM3,FORM3A
+          CALL      RDLET1
+          GOTO      PAGE9999
+.
+.------ reset read to previous record to continue processing ------
+.
+PAGE9000  MOVE      TEMP2,COUNT
+          MOVE      TEMP2,TOPMARG
+          PACK      KEY6,FORM3,FORM3A
+          CALL      RDLET1
+.
+PAGE9999  RETURN
++
+.**********************************************************************
+.*                              MOD0000                               *
+.*             Modify a line to substitute "%" variable values        *
+.**********************************************************************
+MOD0000   MOVE      BLTEXT,DIM70
+          PACK      PRTSTRNG,SP30,SP30,SP10          * initialise PRTSTRNG
+          RESET     PRTSTRNG,0                       *   and pointer positions
+          MOVE      ONE,STARTSTR
+          MOVE      ONE,ENDSTR
+.
+MOD2000   SCAN      SPECCHAR,DIM70                * Scan the Input Line for
+          GOTO      MOD8000 IF NOT EQUAL          * a "%" sign
+.
+MOD3000   MOVEFPTR  DIM70,PERCPOS
+          BUMP      DIM70,-1                     * Go to the character before
+.                                                * the "%" sign
+          GOTO      MOD3100 IF NOT EOS            * Test if the % sign is the
+          RESET     DIM70,0                      * first character on the line
+.                                                * set f.p. to 0 if it is
+.
+MOD3100   MOVEFPTR  DIM70,ENDSTR                  * store endtsr at position
+          COMPARE   STARTSTR,ENDSTR               *   1 char before the % sign
+          GOTO      MOD3200 IF NOT LESS           *   and ensure that end and
+.                                                *   start positions dont
+.                                                *   overlap
+          RESET     DIM70,STARTSTR                * set pointer to next % sign
+          GOTO      MOD9999 IF EOS                *   if end < start
+          GOTO      MOD3300
+.
+MOD3200   RESET     DIM70,STARTSTR                * reset the pointers to
+          SETLPTR   DIM70,ENDSTR                  *   extract text preceding
+          APPEND    DIM70,PRTSTRNG                *   the % sign
+.
+MOD3300   SETLPTR   DIM70,70                      * set the pointers to start at
+          RESET     DIM70,PERCPOS                 *    % and go to position 70
+          MOVE      DIM70,TEMP70                  * delete preceding text from
+          PACK      DIM70,TEMP70,SP30,SP30,SP30   *    the DIM70 string
+.
+MOD4000   CALL      GETV0000                      * extract the % var
+          MOVEFPTR  DIM70,STARTSTR                * store finish pos. of var
+          BRANCH    EXIT,MOD5000
+          RESET     SRCHVAR
+.
+.------ search for the % var in the list of constants ------
+.
+          SEARCH    SRCHVAR,LCADDA,FORTY7,SRCHNUM
+          BRANCH    SRCHNUM,MOD4500,MOD4500,MOD4500,MOD4500,MOD4500:      *5
+                            MOD4500,MOD4500,MOD4500,MOD4500,MOD4500:      *10
+                            MOD4500,MOD4500,MOD4500,MOD4500,MOD7000:      *15
+                            MOD4500,MOD4500,MOD4500,MOD4500,MOD4500:      *20
+                            MOD4500,MOD4500,MOD4500,MOD4500,MOD4500:      *25
+                            MOD4500,MOD4500,MOD4500,MOD4500,MOD4500:      *30
+                            MOD4500,MOD4500,MOD4500,MOD4500,MOD4500:      *35
+                            MOD4500,MOD4500,MOD4500,MOD4500,MOD4500:      *40
+                            MOD4500,MOD4500,MOD4500,MOD4500,MOD4500:      *45
+                            MOD4500,MOD4500                               *50 
+.
+MOD4500   COMPARE   ZERO,SRCHNUM                   * % var not found in list
+          GOTO      MOD5000 IF EQUAL
+.
+.------ load DISPSTRN with the actual value of the % var ------
+.
+          LOAD      DISPSTRN,SRCHNUM,PADD1,PADD2,PSUBRB,DATE,DOCTNAM:     *5
+                    XBDATE,PGNAME,BOOKNUM,PSNAME,BOOKTYPE:                *10
+                    PTELEP,FDATE,FULLNAME,PPOST,LXPAGE:                   *15
+                    LXCELL,LXPADDA,LXPADDB,LXPADDC,LXPADDD:               *20 
+                    LXPPOST,PSUBRB,PADD4,PROCDESC,PMPXUCC4:               *25
+                    LXUCC4LD,PMPXATF1,PMPXUCC5,LXUCC5LD,PMPXATF2:         *30
+                    PMPXSN18,PMPXSN19,PMPXSN20,PMPXSN21,PMPXSN22:         *35
+                    PMPXSN23,PMPXSN24,PMPXSN25,PMPXSN26,PMPXSN27:         *40
+                    PMPXSN28,PMPXSN29,PMPXSN30,BKREATIM,XTHDATE:           *45
+                    EXSTTIME,STSETIME
+.
+          APPEND    DISPSTRN,PRTSTRNG
+          CALL      COMX0000                   * compress trailing blanks in
+          GOTO      MOD2000                    *    PRTSTRNG
+.
+MOD5000   RESET     SRCHVAR                    * add the string starting with
+          APPEND    SRCHVAR,PRTSTRNG           *    a % if not found in the
+          GOTO      MOD8000 IF EOS             *    list of constants 
+          GOTO      MOD2000       
+.
+.------ % page variable found ------
+.
+MOD7000   MOVE      PHYSPAGE,TEMP3
+          SUBTRACT  COUNT,PHYSPAGE
+          MOVE      ONE,COUNT
+          ADD       TOPMARG,PHYSPAGE
+          SUBTRACT  ONE,PHYSPAGE
+.
+MOD7100   PRINT     *N;
+          COMPARE   COUNT,PHYSPAGE
+          GOTO      MOD7500 IF EQUAL
+          ADD       ONE,COUNT
+          GOTO      MOD7100
+.
+MOD7500   MOVE      TEMP3,PHYSPAGE
+          MOVE      TOPMARG,COUNT
+          SUBTRACT  ONE,COUNT
+          PACK      PRTSTRNG,SP30,SP30,SP10
+          GOTO      MOD9999
+.
+MOD8000   APPEND    DIM70,PRTSTRNG                    * add remaining text to
+          RESET     PRTSTRNG                          *   PRTSTRNG if no %
+.                                                    *   signs left
+MOD9999   RETURN
++
+.**********************************************************************
+.*                              GETV0000                              *
+.*           Extracts the "%" variable from the line                  *
+.**********************************************************************
+GETV0000  MOVE      FALSE,EXIT
+          PACK      SRCHVAR,SP30,SP30,SP10
+          RESET     SRCHVAR,0
+          MOVE      DIM70,ANS
+          APPEND    ANS,SRCHVAR
+          RESET     SRCHVAR,0
+          BUMP      DIM70
+          MOVE      DIM70,ANS
+          REPLACE   REPSTR,ANS                        * check to see if first
+          MATCH     "0",ANS                           *   char after % is a
+          GOTO      GETV9000 IF NOT EQUAL             *   lower case letter
+          BUMP      DIM70,-1
+          PACK      SRCHVAR,SP30,SP30,SP10            * initialise SRCHVAR
+          RESET     SRCHVAR,0                         *   value and pointers
+.
+.------ append % var to SRCHVAR until anything but ------
+.------ a lower case letter is found ------
+.
+GETV1000  MOVE      DIM70,ANS
+          APPEND    ANS,SRCHVAR
+.
+          BUMP      DIM70
+          GOTO      GETV9999 IF EOS
+          MOVE      DIM70,ANS
+          REPLACE   REPSTR,ANS
+          MATCH     "0",ANS
+          GOTO      GETV9999 IF NOT EQUAL
+          GOTO      GETV1000
+.
+.------ string found is not a valid % var ------
+.
+GETV9000  MOVE      TRUE,EXIT
+.
+GETV9999  RETURN
++
+.**********************************************************************
+.*                              COMX0000                              *
+.*         Routine to compress trailing blanks in PRTSTRNG            *
+.**********************************************************************
+COMX0000  ENDSET    PRTSTRNG
+.
+COMX1000  CMATCH    SP1,PRTSTRNG
+          GOTO      COMX9999 IF NOT EQUAL
+          BUMP      PRTSTRNG,-1
+          GOTO      COMX9999 IF EOS
+          GOTO      COMX1000
+.
+COMX9999  RETURN
++
+.**********************************************************************
+.*                               MORE0000                             *
+.*                  Any more letters to print?                        *
+.**********************************************************************
+MORE0000  MOVE      FALSE,EXIT
+          DISPLAY   *P1:7,*EF,"Any more letters for the same people? (":
+                    *V2LON,"Y",*HOFF,"/",*V2LON,"N",*HOFF,")";
+          KEYIN     *P44:7,*V2LON,ANS;
+          TYPE      ANS
+          GOTO      MORE0000 IF EQUAL
+          REPLACE   "Y1N0",ANS
+          TYPE      ANS
+          GOTO      MORE0000 IF NOT EQUAL
+          MOVE      ANS,OPTION
+          BRANCH    OPTION,MORE1000
+          MOVE      TRUE,EXIT                     * no more letters desired
+          GOTO      MORE9999
+.
+.------ there are more letters to print ------
+.
+MORE1000  MOVE      TWO,EXIT
+          CLOSE     TEMP1
+          OPEN      TEMP1,FNAMER
+          GOTO      MORE9999
+.
+MORE9999  RETURN
++
+.
+.
+. **********************************************************************
+. * GPMI0000 : Get the PMI details for a booking.                      *
+. **********************************************************************
+.
+GPMI0000  MATCH     ZEROUR,BKREURNO
+          GOTO      GPMI1000 IF EQUAL
+.
+          MOVE      BKREURNO,PURNO
+          MOVE      PURNO,KEY8
+          CALL      RDMAST1
+          BRANCH    OVRCD,GPMI1000
+.
+          PACK      KEY8,PURNO,SP70
+          CALL      RDPMPX21
+          IF        OVRCD = 1
+            CALL     CLPMSPX2
+          ENDIF
+.
+          GOTO      GPMI8000
+.
+GPMI1000  MOVE      BKREBOOK,PURNO
+          MOVE      PURNO,KEY8
+          CALL      RDPRAM1
+          BRANCH    OVRCD,GPMI9000
+.
+GPMI8000  MOVE      ZERO,EXIT
+          GOTO      GPMI9999
+.
+GPMI9000  MOVE      ONE,EXIT
+.
+GPMI9999  RETURN
++
+. **********************************************************************
+. * POST0000 : Set up the postal address: pmscexaf/patmx1af/patma1af   *
+. **********************************************************************
+POST0000  MATCH     "1",PTCNNEWC
+          GOTO      POST5000 IF NOT EQUAL        * using new contacts table ?
+.
+          PACK      KEY14,PURNO,SP70
+          CALL      RSPMCEX1
+POST1000  CALL      RKPMCEX1                     * check new contacts table
+          BRANCH    OVRCD,POST5000
+.
+          MATCH     PURNO,PMCEURNO
+          GOTO      POST5000 IF NOT EQUAL
+.
+          MATCH     SP70,PMCETYPE
+          GOTO      POST1000 IF EQUAL
+.
+          MOVE      "tc",KEY2
+          PACK      KEY5,KEY2,PMCETYPE
+          CALL      RDCODE1
+          BRANCH    OVRCD,POST1000
+.
+          MATCH     "2",TCINDC1
+          GOTO      POST1000 IF NOT EQUAL        * postal address ?
+.
+          MATCH     "1",PMCEACTV
+          IF        @EQUAL
+            MATCH     PMCEDINA,BKREEDAT          * Check Inactive date
+            GOTO      POST1000 IF NOT LESS
+          ENDIF
+.
+          MATCH     SP70,PMCEADD1
+          GOTO      POST1000 IF EQUAL            * no postal address
+.
+.         populate the postal address from pmscexaf
+.
+          MOVE      PMCEADD1,PTMXADD1
+          MOVE      PMCEADD2,PTMXADD2
+          MOVE      PMCEADD3,PTMXADD3
+          MOVE      PMCEADD4,PTMXADD4
+          MOVE      PMCEPOST,PTMXPOST
+.
+          GOTO      POST9999
+.
+POST5000  MATCH     SP70,PTMXADD1
+          GOTO      POST9999 IF NOT EQUAL        * use patmx1af (default)
+.
+.         populate the postal address from patma1af
+.
+          MOVE      PADD1,PTMXADD1
+          MOVE      PADD2,PTMXADD2
+          MOVE      PSUBRB,PTMXADD3
+          MOVE      PADD4,PTMXADD4
+          MOVE      PPOST,PTMXPOST
+
+POST9999  RETURN
++
+.**********************************************************************
+.*                           WOPTN000                                 *
+.*                   Display the web option                           *
+.**********************************************************************
+WOPTN000  MOVE      FALSE,EXIT
+          DISPLAY   *P1:10,*EF,*V2LON,"0":
+                    *P1:11,"1":
+                    *P1:12,"2":
+                    *P2:10,*HOFF,". Exit":
+                    *P2:11,". Selection Letters":
+                    *P2:12,". Print Letters    ";
+.
+WOPTN100  DISPLAY   *P1:14,*EL,"Select Item : ";
+          KEYIN     *P15:14,*V2LON,WOPTION;
+          COMPARE   ZERO,WOPTION
+          GOTO      WOPTN900 IF EQUAL
+          COMPARE   THREE,WOPTION
+          GOTO      WOPTN100 IF NOT LESS
+.
+WOPTN200  DISPLAY   *P1:16,*EL,"Enter Selection ID: ";
+          KEYIN     *P21:16,*V2LON,SELECTID;
+.
+          PACK      SELECTID,SELECTID,SP10
+          MATCH     SP4,SELECTID
+          GOTO      WOPTN100 IF EQUAL
+.
+          MOVE      SELECTID,KEY4
+          CALL      RDBKLTS1
+          IF        OVRCD=0
+            COMPARE   ONE,WOPTION              * Selection
+            GOTO      WOPTN210 IF EQUAL
+            COMPARE   TWO,WOPTION              * Print
+            GOTO      WOPTN300 IF EQUAL
+          ELSE
+            GOTO      WOPTN800 
+          ENDIF
+.
+.         Delete old Booking Letter Selections
+.
+WOPTN210  PACK      KEY12,SELECTID,SP70
+          CALL      RSBKLTL1
+          CALL      RKBKLTL1
+          BRANCH    OVRCD,WOPTN250
+.
+          MATCH     SELECTID,BKLLSEID
+          GOTO      WOPTN250 IF NOT EQUAL
+.
+          PACK      KEY12,BKLLSEID,BKLLBOOK,SP70
+          CALL      DEBKLTL1
+          GOTO      WOPTN210
+.
+.         Setup Booking Letter Selection Criteria
+.
+WOPTN250  MOVE      SP1,DEPPAID
+          MOVE      FALSE,FLAGDEPN
+          MOVE      FALSE,FLAGDEPY
+          MATCH     SP1,BKLSDEPS
+          IF        !@EQUAL
+            MATCH     ANSN,BKLSDEPS 
+            IF        @EQUAL
+              MOVE      TRUE,FLAGDEPN
+              MOVE      BKLSDEPS,DEPPAID
+            ENDIF
+            MATCH     ANSY,BKLSDEPS 
+            IF        @EQUAL
+              MOVE      TRUE,FLAGDEPY
+              MOVE      BKLSDEPS,DEPPAID
+            ENDIF
+          ENDIF
+.
+          MOVE      FALSE,FLAGDATE
+          MOVE      SP70,ADMTEST1
+          MOVE      SP70,ADMTEST2
+          MOVE      ZERO,ADMFORM1
+          MOVE      ZERO,ADMFORM2
+          MATCH     SP8,BKLSSTDT
+          GOTO      WOPTN9999 IF EQUAL
+          MATCH     SP8,BKLSENDT
+          GOTO      WOPTN9999 IF EQUAL
+.
+          MOVE      BKLSSTDT,ADMFORM1
+          MOVE      BKLSENDT,ADMFORM2
+          COMPARE   ADMFORM1,ADMFORM2
+          GOTO      WOPTN810 IF LESS
+.
+          MOVE      TRUE,FLAGDATE
+          MOVE      BKLSSTDT,ADMTEST1
+          MOVE      BKLSENDT,ADMTEST2
+          GOTO      WOPTN999
+.
+.         Booking Letter Print
+.
+WOPTN300  PACK      KEY12,SELECTID,SP70
+          CALL      RSBKLTL1
+          CALL      RKBKLTL1
+          BRANCH    OVRCD,WOPTN820
+.
+          MATCH     SELECTID,BKLLSEID
+          GOTO      WOPTN820 IF NOT EQUAL
+.
+.         position pointer for printing in SET0000
+.
+          PACK      KEY12,SELECTID,SP70
+          CALL      RSBKLTL1
+          GOTO      WOPTN999
+.
+WOPTN800  DISPLAY   *P1:24,*EL,"Selection ID not on file";
+          CALL      HITENTER
+          DISPLAY   *P1:24,*EL;
+          GOTO      WOPTN200
+.
+WOPTN810  DISPLAY   *P1:24,*EL,"Invalid Date Range";
+          CALL      HITENTER
+          DISPLAY   *P1:24,*EL;
+          GOTO      WOPTN200
+.
+WOPTN820  DISPLAY   *P1:24,*EL,"No Records to print for this Selection ID";
+          CALL      HITENTER
+          DISPLAY   *P1:24,*EL;
+          GOTO      WOPTN200
+.
+.------ exit option chosen ------
+.
+WOPTN900  MOVE      TRUE,EXIT
+.
+WOPTN999  RETURN
++
+.******************************************************************************
+.*                           CTMP0000                                         *
+.*                  Create the temp file                                      *
+.******************************************************************************
+CTMP0000  CALL      KTMP0000
+          CLEAR     CMDLINE
+          APPEND    "isbuild ",CMDLINE
+          APPEND    FNAMER2,CMDLINE
+          APPEND    " 17 U1-8,9-16",CMDLINE
+          APPEND    SP30,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+          OPEN      TEMPBK,FNAMER2
+CTMP9999  RETURN
++
+.******************************************************************************
+.*                           KTMP0000                                         *
+.*                  Delete the temp file                                      *
+.******************************************************************************
+KTMP0000  CLOSE     TEMPBK
+          CLEAR     CMDLINE
+          APPEND    "iserase ",CMDLINE
+          APPEND    FNAMER2,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+KTMP9999  RETURN
++
+.******************************************************************************
+.*                  I/O for temp file                                         *
+.******************************************************************************
+.
+RATEMP1   RESET     KEY16
+          MOVE      ZERO,OVRCD
+          READ      TEMPBK,KEY16;ANS
+          GOTO      OVERCOND IF OVER
+          RETURN
+.
+RSTEMP1   RESET     KEY16
+          READ      TEMPBK,KEY16;;
+          RETURN
+.
+RKTEMP1   MOVE      ZERO,OVRCD
+          READKS    TEMPBK;TEMPURNO,TEMPBKNO
+          GOTO      OVERCOND IF OVER
+          RETURN
+.
+RDTEMP1   RESET     KEY16
+          MOVE      ZERO,OVRCD
+          READ      TEMPBK,KEY16;TEMPURNO,TEMPBKNO
+          GOTO      OVERCOND IF OVER
+          RETURN
+.
+WRTEMP1   RESET     KEY16
+          WRITE     TEMPBK,KEY16;TEMPURNO,TEMPBKNO
+          RETURN
++
+.
+          INC       STD001IO
+          INC       TFILENAM                * Generate Temp File Name
+          INC       SMSPRXML
+          INC       PATCODKY
+          INC       PATHSPKY
+          INC       PMSHCPKY
+          INC       SMSMESID 
+          INC       IBASEQIO/INC            * Sequential Numbers File
+          INC       WEBERRIO/INC            * Web Server Error Logging
+.
+          INC       BOKRC1IO/INC
+          INC       BOKLETIO/INC
+          INC       BOKLTLIO/INC
+          INC       BOKLTSIO/INC
+          INC       PATDO1IO/INC
+          INC       PATCODIO/INC
+          INC       PATMA1IO/INC
+          INC       PMSPX2IO/INC
+          INC       PATPR1IO/INC
+          INC       PMSCEXIO/INC
+          INC       PATHSPIO/INC
+          INC       WATPROIO/INC
+          INC       OPRDEAIO/INC
+          INC       PMSVX1IO/INC
+          INC       PMSOOSIO/INC
+          INC       MLTSECIO/INC
+          INC       WEBSECIO/INC
+          INC       PMSHCPIO/INC
+          INC       PATWR1IO/INC
+          INC       BOKRX1IO/INC
+.
+          INC       CLPMSPX2
+.

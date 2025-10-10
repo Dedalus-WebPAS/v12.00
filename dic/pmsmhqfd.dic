@@ -1,0 +1,91 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Patient System 
+                      NIHC IHI Upload MyHR Request Detail 
+  
+TABLE NAME         :  pmsmhqaf
+=====================================================================
+PMMQRTYP    char        2     1   Request Type  
+                                   "10" - Upload to MyHR  
+PMMQCODE    char       50     3   Request Code  
+                                   "10" - Unique Transaction ID  
+PMMQRDAT    char        8    53   Request Date  
+PMMQRTIM    char        8    61   Request Time  
+PMMQRUID    char       10    69   Request User ID (websecaf)  
+PMMQHOSP    char        6    79   Hospital Code  
+PMMQEPID    char        8    85   Source Episode ID (Visit Number)  
+PMMQADAT    char        8    93   Admission Date  
+PMMQREAS    char      200   101   Admission Reason  
+PMMQETYP    char        1   301   Episode Type  
+PMMQELCY    char        2   302   Episode Life Cycle  
+PMMQCONS    char        1   304   Consent to Upload MyHR  
+PMMQAUTH    char       10   305   Author (HCP Code)  
+                                   Display Code - Name on Template  
+PMMQRHCP    char       10   315   Responsible HCP at Discharge (Code)  
+                                   Display Code - Name on Template  
+PMMQB64P    char      200   325   Base64 Document Path  
+PMMQMIME    char        6   525   MIME File-Type  
+PMMQFLNM    char       50   531   Document File Name (Category wi)  
+                                   - obspcoaf  
+PMMQSUBJ    char       50   581   Subject from new Document Type  
+                                   either IP / ED Discharge Summary  
+PMMQURNO    char        8   631   UR Number  
+PMMQCDAT    char        8   639   Date Created  
+PMMQCTIM    char        8   647   Time Created  
+PMMQCUID    char       10   655   Created By  
+PMMQUDAT    char        8   665   Date Updated  
+PMMQUTIM    char        8   673   Time Updated  
+PMMQUUID    char       10   681   Updatd By  
+PMMQSPAR    char      100   691   Spare  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+PMMQRTYP
+PMMQCODE
+PMMQRDAT
+PMMQRTIM
+  
+UNIQUE INDEX 2
+PMMQHOSP
+PMMQRTYP
+PMMQCODE
+PMMQRDAT
+PMMQRTIM
+  
+UNIQUE INDEX 3
+PMMQURNO
+PMMQRTYP
+PMMQCODE
+PMMQRDAT
+PMMQRTIM
+  
+UNIQUE INDEX 4
+PMMQEPID
+PMMQRTYP
+PMMQCODE
+PMMQRDAT
+PMMQRTIM
+  
+UNIQUE INDEX 5
+PMMQCODE
+PMMQRTYP
+PMMQRDAT
+PMMQRTIM
+  
+UNIQUE INDEX 6
+PMMQADAT
+PMMQRTYP
+PMMQCODE
+PMMQRDAT
+PMMQRTIM
+  
+UNIQUE INDEX 7
+PMMQHOSP
+PMMQCDAT
+PMMQCTIM
+PMMQRTYP
+PMMQCODE
+PMMQRDAT
+PMMQRTIM
+  
+=====================================================================

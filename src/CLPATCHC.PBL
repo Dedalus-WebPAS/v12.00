@@ -1,0 +1,30 @@
+.******************************************************************************
+.* System         : PAT                                                       *
+.*                                                                            *
+.* Include Name   : CLPATCHC.PBL                                              *
+.*                                                                            *
+.* Function       : Clear the Patient Code Changes file - PATCHCFD            *
+.*                                                                            *
+.* Modifications  :                                                           *
+.*        V12.00.01 14/05/2025 Nikitha B     TSK 0955096                      *
+.*                  Alphanumeric changes                                      *
+.*        V10.02.00 16/08/2011 Ebon Clements CAR 241939                       *
+.*                  Created inclue                                            *
+.******************************************************************************
+CLPATCHC  MOVE      SP70,CHCATG
+          MOVE      SP70,CHCODE
+          MOVE      SP70,DCHADMN
+          MOVE      SP70,CHDATE
+          MOVE      SP70,CHTIME
+          MOVE      SP70,CHCRDATE
+          MOVE      SP70,CHCRTIME
+          MOVE      SP70,CHCRUSID
+          MOVE      SP70,CHUPDATE
+          MOVE      SP70,CHUPTIME
+          MOVE      SP70,CHUPUSID
+          MOVE      SP70,CHEPISNO
+          MOVE      SP70,CHCODCMP
+          MOVE      SP70,CHSPARE
+          MOVE      ZEROVISN,CHADMN
+.
+          RETURN

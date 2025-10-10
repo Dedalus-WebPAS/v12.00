@@ -1,0 +1,34 @@
+.*********************************************************************
+. Generate the next event number 
+.*********************************************************************
+. V12.00.01 14/05/2025  Ebon Clements   TSK 0955096
+.           Added alpanumeric visit number generation
+.*********************************************************************
+GENBOKNO  OPEN      CONTROLF,"controlf"
+.
+          READ      CONTROLF,HUND30;*75,PTCNUANV      * Using AN Visit Numbers
+.
+          MATCH     "1",PTCNUANV
+          IF        @EQUAL
+            CALL      GANV0000                * Get next AN visit number
+            MOVE      PTCNNXTV,WMBOOK
+          ELSE
+            MOVE      " 10",PRXCODE           * System Lock Sector 10
+            CALL      GETSLK00                * Get System Lock of Sector 10
+            READ      CONTROLF,TEN;*1,FORM8V
+            ADD       ONE,FORM8V
+            WRITAB    CONTROLF,TEN;*1,FORM8V
+            CALL      RELSLK00                * Release System Lock of Sector 10
+            SUB       ONE,FORM8V
+            MOVE      FORM8V,WMBOOK
+.
+            MATCH     ZEROVISN,WMBOOK
+            GOTO      GENBOKNO IF EQUAL       * Invalid number
+          ENDIF
+.
+          PACK      KEY8,WMBOOK,SP70
+          CALL      RDAVISA1
+          COMPARE   ZERO,OVRCD
+          GOTO      GENBOKNO IF EQUAL         * Get the next Admission Number
+.
+          RETURN

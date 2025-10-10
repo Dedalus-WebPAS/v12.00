@@ -1,0 +1,371 @@
+.******************************************************************************
+.* System    :   Common                                                       *
+.* Program   :   IBAVARFX                                                     *
+.* Desc      :                                                                *
+.******************************************************************************
+.* Date      :   19/05/2014                                                   *
+.* Author    :   Peter Vela                                                   *
+.* Function  :   This program will Transfer File and Load File (ibavaraf)     *
+.*                                                                            *
+.*    V12.00.02  29/05/2025  Nikitha B     TSK 0960634                        *
+.*               Added PDUP0000 to print duplicate error while Update.        *
+.*    V12.00.01  20/05/2025  Nikitha B     TSK 0960634                        *
+.*               Added PDUP0000 to print duplicate error while Add.           *
+.*    V11.04.02  18/09/2024  Nikitha B     TSK 0906822                        *
+.*               Removed semicolon at the end of Print statement.             *
+.*    V11.04.01  26/08/2024  Nikitha B     TSK 0906822                        *
+.*               Added report outputs for option (2,3 & 4)Add and Update.     *
+.*               Added SUMR0000,PUPD0000,PADD0000,SHED0000,REND0000,PRTLN000  *
+.*               Modified LOAD0000 and OPTN0000 to accomodate option 2,3,4    * 
+.*    V10.14.01  15/04/2019  Davin         TSK 0838558                        *
+.*               Removed delete of ibavarfx (TRANFILE) on program exit        *
+.*               Fixed option = 0 (OPTN9500) to allow program exit            *
+.*    V10.13.01  05/12/2018  Don Nguyen    TSK 0838558                        *
+.*               Deleted temp file (TRANFILE) on program exit                 *
+.*    V10.05.02  07/01/2015 Davin      CAR 300038                             *
+.*               Check index 1 also to avoid I*D on description               *
+.*    V10.05.01  05/11/2014 Davin      CAR 300038                             *
+.*               Use index 2 to avoid I*D on description                      *
+.*    V10.04.01  21/05/2014 Peter Vela CAR 300038                             *
+.*               Created Program                                              *
+.******************************************************************************
+.
+          INC       STD001FD
+.
+. FILE DESCRIPTION INCLUDES
+. -------------------------
+.
+          INC      IBAVARFD/INC 
+.
+. LOCAL VARIABLE DEFINITION
+. -------------------------
+.
+RECTYPE   FORM      1
+TRANFILE  FILE      ASCII, FIXED=250
+OPTNNAME  DIM       55                  * Option selected by the user to report
+SUMMONLY  FORM      1                   * Pointer if Summary Report is needed
+.
+PRGID     INIT      "IBAVARFX"
+PRGNAM    INIT      "IBAVARAF File Creation and Upload"
+VERSION   INIT      "V12.00.02"
++
+.
+. NAME     TYPE   LENGTH   PHYSICAL  START LOC.   DESCRIPTION
+. ----     ----   ------   --------  ----------   -----------
+DLOADTYP   DIM      3         3          1        Stationery Type
+LOADDESC   DIM      30        30         4        Variable Description
+DLOADFNM   DIM      5         5         34        Field No.
+LOADFLEN   FORM     3         3         39        Field Length
+LOADSPAR   DIM      28        28        42        Spare Variable
+.
+.End of Record                          70
+.
+.
+.  redefine form fields from key
+.  -----------------------------
+.NAME       TYPE     LENGTH     START     DESCRIPTION
+.----       ----     ------     -----     -----------
+LOADSTYP    FORM       3          1       Stationery Type
+LOADFNUM    FORM       5          34      Field No.
+.
++
+.**************************************************************************
+.*                              ML0000                                    *
+.*                      Controlling Logic (Mainline code)                 *
+.**************************************************************************
+.
+ML0000    CALL      INIT0000               * initialisation and open files
+.
+ML0100    CALL      OPTN0000               * select options
+          BRANCH    EXIT,ML9999            * EXIT = 1 if 0 chosen in menu
+          BRANCH    COPTION,ML1000,ML2000,ML2000,ML2000  * proceed with clean up
+.
+ML1000    CALL      CONTQST                * Ok to continue ?
+          BRANCH    CEXIT,ML3000:          * yes
+                          ML0100:          * no
+                          ML0100           * cancel
+.
+ML2000    IF        COPTION = 3 | COPTION = 4
+            CALL      SUMR0000
+          ENDIF
+          CALL      CONTQST                * Ok to continue ?
+          BRANCH    CEXIT,ML4000:          * yes
+                          ML0100:          * no
+                          ML0100           * cancel
+.
+ML3000    PREP      TRANFILE,"ibavarfx"     
+          CALL      MAKE0000               * Export Variable File
+          GOTO      ML9999
+.
+ML4000    MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      TRANFILE,"ibavarfx"     
+          TRAPCLR   IO
+          BRANCH    OVRCD,ML9900
+          CALL      LOAD0000               * Load Transfer File
+          GOTO      ML9999 
+.
+ML9900    DISPLAY   *P1:24,*EL,"Export File ibavarfx Not Found.";
+          CALL      HITENTER
+.
+ML9999    CHAIN     PGM                    * chain back to program
+.****************************************************************************
+.*                                INIT0000             Called by: ML0000    *
+.*  The initialisation routine is used to display headings and open files.  *
+.****************************************************************************
+.
+INIT0000  CALL      DISPHEAD                  * display heading
+          OPEN      IBAVARD1,"ibavaraf"
+          OPEN      IBAVARD2,"ibavaraf"
+.
+INIT9999  RETURN
++
+.
+RDTRTR1   READ      TRANFILE,SEQ;DLOADTYP,LOADDESC,DLOADFNM,LOADFLEN,LOADSPAR
+          GOTO      OVERCOND IF OVER
+          MOVE      DLOADTYP,LOADSTYP
+          MOVE      DLOADFNM,LOADFNUM
+          RETURN
+.
+.
+WRTRTR1   WRITE     TRANFILE,SEQ;DIBVRTYP,IBVRDESC,DIBVRFNM,IBVRFLEN,IBVRSPAR
+          RETURN
+.
++
+.****************************************************************************
+.*                                SUMR0000             Called by: ML0200    *
+.*                        get user options to print Summary Report or not   *
+.****************************************************************************
+SUMR0000  MOVE      ZERO,SUMMONLY                 * assume "N" input
+          DISPLAY   *P1:24,*EL,"Print Summary only (",*V2LON,"Y",*HOFF,"/":
+                    *V2LON,"N",*HOFF,") ? "
+.
+SUMR1000  MOVE      "N",ANS
+          KEYIN     *P28:24,*DV,ANS:
+                    *P28:24,*RV,*V2LON,ANS
+.
+          REP       UPPLOW,ANS
+          MATCH     ANSY,ANS
+          GOTO      SUMR5000 IF EQUAL
+          MATCH     ANSN,ANS
+          GOTO      SUMR9999 IF EQUAL
+          BEEP
+          GOTO      SUMR1000
+.
+SUMR5000  MOVE      ONE,SUMMONLY                  * print summary only
+.
+SUMR9999  RETURN
+.****************************************************************************
+.*                                OPTN0000             Called by: ML0000    *
+.*                        get user options or exit                          *
+.****************************************************************************
+OPTN0000  MOVE       ZERO,CPAGENO      * very strange operation
+.
+          HLINE     *G37,2,52,80
+          DISPLAY   *P1:3,*EF:
+                    *P1:4,*V2LON,ZERO,*HOFF," = Exit":
+                    *P1:5,*V2LON,ONE,*HOFF," = Export Variable File":
+                    *P1:6,*V2LON,TWO,*HOFF," = Import Variable File - Add Only":
+                    *P1:7,*V2LON,THREE,*HOFF," = Import Variable File - ":
+                                             "Add and Update":
+                    *P1:8,*V2LON,FOUR,*HOFF," = Report Variable File - ":
+                                            "Changes only (no file change)":
+                    *P1:10,"Select Option :";
+.
+OPTN1000  KEYIN     *P17:10,*EL,*DV,UNDLN1,*P17:10,*V2LON,COPTION;
+.
+          COMPARE   ZERO,COPTION
+          GOTO      OPTN9500 IF EQUAL
+.
+          BRANCH    COPTION,OPTN1111,OPTN2222,OPTN3333,OPTN4444
+          BEEP
+          GOTO      OPTN1000
+.
+OPTN1111  DISPLAY   *P52:2,*V2LON,"- Export Varible File ";
+          MOVE      " Export Variable File ",OPTNNAME
+          GOTO      OPTN9000
+
+OPTN2222  DISPLAY   *P52:2,*V2LON,"- Import Variable File - Add Only ";
+          MOVE      " Import Variable File - Add Only ",OPTNNAME
+          GOTO      OPTN9000
+.
+OPTN3333  DISPLAY   *P52:2,*V2LON,"- Import Variable File - Add and Update ";
+          MOVE      " Import Variable File - Add and Update ",OPTNNAME
+          GOTO      OPTN9000
+.
+OPTN4444  DISPLAY   *P52:2,*V2LON,"- Report Variable File - Changes only":
+                                   " (no file change) ";
+          CLEAR     OPTNNAME
+          APPEND    " Import Variable File - Changes only ",OPTNNAME;
+          APPEND    "(no file change) ",OPTNNAME;
+          RESET     OPTNNAME
+          GOTO      OPTN9000
+.
+OPTN9000  MOVE      ZERO,EXIT
+          GOTO      OPTN9999
+.
+OPTN9500  MOVE      ONE,EXIT                     * exit program
+OPTN9999  RETURN
++
+.**************************************************************************
+.*                               MAKE0000              Called by: ML0000  *
+.*                     This Export Variable File                          *
+.**************************************************************************
+.
+MAKE0000  PACK      KEY8,SP70
+          CALL      RSIBVAR2
+MAKE1000  CALL      RKIBVAR2
+          BRANCH    OVRCD,MAKE9999
+          CALL      WRTRTR1
+          GOTO      MAKE1000
+.
+MAKE9999  RETURN
++
+.**************************************************************************
+.*                               LOAD0000              Called by: ML0000  *
+.*                     This Loads the Transfer File                       *
+.**************************************************************************
+.
+LOAD0000  CALL      SHED0000                 * Print the header of the report 
+.
+LOAD0500  MOVE      ZERO,OVRCD
+          CALL      RDTRTR1
+          BRANCH    OVRCD,LOAD9000
+.
+LOAD1000  PACK      KEY8,LOADSTYP,LOADFNUM,SP70
+          CALL      RDIBVAR2                 
+          IF        OVRCD=0
+            IF        COPTION = 3 | COPTION = 4   
+              IF      SUMMONLY = 1
+                MATCH     LOADDESC,IBVRDESC
+                IF        @EQUAL
+                  COMPARE     LOADFLEN,IBVRFLEN
+                  GOTO        LOAD0500  IF EQUAL
+                ENDIF
+              ENDIF
+.
+              PACK      KEY33,LOADSTYP,LOADDESC,SP70
+              CALL      RDIBVAR1
+              COMPARE   ZERO,OVRCD
+              IF        @EQUAL
+                COMPARE   IBVRFNUM,LOADFNUM   * check if it's the same record
+                IF        !@EQUAL
+                  CALL      PDUP0000          * Print duplicate error
+                  GOTO      LOAD0500
+                ENDIF
+              ENDIF
+.
+              CALL      PUPD0000            * Printing Update records
+              MOVE      LOADDESC,IBVRDESC
+              MOVE      LOADFLEN,IBVRFLEN
+              IF        COPTION = 3           
+                CALL      UPIBVAR2          * Option 3:Add and Update
+              ENDIF
+            ENDIF
+          ELSE
+            PACK      KEY8,LOADSTYP,LOADFNUM,SP70
+            CALL      RAIBVAR2
+            IF        OVRCD<>0
+              MOVE      LOADSTYP,IBVRSTYP
+              MOVE      LOADFNUM,IBVRFNUM
+              MOVE      LOADDESC,IBVRDESC
+              MOVE      LOADFLEN,IBVRFLEN
+              MOVE      SP70,IBVRSPAR
+.
+              PACK      KEY33,LOADSTYP,LOADDESC,SP70
+              CALL      RAIBVAR1
+              IF        OVRCD<>1
+                CALL      PDUP0000          * Print duplicate error
+                GOTO      LOAD0500
+              ENDIF
+.
+              CALL      PADD0000          * Printing Add records
+              IF        COPTION = 2 | COPTION = 3   
+                CALL      WRIBVAR2        * Option 2:Add or 3:Add & Update
+              ENDIF
+            ENDIF
+          ENDIF
+          GOTO      LOAD0500
+.
+LOAD9000  CALL      REND0000              * Call end of report routine
+.
+LOAD9999  RETURN
++
+.------------------------------------------------------------------------------
+. Print Update
+.------------------------------------------------------------------------------
+PUPD0000  ADD       ONE,CLNO              * Print the details &  1 to counter
+          IF        CLNO >= 54
+            CALL      SHED0000            * Call header to start new page
+          ENDIF
+.
+          PRINT     *1,"|",*3,LOADSTYP,*9,"|",*12,LOADFNUM,*18,"|":
+                    *20,LOADDESC,*54,"|",*56,IBVRFLEN,*67,"|":
+                    *69,LOADFLEN,*80,"|"
+. 
+PUPD9999  RETURN
+.------------------------------------------------------------------------------
+. Print Add 
+.------------------------------------------------------------------------------
+PADD0000  ADD       ONE,CLNO             * Print the details &  1 to counter
+          IF        CLNO >= 54
+            CALL      SHED0000           * Call header to start new page
+          ENDIF
+.
+          PRINT     *1,"|",*3,LOADSTYP,*9,"|",*12,LOADFNUM,*18,"|":
+                    *20,LOADDESC,*54,"|",*56,SP1,*67,"|":
+                    *69,LOADFLEN,*80,"|"
+.
+PADD9999  RETURN
+.------------------------------------------------------------------------------
+. Print Duplicate Error
+.------------------------------------------------------------------------------
+PDUP0000  ADD       ONE,CLNO             * Print the details &  1 to counter
+          IF        CLNO >= 54
+            CALL      SHED0000           * Call header to start new page
+          ENDIF
+.
+          PRINT     *1,"|",*3,LOADSTYP,*9,"|",*12,LOADFNUM,*18,"|":
+                    *20,LOADDESC,*54,"|",*56,"Duplicate",*67,"|":
+                    *69,"Desc.",*80,"|"
+.
+PDUP9999  RETURN
+.------------------------------------------------------------------------------
+. Print the header of the report
+.------------------------------------------------------------------------------
+SHED0000  CALL      IBACLOCK              * Set clock
+          CALL      HEAD80                * Set Header details for report
+.
+          IF        SUMMONLY =1 
+            STRIP     OPTNNAME
+            PRINT     *11,*+,OPTNNAME," : Summary Only" * Disp option selected
+          ELSE  
+            PRINT     *13,OPTNNAME                      * Disp option selected
+          ENDIF
+          CALL      PRTLN000
+          PRINT     *1,"|",*3,"Type",*9,"|",*12,"Code",*18,"|":
+                    *21,"Description",*54,"|",*56,"Old Length",*67,"|":
+                    *69,"New Length",*80,"|"
+          CALL      PRTLN000              * Print a single line
+          ADD       FOUR,CLNO
+.
+SHED9999  RETURN
+.
+PRTLN000  PRINT     *1,"*----------------------------------------------------":
+                       "--------------------------*"
+PRTLN999  RETURN
+.
+. =========================================================================
+. Print the end of the report
+. =========================================================================
+REND0000  PRINT     *1,"*----------------------------------------------------":
+                       "--------------------------*"
+          PRINT     *1,"***  End of Report  ***"
+
+REND9999  RETURN
+. =========================================================================
+.         I/O Includes
+. =========================================================================
+          INC      STD001IO
+.
+          INC      IBAVARIO/INC

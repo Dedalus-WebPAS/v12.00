@@ -1,0 +1,62 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Web System Table 
+                      WebServices DVAW DVYW Payment 
+  
+TABLE NAME         :  webdviaf
+=====================================================================
+WBDIHOSP    char        3     1   Hospital ID  
+WBDIPYPN    char        8     4   Payee Provider Number  
+WBDIPRUN    char        4    12   Payment Run Number  
+WBDIPDAT    char        8    16   Payment Run Date  
+WBDICLBP    char        9    24   Claim Benefit Paid  
+WBDICLCA    char        9    33   Claim Charge Amount  
+WBDICLID    char        6    42   Claim ID  
+WBDILDAT    char        8    48   Lodgement Date  
+WBDITRID    char       24    56   Claim Transaction ID  
+WBDIRKEY    char       24    80   Report Retrieval Key  
+WBDISTAT    char        1   104   Status  
+                                   0 = Received  
+                                   1 = Locked  
+                                   2 = Released  
+                                   3 = Released to Suspense A/C  
+WBDILTYP    char        2   105   Lock Type (numeric - right just)  
+WBDIMSID    char       36   107   Message ID  
+WBDISPAR    char      100   143   Spare Variable  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+WBDIHOSP
+WBDIPYPN
+WBDIPRUN
+WBDIPDAT
+WBDICLID
+WBDITRID
+  
+UNIQUE INDEX 2
+WBDITRID
+WBDIHOSP
+WBDIPYPN
+WBDIPRUN
+WBDIPDAT
+WBDICLID
+  
+UNIQUE INDEX 3
+WBDIRKEY
+WBDIHOSP
+WBDIPYPN
+WBDIPRUN
+WBDIPDAT
+WBDICLID
+WBDITRID
+  
+UNIQUE INDEX 4
+WBDIRKEY
+WBDITRID
+WBDIHOSP
+WBDIPYPN
+WBDIPRUN
+WBDIPDAT
+WBDICLID
+  
+=====================================================================

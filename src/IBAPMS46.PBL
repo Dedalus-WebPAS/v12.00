@@ -1,0 +1,823 @@
+.***************************************************************************
+.* System    :   EDWARD Patient Extract                                    *
+.* Program   :   IBAPMS46                                                  *
+.* Desc      :   Write EDWARD extract triggers for selected patients       * 
+.*           :                                                             *
+.***************************************************************************
+.* Date      :   18 March 2022                                             *
+.* Author    :   DA Sarkies                                                *
+.* Function  :   User selects a date range, and an Visit Discharge type    * 
+.*           :   and the program automatically updates all of the visit    *
+.*           :   types within that date range. Used for EWD Extracts       *
+.*           :                                                             *
+.***************************************************************************
+.* V11.05.02  21.03.2025 Ebon Clements           TSK 0954909               *
+.*            Added trigger admitted patient obj 133 leave records         *
+.* V11.05.01  21.03.2025 Sunny                   TSK 0951071               *
+.*            Added trigger option for Emergency all objects               *  
+.* V11.04.02  18.09.2024 Ebon Clements           TSK 0951071               *
+.*            Added trigger admitted patient obj 142 bed transfers         *
+.* V11.04.01  26.08.2024 Ebon Clements           TSK 0941700               *
+.*            Added trigger client 01 object functionality                 *
+.* V11.02.01  25.07.2022 Ebon Clements           TSK 0921629               *
+.*            Added trigger outpatient booking update option               *
+.* 18.03.2022    DA Sarkies                         TSK 0915072            *
+.*                  Created program                                        *
+.***************************************************************************
+.
+          INC       STD001FD
+.
+. FILE DESCRIPTION INCLUDES
+. -------------------------
+.
+          INC       PATDSCFD/INC
+          INC       PATURAFD/INC
+          INC       PATMI1FD/INC
+          INC       PMSADWFD/INC
+          INC       PMSEDWFD/INC
+          INC       PMSVX1FD/INC
+          INC       OUTBOAFD/INC
+          INC       OUTSESFD/INC
+          INC       OUTSITFD/INC
+          INC       EMRVISFD/INC
+.
+. LOCAL VARIABLE DEFINITION
+. -------------------------
+RECCOUNT  FORM      8
+SITECODE  DIM       6                       * Site code
+CURRDATE  DIM       8
+DISPFDAT  DIM       10
+DISPTDAT  DIM       10
+FROMURNO  DIM       8
+STRTDATE  DIM       8
+ENDDDATE  DIM       8
+VISTDATE  DIM       11
+VISTNUMB  DIM       8
+TRIGTYPE  DIM	    4
+.
+.
+PRGID     INIT      "IBAPMS46"
+PRGNAM    INIT      "EDWARD Extract Trigger Generation       "
+VERSION   INIT      "V12.00.00"
++
+.**************************************************************************
+.*                              ML0000                                    *
+.*                      Controlling Logic (Mainline code)                 *
+.**************************************************************************
+.
+ML0000    CALL      INIT0000               * initialisation and open files
+.
+ML0100    CALL      OPTN0000               * select options
+          BRANCH    EXIT,ML9999            * EXIT = 1 if 0 chosen in menu
+          BRANCH    COPTION,ML1000         * proceed with clean up
+.
+ML1000    CALL      ENTP0000               * Select Trigger Type
+.
+ML1100    MATCH     "E29X",TRIGTYPE        * By Single U/R ?
+          IF        @EQUAL
+            CALL      KYUR0000             * Keyin single U/R ?
+            GOTO      ML2000
+          ENDIF
+.
+          MATCH     "A24 ",TRIGTYPE        * By Admission Number ?
+          IF        @EQUAL
+            CALL      KYVS0000             * Keyin admission number ?
+            GOTO      ML2000
+          ENDIF
+.
+          MATCH     "A25X",TRIGTYPE        * By Admission Number ?
+          IF        @EQUAL
+            CALL      KYVS0000             * Keyin admission number ?
+            GOTO      ML2000
+          ENDIF
+.
+          CALL      DATE0000               * Keyin date range ?
+.
+ML2000    CALL      CONTQST                * Ok to continue ?
+          BRANCH    CEXIT,ML5000:          * yes
+                          ML0100:          * no
+                          ML0100           * cancel
+.
+ML5000    CALL      PROC0000               * process
+.
+ML9999    CHAIN     PGM                    * chain back to program
++
+.****************************************************************************
+.*                                INIT0000             Called by: ML0000    *
+.*                             initialisation                               *
+.*  The initialisation routine is used to display headings and open files.  *
+.****************************************************************************
+.
+INIT0000  CALL      DISPHEAD                  * display heading
+.
+          OPEN      PATDSCH2,"patdschf"
+          OPEN      PATMI1A1,"patmi1af"
+          OPEN      PATURAD1,"paturadf"
+          OPEN      PATURAD2,"paturadf"
+          OPEN      PMSADWA1,"pmsadwaf"
+          OPEN      PMSEDWA1,"pmsedwaf"
+          OPEN      PMSVX1A1,"pmsvx1af"
+          OPEN      EMRVISA4,"emrvisaf"
+.
+          DISPLAY   *P64:24,"outsitaf";
+          OPEN      OUTSITA1,"outsitaf"
+          MOVE      IDDD,SITECODE
+          MOVE      IDDD,KEY6
+          CALL      RDSITA1
+.
+          PACK      CFNAME WITH UID,FILSESA6        * OUTSESFD
+          DISPLAY   *P64:24,CFNAME;
+          OPEN      OUTSESA6,CFNAME
+.
+          PACK      CFNAME WITH UID,FILBOKA1        * OUTBOKFD
+          DISPLAY   *P64:24,CFNAME;
+          OPEN      OUTBOKA1,CFNAME
+.
+INIT9999  RETURN
++
+.****************************************************************************
+.*                                OPTN0000             Called by: ML0000    *
+.*                        get user options or exit                          *
+.*                                                                          *
+.*    Returns:  EXIT    = FALSE (0)  Run clean up                           *
+.*                        TRUE  (1)  Exit option selected                   *
+.****************************************************************************
+.
+OPTN0000  DISPLAY   *P1:3,*EF,*P1:4,*V2LON,ZERO,*HOFF,". Exit":
+                    *P1:5,*V2LON,ONE,*HOFF,". Run Report Only":
+                    *P1:6,*V2LON,TWO,*HOFF,". Run Report and Trigger Records"
+.
+OPTN0500  KEYIN     *P1:8,*EL,"Select Option : ",*DV,UNDLN1:
+                    *P17:8,*V2LON,COPTION
+.
+          COMPARE   ZERO,COPTION                 * exit selected ?
+          GOTO      OPTN9500 IF EQUAL            * yes
+.
+          BRANCH    COPTION,OPTN9000,OPTN9000    * run clean-up
+.
+          BEEP
+          GOTO      OPTN0500
+.
+OPTN9000  MOVE      ZERO,EXIT
+          GOTO      OPTN9999
+.
+OPTN9500  MOVE      ONE,EXIT
+.
+OPTN9999  RETURN
++
++
+.***************************************************************************
+.*                               ENTP0000                                  *
+.*                          Enter Admitted Patient Type                    *
+.*                          AXXX = pmsadwaf trigger                        *
+.*                          EXXX = pmsedwaf trigger                        *
+.***************************************************************************
+.
+ENTP0000  MOVE      SP70,TRIGTYPE
+          KEYIN     *P1:10,*EF,"Enter Trigger Type :",*DV,UNDLN1:
+                    *P30:10,*V2LON,TRIGTYPE
+.
+          PACK      TRIGTYPE,TRIGTYPE,SP70
+.
+ENTP9999  RETURN
++
+.***************************************************************************
+.*                               KYUR0000                                  *
+.* Keyin a single U/R number                                               *
+.***************************************************************************
+.
+KYUR0000  MOVE      SP70,FROMURNO
+          KEYIN     *P1:12,*EF,"Enter U/R Number :",*DV,UNDLN1:
+                    *P30:12,*V2LON,FROMURNO
+.
+          PACK      FROMURNO,FROMURNO,SP70
+.
+KYUR9999  RETURN
++
++
+.***************************************************************************
+.*                               KYVS0000                                  *
+.* Keyin a visit number                                                    *
+.***************************************************************************
+.
+KYVS0000  MOVE      SP70,VISTNUMB
+          KEYIN     *P1:12,*EF,"Enter Visit Number :",*DV,UNDLN1:
+                    *P30:12,*V2LON,VISTNUMB
+.
+          PACK      VISTNUMB,VISTNUMB,SP70
+.
+KYVS9999  RETURN
+
++
+.***************************************************************************
+.*                               DATE0000                                  *
+.*                          accept date range                              *
+.***************************************************************************
+.
+.---------- keyin first date range -------
+.
+DATE0000    MOVE       FALSE,EXIT
+            DISPLAY    *P1:12,*EF,"Date From :":
+                          *P1:13,"Date To   :";
+.
+            MOVE      "12",CVERT
+            MOVE      "13",CCOL
+            CALL      IBACLOCK
+            PACK      CURRDATE,CCC,CYY,CMM,CDD
+            REP       " 0",CURRDATE
+            MOVE      CCC,CCENT
+            MOVE      CYY,CYEAR
+            MOVE      CMM,CMON
+            MOVE      CDD,CDAY
+
+            CALL      KEYDATE                          * enter the from date
+            PACK      STRTDATE,CCENT,CYEAR,CMON,CDAY   * move to form field
+            REP       " 0",STRTDATE                    * from date
+.
+            MATCH     CURRDATE,STRTDATE
+            IF        @EQUAL
+              DISPLAY    *P1:24,*EL,*B,"Fix can't be run for the current date":
+                         " Hit <",*V2LON,"ENTER",*HOFF,"> To Continue ";
+              KEYIN      ANS;
+              DISPLAY    *P1:24,*EL;
+              GOTO       DATE0000
+            ENDIF
+.
+            MOVE       "13",CVERT
+            MOVE       "13",CCOL
+            CALL      KEYDATE                          * enter the from date
+            PACK      ENDDDATE,CCENT,CYEAR,CMON,CDAY   * move to form field
+            REP       " 0",ENDDDATE                    * from date
+.
+            MATCH     CURRDATE,ENDDDATE
+            IF        !@LESS 
+              DISPLAY    *P1:24,*EL,*B,"Fix can't be after the current date":
+                         " Hit <",*V2LON,"ENTER",*HOFF,"> To Continue ";
+              KEYIN      ANS;
+              DISPLAY    *P1:24,*EL;
+              GOTO       DATE0000
+            ENDIF
+.
+            MATCH      STRTDATE,ENDDDATE
+            GOTO       DATE9999 IF NOT LESS
+.
+            DISPLAY    *P1:24,*EL,*B,"2nd Range Must Be Greater Than 1st ":
+                       "Range - Hit <",*V2LON,"ENTER",*HOFF,"> To Continue ";
+            KEYIN      ANS;
+            DISPLAY    *P1:24,*EL;
+            GOTO       DATE0000
+.
+DATE9999    RETURN
++
+.**************************************************************************
+.*                               PROC0000              Called by: ML0000  *
+.*                                                                        *
+.**************************************************************************
+.
+PROC0000  CALL      HEAD0000               * Print Report Heading
+.
+          MOVE      ZERO,RECCOUNT          * Records Checked
+.      
+          MATCH     "A4  ",TRIGTYPE        * pmsadwaf
+          IF        @EQUAL
+            CALL      EDVA0000             * Update ED visit trigger 4 
+            GOTO      PROC9000
+          ENDIF
+.
+          MATCH     "A5  ",TRIGTYPE        * pmsadwaf
+          IF        @EQUAL
+            CALL      OPAT0000             * Update OP visit trigger 5
+            GOTO      PROC9000
+          ENDIF
+.
+          MATCH     "A14 ",TRIGTYPE        * pmsadwaf
+          IF        @EQUAL
+            CALL      IPAT0000             * Update IP visit trigger 14
+            GOTO      PROC9000
+          ENDIF
+.
+          MATCH     "A24 ",TRIGTYPE        * pmsadwaf
+          IF        @EQUAL
+            CALL      BTRN0000             * All Bed Transfers trigger 14
+            GOTO      PROC9000
+          ENDIF
+.
+          MATCH     "E29 ",TRIGTYPE        * pmsedwaf
+          IF        @EQUAL
+            CALL      ACLN0000             * Client 01 object trigger 29
+            GOTO      PROC9000             * By created date range
+          ENDIF
+.
+          MATCH     "E29X",TRIGTYPE        * pmsedwaf
+          IF        @EQUAL
+            CALL      CLNT0000             * Client 01 objects trigger 29
+            GOTO      PROC9000             * Single U/R
+          ENDIF
+.
+          MATCH     "A25 ",TRIGTYPE        * pmsadwaf
+          IF        @EQUAL
+            CALL      IPAT0000             * IP all leave trigger 25
+            GOTO      PROC9000
+          ENDIF
+.
+          MATCH     "A25X",TRIGTYPE        * pmsadwaf
+          IF        @EQUAL
+            CALL      BTRN0000             * IP all leave trigger 25
+            GOTO      PROC9000
+          ENDIF
+.
+PROC9000  CALL      UND80
+          PRINT     *1," Number of records checked :",RECCOUNT
+          DISPLAY   *P1:20,*EF,"Program Complete.";
+          CALL      HITENTER
+.
+PROC9999  RETURN
++
+.------------------------------------------------------------
+. Process ED visit all trigger 4  - pmsadwaf
+.------------------------------------------------------------
+EDVA0000  PACK      KEY24,STRTDATE,SP70
+          CALL      RSEMVIS4
+EDVA1000  CALL      RKEMVIS4
+          BRANCH    OVRCD,EDVA9999
+.
+          MATCH     EMVIDATE,ENDDDATE        * End Date
+          GOTO      EDVA9999 IF LESS
+
+          ADD       ONE,RECCOUNT           * Records Checked
+          UNPACK    EMVIDATE,CCENT,CYEAR,CMON,CDAY
+          CALL      PACDATE
+          MOVE      CPCDATE,VISTDATE
+.
+          DISPLAY   *P25:15,*EL,*V2LON,"ED Visit: ",VISTDATE,SP4,DEMVIADM
+.
+          COMPARE   ONE,EMVISTAT            * Skip current ED visits
+          GOTO      EDVA1000 IF EQUAL
+.
+          COMPARE   FOUR,EMVISTAT           * Skip cancelled ED visits
+          GOTO      EDVA1000 IF EQUAL
+.
+          MATCH     "       0",EMVIURNO     * Skip Zero U/R
+          GOTO      EDVA1000 IF EQUAL
+.
+          CALL      WEDT0000                * Write ED update trigger
+          PRINT     *1,"| ",DEMVIADM,*12,"| ",VISTDATE,*80,"|"
+.
+          GOTO      EDVA1000
+.
+EDVA9999  RETURN
++
+.------------------------------------------------------------
+. Process OP visit update trigger 5 - pmsadwaf
+.------------------------------------------------------------
+OPAT0000  PACK      KEY25,SITECODE,STRTDATE,SP70
+          CALL      RDSSESA6                * Sesssion for site and date
+OPAT1000  CALL      RDKSESA6
+          BRANCH    OVRCD,OPAT9999
+.
+          MATCH     OSESITE,OSTSITE         * Correct site
+          GOTO      OPAT9999 IF NOT EQUAL
+.
+          MATCH     OSEDATE,ENDDDATE        * Session date
+          GOTO      OPAT9999 IF LESS
+.
+          PACK      KEY28,OSESITE,OSECLIN,OSEDATE,OSESTRT,SP70
+          CALL      RDSBOKA1
+OPAT5000  CALL      RDKBOKA1                * Check all bookings
+          BRANCH    OVRCD,OPAT1000
+.
+          MATCH     OBASITE,OSESITE         * Site
+          GOTO      OPAT1000 IF NOT EQUAL
+.
+          MATCH     OBACLIN,OSECLIN         * Clinic
+          GOTO      OPAT1000 IF NOT EQUAL
+.
+          MATCH     OBADATE,OSEDATE         * Date
+          GOTO      OPAT1000 IF NOT EQUAL
+.
+          MATCH     OBASTRT,OSESTRT         * Start time
+          GOTO      OPAT1000 IF NOT EQUAL
+.
+.  Booked, Attended and DNA
+.
+          IF        OBASTAT <> 1 & OBASTAT <> 4 & OBASTAT <> 5
+            GOTO      OPAT5000
+          ENDIF
+.
+          ADD       ONE,RECCOUNT           * Records Checked
+          UNPACK    OBADATE,CCENT,CYEAR,CMON,CDAY
+          CALL      PACDATE
+          MOVE      CPCDATE,VISTDATE
+.
+          COMPARE   "55",CLNO
+          CALL      HEAD0000 IF NOT LESS
+.
+          DISPLAY   *P25:15,*EL,*V2LON,"OP Visit: ",VISTDATE,SP4,OBAOUTNO
+.
+          CALL      WEDA0000                * Write EDWARD trigger
+          PRINT     *1,"| ",OBAOUTNO,*12,"| ",VISTDATE,*80,"|"
+.
+          GOTO      OPAT5000
+.
+OPAT9999  RETURN
++
+.------------------------------------------------------------
+. Process IP visit update trigger 14 - pmsadwaf
+. Process IP visit all leave trigger 25 - pmsadwaf
+.------------------------------------------------------------
+IPAT0000  PACK      KEY16,STRTDATE,SP70
+          CALL      RDSDSCH2               * Loop discharge file using
+IPAT1000  CALL      RDKDSCH2               * the discharge date index 2
+          BRANCH    OVRCD,IPAT9999
+.
+          MATCH     DDATE,ENDDDATE         * Discharge Data after end date
+          GOTO      IPAT9999 IF LESS
+
+          ADD       ONE,RECCOUNT           * Records Checked
+          UNPACK    DDATE,CCENT,CYEAR,CMON,CDAY
+          CALL      PACDATE
+          MOVE      CPCDATE,VISTDATE
+.
+          COMPARE   "55",CLNO
+          CALL      HEAD0000 IF NOT LESS
+.
+          DISPLAY   *P25:15,*EL,*V2LON,"IP Visit: ",VISTDATE,SP4,DADMNO
+.
+          CALL      WEDV0000                * Write EDWARD trigger
+          PRINT     *1,"| ",DADMNO,*12,"| ",VISTDATE,*80,"|"
+.
+          GOTO      IPAT1000
+.
+IPAT9999  RETURN
++
+.------------------------------------------------------------
+. Process IP visit all bed transfers trigger 24  - pmsadwaf
+. Process IP visit all leave records trigger 25  - pmsadwaf
+.------------------------------------------------------------
+BTRN0000  PACK      KEY8,VISTNUMB,SP70
+          CALL      RDMISS1
+          BRANCH    OVRCD,BTRN9999
+.
+          ADD       ONE,RECCOUNT           * Records Checked
+          UNPACK    ADATE,CCENT,CYEAR,CMON,CDAY
+          CALL      PACDATE
+          MOVE      CPCDATE,VISTDATE
+.
+          COMPARE   "55",CLNO
+          CALL      HEAD0000 IF NOT LESS
+.
+          DISPLAY   *P25:15,*EL,*V2LON,"IP Visit: ",VISTDATE,SP4,AADMNO
+.
+          CALL      WEAV0000                * Write EDWARD trigger
+          PRINT     *1,"| ",AADMNO,*12,"| ",VISTDATE,*80,"|"
+.
+BTRN9999  RETURN
++
+.------------------------------------------------------------
+. Process Client 01 object trigger 29 - pmsedwaf
+. By U/R Creation date
+.------------------------------------------------------------
+ACLN0000  PACK      KEY17,ANSA,STRTDATE,SP70
+          CALL      RDSURAD1               * Loop U/R audit file using
+ACLN1000  CALL      RDKURAD1               * the record type and date index 1
+          BRANCH    OVRCD,ACLN9999
+.
+          MATCH     ANSA,URRTYPE           * Add
+          GOTO      ACLN9999 IF NOT EQUAL
+.
+          MATCH     URDATE,ENDDDATE        * Creation Data after end date
+          GOTO      ACLN9999 IF LESS
+
+          ADD       ONE,RECCOUNT           * Records Checked
+          UNPACK    URDATE,CCENT,CYEAR,CMON,CDAY
+          CALL      PACDATE
+          MOVE      CPCDATE,VISTDATE
+.
+          COMPARE   "55",CLNO
+          CALL      HEAD0000 IF NOT LESS
+.
+          DISPLAY   *P25:15,*EL,*V2LON,"UR : ",VISTDATE,SP4,URURNO
+.
+          CALL      WCLN0000                * Write EDWARD trigger
+          PRINT     *1,"| ",URURNO,*12,"| ",VISTDATE,*80,"|"
+.
+          GOTO      ACLN1000
+.
+ACLN9999  RETURN
++
+.------------------------------------------------------------
+. Process Client 01 object trigger 29 - pmsedwaf
+. For a single U/R
+.------------------------------------------------------------
+CLNT0000  PACK      KEY17,FROMURNO,ANSA,SP70
+          CALL      RDSURAD2               * Loop U/R audit file using
+CLNT1000  CALL      RDKURAD2               * the record type and date index 1
+          BRANCH    OVRCD,CLNT9999
+.
+          MATCH     FROMURNO,URURNO        * Correct U/R
+          GOTO      CLNT9999 IF NOT EQUAL
+.
+          MATCH     ANSA,URRTYPE           * Add
+          GOTO      CLNT9999 IF NOT EQUAL
+.
+          ADD       ONE,RECCOUNT           * Records Checked
+          UNPACK    URDATE,CCENT,CYEAR,CMON,CDAY
+          CALL      PACDATE
+          MOVE      CPCDATE,VISTDATE
+.
+          COMPARE   "55",CLNO
+          CALL      HEAD0000 IF NOT LESS
+.
+          DISPLAY   *P25:15,*EL,*V2LON,"UR : ",VISTDATE,SP4,URURNO
+.
+          CALL      WCLN0000                * Write EDWARD trigger
+          PRINT     *1,"| ",URURNO,*12,"| ",VISTDATE,*80,"|"
+.
+          GOTO      CLNT1000
+.
+CLNT9999  RETURN
++
+.------------------------------------------------------------
+. Print Report Heading
+.------------------------------------------------------------
+HEAD0000  CALL      IBACLOCK
+          CALL      HEAD80
+.
+          UNPACK    STRTDATE,CCENT,CYEAR,CMON,CDAY
+          CALL      PACDATE
+          MOVE      CPCDATE,DISPFDAT
+.
+          UNPACK    ENDDDATE,CCENT,CYEAR,CMON,CDAY
+          CALL      PACDATE
+          MOVE      CPCDATE,DISPTDAT
+.
+          MATCH     "A4  ",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *20,"Emergency Visit: All Objects"
+            PRINT     *20,"ED Visit Date :",DISPFDAT," to ",DISPTDAT
+          ENDIF
+.
+          MATCH     "A5  ",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *20,"Non Admitted Patient: Update Outpatient Visit"
+            PRINT     *20,"Booking Date :",DISPFDAT," to ",DISPTDAT
+          ENDIF
+.
+          MATCH     "A14 ",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *20,"Admitted Patient: Admission Details Update"
+            PRINT     *20,"Discharge Date :",DISPFDAT," to ",DISPTDAT
+          ENDIF
+.
+          MATCH     "A24 ",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *20,"Admitted Patient: All Bed Transfers"
+            PRINT     *20,"Admission Number :",VISTNUMB
+          ENDIF
+.
+          MATCH     "A25 ",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *20,"Admitted Patient: All Leave Records"
+            PRINT     *20,"Discharge Date :",DISPFDAT," to ",DISPTDAT
+          ENDIF
+.
+          MATCH     "A25X",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *20,"Admitted Patient: All Leave Records"
+            PRINT     *20,"Admission Number :",VISTNUMB
+          ENDIF
+.
+          MATCH     "E29 ",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *20,"Client : 01 Object By U/R Creation Date Range"
+            PRINT     *20,"Creation Date :",DISPFDAT," to ",DISPTDAT
+          ENDIF
+.
+          MATCH     "E29X",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *20,"Client : 01 Object Single U/R"
+            PRINT     *20,"U/R :",FROMURNO
+          ENDIF
+.
+          ADD       TWO,CLNO
+.
+          IF        COPTION=1
+            PRINT     *20,"Report Only"
+          ELSE
+            PRINT     *20,"Report and Trigger Records"
+          ENDIF
+.
+          CALL      UND80
+.
+          MATCH     "A4  ",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *1,"| Visit    ",*12,"| ED Visit Date",*80,"|"
+          ENDIF
+.
+          MATCH     "A5  ",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *1,"| Visit    ",*12,"| Booking Date",*80,"|"
+          ENDIF
+.
+          MATCH     "A14 ",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *1,"| Visit    ",*12,"| Discharge Date",*80,"|"
+          ENDIF
+.
+          MATCH     "A24 ",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *1,"| Visit    ",*12,"| Admission Date",*80,"|"
+          ENDIF
+.
+          MATCH     "A25 ",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *1,"| Visit    ",*12,"| Admission Date",*80,"|"
+          ENDIF
+.
+          MATCH     "A25X",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *1,"| Visit    ",*12,"| Admission Date",*80,"|"
+          ENDIF
+.
+          MATCH     "E29 ",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *1,"| U/R      ",*12,"| Creation Date",*80,"|"
+          ENDIF
+.
+          MATCH     "E29X",TRIGTYPE
+          IF        @EQUAL
+            PRINT     *1,"| U/R      ",*12,"| Creation Date",*80,"|"
+          ENDIF
+.
+          ADD       ONE,CLNO
+          ADD       ONE,CLNO
+.
+          CALL      UND80
+.
+HEAD9999  RETURN
++
+.-----------------------------------------------------------
+. Write EDWARD emergency visit trigger record
+.------------------------------------------------------------
+WEDT0000  BRANCH    COPTION,WEDT9999        * Report Only
+.
+          MOVE      EMVIADMN,PMAWVISN
+          MOVE      FOUR,PMAWTYPE
+          PACK      PMAWOLDV,SP70,SP70,SP70,SP70
+          PACK      PMAWNEWV,SP70,SP70,SP70,SP70
+.
+          CALL      IBACLOCK
+          PACK      PMAWCDAT,CCC,CYY,CMM,CDD
+          REP       " 0",PMAWCDAT
+          MOVE      "00:00:00",PMAWCTIM
+          MOVE      "IBAPMS46",PMAWCUID
+          PACK      PMAWSPAR,SP70,SP70
+.
+          PACK      KEY27,PMAWCDAT,PMAWCTIM,PMAWVISN,PMAWTYPE,SP70
+          CALL      RAPMADW1
+          IF        OVRCD=1
+            CALL      WRPMADW1
+          ELSE
+            CALL      UPPMADW1
+          ENDIF
+.
+WEDT9999  RETURN
++
+.-----------------------------------------------------------
+. Write EDWARD update inpatient visit trigger - DADMNO
+.------------------------------------------------------------
+WEDV0000  BRANCH    COPTION,WEDV9999        * Report Only
+.
+          MOVE      DADMNO,PMAWVISN
+          UNPACK    TRIGTYPE,D1,PMAWTYPE
+          PACK      PMAWOLDV,SP70,SP70,SP70,SP70
+          PACK      PMAWNEWV,SP70,SP70,SP70,SP70
+.
+          CALL      IBACLOCK
+          PACK      PMAWCDAT,CCC,CYY,CMM,CDD
+          REP       " 0",PMAWCDAT
+          MOVE      "00:00:00",PMAWCTIM
+          MOVE      "IBAPMS46",PMAWCUID
+          PACK      PMAWSPAR,SP70,SP70
+.
+          PACK      KEY27,PMAWCDAT,PMAWCTIM,PMAWVISN,PMAWTYPE,SP70
+          CALL      RAPMADW1
+          IF        OVRCD=1
+            CALL      WRPMADW1
+          ELSE
+            CALL      UPPMADW1
+          ENDIF
+.
+WEDV9999  RETURN
++
+.-----------------------------------------------------------
+. Write EDWARD update inpatient visit trigger - AADMNO
+.------------------------------------------------------------
+WEAV0000  BRANCH    COPTION,WEAV9999        * Report Only
+.
+          MOVE      AADMNO,PMAWVISN
+.
+          MATCH     "A25X",TRIGTYPE
+          IF        @EQUAL
+            UNPACK    TRIGTYPE,D1,D2
+            PACK      PMAWTYPE,D2,SP70
+          ELSE
+            UNPACK    TRIGTYPE,D1,PMAWTYPE
+          ENDIF
+.
+          PACK      PMAWOLDV,SP70,SP70,SP70,SP70
+          PACK      PMAWNEWV,SP70,SP70,SP70,SP70
+.
+          CALL      IBACLOCK
+          PACK      PMAWCDAT,CCC,CYY,CMM,CDD
+          REP       " 0",PMAWCDAT
+          MOVE      "00:00:00",PMAWCTIM
+          MOVE      "IBAPMS46",PMAWCUID
+          PACK      PMAWSPAR,SP70,SP70
+.
+          PACK      KEY27,PMAWCDAT,PMAWCTIM,PMAWVISN,PMAWTYPE,SP70
+          CALL      RAPMADW1
+          IF        OVRCD=1
+            CALL      WRPMADW1
+          ELSE
+            CALL      UPPMADW1
+          ENDIF
+.
+WEAV9999  RETURN
+.
+.-----------------------------------------------------------
+. Write EDWARD update OP visit trigger type 5
+.------------------------------------------------------------
+WEDA0000  BRANCH    COPTION,WEDV9999        * Report Only
+.
+          MOVE      OBAOUTNO,PMAWVISN
+          UNPACK    TRIGTYPE,D1,PMAWTYPE
+          PACK      PMAWOLDV,SP70,SP70,SP70,SP70
+          PACK      PMAWNEWV,SP70,SP70,SP70,SP70
+.
+          CALL      IBACLOCK
+          PACK      PMAWCDAT,CCC,CYY,CMM,CDD
+          REP       " 0",PMAWCDAT
+          MOVE      "00:00:00",PMAWCTIM
+          MOVE      "IBAPMS46",PMAWCUID
+          PACK      PMAWSPAR,SP70,SP70
+.
+          PACK      KEY27,PMAWCDAT,PMAWCTIM,PMAWVISN,PMAWTYPE,SP70
+          CALL      RAPMADW1
+          IF        OVRCD=1
+            CALL      WRPMADW1
+          ELSE
+            CALL      UPPMADW1
+          ENDIF
+.
+WEDA9999  RETURN
+.
+.-----------------------------------------------------------
+. Write EDWARD client 01 object trigger type 29
+.------------------------------------------------------------
+WCLN0000  BRANCH    COPTION,WCLN9999        * Report Only
+.
+          MOVE      URURNO,PMEWURNO
+          MATCH     "E29X",TRIGTYPE
+          IF        @EQUAL
+            UNPACK    TRIGTYPE,D1,D2
+            PACK      PMEWTYPE,D2,SP70
+          ELSE
+            UNPACK    TRIGTYPE,D1,PMEWTYPE
+          ENDIF
+          PACK      PMEWOLDV,SP70,SP70,SP70,SP70
+          PACK      PMEWNEWV,SP70,SP70,SP70,SP70
+.
+          CALL      IBACLOCK
+          PACK      PMEWCDAT,CCC,CYY,CMM,CDD
+          REP       " 0",PMEWCDAT
+          CLOCK     TIME,PMEWCTIM
+          MOVE      "IBAPMS46",PMEWCUID
+          PACK      PMEWSPAR,SP70,SP70
+.
+          PACK      KEY27,PMEWCDAT,PMEWCTIM,PMEWURNO,PMEWTYPE,SP70
+          CALL      RAPMEDW1
+          IF        OVRCD=1
+            CALL      WRPMEDW1
+          ELSE
+            CALL      UPPMEDW1
+          ENDIF
+.
+WCLN9999  RETURN
++
+. =========================================================================
+.         I/O Includes
+. =========================================================================
+.
+          INC       STD001IO
+.
+          INC       PATDSCIO/INC
+          INC       PATURAIO/INC
+          INC       PATMI1IO/INC
+          INC       PMSADWIO/INC
+          INC       PMSEDWIO/INC
+          INC       PMSVX1IO/INC
+          INC       OUTBOAIO/INC
+          INC       OUTSESIO/INC
+          INC       OUTSITIO/INC
+          INC       EMRVISIO/INC

@@ -1,0 +1,68 @@
+.------------------------------------------------------------------------------
+. Include        : CLPMSCEX
+.
+. Modifications  :
+.------------------------------------------------------------------------------
+. V11.04.02 11/06/2024 Thanh T           TSK 0941543 
+.           Added Main Language Spoken At Home 1-2 
+. V11.04.01 19/12/2023 Thanh T           TSK 0932545  
+.           Added PMCEFTXT with spaces 
+.------------------------------------------------------------------------------
+. V10.13.01 22/08/2018 Peter Vela         TSK 0859742
+.                      Added PMCECMED, PMCECREF, PMCECDOB
+. V10.03.02 30.11.2011 Steve Armstrong    CAR 248529
+.                      Added PMCETPID & PMCEWPID
+. V10.03.01 08.11.2011 Ebon Clements  CAR 248529
+.                      Added PMCECNTR
+. V10.02.03 08.06.2011 Ebon Clements  CAR 239530
+.                      Added PMCECONT
+. V10.02.02 06.06.2011 Jeni Tan       CAR 240722
+.                      Added PMCEGNM2
+. V10.02.01 01.06.2011 Jill Parkinson CAR 242416
+.                      Added send letter and active
+. V9.05.00  24.03.2006 Ebon Clements CAR 76341
+.                      Created include
+.------------------------------------------------------------
+. Clear Carer Contact Table Fields
+.------------------------------------------------------------
+.
+CLPMSCEX  MOVE      SP70,PMCEURNO      . U/R Number
+          MOVE      SP70,PMCETYPE      . Type of Contact (Cat tc)
+          MOVE      SP70,PMCECNTR      . Counter
+          MOVE      SP70,PMCETITL      . Title
+          MOVE      SP70,PMCESNAM      . Surname
+          MOVE      SP70,PMCEGNAM      . Given Name
+          MOVE      SP70,PMCEGNM2      . Second Given Name
+          MOVE      SP70,PMCEADD1      . Address Line 1
+          MOVE      SP70,PMCEADD2      . Address Line 2
+          MOVE      SP70,PMCEADD3      . Address Line 3
+          MOVE      SP70,PMCEADD4      . Address Line 4
+          MOVE      SP70,PMCEPOST      . Post Code
+          MOVE      SP70,PMCETELP      . Telephone Private
+          MOVE      SP70,PMCETELB      . Telephone Business
+          MOVE      SP70,PMCETELM      . Telephone Mobile
+          MOVE      SP70,PMCERELP      . Relationship
+          PACK      PMCEEMAI,SP70,SP70 . Email Address
+          MOVE      SP70,PMCECDAT      . Date Record Created (CCYYMMDD)
+          MOVE      SP70,PMCECTIM      . Time Record Created (HH:MM:SS)
+          MOVE      SP70,PMCECUID      . WEB User ID Created (websecaf)
+          MOVE      SP70,PMCEUDAT      . Update Date (CCYYMMDD)
+          MOVE      SP70,PMCEUTIM      . Update Time (HH:MM:SS)
+          MOVE      SP70,PMCEUUID      . WEB User ID Updated (websecaf)
+          MOVE      SP70,PMCESLET      . Send Letter (0=No,1=Yes)
+          MOVE      SP70,PMCEACTV      . Active (0=Active 1=Inactive)
+          MOVE      SP70,PMCECONT      . Country of Birth (Cat C)
+          MOVE      SP70,PMCEDINA      . Inactivate Date (CCYYMMDD)
+          MOVE      SP70,PMCETPID      . Third Party Unique ID
+          MOVE      SP70,PMCEWPID      . webPAS Unique ID
+          MOVE      SP70,PMCESSMS      . Send SMS
+          MOVE      SP70,PMCECMED      . Contact Medicare Card Number
+          MOVE      SP70,PMCECREF      . Contact Reference Number
+          MOVE      SP70,PMCECDOB      . Contact Date of Birth
+          PACK      PMCEFTXT,SP70,SP70,SP70,SP70
+.                                      . Free Text
+          MOVE      SP70,PMCELAN1      . Main Language Spoken at Home 1
+          MOVE      SP70,PMCELAN2      . Main Language Spoken at Home 2
+          MOVE      SP70,PMCESPAR      . Spare
+.
+          RETURN

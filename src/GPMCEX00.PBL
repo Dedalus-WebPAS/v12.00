@@ -1,0 +1,33 @@
+.----------------------------------------------------------------------------
+. Get the first pmscexaf row where PMCETYPE for category tc indicator 1 = "1"
+. Returns EXIT = 0 (OK. Record Found)
+.              = 1 (NOT OK. Record NOT Found)
+.----------------------------------------------------------------------------
+. V11.04.00 17/05/2024  Thanh T         TSK 0941543
+.           Initial Version 
+.----------------------------------------------------------------------------
+GPMCEX00  MOVE      ZERO,EXIT
+          PACK      KEY14,PURNO,SP20
+          CALL      RSPMCEX1
+GPMCEX20  CALL      RKPMCEX1
+          BRANCH    OVRCD,GPMCEX98
+.
+          MATCH     PURNO,PMCEURNO
+          GOTO      GPMCEX98 IF NOT EQUAL
+.
+          MATCH     "1",PMCEACTV
+          GOTO      GPMCEX20 IF EQUAL
+.
+          MOVE      "tc",DIM2
+          PACK      KEY5,DIM2,PMCETYPE,SP70
+          CALL      RDCODE1
+          BRANCH    OVRCD,GPMCEX20
+.
+          MATCH     "1",TCINDC1
+          GOTO      GPMCEX20 IF NOT EQUAL
+.
+          GOTO      GPMCEX99
+.
+GPMCEX98  MOVE      ONE,EXIT
+.
+GPMCEX99  RETURN

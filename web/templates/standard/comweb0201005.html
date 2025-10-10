@@ -1,0 +1,312 @@
+<meta name="TemplateVersion" content="V12.00.02">
+<meta name="TemplateHome" content="standard">
+<meta name="CrossBrowser" content="true">
+<meta name="HelpFileName"    content="NoContextSet.html">
+<script type="text/javascript">
+function DispAdmissInvoiceNo() {
+if (UpdateForm.pplantyp.value=="4") { // Payment Plan Type - Admission
+    if(UpdateForm.admiss01.value==".1") {
+     alert("No Payment Plan for this Admission");
+     UpdateForm.pplantyp.value="";
+     return;
+    }
+    UpdateForm.pymtplan.value="4";
+    document.getElementById('admnno').style.display = "";
+    document.getElementById('invno').style.display = "none";
+    UpdateForm.ptdet001.classList.remove("Mandatory");
+    UpdateForm.admnnum.value = UpdateForm.admissno.value;
+    UpdateForm.paystart.value = UpdateForm.admiss01.value;
+    UpdateForm.outstand.value = UpdateForm.admiss02.value;
+    UpdateForm.d_ptdet002.value = trim(UpdateForm.admiss03.value);
+    UpdateForm.d_ptdet003.value = UpdateForm.admiss04.value;
+    UpdateForm.futureac.value = UpdateForm.admiss05.value;
+    UpdateForm.numrepay.value = trim(UpdateForm.admiss06.value);
+    UpdateForm.numrepay.value = Math.ceil(UpdateForm.admiss06.value);
+    UpdateForm.lastdate.value = UpdateForm.admiss07.value;
+  } else if (UpdateForm.pplantyp.value=="2") { // Payment Plan Type - Invoice
+    UpdateForm.pymtplan.value="2";
+    document.getElementById('admnno').style.display = "none";
+    document.getElementById('invno').style.display = "";
+    UpdateForm.ptdet001.classList.add("Mandatory");
+    UpdateForm.paystart.value = "";
+    UpdateForm.outstand.value = "";
+    UpdateForm.d_ptdet002.value = "";
+    UpdateForm.d_ptdet003.value = "";
+    UpdateForm.futureac.value = "";
+    UpdateForm.numrepay.value = "";
+    UpdateForm.lastdate.value = "";
+  } else {
+    UpdateForm.pymtplan.value="";
+    document.getElementById('admnno').style.display = "none";
+    document.getElementById('invno').style.display = "none";
+    UpdateForm.paystart.value = "";
+    UpdateForm.outstand.value = "";
+    UpdateForm.d_ptdet002.value = "";
+    UpdateForm.d_ptdet003.value = "";
+    UpdateForm.futureac.value = "";
+    UpdateForm.numrepay.value = "";
+    UpdateForm.lastdate.value = "";
+  }
+}
+
+function SubmitPatDebt() {
+  if(UpdateForm.outstand.value>0) {
+    alert("Cannot clear Payment Plan with an Outstanding Amount.");
+    return;
+  }
+  if (validateMandatory(UpdateForm)) {
+    if(confirm("Clear Payment Plan indicator for this patient?")) {
+     if(UpdateForm.pymtplan.value=="2") {
+       UpdateForm.invoicen.value = UpdateForm.ptdet001.value;
+     } else {
+       UpdateForm.invoicen.value = UpdateForm.admissno.value;
+       UpdateForm.debttype.value = "4";
+     }
+     SubmitHiddenNew(UpdateForm);
+    }
+  }
+}
+
+//========================================================================
+//  function for Debt Alerts
+//========================================================================
+function valInv() {
+  p=document.UpdateForm
+  p.ptdet001.min=1;
+  p.ptdet001.max=99999999;
+
+  if(isWhitespace(p.ptdet001.value)) {
+    UpdateForm.paystart.value = "";
+    UpdateForm.outstand.value = "";
+    UpdateForm.d_ptdet002.value = "";
+    UpdateForm.d_ptdet003.value = "";
+    UpdateForm.futureac.value = "";
+    UpdateForm.numrepay.value = "";
+    UpdateForm.lastdate.value = "";
+    return;}
+  if (!checkInteger(p.ptdet001,"Invoice Number")){
+     return;}
+
+//            validate Invoice remote script
+  var Url = "../cgi-bin/patweb80.pbl?reportno=51" +
+            "&valdadno="+p.admissno.value.replace(/ /g,"+") +
+            "&valdcode="+p.ptdet001.value.replace(/ /g,"+") +
+            "&valdurno="+p.urnumber.value.replace(/ /g,"+") +
+            "&valdtype=3&valdcrst=1";
+  var returnValue = RSExecute(Url);
+  var invnumb = "";
+  var patadmn = "";
+  var paturno = "";
+  var debttype = "";
+  var system = "";
+  if (returnValue.status==0) {
+    ReturnValue=returnValue.return_value.split("|");
+    system=ReturnValue[3];
+    if (system==4) {
+      invnumb=ReturnValue[0];
+      justifyRight(invnumb);
+      paturno=ReturnValue[2];
+      debttype = ReturnValue[5];
+      p.outstand.value = ReturnValue[4];
+      p.d_ptdet002.value = ReturnValue[6];
+      p.d_ptdet003.value = ReturnValue[7];
+
+      p.paystart.value="";
+      p.futureac.value="";
+      p.numrepay.value="";
+      p.lastdate.value="";
+
+    } else {
+      invnumb=ReturnValue[0];
+      justifyRight(invnumb);
+      patadmn=ReturnValue[1];
+      paturno=ReturnValue[2];
+      debttype = ReturnValue[9];
+      p.outstand.value = trim(ReturnValue[4]);
+      p.d_ptdet002.value = trim(ReturnValue[11]);
+      p.d_ptdet003.value = ReturnValue[12];
+      p.paystart.value = ReturnValue[13];
+      p.numrepay.value = trim(ReturnValue[14]);
+      p.numrepay.value = Math.ceil(ReturnValue[14]);
+      p.lastdate.value = ReturnValue[15];
+      p.futureac.value = ReturnValue[16];
+    }
+  } else {
+    p.ptdet001.value="";
+    p.ptdet001.focus();
+    return false;
+  }
+}
+
+</script>
+
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);">
+<div id=PatientHeading></div>
+<script type="text/javascript">
+PatientURN="%COMWEB02.01.003";
+PatientVIS="%COMWEB02.01.081";
+PatientNAM="%COMWEB02.01.002";
+PatientSTA="%COMWEB02.01.086.078";
+PatientALT="%COMWEB02.01.084";
+PatientSEX="%COMWEB02.01.019";
+PatientDOB="%COMWEB02.01.020";
+PatientAGE="%COMWEB02.01.021";
+PatientLOC="%COMWEB02.01.083";
+PatientPRI="%COMWEB02.01.086.066.1";
+PatientUNT="%COMWEB02.01.066.0";
+DoctorCOD="%COMWEB02.01.082.003";
+DoctorNAM="%COMWEB02.01.082.002";
+PatientAID="%COMWEB02.01.086.090";
+PatientIND="%COMWEB02.01.086.091";
+PatientCUR="%COMWEB02.01.086.092";
+PatientCLC="%COMWEB02.01.086.093.1";
+PatientCLH="%STANDARD.01.017.CL";
+PatientHFT="%COMWEB02.01.086.094";
+PatientCDM="%COMWEB02.01.086.095";
+PatientVDH="%COMWEB02.01.086.099.015";
+InsertPatientHeader()
+</script>
+<div id=PatientMenu></div>
+<div id=PageBodySection>
+<form name=UpdateForm method=post action=comweb02.pbl style="margin:0">
+   <input type=hidden name=reportno value="1">
+   <input type=hidden name=template value="005">
+   <input type=hidden name=updttype value="Q">
+   <input type=hidden name=urnumber value="%COMWEB02.01.003">
+   <input type=hidden name=admissno value="%COMWEB02.01.081">
+   <input type=hidden name=patientn value="%COMWEB02.01.009">
+   <input type=hidden name=systemcd value="">
+   <input type=hidden name=nextpage value="4">
+   <input type=hidden name=invoicen value="">
+   <input type=hidden name=numinv   value="%COMWEB02.01.111">
+   <input type=hidden name=debttype value="2">
+   <input type=hidden name=dummy    value="">
+   <input type=hidden name=redirect value="%COMWEB02.01.001.comweb02.01.005">
+   <input type=hidden name=pymtplan value="">
+   <input type=hidden name=admiss01 value="%COMWEB02.01.113.1">
+   <input type=hidden name=admiss02 value="%COMWEB02.01.112">
+   <input type=hidden name=admiss03 value="%COMWEB02.01.113.2">
+   <input type=hidden name=admiss04 value="%COMWEB02.01.113.3">
+   <input type=hidden name=admiss05 value="%COMWEB02.01.113.4"><!--admiss-->
+   <input type=hidden name=admiss06 value="%COMWEB02.01.113.5">
+   <input type=hidden name=admiss07 value="%COMWEB02.01.113.6">
+
+<table width=50% align=center border=1 cellspacing=0>
+<tr><td colspan=2 class=HeadingCell width=50% align=center>Clear Payment Plan Indicator
+    </td>
+<tr><td class=DataLabel width=50%>Surname</td>
+    <td class=DataField>%COMWEB02.01.009</td>
+
+<tr><td class=DataLabel>Given Names</td>
+    <td class=DataField>%COMWEB02.01.010</td>
+
+<tr><td class=DataLabel>Date of Birth</td>
+    <td class=DataField>%COMWEB02.01.020</td>
+
+<tr><td class=DataLabel>Sex</td>
+    <td class=DataField>%COMWEB02.01.019</td>
+
+<tr><td class=DataLabel>Medicare Number</td>
+    <td class=DataField>%COMWEB02.01.027 &nbsp;</td>
+
+<tr><td class=DataLabel>Address 1</td>
+    <td class=DataField>%COMWEB02.01.012 &nbsp;</td>
+
+<tr><td class=DataLabel>Address 2</td>
+    <td class=DataField>%COMWEB02.01.013 &nbsp;</td>
+
+<tr><td class=DataLabel>Address 3</td>
+    <td class=DataField>%COMWEB02.01.014 &nbsp;</td>
+
+<tr><td class=DataLabel>Address 4</td>
+    <td class=DataField>%COMWEB02.01.015 &nbsp;</td>
+
+<tr><td class=DataLabel>Postcode</td>
+    <td class=DataField>%COMWEB02.01.016 &nbsp;</td>
+    </tr>
+
+<tr><td class=DataLabel>Payment Plan Type</td>
+    <td class=DataField>
+    <select name=pplantyp class="SelectBig Mandatory"
+     title="Payment Plan Type" onchange="DispAdmissInvoiceNo();">
+    <option value=""></option>
+    <option value="4">Admission</option>
+    <option value="2">Inpatient/Private Practice Invoice</option>
+    </select>
+    </td></tr>
+
+<tr><td class=DataLabel>Admission No / Invoice No</td>
+    <td class=DataField>
+    <span id=admnno style="display:none;">
+    <input type=text class=Readonly name="admnnum" class=Number size=12
+     maxlength=8 readonly></span>
+    <span id="invno" style="display:none;">
+    <select name=ptdet001 title="Invoice No." class=Mandatory
+        onchange="valInv();">
+        <option value=""></option>
+        %COMWEB02.01.106.2
+        </select></span>
+    </td>
+    </tr>
+
+<tr><td class=DataLabel>Payments Starting</td>
+    <td class=DataField>
+    <input type=text name="paystart" class="Readonly" readonly
+     title="Payments Starting" tabindex=-1>
+    </td></tr>
+
+<tr><td class=DataLabel>Outstanding Amount</td>
+    <td class=DataField>
+    <input type=text class=Readonly name=outstand class=Number size=12
+     maxlength=12 readonly tabindex=-1>
+    </td></tr>
+
+<tr><td class=DataLabel>Amount to be repaid per period</td>
+    <td class=DataField>
+    <input type=text class=Readonly name=d_ptdet002 class=Number size=12
+     maxlength=12 readonly tabindex=-1>
+    </td></tr>
+
+<tr><td class=DataLabel>Repayment Frequency</td>
+    <td class=DataField>
+    <input type=text name=d_ptdet003 class=Readonly readonly
+     title="Repayment Frequency" tabindex=-1>
+    </td></tr>
+
+<tr><td class=DataLabel>Future Action Type</td>
+    <td class=DataField>
+    <input type=text name="futureac" class="Readonly" readonly
+     title="Future Action Type" tabindex=-1>
+    </td></tr>
+
+<tr><td class=DataLabel>Number of Repayments</td>
+    <td class=DataField>
+    <input type=text name="numrepay" class="Readonly" readonly
+     title="Number of Repayments" tabindex=-1>
+    </td></tr>
+
+<tr><td class=DataLabel>Expected Last Payment Date</td>
+    <td class=DataField>
+    <input type=text name="lastdate" class="Readonly" readonly
+     title="Expected Last Payment Date" tabindex=-1>
+    </td></tr>
+
+<tr><td colspan=3 align=center>
+    <input type=button value=Clear class="button" id=clrbtn
+           onclick="tempDisable(this);SubmitPatDebt();">
+    <input type=button value=Cancel class="button" 
+           onclick="PatientLinkTo('patweb98.pbl',1,1,0);">
+    </td></tr>
+</table>
+</form>
+</div>
+
+<form name="PatientLinks" method="get">
+<input type="hidden" name="reportno" value="1">
+<input type="hidden" name="template" value="002">
+<input type="hidden" name="urnumber" value="%COMWEB02.01.003">
+<input type="hidden" name="admissno" value="%COMWEB02.01.081">
+<input type="hidden" name="MenuType" value="%COMWEB02.01.088">
+</form>

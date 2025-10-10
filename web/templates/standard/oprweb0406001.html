@@ -1,0 +1,68 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/oprweb04.js"> </script>
+<script type="text/javascript">
+function ShowHeading() {
+  f = document.SelectCode;
+  if (f.ibcnmhos.value==1) {
+    document.getElementById('MultHospHeading').style.display = "";
+    document.getElementById('SingleHospHeading').style.display = "none";
+  }
+  else {
+    document.getElementById('MultHospHeading').style.display = "none";
+    document.getElementById('SingleHospHeading').style.display = "";
+  }
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);ShowHeading();">
+<form name=SelectCode method=get action=oprweb04.pbl style=margin:0>
+   <input type=hidden name=reportno value="">
+   <input type=hidden name=template value="">
+   <input type=hidden name=oprtb001 value="%OPRWEB04.06.001">
+   <input type=hidden name=hospcode id=hospcode value="%OPRWEB04.06.010.1">
+   <input type=hidden name=ibcnmhos id=ibcnmhos
+    value="%STANDARD.01.025.000.043.1.1">
+
+<table border=1 width=100% cellspacing=0 cellpadding=0>
+<tr><td>
+<table width="100%" cellpadding=0 cellspacing=0 border=0 bgcolor=#CCCCCC>
+<tr>
+<td id=MultHospHeading align=center class=MaintenanceHeading>
+       Tray Details Maintenance for Tray: %OPRWEB04.06.002 &nbsp; &nbsp; Hospital: %OPRWEB04.06.010.0</td>
+<td id=SingleHospHeading align=center class=MaintenanceHeading>
+       Tray Details Maintenance for Tray: %OPRWEB04.06.002</td>
+</tr>
+</table>
+<table cellspacing=0 colspan=4 border=1 width=100%>
+%OPRWEB04.06.104.oprweb04.06.003
+</table>
+
+<table width=100% bgcolor=#CCCCCC><tr>
+  <td align=center>
+  <input type=button value="Tray List" class="button"
+   onclick='location.href="oprweb04.pbl?reportno=5&template=001"'>
+  <input type=button value="Tray %OPRWEB04.06.001" class="button"
+     onclick='Tray06()'> 
+  <input type=button value="<< Previous" class="button"
+   onclick='location.href="%OPRWEB04.06.106.001"'>
+  <input type=button value=Add class="button"
+     onclick='AddDetail06()'> 
+  <input type=button value="Next >>" class="button"
+   onclick='location.href="%OPRWEB04.06.105.001"'>
+</td></tr>
+</table>
+</td></tr>
+</table>
+</form>
+
+<form name=LinkForm method=get action=oprweb04.pbl style=margin:0>
+   <input type=hidden name=reportno value="">
+   <input type=hidden name=template value="">
+   <input type=hidden name=oprtr001 id=oprtr001 value="%OPRWEB04.06.001">
+   <input type=hidden name=hospcode id=hospcode value="%OPRWEB04.06.010.1">
+</form>
+

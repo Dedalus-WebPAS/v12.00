@@ -1,0 +1,104 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="stv">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript">
+function CheckCopyID(){
+  f = document.security_copy;
+  var checkid = f.cpsec001.value.search('[^a-zA-Z0-9]');
+  var loginame = f.cpsec063.value.replace(/^\s+|\s+$/g, "");
+
+  if (checkid >= 0) {
+    alert("User ID can only be alphanumeric!");
+    f.cpsec001.value = "";
+    f.cpsec001.focus();
+    return false;
+  }
+  if (loginame.length == 0 ) {
+    f.cpsec063.value = f.cpsec001.value;
+  }
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);">
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon"
+ src="../images/ExitIcon.gif" onclick="DFrameExit();">
+Security ID Copy
+</span>
+<div id=PageBodySection style="overflow: auto;">
+<form name=security_copy method=post action=websec01.pbl
+  onsubmit="return validateMandatory(this);">
+<input type=hidden name=reportno value="3">
+<input type=hidden name=template value="013">
+<input type=hidden name=updttype value="C">
+<input type=hidden name=nextpage value="0">
+
+<table align=center cellpadding=2 cellspacing=2 width=100% border=0>
+<tr valign=top>
+  <td class=DataLabel>
+    Copy From User ID
+    <br />
+    <input type=text name=wbsec001 title="Copy From User ID"
+     size=10 readonly maxlength=10 value="%WEBSEC01.03.001"
+     class=Readonly tabindex=-1 />
+  </td>
+  <td class=DataLabel>
+    Login Name <br />
+    <input type="text" name="wbsec063" title="Login Name" size="40"
+      readonly class="readonly" maxlength="80" value="%WEBSEC01.03.079" />
+  </td>
+</tr>
+
+<tr>
+  <td>&nbsp;</td>
+  <td class="DataLabel">
+    User Name
+    <br />
+    <input type=text name=wbsec002 title="User Name" size="35"
+     readonly class=readonly maxlength=35 value="%WEBSEC01.03.002" />
+  </td>
+</tr>
+
+<tr>
+  <td colspan="2" align="center">
+    <br />
+  </td>
+</tr>
+
+<tr valign=top>
+  <td class=DataLabel>
+    Copy to User ID
+    <br />
+    <input type="text" name="cpsec001" title="Copy to User ID"
+     size="10" maxlength="10" class="Mandatory" onblur="CheckCopyID();" />
+  </td>
+  <td class="DataLabel">
+    Login Name
+    <br />
+    <input type="text" name="cpsec063" title="Login Name"
+     size="40" maxlength="80" class="Mandatory"  />
+    </td>
+</tr>
+
+<tr>
+   <td>&nbsp;</td>
+   <td class="DataLabel">
+     User Name
+     <br />
+     <input type="text" name="cpsec002" title="User Name" size="35"
+      maxlength="35" class="Mandatory" />
+     </td>
+</tr>
+
+<tr>
+  <td colspan=2 align=center>
+    <br>
+    <input type=submit value="Ok" class="button">
+    <input type=button value="Cancel" class="button"
+     onclick="DFrameClose();">
+  </td>
+</tr>
+</table>
+</form>

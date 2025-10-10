@@ -1,0 +1,27 @@
+Version Control
+---------------
+
+Server Name   : HOSWEB01
+Option Name   : 04
+Template      : 003
+
+Creation Date : 25/06/2021
+
+Version   Date        Responsible/Changes Made
+--------  ----------  ------------------------
+          20/05/2024  Ebon Clements          0946878
+                      Made cab version obsolete
+V11.02.03 27/06/2022  Peter Vela             0921492
+                      Fixed first line truncation. Removed regex special
+                      character validation for IE browsers.
+V11.02.02 21/06/2022  Peter Vela             0920830
+                      Added certificate text special character validation for 
+                      IE.
+                      Fixed double whitespace / carriage return validation for
+                      all browsers.
+V11.02.01 10/06/2022  Peter Vela             0920830
+                      Added special character validation for Certificate text
+                      field
+V11.01.01 25/06/2021  Jill Parkinson Task 0908067
+                      Copied from standard - removed checkEclipse
+

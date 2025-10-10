@@ -1,0 +1,154 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/oprweb04.js"> </script>
+<script type="text/javascript">
+function redButtonComment() {
+  if (document.UpdateForm.exiscomm.value=="1") {
+    document.UpdateForm.commbutt.className="redbutton";  
+  }
+  if (document.UpdateForm.exisdetl.value=="1") {
+    document.UpdateForm.detlbutt.className="redbutton";
+  }
+}
+function CreateCopy(olddh001,olddh002,hospcode) {
+  location.href = "oprweb04.pbl?reportno=10&template=004" +
+                  "&olddh001=" + olddh001.replace(/ /g,"+") +  
+                  "&olddh002=" + olddh002.replace(/ /g,"+") +
+                  "&doctcode=" + olddh001.replace(/ /g,"+") +
+                  "&oprdh001=" + olddh002.replace(/ /g,"+") +
+                  "&hospcode=" + hospcode.replace(/ /g,"+");
+
+}
+function DisplayHospitalList() {
+  f = document.UpdateForm;
+  if (f.ibcnmhos.value==1) {
+    if (isWhitespace(f.currhosp.value)) { 
+      document.getElementById('HospitalList').style.display = "";
+      AddClassName(f.hospcods,"Mandatory");
+      document.getElementById('HospitalName').style.display = "none";
+      document.getElementById('detlbutt').disabled = true
+      document.getElementById('commbutt').disabled = true
+      document.getElementById('copybutt').disabled = true
+    }
+    else {
+      document.getElementById('HospitalName').style.display = "";
+      document.getElementById('HospitalList').style.display = "none";
+    }
+  }
+  else {
+    document.getElementById('HospitalList').style.display = "none";
+    document.getElementById('HospitalName').style.display = "none";
+  }
+}
+function btnUpdateClick(f) {
+  if (!validateMandatory(f)) {return;}
+  SetupHospCode(f)
+
+  f.updttype.value = "U";
+  f.submit();
+}
+function SetupHospCode(f) {
+  hospcode = "";
+  if (f.ibcnmhos.value==1) {
+    if (!isWhitespace(f.currhosp.value)) {
+      hospcode = f.currhosp.value;
+    }
+    else {
+      i =  document.getElementById('hospcods').selectedIndex;
+      if (i == -1) {
+        hospcode = "";
+      }
+      else {
+        hospcode = document.getElementById('hospcods').options[i].value;
+      }
+    }
+  }
+  f.updthosp.value = hospcode;
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);redButtonComment();
+              DisplayHospitalList();">
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon" 
+ src="../images/ExitIcon.gif" onclick="DFrameExit();">
+<script type="text/javascript">document.write(self.document.title);</script>
+</span>
+<form name=UpdateForm method=post action=oprweb04.pbl style="margin:0">
+<input type=hidden name=reportno value="10">
+<input type=hidden name=template value="003">
+<input type=hidden name=updttype value="">
+<input type=hidden name=exiscomm value="%OPRWEB04.10.105">
+<input type=hidden name=exisdetl value="%OPRWEB04.10.108">
+<input type=hidden name=ibcnmhos id=ibcnmhos
+  value="%STANDARD.01.025.000.043.1.1">
+<input type=hidden name=currhosp id=currhosp value="%OPRWEB04.10.109.1">
+<input type=hidden name=updthosp id=updthosp value="%OPRWEB04.10.109.1">
+
+<table align=center width=95% border=0>
+<tr><td>
+<table align=center width=100% border=0>
+<tr><td class=DataLabel>Doctor </td>
+    <td><input type=hidden name=doctcode value="%OPRWEB04.10.101">
+        <input type=text name=doctname class=Readonly readonly
+         value="%OPRWEB04.10.002" size=35 tabindex=-1></td></tr>
+<tr><td class=DataLabel>Preference Code</td>
+    <td><input type=text name=oprdh001 class=Readonly title="Preference Code"
+         size=10 maxlength=9 readonly value="%OPRWEB04.10.102" tabindex=-1>
+    </td></tr>
+<tr><td class=DataLabel>Description</td>
+    <td><input type=text name=oprdh002 class=Mandatory title="Description"
+         size=50 maxlength=50 value="%OPRWEB04.10.103"></td></tr>
+<tr id=HospitalName>
+    <td class=DataLabel>Hospital</td>
+    <td>
+      <input type=hidden name=hospcode id=hospcode value="%OPRWEB04.10.109.1">
+      <input type=text name=hospname id=hospname class=Readonly readonly
+       value="%OPRWEB04.10.109.0" size=35 tabindex=-1>
+    </td>
+</tr>
+<tr id=HospitalList>
+    <td class=DataLabel>Hospital</td>
+    <td colspan=2>
+       <select name=hospcods id=hospcods class="SelectBig"
+        title="Hospital">
+        <option value="  "></option>
+         %OPRWEB04.10.110
+       </select>
+    </td>
+</tr>
+
+<tr><td>&nbsp;</td></tr>
+<tr>
+<td colspan=2 align=center>
+<input type=button class=button value="Update" name=btnUpdate id=btnUpdate
+ onclick="btnUpdateClick(document.UpdateForm);">
+<input type=button class=button value="Delete" name=btnDelete id=btnDelete
+ onclick="setFormactn('D');">
+<input type=button class=button value="Cancel" name=btnCancel id=btnCancel
+ onclick="DFrameCloseRefresh();">
+</td>
+</tr>
+<tr>
+<td colspan=2 align=center>
+<input type=button class=button value="Details" name=detlbutt id=detlbutt
+     onclick='PreferenceDetails("%OPRWEB04.10.101",
+                                "%OPRWEB04.10.102",
+                                "%OPRWEB04.10.109.1")'>
+<input type=button class=button value="Comments" name=commbutt id=commbutt
+     onclick='PreferenceCommentsDetails("%OPRWEB04.10.101",
+                                        "%OPRWEB04.10.102",
+                                        "%OPRWEB04.10.109.1")'>
+<input type=button class=button value="Create Copy" name=copybutt id=copybutt
+     onclick='CreateCopy("%OPRWEB04.10.101",
+                         "%OPRWEB04.10.102",
+                         "%OPRWEB04.10.109.1");'>
+</td>
+</tr>
+</table>
+</td></tr>
+</table>
+</form>

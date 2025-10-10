@@ -1,0 +1,16 @@
+.---------------------------------------------------------------------------
+. Include Name : CLOPRTPS.PBL
+. Function     : Clear function for OPRTPSFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.04.01  15/02/2024  Thanh T          TSK 0923560
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLOPRTPS  MOVE      SP70,OPTPSPEC      . Specialty      
+          MOVE      SP70,OPTPTRPR      . Tray Preference     
+          MOVE      SP70,OPTPHOSP      . Hospital ID (pathspaf)    
+          MOVE      SP70,OPTPSPAR      . Spare Variable     
+.
+          RETURN

@@ -1,0 +1,55 @@
+<meta name="TemplateVersion" content="V12.00.01">
+<meta name="TemplateHome" content="standard">
+<meta name="CrossBrowser" content="true">
+<meta name="HelpFileName" content="NoContextSet.html">
+<script type="text/javascript">
+</script>
+</head>
+%START.OF.PAGE
+<body onload=PageLoad(event);>
+<div id=PatientHeading></div>
+<script type="text/javascript">
+PatientURN="%PATWEB78.16.003";
+PatientVIS="%PATWEB78.16.081";
+PatientNAM="%PATWEB78.16.002";
+PatientSTA="%PATWEB78.16.086.078";
+PatientALT="%PATWEB78.16.084";
+PatientSEX="%PATWEB78.16.019";
+PatientDOB="%PATWEB78.16.020";
+PatientAGE="%PATWEB78.16.021";
+PatientLOC="%PATWEB78.16.083";
+PatientPRI="%PATWEB78.16.086.066.1";
+PatientUNT="%PATWEB78.16.066.0";
+DoctorCOD="%PATWEB78.16.082.003";
+DoctorNAM="%PATWEB78.16.082.002";
+PatientAID="%PATWEB78.16.086.090";
+PatientIND="%PATWEB78.16.086.091";
+PatientCUR="%PATWEB78.16.086.092";
+PatientCLC="%PATWEB78.16.086.093.1";
+PatientCLH="%STANDARD.01.017.CL";
+PatientHFT="%PATWEB78.16.086.094";
+PatientCDM="%PATWEB78.16.086.095";
+PatientVDH="%PATWEB78.16.086.099.015";
+InsertPatientHeader()
+</script>
+<div id=PatientMenu></div>
+<div id=PageBodySection >
+<table border=1 width="100%" cellspacing="0" cellpadding="2">
+<tr><td class=HeadingCell align=center>Casemix Verification Audit for Visit No. %PATWEB78.16.081</td></tr>
+</table>
+<table border=1 width="100%" cellspacing="0" cellpadding="2">
+<tr><td class=HeadingCell>Date/Time</td>
+    <td class=HeadingCell>Audit Type</td>
+    <td class=HeadingCell>%STANDARD.01.035.RV</td>
+    <td class=HeadingCell>User</td>
+    <td class=HeadingCell>Verified</td>
+%PATWEB78.16.201
+</table>
+</div>
+<form name=PatientLinks method=get>
+<input type=hidden name=reportno value=16>
+<input type=hidden name=template value=001>
+<input type=hidden name=urnumber value="%PATWEB78.16.003">
+<input type=hidden name=admissno value="%PATWEB78.16.081">
+<input type=hidden name=MenuType value="%PATWEB78.16.088">
+</form>

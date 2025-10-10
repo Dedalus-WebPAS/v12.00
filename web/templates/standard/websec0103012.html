@@ -1,0 +1,42 @@
+Content-Type: application/json+fhir
+Cache-Control: no-cache
+
+%START.OF.PAGE
+templateVersion=v11.05.00
+templateHome=standard
+{
+    "resourceType": "Practitioner",
+    "id": "Longn-%WEBSEC01.03.079",
+    "extension" : [
+    { "url" : "%BASEURL/extension/webPASService",
+      "valueString" : "%STANDARD.01.004 %STANDARD.01.005 %STANDARD.01.006" },
+    { "url" : "%BASEURL/extension/webPASTemplate",
+      "valueString" : "%TEMPLATEHOME/websec0103012.html %TEMPLATEVERSION" },
+    { "url": "%BASEURL/extension/dxc-hc-role",
+      "valueString": "%WEBSEC01.03.008.0" }
+       %WEBSEC01.03.081  
+       %WEBSEC01.03.089
+       %WEBSEC01.03.090
+    ],
+    "identifier": [ {
+        "use": "offical",
+        "system": "%BASEURL",
+        "value": "%WEBSEC01.03.079"
+    },
+    {
+        "use": "secondary",
+        "system": "%BASEURL",
+        "value": "%WEBSEC01.03.001"
+    }
+ ],
+    "name": [ {
+        "use": "usual",
+        "text": "%WEBSEC01.03.002",
+        "family": ".",
+        "given": [ "%WEBSEC01.03.002" ]
+    } ],
+    "telecom": [ {
+      "system" : "email",
+      "value"  : "%WEBSEC01.03.078" 
+    } ]
+}

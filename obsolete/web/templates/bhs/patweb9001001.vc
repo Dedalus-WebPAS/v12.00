@@ -1,0 +1,127 @@
+Version Control
+---------------
+
+Server Name   : PATWEB90
+Option Name   : 01
+Template      : 001
+
+Creation Date : 16.11.1999
+
+Version   Date        Responsible/Changes Made
+--------  ----------  ------------------------
+          20/05/2024  Ebon Clements      TSK 0946940
+                      Made bsh version obsolete
+V11.03.03 16/10/2023  PJ Le Febour       TSK 0929944
+                      Added value="PATWEB90.01.016"                        
+                      to retain the Medicare no used to search
+V11.03.02 20/09/2023  Thanh T.           TSK 0914053
+                      Added ptcnvsr0 - Visit Search redirect for Outpatient
+                      and ptcnvsrr - Visit Search redirect for Referral
+V11.03.01 14.12.2022  PJ Le Febour  TSK 0925832m
+                      replace onkeypress with onkeydown
+V10.14.01 24/07/2019  Don Nguyen    TSK 0870345
+                      Added onblur validation for Surname & Given Name fields
+                      to prevent Reflected XSS.
+V10.12.03 20/03/2018  Thanh T.           TSK 0852800
+                      Reversed the Search control type back to submit
+                      from button.
+V10.12.02 14/03/2018  Thanh T.           TSK 0852800
+                      Fixed the Blank ED search screen when Invalid U/R
+                      number is entered.
+V10.12.01 27/02/2018  Peter Vela     TSK 0842991
+                      Port bhs custom changes from site. New bhs template.
+V10.11.01 22/11/2017  Tracey/Don Nguyen  TSK 0842027
+                      Cross-browser compatibility changes
+ _____________________________________________
+#         Cross-browser compatible            #
+#_________ from this point onwards ___________#
+V10.10.01 19/06/2017  Ebon Clements  TSK 0840565
+                      Disable enter key to prevent multiple posts
+V10.03.01 14.02.2013  Peter Vela      CAR 281223
+                      V10.03 CD DIFF - Age italics added
+V10.02.01 14.07.2011  Peter McMullen  CAR 241813
+                      Added number of records tag
+V10.00.02 29.07.2010  Ebon Clements    CAR 226559
+                      Clear CasePath cookie in init()
+V10.00.01 07.07.2010  Jill Parkinson   CAR 224836
+                      Added soundex strict given option
+V9.10.02  28.08.2008  Peter Vela         176904
+                      Trim age range tag before comparing with srcharan.
+V9.10.01  05.08.2008  Ebon Clements  CAR 168718
+                      Added mrcnlzer - Remove leading zero's and hyphen
+                      from U/R scan
+V9.09.03  05.02.2008  Jill Habasque  CAR 160618
+                      Fixed submit if invalid admission number
+V9.09.02  08.01.2008  Ebon Clements  CAR 150433
+                      Changed admission search type value to 7 as 6 was
+                      already used
+V9.09.01  19.07.2007  Jill Habasque  CAR 141569
+                      Added admission number
+V9.05.B01 02.03.2006  Ebon Clements      93423
+                      Changed medicare number maxlength to 17
+V9.04.04  06.07.2005  Peter Vela         65386
+                      Fixed the parameter of setMedicare onblur
+                      Changed maxlength to 10 for Medicare Number
+V9.04.03  23.05.2005  Jill Habasque      62232
+                      Fixed call to setMedicare
+V9.04.02  20.12.2004  Pat Dirito         55406
+                      Modified for SMS sending for Healthsmart. Now edited out.
+V9.04.01  09.09.2004  Ebon Clements      53354
+                      Mods for alternate ID
+V9.03.01  24.06.2004  Jill Habasque      44641
+                      Added alternate ID search
+V9.02.07  12.09.2002  Pat Dirito
+                      Fixed javascript error on pageload
+V9.02.06  29.06.2002  Ebon Clements
+                      Fixed search limit for patient search performance
+V9.02.05  08.11.2001  Ebon Clements
+                      Clear date after invalid date message
+V9.02.04  01.09.2001  Sandra & team
+                      Changed at onsite(STV) to incorporate clients requirements
+V9.02.03  30.08.2001  Sandra Barcham
+                      Remove Medicare from search
+V9.02.02  30.08.2001  Jill Habasque
+                      Changed DOB check to be onchange
+V9.02.01  23.08.2001  Sandra Barcham
+                      SVHM template change on site
+                      Remove medicare from search
+V9.00.05  20.08.2001  Jeni Tan
+                      Mods to display postcode on address
+V9.00.04  13.08.2001  Jill Habasque
+                      Added Temp Registration Button
+V9.00.03  26.06.2001  HPS
+                      Modified for Search
+V9.00.02  22.06.2001  HPS
+                      Modified for search
+V9.00.01  23.05.2001  HPS
+                      no of records per page changed from 10 to 5
+V5.10.08  26.04.2001  Ebon Clements
+                      Only display the new reg button after a surname
+                      search has been completed.
+V5.10.07  09.04.2001  Ebon Clements
+                      Changed valid age to be (Age + range) & (Age - range)
+                      from (Age + half range) & (Age - half range)
+V5.10.06  05.04.2001  B.G.Ackland
+                      Increase Search Limit to 400 Records
+V5.10.05  19.03.2001  Pat Dirito
+                      Added change to defualt D.O.B search on change of D.O.B
+V5.10.04  16.03.2001  Pat Dirito
+                      Added validation to Age input field now justifies left
+V5.10.03  13.03.2001  Pat Dirito
+                      Added checkDate to onsubmit
+V5.10.02  08.03.2001  Bronko Sosic
+                      Changed focus and added checkType() to display of search
+                      type
+V5.10.01  07.03.2001  Bronko Sosic
+                      Changed the refreash of page
+V5.10.00  02.03.2001  Ebon Clements
+                      Added tabindex to patient search screen
+V5.07.02  14.12.1999  Katie Nelson
+                      Made changes to U/R Number search so the search type
+                             defaults to "4" and passes the srchtype to patweb98.
+                      Also added normal default value for search type as a
+                      parameter on the end of the search type tag.
+V5.07.01  25.11.1999  Nicole Harrington
+                      Added Date of Birth and U/R Number Search Capabilities
+V5.07.00  16.11.1999  B.G.Ackland
+                      Added Version Control and Help meta tags

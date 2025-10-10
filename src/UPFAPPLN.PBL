@@ -1,0 +1,203 @@
+.
+.         Routine to Update the Completion Date of Future Action from 
+.         Payment Plan (Cat FA Indc3=P) for Fully paid invoice
+.
+.         also the Future Action for the Admission if patient has no other
+.         Outstanding invoice
+.
+.*******************************************************************************
+. Modification :
+.            V12.00.01 24/07/2025  J.Tan          TSK 0962500
+.                      Mod Cash routines to check for U/R number
+.            V11.05.05 23/05/2025  J.Tan          TSK 0925576
+.                      Mod to set the Date Debt cleared                        
+.            V11.05.04 20/05/2025  J.Tan          TSK 0925576
+.                      Fixed clearing payment plan with neg outstanding amount
+.            V11.05.03 08/05/2025  J.Tan          TSK 0925576
+.                      Fixed Checking Invoice number
+.            V11.05.02 15/04/2025  Bella Turco    TSK 0925576
+.                      Fixed Clear Admission Payment Plan  
+.            V11.05.01 26/02/2025  J.Tan          TSK 0945920
+.                      Mod to update the Updated Username/Date/Time
+.            V11.05.00 22/01/2025  J.Tan          TSK 0945920
+.                      Created routine
+.*******************************************************************************
+.
+UPFAPPLN  OPEN      RCPDTEA3,"rcpdteaf"
+          OPEN      PATDETA1,"patdetaf"
+.
+.         PINVNO is blank for Admission Clear payment plan
+.
+          MOVE      ZERO,F12P2             * Total Outstanding amount for Adm.
+          MOVE      ZERO,FORM12P2          * Total Outstandding amount for Inv.
+          MOVE      PINVNO,KEY8            * save invoice number
+          MOVE      DPINVADM,D8            * save admission number
+.
+.         Get Oustanding amount for all invoice
+.
+          OPEN      PATINVR3,"patinvrf"
+          PACK      KEY16,D8,SP70
+          CALL      RDSINV3
+UPFA1000  CALL      RDKINV3
+          BRANCH    OVRCD,UPFA2800
+.
+          MATCH     DPINVADM,D8            * same admission ?
+          GOTO      UPFA2800 IF NOT EQUAL
+.
+          CALL      GCSH0000                * Get payment for this invoice
+.
+          ADD       PINVAMT,F12P2           * outstanding amount for Adm.
+          ADD       PINVJOUR,F12P2
+          ADD       PTINGSTJ,F12P2
+          ADD       PTINCRTT,F12P2
+          ADD       SAVAMNT,F12P2
+.
+          MATCH     SP70,KEY8
+          IF        !@EQUAL
+            MATCH     PINVNO,KEY8            * same invoice no ?
+            GOTO      UPFA1000 IF NOT EQUAL
+.
+            ADD       PINVAMT,FORM12P2       * outstanding amount for Inv.
+            ADD       PINVJOUR,FORM12P2
+            ADD       PTINGSTJ,FORM12P2
+            ADD       PTINCRTT,FORM12P2
+            ADD       SAVAMNT,FORM12P2
+          ENDIF
+          GOTO      UPFA1000
+.
+.-------------------------------------------------------------------------------
+.
+UPFA2800  MATCH     SP70,KEY8
+          GOTO      UPFA3000 IF EQUAL        * Blank Invoice no
+.
+          CALL      RDINV1                   * reposition
+          BRANCH    OVRCD,UPFA9999
+.
+          COMPARE   FORM12P2,ZERO
+          GOTO      UPFA9999 IF LESS
+.
+.         Check if there is any oustanding amount for the Admission
+.
+          COMPARE   F12P2,ZERO
+          GOTO      UPFA3200 IF LESS         * still got outstanding amount
+.
+.         No Outstanding amount for Admission, set invoice number to blank
+.
+          MOVE      SP70,KEY8                * blank invoice number
+          GOTO      UPFA3100
+.
+UPFA3000  COMPARE   F12P2,ZERO
+          GOTO      UPFA9999 IF LESS
+.
+.         Clear Payment plan for Admission
+.
+UPFA3100  MOVE      "4",KEY1              * Payment plan by admission
+          PACK      KEY10,KEY1,DPINVADM,DPINVSYS,SP70
+          CALL      RDPTDET1
+          IF        OVRCD=0
+            MATCH     SP70,PTDEDTCL
+            IF        @EQUAL
+              PACK      PTDEDTCL,CCC,CYY,CMM,CDD * set "Date Debt Cleared"
+              REP       " 0",PTDEDTCL
+              PACK      PTDEUDAT,CCC,CYY,CMM,CDD
+              REP       " 0",PTDEUDAT
+              CLOCK     TIME,PTDEUTIM
+              MOVE      USERID,PTDEUUID
+              CALL      UPPTDET1
+            ENDIF
+          ENDIF
+.
+.         Set Future Action Completion date
+.
+UPFA3200  PACK      KEY19,D8,SP70
+          CALL      RDSFACT1
+UPFA4000  CALL      RDKFACT1
+          BRANCH    OVRCD,UPFA9999
+.
+          MATCH     D8,DFADMNO
+          GOTO      UPFA9999 IF NOT EQUAL
+.
+          MATCH     SP70,PTFCDTCP
+          GOTO      UPFA4000 IF NOT EQUAL    * date completed
+.
+          MATCH     SP70,KEY8
+          IF        !@EQUAL
+            MATCH     KEY8,PTFCINVN          * same invoice number?
+            GOTO      UPFA4000 IF NOT EQUAL
+          ENDIF
+.
+          MOVE      "FA",TCODE
+          PACK      KEY5,TCODE,FACODE,SP70
+          CALL      RDCODE1
+          BRANCH    OVRCD,UPFA4000
+.
+          MATCH     "P",TCINDC3
+          GOTO      UPFA4000 IF NOT EQUAL
+.
+          PACK      PTFCDTCP,CCC,CYY,CMM,CDD * set to today's date
+          REP       " 0",PTFCDTCP
+.
+          PACK      PTFCUDAT,CCC,CYY,CMM,CDD
+          REP       " 0",PTFCUDAT
+          CLOCK     TIME,PTFCUTIM
+          MOVE      USERID,PTFCUUID
+.
+          CALL      UPFACT1
+.
+          MATCH     SP70,PTFCINVN
+          IF        !@EQUAL
+            CALL      INVP0000           * Clear Payment plan for the invoice
+          ENDIF
+.
+          GOTO      UPFA4000
+.
+UPFA9999  RETURN
++
+.-------------------------------------------------------------------------------
+.         if Outstanding amount for Admission is zero then Clear Payment plan
+.         for invoice
+.-------------------------------------------------------------------------------
+INVP0000  MOVE      "2",KEY1                * payment plan for Admission
+          PACK      KEY10,KEY1,PTFCINVN,DPINVSYS,SP10
+          CALL      RDPTDET1                * read "patdetaf"
+          IF        OVRCD = 0
+            MATCH     SP70,PTDEDTCL
+            IF        @EQUAL
+              PACK      PTDEDTCL,CCC,CYY,CMM,CDD * set "Date Debt Cleared"
+              REP       " 0",PTDEDTCL
+              PACK      PTDEUDAT,CCC,CYY,CMM,CDD
+              REP       " 0",PTDEUDAT
+              CLOCK     TIME,PTDEUTIM
+              MOVE      USERID,PTDEUUID
+              CALL      UPPTDET1
+            ENDIF
+          ENDIF
+INVP9999  RETURN
++
+.-------------------------------------------------------------------------------
+.         Get all payment for this invoice
+.-------------------------------------------------------------------------------
+GCSH0000  MOVE      ZERO,SAVAMNT            * amount payment for an invoice
+          PACK      DIM12,SP4,PINVNO        * invoice number
+          PACK      KEY29,DIM12,SP70
+          CALL      RSRCDTE3
+GCSH1000  CALL      RKRCDTE3
+          BRANCH    OVRCD,GCSH9999
+.
+          MATCH     DIM12,RCDTINVN
+          GOTO      GCSH9999 IF NOT EQUAL
+.
+          MATCH     PINVUR,RCDTURNO         * Same U/R number ?
+          GOTO      GCSH1000 IF NOT EQUAL
+.
+          PACK      KEY12,RCDTRECN
+          CALL      RDRCBNK1
+          BRANCH    OVRCD,GCSH1000
+          MATCH     "1",RCBNSTAT            * check if cancelled
+          GOTO      GCSH1000 IF EQUAL
+.
+          MULT      "-1",RCDTAMNT
+          ADD       RCDTAMNT,SAVAMNT
+          GOTO      GCSH1000
+.
+GCSH9999  RETURN

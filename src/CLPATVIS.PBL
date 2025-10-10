@@ -1,0 +1,24 @@
+.
+. Clear Visit File Variables
+.
+. Mods:
+.    V12.00.01 22/05/2025  Alina Bhari   TSK 0955096
+.              Added alpanumeric visit number generation -CLPATVIS
+.    V9.03.01  24/06/2003  Tonii  CAR 39849
+.              Added clear of PVITRAN and PTVITYPE
+.
+CLPATVIS  MOVE      SP70,PVIURNO
+          MOVE      SP70,PVIDATE
+          MOVE      ZEROVISN,PVIBILL
+          MOVE      ZERO,PVITYPE
+          MOVE      SP70,PVIDOCT
+          MOVE      ZERO,PVISTAT
+          MOVE      ZERO,PVITRAN
+          MOVE      SP70,PVILOCK
+          MOVE      SP70,PVISITE
+          MOVE      SP70,PVIRESI
+          MOVE      SP70,PVIUNQE
+          MOVE      SP70,PVISYST
+          MOVE      SP70,PTVITYPE
+          MOVE      SP70,PVISPAR
+          RETURN

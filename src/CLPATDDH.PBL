@@ -1,0 +1,28 @@
+.*****************************************************************************
+.*                               CLPATDDH                                    *
+.*                     Clear patddhaf variables                              *
+.* Mods:                                                                     *
+.*                                                                           *
+.* V11.04.01  04/03/2024  Jacob Jackson    TSK 0919335                       *
+.*            Create includes                                                *
+.*****************************************************************************
+.
+CLPATDDH  MOVE      SP70,PTDDFUND
+          MOVE      SP70,PTDDFTYP
+          MOVE      SP70,PTDDDTTO
+          PACK      PTDDFLD1,SP70,SP70
+          PACK      PTDDFLD2,SP70,SP70
+          MOVE      SP70,PTDDCFD1
+          MOVE      SP70,PTDDCFD2
+          MOVE      ZERO,PTDDFVL1
+          MOVE      ZERO,PTDDFVL2
+          MOVE      SP70,PTDDCRBY
+          MOVE      SP70,PTDDCRDT
+          MOVE      SP70,PTDDCRTM
+          MOVE      SP70,PTDDUPBY
+          MOVE      SP70,PTDDUPDT
+          MOVE      SP70,PTDDUPTM
+          MOVE      SP70,PTDDDLEN
+          MOVE      SP70,PTDDSPAR
+.
+          RETURN

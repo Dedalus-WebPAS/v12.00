@@ -1,0 +1,168 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript">
+function init() {
+}
+function validateFee() {
+  if (isWhitespace(UpdateForm.ptec0007.value))
+      UpdateForm.ptec0007.value=0.00;
+
+  if (isWhitespace(UpdateForm.ptec0008.value))
+      UpdateForm.ptec0008.value=0.00;
+      
+  if (isWhitespace(UpdateForm.ptec0009.value))
+      UpdateForm.ptec0009.value=0.00;
+
+  var1 = parseFloat(UpdateForm.ptec0007.value);
+  var2 = parseFloat(UpdateForm.ptec0008.value);
+  var3 = parseFloat(UpdateForm.ptec0009.value);
+
+  if (var1 < var2)
+  {
+    alert("First Misc Fee % must be >= Second Misc Fee %");
+    UpdateForm.ptec0007.focus();
+    return false;
+  }
+
+  if (var1 < var3)
+  {
+    alert("First Misc Fee % must be >= Third Misc Fee %");
+    UpdateForm.ptec0007.focus();
+    return false;
+  }
+
+  if (var2 < var3)
+  {
+    alert("Second Misc Fee % must be >= Third Misc Fee %");
+    UpdateForm.ptec0008.focus();
+    return false;
+  }
+  return true;
+}
+
+function setUpdateFormactn01()
+{
+  if ((validateMandatory(UpdateForm)) && (validateFee() == true))
+     setFormactn('U');
+}
+
+</script>
+
+</head>
+%START.OF.PAGE
+<body onload=PageLoad(event);>
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon"
+ src="../images/ExitIcon.gif" onclick="DFrameExit();">
+ MBS Item Explosion Charge Maintenance 
+</span>
+   <form name=UpdateForm method=post action=patweb61.pbl>
+   <input type=hidden name=reportno value="2">
+   <input type=hidden name=template value="003">
+   <input type=hidden name=updttype value="">
+   <input type=hidden name=ptec0001 value="%PATWEB61.02.004.1">
+   <input type=hidden name=ptec0002 value="%PATWEB61.02.005.1">
+   <input type=hidden name=ptec0003 value="%PATWEB61.02.019">
+   <input type=hidden name=ptec0004 value="%PATWEB61.02.013">
+   <input type=hidden name=ptec0010 value="%PATWEB61.02.018.2">
+   <input type=hidden name=ptec0011 value="%PATWEB61.02.015.2">
+   <input type=hidden name=multhosp value="   " id=multhosp>
+<table align=center width=95% cellpadding=1 cellspacing=1 border=0>
+<tr><td>
+<table align=center width=95% cellpadding=1 cellspacing=1 border=0>
+
+<table width="95%" cellpadding=1 cellspacing=1 border=0 align=center>
+
+<tr><td class=DataLabel>%STANDARD.01.017.CL</td>
+    <td><input type=text name=claimtype class="Readonly" readonly
+         title="%STANDARD.01.017.CL" value="%PATWEB61.02.004.0" tabindex=-1>
+    </td></tr>
+
+<tr><td class=DataLabel>%STANDARD.01.017.A </td>
+    <td><input type=text name=admintype class="Readonly" readonly size=30
+         title="%STANDARD.01.017.A " value="%PATWEB61.02.017.0" tabindex=-1>
+    </td></tr>
+
+<tr><td class=DataLabel>Health Fund </td>
+    <td><input type=text name=hfund class="Readonly" style="width:250px;"
+          readonly size=50 title="Health Fund " value="%PATWEB61.02.016" 
+          tabindex=-1>
+    </td></tr>
+
+<tr><td>OR</td></tr>
+
+<tr><td class=DataLabel>Health Fund Group </td>
+    <td><input type=text name=hfgrp class="Readonly" style="width:250px;"
+          readonly size=50 title="Health Fund Group " value="%PATWEB61.02.015.1" tabindex=-1>
+    </td></tr>
+
+<tr><td class=DataLabel>MBS Code</td>
+    <td><input type=text name=mbscode size=9 readonly
+         value="%PATWEB61.02.006.1" class="Readonly"
+         title="MBS Code" >
+        <input type=text readonly name=mbscdesc size=60 id=mbscdesc 
+         value="%PATWEB61.02.006.2" tabindex=-1 class=Readonly
+         title="MBS Code Description">
+    </td></tr>
+
+<tr><td class=DataLabel>Misc Charge Code</td>
+    <td><input type=text name=ptec0005 size=9 maxlength=9 readonly 
+         class=Readonly value="%PATWEB61.02.008.1" class="SelectBig Mandatory"
+         title="Misc Charge Code" >
+        <input type=text readonly name=miscdesc size=60 id=miscdesc
+         value="%PATWEB61.02.008.2" tabindex=-1 class=Readonly
+         title="Misc Charge Code Description">
+    </td></tr>
+
+<tr><td class=DataLabel>Quantity</td>
+    <td class=DataField>
+    <input type=text name=ptec0012 class=Number value='%PATWEB61.02.014' size=3 maxlength=3
+     min=1 max=999 title='Quantity'>
+</td></tr>
+
+<tr><td class=DataLabel> Operating Personnel</td>
+    <td class=DataField>
+        <select name=ptec0006 class="SelectBig Mandatory"
+         title="Operating Personnel" >
+        <option></option>
+         %PATWEB61.02.009.2
+        </select>
+    </td></tr>
+
+<tr><td class=DataLabel>1st Misc Fee %</td>
+    <td class=DataField>
+    <input type=text name=ptec0007 class=Number size=7 maxlength=7
+     value="%PATWEB61.02.010" min=0 max=100 title='1st Misc Fee%'
+     onblur='RoundNumber(this,2);'>
+    </td></tr>
+
+<tr><td class=DataLabel>2nd Misc Fee %</td>
+    <td class=DataField>
+    <input type=text name=ptec0008 class=Number size=7 maxlength=7
+     value="%PATWEB61.02.011" min=0 max=100 title='2nd Misc Fee%'
+     onblur='RoundNumber(this,2);'>
+    </td></tr>
+
+<tr><td class=DataLabel>3rd Misc Fee %</td>
+    <td class=DataField>
+    <input type=text name=ptec0009 class=Number size=7 maxlength=7
+     value="%PATWEB61.02.012" min=0 max=100 title='3rd Misc Fee%'
+     onblur='RoundNumber(this,2);'>
+    </td></tr>
+
+<tr><td colspan=2 align=center><br>
+   <input type=button value="Update" class="button" 
+    onclick="setUpdateFormactn01();">
+   <input type=button value="Delete" class="button" 
+    onclick="setFormactn('D');">
+   <input type=button value="Cancel" class="button" 
+    onclick="DFrameCloseRefresh();">
+</td></tr>
+
+</table>
+
+</td></tr>
+</table>
+</form>

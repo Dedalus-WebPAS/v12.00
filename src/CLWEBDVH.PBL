@@ -1,0 +1,21 @@
+.*****************************************************************************
+.* Clear WEBDVHFD variables                                                  *
+.*****************************************************************************
+.* V12.00.01 19/06/2025 Peter Vela       TSK 0939466                         *
+.*          Created include                                                  *
+.*****************************************************************************
+CLWEBDVH  MOVE      SP70,WBDHHOSP 
+          MOVE      SP70,WBDHPYPN 
+          MOVE      SP70,WBDHPRUN 
+          MOVE      SP70,WBDHPDAT 
+          MOVE      SP70,WBDHDAMN 
+          MOVE      SP70,WBDHACCN 
+          MOVE      SP70,WBDHACNM 
+          MOVE      SP70,WBDHBSBC 
+          MOVE      SP70,WBDHSTAT 
+          MOVE      SP70,WBDHRSTA 
+          MOVE      SP70,WBDHRKEY 
+          MOVE      SP70,WBDHMSID 
+          PACK      WBDHSPAR,SP70,SP70
+.
+          RETURN

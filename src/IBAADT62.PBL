@@ -1,0 +1,449 @@
+.***************************************************************************
+.* System    :   Patient Billing                                           *
+.* Program   :   IBAADT62                                                  *
+.* Desc      :   Update invoice pending on hold details                    *
+.***************************************************************************
+.* Date      :   25/11/2010                                                *
+.* Author    :   Ebon Clements                                             *
+.* Function  :   Update patient invoice pending on hold details            *
+.*           :   for a health fund or claim code                           *
+.* Modifications  :                                                        *
+.* V11.04.01 20/09/2024 J.Tan           TSK 0950577                        *
+.*           Added PATIPERH to check for Hold Invoice                      *
+.* V11.03.03 09/05/2023 J.Tan           TSK 0911166                        *
+.*           Mod to check changes from HF to Claim code hold and vice versa*
+.* V11.03.02 09/05/2023 J.Tan            TSK 0911166                       *
+.*           Mod to write Delete record to Hold invoice audit file         *
+.* V11.03.01 05/04/2023 J.Tan            TSK 0911166                       *
+.*           Mod for Hold Invoice Audit                                    *
+.* V10.03.02 12/12/2012  J.Tan           CAR 274284                        *
+.*           Fixed reseting Holding date                                   *
+.* V10.03.01 01/06/2012  J.Tan           CAR 255708                        *
+.*           Mods checking for Hold Invoice From date                      *
+.* V10.01.00 25/11/2010  Ebon Clements   CAR 234288                        *
+.*           Created program                                               *
+.***************************************************************************
+.
+          INC       STD001FD
+.
+. FILE DESCRIPTION INCLUDES
+. -------------------------
+          INC       EMRVISFD/INC
+          INC       AAEDE1FD/INC
+          INC       OUTBOAFD/INC
+          INC       OUTBB1FD/INC
+          INC       OUTSITFD/INC 
+          INC       PATCFAFD/INC
+          INC       PATCODFD/INC
+          INC       PATCONFD/INC
+          INC       PATVISFD/INC
+          INC       PATFN1FD/INC      
+          INC       PATFX1FD/INC      
+          INC       PATIPEFD/INC      
+          INC       PATMI1FD/INC
+          INC       PATDSCFD/INC
+          INC       PMSVX1FD/INC
+          INC       PATFHIFD/INC
+          INC       PATONHFD/INC
+.
+. LOCAL VARIABLE DEFINITION
+. -------------------------
+PENDSDAT  DIM       8
+PENDADAT  DIM       8
+PENDDDAT  DIM       8
+PENDFUND  DIM       6
+PENDCLAM  DIM       3
+PENDHOSP  DIM       3
+PENDSYST  DIM       2
+.
+IBCNMHOS  FORM      1
+CEFFFROM  FORM      1
+CNTRDATE  DIM       8
+HOLDDATE  DIM       8
+CFILEPRE  DIM       3
+CLAIMCOD  DIM       3
+CODE      DIM       2
+DIM3      DIM       3
+DIM6      DIM       6
+DIM8      DIM       8
+ECOL1     FORM      2
+FILEFLAG  FORM      1
+HLTHFUND  DIM       6 
+REASHOLD  DIM       3
+ZERO8     INIT      "0000    "
+.
+PRGID     INIT      "IBAADT62"
+PRGNAM    INIT      "Update Invoice Pending Details"
+VERSION   INIT      "V12.00.00"
++
+.**************************************************************************
+.*                              ML0000                                    *
+.*                      Controlling Logic (Mainline code)                 *
+.**************************************************************************
+.
+ML0000    CALL      INIT0000               * initialisation and open files
+.
+ML0100    CALL      OPTN0000               * select options
+          BRANCH    EXIT,ML9999            * EXIT = 1 if 0 chosen in menu
+.
+          BRANCH    COPTION,ML1000,ML2000  * proceed with clean up
+.
+ML1000    CALL      KFND0000               * keyin health fund
+          BRANCH    EXIT,ML0100
+.
+          CALL      KREA0000               * Keyin reason for hold
+          BRANCH    EXIT,ML0100,ML0100
+.
+          CALL      CONTQST                * Ok to continue ?
+          BRANCH    CEXIT,ML1100:          * yes
+                          ML0100:          * no
+                          ML0100           * cancel
+.
+ML1100    CALL      HPEN0000               * health fund invoice pending update
+          GOTO      ML9999
+.
+ML2000    CALL      KCLM0000               * keyin claim code 
+          BRANCH    EXIT,ML0100
+.
+          CALL      KREA0000               * Keyin reason for hold
+          BRANCH    EXIT,ML0100
+.
+          CALL      CONTQST                * Ok to continue ?
+          BRANCH    CEXIT,ML2100:          * yes
+                          ML0100:          * no
+                          ML0100           * cancel
+.
+ML2100    CALL      CPEN0000               * Claim code invoice pending update
+          GOTO      ML9999
+.
+ML9999    CHAIN     PGM                    * chain back to program
++
+.****************************************************************************
+.*                                INIT0000             Called by: ML0000    *
+.*                             initialisation                               *
+.*  The initialisation routine is used to display headings and open files.  *
+.****************************************************************************
+.
+INIT0000  CALL      DISPHEAD                  * display heading
+.
+          DISPLAY   *P64:24,"patcodes"
+          OPEN      PATCODE1,"patcodes"
+.
+          DISPLAY   *P64:24,"patcfaaf"
+          OPEN      PATCFAA1,"patcfaaf"
+.
+          DISPLAY   *P64:24,"patipenf"
+          OPEN      PATIPEN1,"patipenf"
+.
+          DISPLAY   *P64:24,"patfn1af"
+          OPEN      PATFN1A1,"patfn1af"
+.
+          DISPLAY   *P64:24,"patfx1af"
+          OPEN      PATFX1A1,"patfx1af"
+.
+          DISPLAY   *P64:24,"patmi1af"
+          OPEN      PATMI1A1,"patmi1af"
+.
+          DISPLAY   *P64:24,"pmsvx1af"
+          OPEN      PMSVX1A1,"pmsvx1af"
+.
+          DISPLAY   *P64:24,"patvisaf"
+          OPEN      PATVISA1,"patvisaf"
+.
+          DISPLAY   *P64:24,"emrvisaf"
+          OPEN      EMRVISA1,"emrvisaf"
+          DISPLAY   *P64:24,"aaede1af";
+          OPEN      AAEDE1A1,"aaede1af"
+.
+          DISPLAY   *P64:24,"outsitaf"
+          OPEN      OUTSITA1,"outsitaf"
+.
+          DISPLAY   *P64:24,"patdschf"
+          OPEN      PATDSCH1,"patdschf"
+.
+          OPEN      PATONHA1,"patonhaf"
+.
+          MOVE      "out",CFILEPRE          * Save Current File Prefix
+          CALL      OPNOUT00                * Open Outpatient Files
+.
+          DISPLAY   *P64:24,"controlf";
+          OPEN      CONTROLF,"controlf"
+          READ      CONTROLF,TEN9;*212,CFEETYP
+          READ      CONTROLF,ZERO;*43,IBCNMHOS
+.
+INIT9999  RETURN
++
+.****************************************************************************
+.*                                OPTN0000             Called by: ML0000    *
+.*                        get user options or exit                          *
+.*                                                                          *
+.*    Returns:  EXIT    = FALSE (0)  Run clean up                           *
+.*                        TRUE  (1)  Exit option selected                   *
+.****************************************************************************
+.
+OPTN0000  DISPLAY   *P1:3,*EF,*P1:4,*V2LON,ZERO,*HOFF,". Exit":
+                    *P1:5,*V2LON,ONE,*HOFF,". Update Health Fund Invoice ":
+                                           "Pending":
+                    *P1:6,*V2LON,TWO,*HOFF,". Update Claim Code Invoice ":
+                                           "Pending"
+.
+OPTN0500  KEYIN     *P1:7,*EL,"Select Option : ",*DV,UNDLN1:
+                    *P17:7,*V2LON,COPTION
+.
+          COMPARE   ZERO,COPTION                 * exit selected ?
+          GOTO      OPTN9500 IF EQUAL            * yes
+.
+          BRANCH    COPTION,OPTN9000,OPTN9000    * run clean-up
+.
+          BEEP
+          GOTO      OPTN0500
+.
+OPTN9000  MOVE      ZERO,EXIT
+          GOTO      OPTN9999
+.
+OPTN9500  MOVE      ONE,EXIT
+.
+OPTN9999  RETURN
++
+.******************************************************************************
+.* Keyin Health fund                                                          *
+.******************************************************************************
+KFND0000  MOVE      SP6,HLTHFUND
+          MOVE      "9",EVERT
+          MOVE      "24",ECOL
+          MOVE      "33",ECOL1
+.
+          MOVE      ONE,CKYIMAND
+          MOVE      ONE,CKYINACT
+          MOVE      SP20,HLTHFUND
+          PACK      HCODE,SP20
+.
+          DISPLAY   *P1:EVERT,"Health Fund          : "
+          DISPLAY   *PECOL:EVERT,*EL;
+          CALL      PATFNDKY
+.
+          PACK      HLTHFUND,HCODE,SP10
+.
+          BRANCH    EXIT,KFND9200:          * Nothing entered
+                         KFND9999           * Exitchar entered
+.
+KFND9200  DISPLAY   *PECOL1:EVERT,*V2LON,HFNAME;
+KFND9999  RETURN
++
+.******************************************************************************
+.* Keyin the reason for hold invoice                                          *
+.******************************************************************************
+KREA0000  MOVE      "10",EVERT
+          MOVE      "24",ECOL               * keyin position
+          MOVE      "33",ECOL1              * Display description position
+.
+          MOVE      SP3,ACODE
+          MOVE      SP3,REASHOLD
+          MOVE      "rh",CODE
+          MOVE      ZERO,CKYIMAND
+          DISPLAY   *P1:EVERT,"Reason for Hold Inv  : "
+          DISPLAY   *PECOL:EVERT,*EL;
+          CALL      PATCODKY                * keyin code
+          BRANCH    EXIT,KREA1000,KREA9999  * Nothing,exit entered
+          PACK      REASHOLD,ACODE,SP70
+.
+KREA1000  DISPLAY   *PECOL1:EVERT,*EL,*V2LON,TDESC;
+          MOVE      ZERO,EXIT
+.
+KREA9999  RETURN
++
+.******************************************************************************
+.* Keyin the claim code                                                       *
+.******************************************************************************
+KCLM0000  MOVE      "9",EVERT
+          MOVE      "24",ECOL               * keyin position
+          MOVE      "33",ECOL1              * Display description position
+.
+          MOVE      SP3,ACODE
+          MOVE      "CL",CODE
+          MOVE      ONE,CKYIMAND
+          DISPLAY   *P1:EVERT,"Claim Code           : "
+          DISPLAY   *PECOL:EVERT,*EL;
+          CALL      PATCODKY                * keyin code
+          BRANCH    EXIT,KCLM1000,KCLM9999  * Nothing,exit entered
+          PACK      CLAIMCOD,ACODE,SP70
+.
+KCLM1000  DISPLAY   *PECOL1:EVERT,*EL,*V2LON,TDESC;
+.
+KCLM9999  RETURN
++
+.**************************************************************************
+.* Update invoice pending for a health fund                               *
+.**************************************************************************
+HPEN0000  PACK      KEY14,HLTHFUND,ZERO8
+          CALL      RDFUND1                      * Read health fund
+          BRANCH    OVRCD,HPEN9999
+.
+          PACK      KEY6,HCODE,SP70
+          CALL      RDPTFX11                     * Read health fund
+          BRANCH    OVRCD,HPEN9999
+.
+          MOVE      SP70,KEY9
+          PACK      KEY8,SP70
+          CALL      RDSIPEN1
+HPEN1000  CALL      RDKIPEN1
+          BRANCH    OVRCD,HPEN9999
+.
+          CALL      CHLD0000               * Check Hold invoice status
+          GOTO      HPEN1000
+.
+HPEN9999  RETURN
++
+.**************************************************************************
+.* Check Holding invoice file                                             *
+.**************************************************************************
+CHLD0000  MATCH     SP70,PTIPRHLD
+          GOTO      CHLD0200 IF EQUAL      * not on hold
+.
+.         Invoice already on hold, check for Patient hold invoice
+.
+          MOVE      "rh",KEY2
+          PACK      KEY5,KEY2,PTIPRHLD
+          CALL      RDCODE1
+          BRANCH    OVRCD,CHLD0200
+.
+          MATCH     "P",TCINDC2
+          GOTO      CHLD9999 IF EQUAL             * Patient hold invoice
+.
+          MATCH     "C",TCINDC4
+          GOTO      CHLD9999 IF EQUAL             * CodeFocus hold invoice
+.
+.         Check the Health fund/Claim code hold invoice for
+.         printing Exclude Hold invoice or Hold Invoice only
+.
+CHLD0200  PACK      KEY8,IPADMNO,SP70
+          CALL      RDPTVIS1
+          BRANCH    OVRCD,CHLD9999
+          CALL      RDPMVX11
+          BRANCH    OVRCD,CHLD9999
+.
+          UNPACK    SP70,PENDHOSP,PENDDDAT,PENDCLAM,PENDFUND
+          IF        IBCNMHOS=1
+            MOVE      PMVXMHOS,PENDHOSP            * hospital id
+          ENDIF
+.
+          MOVE      ZERO,F2
+          MOVE      IPSYSTM,F2
+          MOVE      F2,PENDSYST                    * system
+.
+          BRANCH    IPSYSTM OF CHLD1000,CHLD2000,CHLD3000
+          GOTO      CHLD9999
+.
+.         Emergency
+.
+CHLD1000  MOVE      IPADMNO,KEY8
+          CALL      RDEMVIS1
+          BRANCH    OVRCD OF CHLD9999
+          CALL      RDDETA1
+          BRANCH    OVRCD OF CHLD9999
+.
+          MOVE      ADADATE,PENDADAT         * admission date
+          MOVE      ADACOMP,PENDCLAM         * claim code
+          MOVE      AEDAFUND,PENDFUND        * health fund
+          IF        EMVISTAT=2 | EMVISTAT=3
+            MOVE      EMVIDDAT,PENDDDAT      * discharged date
+          ENDIF
+          GOTO      CHLD8000
+.
+.         Outpatient
+.
+CHLD2000  MOVE      "out",OSTFILE
+          MOVE      PVISITE,KEY6
+          CALL      RDSITA1
+.
+          PACK      CFNAME WITH OSTFILE,FILBB1A2
+          CLOSE     OUTBB1A1
+          CALL      OPOTBB11
+.
+          MOVE      IPADMNO,KEY8
+          CALL      RDBOKB1
+          BRANCH    OVRCD OF CHLD9999
+.
+          MOVE      OBADATE,PENDADAT         * admission date
+          MOVE      OBACOMP,PENDCLAM         * claim code
+          MOVE      OTBBFUND,PENDFUND        * health fund
+          MOVE      OBADATE,PENDDDAT
+          GOTO      CHLD8000
+.
+.         Inpatient
+.
+CHLD3000  MOVE      IPADMNO,KEY8
+          CALL      RDMISS1
+          BRANCH    OVRCD OF CHLD9999
+.
+          MOVE      ADATE,PENDADAT         * admission date
+          MOVE      ACLAIM,PENDCLAM        * claim code
+          MOVE      AFUNDH,PENDFUND        * health fund
+          IF        ASTAT=3
+            CALL      RDDSCH1
+            IF        OVRCD=0
+              MOVE      DDATE,PENDDDAT     * discharged date
+            ENDIF
+          ENDIF
+.
+CHLD8000  MOVE      PENDADAT,PENDSDAT         * As at date
+          CALL      IPRH0000
+          CALL      UPIPEN1                * Update Hold invoice status
+.
+CHLD9999  RETURN
++
+.**************************************************************************
+.* Update invoice pending for a claim code                                *
+.**************************************************************************
+CPEN0000  PACK      KEY5,ANSC,ANSL,CLAIMCOD,SP70
+          CALL      RDCODE1                      * Read admission claim code
+          BRANCH    OVRCD,CPEN9999
+.
+          PACK      KEY3,ACODE,SP70
+          CALL      RDPTCFA1                     * Check if claim code is
+          BRANCH    OVRCD,CPEN9999               * on hold
+.
+          PACK      KEY8,SP70
+          CALL      RDSIPEN1
+CPEN1000  CALL      RDKIPEN1
+          BRANCH    OVRCD,CPEN9999
+.
+          CALL      CHLD0000               * Check Hold invoice status
+          GOTO      CPEN1000
+.
+CPEN9999  RETURN
++
+.************************************************************************
+.                    Open Outpateint Files
+.************************************************************************
+OPNOUT00  PACK      CFNAME,CFILEPRE,FILBB1A1  * Set up physical filename
+          CLOSE     OUTBB1A1
+          OPEN      OUTBB1A1,CFNAME
+.
+OPNOUT99  RETURN
++
+. =========================================================================
+.         I/O Includes
+. =========================================================================
+.
+          INC       STD001IO
+          INC       PATCODKY
+          INC       PATFNDKY
+          INC       PATIPERH
+.
+          INC       EMRVISIO/INC
+          INC       AAEDE1IO/INC
+          INC       OUTBOAIO/INC
+          INC       OUTBB1IO/INC
+          INC       OUTSITIO/INC
+          INC       PATCFAIO/INC
+          INC       PATCODIO/INC
+          INC       PATVISIO/INC
+          INC       PATFN1IO/INC      
+          INC       PATFX1IO/INC      
+          INC       PATIPEIO/INC      
+          INC       PATMI1IO/INC
+          INC       PATDSCIO/INC
+          INC       PMSVX1IO/INC
+          INC       PATFHIIO/INC
+          INC       PATONHIO/INC

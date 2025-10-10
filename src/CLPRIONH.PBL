@@ -1,0 +1,26 @@
+.---------------------------------------------------------------------------
+. Include Name : CLPRIONH.PBL
+. Function     : Clear function for PRIONHFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.04.01  13/12/2023  Thanh T       TSK 0932089
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLPRIONH  MOVE      SP70,PRONUNIQ      . Unique ID for Private Practice  
+          MOVE      SP70,PRONTDAT      . Transaction Date (ccyymmdd)    
+          MOVE      SP70,PRONTTIM      . Transaction Time (hh:mm:ss)    
+          MOVE      SP70,PRONUSID      . User ID of user performing trans 
+          MOVE      SP70,PRONHRSN      . Reason for Hold Code (Cat rh) 
+          PACK      PRONFTXT,SP70,SP70 . Reason for Hold Free Text  
+          MOVE      SP70,PRONACTN      . Action Code     
+          MOVE      SP70,PRONDOCT      . Service Doctor (prihreff)    
+          MOVE      SP70,PRONPRAC      . Medical Practice (prihreff)    
+          MOVE      SP70,PRONPIND      . Patient Indicator (Cat GI)   
+          MOVE      SP70,PRONCLAM      . Claim Code (Cat CL)   
+          MOVE      SP70,PRONHFND      . Health Fund Code    
+          MOVE      SP70,PRONHIFD      . Hold Invoices From Date (ccyymmdd)  
+          MOVE      SP70,PRONSPAR      . Spare Variable     
+.
+          RETURN

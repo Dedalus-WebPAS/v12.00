@@ -1,0 +1,36 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Definition include for Private Practice * 
+                      Future Action 
+  
+TABLE NAME         :  prifactf
+=====================================================================
+PRFADATE    char        8     1   Future Action Date  
+PRFADEBT    char        8     9   Debtor Number  
+DPRFASCN    char        2    17   Scan Flag  
+                                   0 = Debtor File  
+                                   1 = PMI  
+PRFAACTN    char        3    19   Future Action Code  
+PRFACOMM    char       60    22   Comments  
+PRFAMPRA    char        6    82   Medical Practice  
+PRFADTCP    char        8    88   Date Action Completed (CCYYMMDD)  
+PRFACDAT    char        8    96   Date Record Created (CCYYMMDD)  
+PRFACTIM    char        8   104   Time Record Created (HH:MM:SS)  
+PRFACUID    char       10   112   WEB User ID Created (websecaf)  
+PRFAUDAT    char        8   122   Date Record Updated (CCYYMMDD)  
+PRFAUTIM    char        8   130   Time Record Updated (HH:MM:SS)  
+PRFAUUID    char       10   138   WEB User ID Updated (websecaf)  
+PRFASPAR    char       50   148   Spare Variable  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+PRFADATE
+PRFADEBT
+DPRFASCN
+  
+UNIQUE INDEX 2
+PRFADEBT
+DPRFASCN
+PRFADATE
+  
+=====================================================================

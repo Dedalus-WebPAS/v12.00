@@ -1,0 +1,96 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript">
+function Update() {
+  var p = document.UpdateForm;
+  if (p.d_pmhat014.checked ) {
+     p.pmhat014.value = "1";
+  } else {
+     p.pmhat014.value = "0";
+  }
+  if (validateMandatory(p)) {
+   if (!isWhitespace(p.pmhat005.value)) {
+    if (!CheckDateRange(p.pmhat004,p.pmhat005)) {
+     return;
+    }
+  }
+  p.submit();
+ }
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);">
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon"
+ src="../images/ExitIcon.gif" onclick="DFrameExit();">
+Health Fund %PATWEB87.56.202.0 - CWO MV DRG
+</span>
+<div id=PageBodySection>
+<form name=UpdateForm method=post action=patweb87.pbl>
+<input type=hidden name=reportno value="56">
+<input type=hidden name=template value="003">
+<input type=hidden name=updttype value="U">
+<input type=hidden name=ibcnmhos value="%STANDARD.01.025.000.043.1.1">
+<input type=hidden name=hfund001 value="%PATWEB87.56.202.0">
+<input type=hidden name=pmhat001 value="%PATWEB87.56.101.0">
+<input type=hidden name=pmhat002 value="%PATWEB87.56.102">
+<input type=hidden name=pmhat003 value="%PATWEB87.56.103">
+<input type=hidden name=pmhat004 value="%PATWEB87.56.104">
+<input type=hidden name=pmhat014 value="">
+
+<table width=90% border=0 cellspacing=0 cellpadding=2 align=center>
+<tr id=trHospital>
+  <td class=DataLabel>Hospital</td>
+  <td><input type="text" class=Readonly readonly size=50 
+       value="%PATWEB87.56.101.1">
+  </td>
+</tr>
+<tr>
+  <td class=DataLabel>Discharge DRG</td>
+  <td><input type="text" name=ddrgcode value="%PATWEB87.56.202.1" size=2
+       class=Readonly readonly></td>
+</tr>
+
+<tr><td class=DataLabel>Active</td>
+   <td><input type=checkbox name=d_pmhat014 value="1" checked
+        title="Active">
+    </td></tr>
+
+<tr>
+  <td class=DataLabel width=30%>Effective From Date</td>
+  <td><input type="text" class=Readonly readonly
+       title="Effective From Date" size="12" value="%PATWEB87.56.104">
+</tr>
+<tr>
+  <td class=DataLabel>Effective To Date</td>
+  <td><input type="text" name=pmhat005 id=pmhat005
+       title="Effective To Date" size="12" value="%PATWEB87.56.105"
+       onchange="checkDate(this,'Effective To Date');">
+      <img src="../images/DateLookup.gif" class=Icon
+       onclick="DateLookupFrame(UpdateForm.pmhat005);">
+</tr>
+<tr><td>&nbsp;</td></tr>
+<tr>
+  <td colspan=5 align=center>
+    <input type=button value="Update" class="button" onclick="Update();">
+    <input type=button Value="Cancel" class="button" onclick="DFrameExit();">
+  </td>
+</tr>
+</table>
+</form>
+</div>
+
+<script type="text/javascript">
+ Active="%PATWEB87.56.114";
+ if(Active=="1") {
+   document.UpdateForm.d_pmhat014.checked=true;
+ } else {
+   document.UpdateForm.d_pmhat014.checked=false;
+ }
+if (document.UpdateForm.ibcnmhos.value == "0") {
+  document.getElementById('trHospital').style.display = "none";
+}
+</script>

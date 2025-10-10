@@ -1,0 +1,281 @@
+Content-Type: text/html
+Cache-Control: no-cache
+
+<!DOCTYPE HTML>
+<head>
+<!--"TemplateVersion"  : "V12.00.00"
+    "TemplateHome"     : "mobile"-->
+<title>Patient Contacts</title>
+<script type="text/javascript" src="../html/iphone/iphone.js"> </script>
+<link   rel="stylesheet" href="../html/iphone/iphone.css" type="text/css">
+<style type=text/css>
+.subhead {
+ font-weight:bold;
+ font-size:15px;
+ margin-top:0px;
+ margin-bottom:0px;
+ margin-left:15px;
+}
+</style>
+</head>
+%START.OF.PAGE
+<body onload="init();">
+<br>
+<div id="Contacts"></div>
+
+<div id="LegacyContacts" style="display:none">
+  <p class=subhead>Next of Kin</p>
+  <ul class=sectionList>
+    <li class=sectionItem>name
+      <span class=sectionText>%PATWEB98.01.053</span>
+    </li>
+
+    <li class=sectionItem>relationship
+      <span class=sectionText>%PATWEB98.01.552</span>
+    </li>
+
+    <li class=sectionItem>
+      <a class=sectionLink id=GoogleLink1>address
+        <span class=sectionText  style="margin-left:20px;display:block;">
+          %PATWEB98.01.054 <br>
+         %PATWEB98.01.055 %PATWEB98.01.056
+          %PATWEB98.01.057 %PATWEB98.01.058
+        </span></a>
+    </li>
+
+    <li class=sectionItem>
+      <a class=sectionLink href='tel:%PATWEB98.01.059'>home phone
+        <span class=sectionText> %PATWEB98.01.059</span></a>
+    </li>
+
+    <li class=sectionItem>
+      <a class=sectionLink href='tel:%PATWEB98.01.060'>business phone
+        <span class=sectionText>%PATWEB98.01.060</span></a>
+    </li>
+
+    <li class=sectionItem>
+      <a class=sectionLink href='tel:%PATWEB98.01.710'>mobile phone
+        <span class=sectionText>%PATWEB98.01.710</span></a>
+    </li>
+
+    <li class=sectionItem>
+      <a class=sectionLink href='mailto:%PATWEB98.01.711'>email
+        <span class=sectionText>%PATWEB98.01.711</span></a>
+    </li>
+  </ul>
+
+  <p class=subhead>Emergency Contact</p>
+  <ul class=sectionList>
+    <li class=sectionItem>name
+      <span class=sectionText>%PATWEB98.01.511</span>
+    </li>
+
+    <li class=sectionItem>relationship
+      <span class=sectionText>%PATWEB98.01.553</span>
+    </li>
+
+    <li class=sectionItem>
+      <a class=sectionLink id=GoogleLink2>
+      address
+        <span class=sectionText  style="margin-left:20px;display:block;">
+          %PATWEB98.01.512 <br>
+          %PATWEB98.01.513 %PATWEB98.01.514
+          %PATWEB98.01.515 %PATWEB98.01.516
+        </span></a>
+    </li>
+
+    <li class=sectionItem>
+      <a class=sectionLink href='tel:%PATWEB98.01.517'>
+      home phone 
+      <span class=sectionText>%PATWEB98.01.517
+      </span></a>
+    </li>
+
+    <li class=sectionItem>
+      <a class=sectionLink href='tel:%PATWEB98.01.518'>
+      business phone 
+      <span class=sectionText>%PATWEB98.01.518
+      </span></a>
+    </li>
+
+    <li class=sectionItem>
+      <a class=sectionLink href='tel:%PATWEB98.01.707'>
+      mobile phone 
+      <span class=sectionText>%PATWEB98.01.707
+      </span></a>
+    </li>
+
+    <li class=sectionItem>
+      <a class=sectionLink href='mailto:%PATWEB98.01.708'>
+      email
+      <span class=sectionText>%PATWEB98.01.708
+      </span></a>
+    </li>
+  </ul>
+
+  <p class=subhead>Enduring Power of Attorney</p>
+  <ul class=sectionList>
+    <li class=sectionItem>name
+      <span class=sectionText>%PATWEB98.01.520</span>
+    </li>
+
+    <li class=sectionItem>relationship
+      <span class=sectionText>%PATWEB98.01.554</span>
+    </li>
+
+    <li class=sectionItem>
+      <a class=sectionLink id=GoogleLink3>
+      address
+      <span class=sectionText  style="margin-left:20px;display:block;">
+        %PATWEB98.01.521 <br>
+        %PATWEB98.01.522 %PATWEB98.01.523
+        %PATWEB98.01.524 %PATWEB98.01.525
+      </span></a>
+    </li>
+
+    <li class=sectionItem>
+      <a class=sectionLink href='tel:%PATWEB98.01.059'>
+      home phone 
+      <span class=sectionText>%PATWEB98.01.526</span></a>
+    </li>
+
+    <li class=sectionItem>
+      <a class=sectionLink href='tel:%PATWEB98.01.060'>
+      business phone 
+      <span class=sectionText>%PATWEB98.01.527</span></a>
+    </li>
+
+    <li class=sectionItem>
+      <a class=sectionLink href='tel:%PATWEB98.01.713'>
+      mobile phone 
+      <span class=sectionText>%PATWEB98.01.713</span></a>
+    </li>
+  </ul>
+</div>
+
+<div style='display:none'>
+<form name=PatientLinks method=get action=patweb98.pbl>
+<input type="hidden" name="reportno" value="1">
+<input type="hidden" name="template" value="081">
+<input type="hidden" name="urnumber" value="%PATWEB98.01.003">
+<input type="hidden" name="admissno" value="%PATWEB98.01.081">
+</div>
+
+<script type=text/javascript>
+function init() {
+  ADL1="%PATWEB98.01.054";
+  ADL2="%PATWEB98.01.055";
+  ADL3="%PATWEB98.01.056";
+  ADL4="%PATWEB98.01.057";
+  ADL5="%PATWEB98.01.058";
+  TOADD=ADL1.replace(/ *$/," ") +
+        ADL2.replace(/ *$/," ") +
+        ADL3.replace(/ *$/," ") +
+        ADL4.replace(/ *$/," ") +
+        ADL5.replace(/ *$/," ")
+  GL1=document.getElementById("GoogleLink1");
+  GL1.href='https://maps.google.com.au/maps?output=embed&q='+TOADD;
+
+  ADL1="%PATWEB98.01.512";
+  ADL2="%PATWEB98.01.513";
+  ADL3="%PATWEB98.01.514";
+  ADL4="%PATWEB98.01.515";
+  ADL5="%PATWEB98.01.516";
+  TOADD=ADL1.replace(/ *$/," ") +
+        ADL2.replace(/ *$/," ") +
+        ADL3.replace(/ *$/," ") +
+        ADL4.replace(/ *$/," ") +
+        ADL5.replace(/ *$/," ")
+  GL1=document.getElementById("GoogleLink2");
+  GL1.href='https://maps.google.com.au/maps?output=embed&q='+TOADD;
+
+  ADL1="%PATWEB98.01.521";
+  ADL2="%PATWEB98.01.522";
+  ADL3="%PATWEB98.01.523";
+  ADL4="%PATWEB98.01.524";
+  ADL5="%PATWEB98.01.525";
+  TOADD=ADL1.replace(/ *$/," ") +
+        ADL2.replace(/ *$/," ") +
+        ADL3.replace(/ *$/," ") +
+        ADL4.replace(/ *$/," ") +
+        ADL5.replace(/ *$/," ")
+  GL1=document.getElementById("GoogleLink3");
+  GL1.href='https://maps.google.com.au/maps?output=embed&q='+TOADD;
+
+
+  // Show Contacts...
+
+  var usingNewContacts = "%STANDARD.01.025.118.138.0.1";
+  if (usingNewContacts == "0") {  // Using legacy contacts
+    document.getElementById('Contacts').innerHTML=document.getElementById('LegacyContacts').innerHTML;
+  }
+  else {  // Using 'New Contacts' table ('pmscexaf')
+    t = new Table();
+    %PATWEB98.01.356
+    SortOrderBy=1;
+    t.rows.sort();
+
+    DrawNewContacts(t);
+  }
+}
+
+function DrawNewContacts(t) {
+  var OS="";
+
+  for (var i = 0; i < t.rows.length; i++) {
+    if (t.rows[i][9] == "Yes") continue; // skip if Inactive
+
+    // Compress whitespaces from name & address
+    var arrName = trim(t.rows[i][3].replace(/\s\s+/g, ' ')).split(" ");
+    var sFirstName = arrName.length > 0 ? arrName[0] : "";
+    var sLastName = arrName.length > 1 ? arrName[1] : "";
+
+    var sAddr = t.rows[i][7];
+    var sAddr1 = sAddr.match(/^.*?\s{2,}/);       // street number
+    var sAddr2 = sAddr.match(/.\s{2,}(.*$)/)[1];  // remaining parts
+    var sMapAddr = trim(sAddr.replace(/\s\s+/g, ' '));
+
+    OS += "<p class=subhead>" + trim(t.rows[i][1]) + "</p>";
+    OS += "<ul class=sectionList>";
+    OS += "<li class=sectionItem>";
+    OS += "<span class=labelText>name</span><span class=sectionText>" +
+          sFirstName + " " + sLastName + "</span>";
+    OS += "</li>";
+
+    OS += "<li class=sectionItem>";
+    OS += "<span class=labelText>relationship</span><span class=sectionText>" + t.rows[i][2] + "</span>";
+    OS += "</li>";
+
+    OS += "<li class=sectionItem>";
+    OS += "<a class=sectionLink ";
+    OS += " href=\"https://maps.google.com.au/maps?output=embed&q=" + sMapAddr + "\">";
+    OS += "<span class=labelText>address</span>";
+    OS += "<span class=sectionText style='display:inline-block;'>" + sAddr1 +             "<br>" + sAddr2 + "</span></a>";
+    OS += "</li>";
+
+    OS += "<li class=sectionItem>";
+    OS += "<a class=sectionLink href='tel:" + trim(t.rows[i][4]) + "'>";
+    OS += "<span class=labelText>home phone</span><span class=sectionText>" + trim(t.rows[i][4]) + "</span></a>";
+    OS += "</li>";
+
+    OS += "<li class=sectionItem>";
+    OS += "<a class=sectionLink href='tel:" + trim(t.rows[i][5]) + "'>";
+    OS += "<span class=labelText>business phone</span><span class=sectionText>" + trim(t.rows[i][5]) + "</span></a>";
+    OS += "</li>";
+
+    OS += "<li class=sectionItem>";
+    OS += "<a class=sectionLink href='tel:" + trim(t.rows[i][6]) + "'>";
+    OS += "<span class=labelText>mobile phone</span><span class=sectionText>" + trim(t.rows[i][6]) + "</span></a>";
+    OS += "</li>";
+
+    OS += "<li class=sectionItem>";
+    OS += "<a class=sectionLink href='mailto:" + trim(t.rows[i][11]) + "'>";
+    OS += "<span class=labelText>email</span><span class=sectionText>" + trim(t.rows[i][11]) + "</span></a>";
+    OS += "</li>";
+    OS += "</ul>";
+  }
+
+  document.getElementById('Contacts').innerHTML=OS;
+}
+</script>
+</body>

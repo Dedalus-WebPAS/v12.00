@@ -1,0 +1,167 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="qld">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/patweb78.js"></script>
+%START.OF.PAGE
+<body onload="PageLoad(event);">
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon" 
+ src="../images/ExitIcon.gif" onclick="DFrameExit();">
+<script type="text/javascript">
+document.write("Sub Acute Episode");
+</script>
+</span>
+
+  <form name=AddForm action=patweb78.pbl method=post>
+  <input type=hidden name=reportno value=01>
+  <input type=hidden name=template value=002>
+  <input type=hidden name=urnumber value="%PATWEB78.01.003">
+  <input type=hidden name=admissno value="%PATWEB78.01.081">
+  <input type=hidden name=episodno value="%PATWEB78.01.220">
+  <input type=hidden name=updttype value="U">
+  <input type=hidden name=acuttype value="3">
+  <input type=hidden name=admdate  value="%PATWEB78.01.102">
+  <input type=hidden name=disdate  value="%PATWEB78.01.301">
+
+<table cellspacing=0 cellpadding=1 border=0 width=100% align=center>
+<tr><td colspan=2 class=HeadingCell align=center>
+Episode: %PATWEB78.01.220 &nbsp;&nbsp;&nbsp;&nbsp;  
+%PATWEB78.01.221 - %PATWEB78.01.222 
+&nbsp;&nbsp;&nbsp;&nbsp; Care Type: %PATWEB78.01.223
+</td></tr>
+
+<tr><td>
+<table cellspacing=0 cellpadding=1 border=0 width=95% align=center>
+
+
+
+
+<!--
+<tr><td class=DataLabel>User Flag</td>
+<td><input type="text" size="1" maxlength="1" name=ptrde006 title="User Flag"
+     value="PATWEB78.01.209">
+     </td></tr>
+
+<tr><td class=DataLabel>Comments Line 1</td>
+<td><input type="text" size="45" maxlength="70" name=ptrde015 
+     title="Comments Line 1"
+     value="PATWEB78.01.218">
+     </td></tr>
+
+<tr><td class=DataLabel>Comments Line 2</td>
+<td><input type="text" size="45" maxlength="70" name=ptrde016 
+     title="Comments Line 1"
+     value="PATWEB78.01.219">
+     </td></tr>
+-->
+
+<tr><td class=DataLabel>Multi Disciplinary Care Plan Date</td>
+    <td class=DataField><input type=text size=12 maxlength=12 width=30%
+        name=ptrde017 title="Multi-Disciplinary Date" class=""
+        value="%PATWEB78.01.224" id="ptrde017"
+        onblur="valImpairmentCode(ptrde021,d_ptrde021);
+                 ">
+       <img src=../images/DateLookup.gif class=Icon
+       onclick="DateLookupFrame(ptrde017);">
+     </td></tr>
+
+<tr><td class=DataLabel>Impairment Code</td>
+     <td><input type=text size=7 maxlength=7 name=ptrde021 id=ptrde021
+                 value="%PATWEB78.01.227" class=""
+                 title="Impairment Code"
+                 onblur="valImpairmentCode(ptrde021,d_ptrde021);
+                 getDefaultFields(ptrde021,ptrde017);"/>
+          <input type=text name=d_ptrde021 title="Impairment Code Description"
+                 class=readonly size=24 value="%PATWEB78.01.234" 
+                 id=d_ptrde021>
+          <img src="../images/SearchIcon.gif" class=Icon
+               onClick="ImpairmentCodeSearchFrame(ptrde021,d_ptrde021);" />
+          <img src="../images/ClearIcon.gif" class=Icon
+               onClick="clrFields(ptrde021,d_ptrde021);" />
+          <input type=hidden name=ansnapCode title="AN-SNAP Code">
+          <input type=hidden name=ansnapversion title="AN-SNAP Version">
+</td></tr>
+<tr><td class=DataLabel>AN SNAP Classification</td>
+       <td><input type=text name=ptrde026 id=ptrde026 size=4 maxlength=3
+                  title="AN SNAP Classification" value="%PATWEB78.01.233"
+                  onblur="valANSNAPClassCode(ptrde026,ptrde025,snapdesc);">
+           <input type=text readonly name=snapdesc id=snapdesc size=27
+                  maxlength=80 value="%PATWEB78.01.232"
+                  class=readonly tabindex=-1 title="AN SNAP Description">
+                  &nbsp;&nbsp;Version&nbsp;&nbsp;
+           <input type=text name=ptrde025 id=ptrde025 maxlength=2
+                  size=3 value="%PATWEB78.01.231" title="AN SNAP Version"
+                  onblur="valANSNAPClassCode(ptrde026,ptrde025,snapdesc);">
+             <img src="../images/SearchIcon.gif" class=Icon
+                  onclick="ClassCodeSearchFrame(ptrde026,ptrde025,snapdesc);">
+             <img src="../images/ClearIcon.gif" class=Icon
+                   onclick="clrFields(ptrde026,ptrde025,snapdesc);">
+    </td>
+</tr>
+
+<tr><td class=DataLabel>Clinical Assessment Only?</td>
+<td><input type=checkbox name=ptrde006 title="Clinical Assessment Only" 
+    id="Clinical Assessment Only" value="1">
+     </td></tr>
+
+<tr><td colspan=2 align=center><br>
+    <input type=button value="OK" class="button" 
+     onclick="SubmitHidden(AddForm)">
+    <input type=button class="button" type=button value="Close"
+     onclick='DFrameClose();'>
+    </td></tr>
+</table>
+</td></tr>
+</table>
+</form>
+<script type="text/javascript">
+//
+ ClinicalAssessment="%PATWEB78.01.209";
+ if ( ClinicalAssessment == "1") {
+   document.getElementById('ptrde006').checked=1;
+ }
+function getDefaultFields(icde,sdat){
+//  document.getElementById('ptrde017').blur(); 
+//  document.getElementById('ptrde021').blur(); 
+  if (isWhitespace(icde.value)) {
+      document.AddForm.ptrde026.value="";
+      document.AddForm.ptrde025.value="";
+      document.AddForm.snapdesc.value="";
+      return; }
+  if (isWhitespace(sdat.value)) {
+      return; }
+  var serverURL= "../cgi-bin/patweb78.pbl?reportno=3&remoteno=3" +
+       "&valdicde=" + icde.value.substr(0,7).replace(/ /g,"+") +
+       "&valdsdat=" + sdat.value.substr(0,11).replace(/ /g,"+");
+  var returnValue = RSExecute(serverURL);
+  if (returnValue.status!=0) {
+      return; }
+
+  ReturnValue=returnValue.return_value.split("|");
+  var clss = ReturnValue[0];
+  var vers = ReturnValue[1];
+
+  if (isWhitespace(clss)) {
+      return; } 
+
+  var r=confirm("AN SNAP Auto Classification\n\n" +
+                "AN SNAP Class " + clss + " Version " + vers +
+                " has been found\n" + 
+                "Select OK to use, Cancel to ignore this match");
+  if (r==true) {
+      document.AddForm.ptrde026.value = clss;
+      document.AddForm.ptrde025.value = vers;
+      valANSNAPClassCode(document.AddForm.ptrde026,
+                         document.AddForm.ptrde025,
+                         document.AddForm.snapdesc);
+      return; }
+  else{
+      document.AddForm.ptrde026.value="";
+      document.AddForm.ptrde025.value="";
+      document.AddForm.snapdesc.value="";
+  }  
+}
+document.getElementById('ptrde017').blur();
+</script>
+

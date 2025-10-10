@@ -1,0 +1,30 @@
+. *----------------------------------------------------------------------
+. * Include Name  :   CLPMSDSD.PBL
+. *
+. * Function      :   Clear variables for PMSDSDFD - pmsdsdaf.dat
+. *
+. * Includes Needed :
+. *
+. *----------------------------------------------------------------------
+.  Modifications Done :
+.
+.  V11.04.01  01/02/2024 Peter Vela     TSK 0939978
+.             Created include
+.------------------------------------------------------------
+.  Clear Patient System Patient Discharge Summary Details
+.------------------------------------------------------------
+CLPMSDSD  MOVE      SP70,PMDDVISN
+          MOVE      SP70,PMDDCPID
+          MOVE      SP70,PMDDDATE
+          MOVE      SP70,PMDDTIME
+          MOVE      SP70,PMDDDEST
+          MOVE      SP70,PMDDFAXN
+          MOVE      SP70,PMDDCUID
+          MOVE      SP70,PMDDHCPC
+          MOVE      SP70,PMDDHCPP
+          MOVE      SP70,PMDDHCPT
+          MOVE      SP70,PMDDFAXS
+          MOVE      SP70,PMDDESNT
+          MOVE      SP70,PMDDSPAR
+          RETURN
++

@@ -1,0 +1,45 @@
+.---------------------------------------------------------------------------
+. Include Name : CLOPREQP.PBL
+. Function     : Clear function for OPREQPFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.04.01  15/02/2024  Thanh T          TSK 0923560
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLOPREQP  MOVE      SP70,OPEQCODE      . Equipment Code     
+          MOVE      SP70,OPEQDESC      . Equipment Description     
+          MOVE      SP70,OPEQTYPE      . Equipment type (Cat OE)   
+          MOVE      SP70,OPEQUNIQ      . Theatre Unique Id    
+          MOVE      SP70,OPEQTEAM      . Theatre Team Number    
+          MOVE      SP70,OPEQSTAT      . Current Status (Cat ER)   
+          MOVE      SP70,OPEQDTSC      . Date Status Changed (CCYYMMDD)   
+          MOVE      SP70,OPEQUSLO      . Usual Location/Tray     
+          MOVE      SP70,OPEQCULO      . Current Location/Tray     
+          MOVE      SP70,OPEQDE1U      . Date Equipment 1st Used (CCYYMMDD)  
+          MOVE      ZERO,F5
+          MOVE      F5,OPEQMNOU        . Maximum Number of Uses   
+          MOVE      SP70,OPEQEEDT      . Equipment Expiry Date (CCYYMMDD)   
+          MOVE      F5,OPEQNOUR        . Number of Uses Remaining   
+          MOVE      SP70,OPEQLSDT      . Last Sterilisation Date (CCYYMMDD)   
+          MOVE      F5,OPEQULST        . Total Num of Uses Since Last Steril
+          MOVE      SP70,OPEQLMDT      . Last Maintenance Date (CCYYMMDD)   
+          MOVE      F5,OPEQULMT        . Total Num of Uses Since Last Maintd
+          MOVE      SP70,OPEQSRNO      . Equipment Serial Number    
+          MOVE      SP70,OPEQSPNO      . Supplier Catalog Number    
+          MOVE      SP70,OPEQSPDT      . Supplier Details     
+          MOVE      SP70,OPEQNOTE      . Notes      
+          MOVE      SP70,OPEQUDT1      . User Defined Text 1   
+          MOVE      SP70,OPEQUDT2      . User Defined Text 2   
+          MOVE      SP70,OPEQUDF1      . User Defined Cat 1 (Cat o6) 
+          MOVE      SP70,OPEQUDF2      . User Defined Cat 2 (Cat o7 
+          MOVE      SP70,OPEQDTE1      . User Defined Date 1 (CCYYMMDD)  
+          MOVE      SP70,OPEQDTE2      . User Defined Date 2 (CCYYMMDD)  
+          MOVE      SP70,OPEQTME1      . User Defined Time 1 (HH:MM:SS)  
+          MOVE      SP70,OPEQTME2      . User Defined Time 2 (HH:MM:SS)  
+          MOVE      SP70,OPEQACTV      . Inactive? (Y=1, N=0)    
+          MOVE      SP70,OPEQHOSP      . Hospital ID (pathspaf)    
+          MOVE      SP70,OPEQSPAR      . Spare Variable     
+.
+          RETURN

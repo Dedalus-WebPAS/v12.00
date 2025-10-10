@@ -1,0 +1,1078 @@
+.*****************************************************************************
+. Program      : X04OPQUE
+. Description  : Conversion oprqueaf to new File layout
+.*****************************************************************************
+. Modifications:
+.*****************************************************************************
+. V11.04.01  24/01/2024  Thanh T       TSK 0935728
+.            Changed OPTN0000 to move 'No' to USINGORC instead of 'Yes'
+. V11.04.00  08/12/2023  Thanh T       TSK 0935728  
+.            Initial Version
+.*****************************************************************************
+.
+.  using vi Global change command      :%s/FromString/ToString/g
+.
+.  Global change X04OPQUE  eg F57PTDOC
+.  Global change x04opque  eg f57ptdoc
+.  Global change OPRQUEFD  eg PATDOCFD (new layout)
+.  Global change oprqueaf  eg patdoctf
+.  Global change OPRQUEA1  eg PATDOCT1
+.  Global change KEY20     eg KEY20
+.  Global change KEY20     eg KEY9
+.  Global change WROPQUE1  eg WRDOCT1
+.  Global change soprquef  eg sptdoctf
+.
+.  Global Change answeryn  to Yes
+.  Global change RSOPQUE1  eg RSPTDOC1
+.  Global change RKOPQUE1  eg RKPTDOC1
+.  Global change UPOPQUE1  eg UPPTDOC1
+.
+.  Global changes if Oracle Option is NOT required -
+
+.  Global Change answeryn  to No
+.  Global change RSOPQUE1  to OFDUMYIO
+.  Global change RKOPQUE1  to OFDUMYIO
+.  Global change UPOPQUE1  to OFDUMYIO
+.
+          INC       STD001FD
+.
+FINDFILE  FILE      ASCII, FIXED=256
+LOGFILE   FILE      ASCII, FIXED=256
+.
+. Enter the first or the shortest index from the original FD and rename
+. the index OLDFILE1
+.
+.                                     ******** copy the old FD here *******
+.                                     * comment out all continuing fields and
+.                                     * prefix changing fields with "OLD" -
+.                                     * remove old Indexes and Redefines     
+.
+..OLDFILE1  IFILE     SQL, FIXED=xxx, KEY="Uxx-xx"
+OLDFILE1   IFILE    SQL, FIXED=919, KEY="U1-20" 
+.
+.Name     Type      Length Physical Start Description
+.----     ----      ------ -------- ----- -----------
+.DOPQUMES  DIM       20       20       1   Message Id
+.
+.OPDADATE DIM       8        8       21   Session Date (CCYYMMDD)
+.OPDATIME DIM       5        5       29   Start Time (HH:MM)
+.OPDACLIN DIM       6        6       34   Clinic/Surgeon
+.OPDASTAT FORM      1        2       40   Booking Status
+.                                            0 = Booked
+.                                            1 = Preadmitted
+.                                            2 = Admitted
+.                                            3 = Cancelled
+.                                            4 = Discharged
+.OPDACASE DIM       3        3       42   Case Number
+.OPDAADMN DIM       8        8       45   Admission Number
+.OPDAUNIQ DIM       10       10      53   Unique id for theatre booking
+.OPDAEXPS DIM       5        5       63   Expected Start Time
+.OPDAEXPD FORM      4        3       68   Expected Duration (min)
+.OPDAANAE DIM       3        3       71   Anaesthetic Code (Cat. OA )
+.OPDATYPE DIM       3        3       74   Operation Type   (Cat. OY )
+.OPDATRAN DIM       3        3       77   Transport Code   (Cat. OR )
+.OPDAUSR1 DIM       3        3       80   Unplan return to theatre (Cat Y6)
+.OPDAUSR2 DIM       3        3       83                2 (Category Y7)
+.OPDAUSR3 DIM       3        3       86                3 (Category Y8)
+.OPDAUSR4 DIM       3        3       89                4 (Category Y9)
+.OPDAWAIT DIM       1        1       92   Waiting Lists (Y/N)
+.OPDAPROV DIM       9        9       93   Provisional item # 1 ( MBS or ICD9CM)
+.OPDAPRV2 DIM       9        9      102   Provisional item # 2 ( MBS or ICD9CM)
+.OPDAPRV3 DIM       9        9      111   Provisional item # 3 ( MBS or ICD9CM)
+.OPDADES1 DIM       80       80     120   Operation description line 1
+.OPDADES2 DIM       80       80     200                              2
+.OPDADES3 DIM       80       80     280                              3
+.OPDACOMM DIM       40       40     360   Comments
+.OPDACANC DIM       3        3      400   Cancellation Code (Category SC)
+.OPDATHET DIM       6        6      403   Operating Room Code
+.OPDAPRE1 DIM       5        5      409   Pre-operative time 1 (HH:MM)
+.OPDAPRE2 DIM       5        5      414   Pre-operative time 2 (HH:MM)
+.OPDAPRE3 DIM       5        5      419   Pre-operative time 3 (HH:MM)
+.OPDAPRE4 DIM       5        5      424   Pre-operative time 4 (HH:MM)
+.OPDAPRE5 DIM       5        5      429   Pre-operative time 5 (HH:MM)
+.OPDAPOS1 DIM       5        5      434   Post-operative time 1 (HH:MM)
+.OPDAPOS2 DIM       5        5      439   Post-operative time 2 (HH:MM)
+.OPDAPOS3 DIM       5        5      444   Post-operative time 3 (HH:MM)
+.OPDAPOS4 DIM       5        5      449   Post-operative time 4 (HH:MM)
+.OPDATDUR FORM      4        3      454   Actual duration in theatre (mins)
+.OPDAKNOW DIM       3        3      457   Known Infection (Category OK)
+.OPDACDAT DIM       8        8      460   Cancellation Date
+.OPDAEQR1 DIM       3        3      468   Equipment Required 1(Category XE)
+.OPDAEQR2 DIM       3        3      471   Equipment Required 2(Category XE)
+.OPDALEQR DIM       3        3      474   Loan Equip. Required(Category XO)
+.OPDAEQR3 DIM       3        3      477   Equipment Required 3(Category XE)
+.OPDAUNIT DIM       3        3      480   Specialty/Unit (Category ST)
+.OPDAURNO DIM       8        8      483   UR Number
+.OPDAPROC DIM       9        9      491   WL Procedure Code(watproaf)
+.OPDACONT DIM       2        2      500   WL Procedure Count
+.OPDAASRC DIM       3        3      502   Admission Source (Cat S)
+.OPDACSST DIM       1        1      505   Consent Obtained (N=No, Y=Yes)
+.OPDACSDT DIM       8        8      506   Consect Changed Date (ccyymmdd)
+.OPDACRDT DIM       8        8      514   Date record created (ccyymmdd)
+.OPDACTIM DIM       8        8      522   Time record created (hh:mm:ss)
+.OPDAWEBC DIM       10       10     530   WEB User Id rec.creator(websecaf)
+.OPDAUDAT DIM       8        8      540   Last Update Date (ccyymmdd)
+.OPDAUTIM DIM       8        8      548   Last Update Time (hh:mm:ss)
+.OPDAWEBU DIM       10       10     556   WEB User Id rec.updater(websecaf)
+.OPDAPCOM DIM       1        1      566   Prosthetic Items Complete
+.                                              0=No 1=Yes
+.OPDAVUN1 DIM       10       10     567   Verification User 1 (websecaf)
+.OPDAVUN2 DIM       10       10     577   Verification User 2 (websecaf)
+.OPDAPHMN DIM       10       10     587   Prosthetics Manager (websecaf)
+.OPDAREQN DIM       10       10     597   Unique Request ID
+.OPDADES4 DIM       80       80     607   Operation Description line 4
+.OPDADES5 DIM       80       80     687   Operation Description line 5
+.OPDADES6 DIM       80       80     767   Operation Description line 6
+.OPDAFAST DIM       8        8      847   Fasting Time (hh:mm:ss)
+.OPDAAPRC DIM       1        1      855   Adm Paperwork received (1=yes)
+.OPDAACPD DIM       1        1      856   All charges posted (1=yes)
+.OPDARICM DIM       3        3      857   Reason Incomplete (Category Rt)
+.OPDAMHRC DIM       1        1      860   Medical History Received
+.                                               0 or Blank = No
+.                                               1 = Yes
+.OPDAPOWD DIM       3        3      861   Expected Post-op Ward (patwr1af)
+.OPDAPOBD DIM       3        3      864   Expected Post-op Bed (patwr1af)
+.OPDACTYP DIM       3        3      867   Claim Type (Cat CL)
+.OPDAATYP DIM       3        3      870   Admission Type (Cat P)
+.OPDADTFF DIM       8        8      873   Date of Fasting Food (ccyymmdd)
+.OPDADTFL DIM       8        8      881   Date of Fasting Fluid (ccyymmdd)
+.OPDAPRV4 DIM       9        9      889   Provisional item # 4 ( MBS or ICD9CM)
+.OPDAPRV5 DIM       9        9      898   Provisional item # 5 ( MBS or ICD9CM)
+.OPDAPRV6 DIM       9        9      907   Provisional item # 6 ( MBS or ICD9CM)
+OLDASPAR  DIM      3        3      916   Spare (OPDAHOSP in V11.03)
+.
+.End of record                      919
+.
+.                                     ******** copy the new FD here *******
+.
+OPRQUEA1   IFILE SQL, FIXED=969, KEY="U1-20"
+.
+.Name     Type      Length Physical Start Description
+.----     ----      ------ -------- ----- -----------
+DOPQUMES  DIM       20       20       1   Message Id
+.
+OPDADATE DIM       8        8       21   Session Date (CCYYMMDD)
+OPDATIME DIM       5        5       29   Start Time (HH:MM)
+OPDACLIN DIM       6        6       34   Clinic/Surgeon
+OPDASTAT FORM      1        2       40   Booking Status
+.                                            0 = Booked
+.                                            1 = Preadmitted
+.                                            2 = Admitted
+.                                            3 = Cancelled
+.                                            4 = Discharged
+OPDACASE DIM       3        3       42   Case Number
+OPDAADMN DIM       8        8       45   Admission Number
+OPDAUNIQ DIM       10       10      53   Unique id for theatre booking
+OPDAEXPS DIM       5        5       63   Expected Start Time
+OPDAEXPD FORM      4        3       68   Expected Duration (min)
+OPDAANAE DIM       3        3       71   Anaesthetic Code (Cat. OA )
+OPDATYPE DIM       3        3       74   Operation Type   (Cat. OY )
+OPDATRAN DIM       3        3       77   Transport Code   (Cat. OR )
+OPDAUSR1 DIM       3        3       80   Unplan return to theatre (Cat Y6)
+OPDAUSR2 DIM       3        3       83                2 (Category Y7)
+OPDAUSR3 DIM       3        3       86                3 (Category Y8)
+OPDAUSR4 DIM       3        3       89                4 (Category Y9)
+OPDAWAIT DIM       1        1       92   Waiting Lists (Y/N)
+OPDAPROV DIM       9        9       93   Provisional item # 1 ( MBS or ICD9CM)
+OPDAPRV2 DIM       9        9      102   Provisional item # 2 ( MBS or ICD9CM)
+OPDAPRV3 DIM       9        9      111   Provisional item # 3 ( MBS or ICD9CM)
+OPDADES1 DIM       80       80     120   Operation description line 1
+OPDADES2 DIM       80       80     200                              2
+OPDADES3 DIM       80       80     280                              3
+OPDACOMM DIM       40       40     360   Comments
+OPDACANC DIM       3        3      400   Cancellation Code (Category SC)
+OPDATHET DIM       6        6      403   Operating Room Code
+OPDAPRE1 DIM       5        5      409   Pre-operative time 1 (HH:MM)
+OPDAPRE2 DIM       5        5      414   Pre-operative time 2 (HH:MM)
+OPDAPRE3 DIM       5        5      419   Pre-operative time 3 (HH:MM)
+OPDAPRE4 DIM       5        5      424   Pre-operative time 4 (HH:MM)
+OPDAPRE5 DIM       5        5      429   Pre-operative time 5 (HH:MM)
+OPDAPOS1 DIM       5        5      434   Post-operative time 1 (HH:MM)
+OPDAPOS2 DIM       5        5      439   Post-operative time 2 (HH:MM)
+OPDAPOS3 DIM       5        5      444   Post-operative time 3 (HH:MM)
+OPDAPOS4 DIM       5        5      449   Post-operative time 4 (HH:MM)
+OPDATDUR FORM      4        3      454   Actual duration in theatre (mins)
+OPDAKNOW DIM       3        3      457   Known Infection (Category OK)
+OPDACDAT DIM       8        8      460   Cancellation Date
+OPDAEQR1 DIM       3        3      468   Equipment Required 1(Category XE)
+OPDAEQR2 DIM       3        3      471   Equipment Required 2(Category XE)
+OPDALEQR DIM       3        3      474   Loan Equip. Required(Category XO)
+OPDAEQR3 DIM       3        3      477   Equipment Required 3(Category XE)
+OPDAUNIT DIM       3        3      480   Specialty/Unit (Category ST)
+OPDAURNO DIM       8        8      483   UR Number
+OPDAPROC DIM       9        9      491   WL Procedure Code(watproaf)
+OPDACONT DIM       2        2      500   WL Procedure Count
+OPDAASRC DIM       3        3      502   Admission Source (Cat S)
+OPDACSST DIM       1        1      505   Consent Obtained (N=No, Y=Yes)
+OPDACSDT DIM       8        8      506   Consect Changed Date (ccyymmdd)
+OPDACRDT DIM       8        8      514   Date record created (ccyymmdd)
+OPDACTIM DIM       8        8      522   Time record created (hh:mm:ss)
+OPDAWEBC DIM       10       10     530   WEB User Id rec.creator(websecaf)
+OPDAUDAT DIM       8        8      540   Last Update Date (ccyymmdd)
+OPDAUTIM DIM       8        8      548   Last Update Time (hh:mm:ss)
+OPDAWEBU DIM       10       10     556   WEB User Id rec.updater(websecaf)
+OPDAPCOM DIM       1        1      566   Prosthetic Items Complete
+.                                              0=No 1=Yes
+OPDAVUN1 DIM       10       10     567   Verification User 1 (websecaf)
+OPDAVUN2 DIM       10       10     577   Verification User 2 (websecaf)
+OPDAPHMN DIM       10       10     587   Prosthetics Manager (websecaf)
+OPDAREQN DIM       10       10     597   Unique Request ID
+OPDADES4 DIM       80       80     607   Operation Description line 4
+OPDADES5 DIM       80       80     687   Operation Description line 5
+OPDADES6 DIM       80       80     767   Operation Description line 6
+OPDAFAST DIM       8        8      847   Fasting Time (hh:mm:ss)
+OPDAAPRC DIM       1        1      855   Adm Paperwork received (1=yes)
+OPDAACPD DIM       1        1      856   All charges posted (1=yes)
+OPDARICM DIM       3        3      857   Reason Incomplete (Category Rt)
+OPDAMHRC DIM       1        1      860   Medical History Received
+.                                               0 or Blank = No
+.                                               1 = Yes
+OPDAPOWD DIM       3        3      861   Expected Post-op Ward (patwr1af)
+OPDAPOBD DIM       3        3      864   Expected Post-op Bed (patwr1af)
+OPDACTYP DIM       3        3      867   Claim Type (Cat CL)
+OPDAATYP DIM       3        3      870   Admission Type (Cat P)
+OPDADTFF DIM       8        8      873   Date of Fasting Food (ccyymmdd)
+OPDADTFL DIM       8        8      881   Date of Fasting Fluid (ccyymmdd)
+OPDAPRV4 DIM       9        9      889   Provisional item # 4 ( MBS or ICD9CM)
+OPDAPRV5 DIM       9        9      898   Provisional item # 5 ( MBS or ICD9CM)
+OPDAPRV6 DIM       9        9      907   Provisional item # 6 ( MBS or ICD9CM)
+OPDAHOSP DIM       3        3      916   Hospital (pathspaf)
+OPDASPAR DIM       50       50     919   Spare variable
+.
+.End of record                     969
+.
+. Redefine form fields from key
+. -----------------------------
+.
+PRFASCAN  FORM      2
+.
+. LOCAL VARIABLES
+. ---------------
+CMDLINE   DIM       200
+.
+DEFPATH   DIM       60
+DIM60     DIM       60
+DISNUM    FORM      4
+.
+ERORTEXT  DIM       80
+.
+INPFILE   DIM       8
+.
+MINUS3    FORM      "-3"
+.
+NEWFILE   DIM       60
+NEWPATH   DIM       60
+.
+OLDPATH   DIM       60
+.
+RECNUM    FORM      8
+.
+SAVEFLG   FORM      1
+.
+USINGORC  DIM       1
+.
+.
+. PROGRAM CONSTANTS
+. -----------------
+CREATEXT  INIT    "Log file created "
+DASHLINE  INIT    "--------------------------------------------------":
+                  "------------------------------"
+ENDGTEXT  INIT    "Ending   fixit (Option "
+OPENTEXT  INIT    "Log file opened "
+SP60      INIT    "                                                            "
+STARTTXT  INIT    "Starting fixit (Option "
+.
+.
+.
+PRGNAM    INIT      "CONVERSION OPRQUEFD"
+PRGID     INIT      "X04OPQUE"
+VERSION   INIT      "V12.00.00"
++
+.*****************************************************************************
+.*                             MAIN0000                                      *
+.*                         Program Mainline                                  *
+.*****************************************************************************
+.
+MAIN0000  CALL      INIT0000                      * init and open files
+.
+          CALL      OLOG0000                      * create/open log file
+MAIN0500  CALL      OPTN0000                      * get option
+          BRANCH    COPTION,MAIN1000:             * run c-isam fixit
+                            MAIN2000              * run oracle fixit
+          GOTO      MAIN9999                      * exit selected
+.
+MAIN1000  CALL      KDIR0000                      * Keyin directory
+          BRANCH    EXIT,MAIN9000
+.
+MAIN2000  CALL      CONTQST                       * Ok to continue ?
+          BRANCH    CEXIT,MAIN5000:               * yes
+                          MAIN0500:               * no
+                          MAIN9000                * cancel
+.
+MAIN5000  BRANCH    COPTION,MAIN6000:             * c-isam fixit
+                            MAIN7000              * oracle fixit
+.
+.         Running c-isam fix
+.
+MAIN6000  CALL      PREP0000                      * preparing files
+          BRANCH    EXIT,MAIN9000
+.
+          CALL      READ0000                      * read old records and write
+          CALL      ENDP0000                      * save/zip saved file
+          GOTO      MAIN9000
+.
+.         Running oracle fix
+.
+MAIN7000  CALL      OFIX0000                      * run oracle fix
+.
+MAIN9000  CALL      CLOG0000                      * close log file
+.
+MAIN9999  CHAIN     PGM
++
+.********************************************************************
+.*                          INIT0000                                *
+.*  Display heading and check that the files needed exist&open them *
+.********************************************************************
+.
+INIT0000  CALL      DISPHEAD
+          MOVE      ZERO,RECNUM
+          MOVE      ZERO,DISNUM
+          
+INIT9999  RETURN
++
+.*****************************************************************************
+.*                                OPTN0000             Called by: MAIN0000   *
+.*                        Get user options or exit                           *
+.*    Returns:  EXIT    = FALSE (0)  Ok to proceed                           *
+.*                        TRUE  (1)  Exit option selected                    *
+.*              COPTION - option selected                                    *
+.*****************************************************************************
+.
+OPTN0000  MOVE      "No",USINGORC
+          REP       "yYnN",USINGORC
+          MOVE      USINGORC,KEY1
+          REP       "Y-N-",KEY1
+          MATCH     "-",KEY1
+          GOTO      OPTN9200 IF NOT EQUAL
+.
+          DISPLAY   *P1:3,*EF,*P1:4,*V2LON,ZERO,*HOFF,". Exit":
+                    *P1:5,*V2LON,ONE,*HOFF,". Run Fixit (c-isam only)"
+          MATCH     "Y",USINGORC
+          IF        @EQUAL
+            DISPLAY   *P1:6,*V2LON,TWO,*HOFF,". Run Fixit (Oracle only)"
+          ENDIF
+.
+OPTN0500  KEYIN     *P1:8,*EL,"Select Option : ":
+                    *P17:8,*V2LON,COPTION
+.
+          COMPARE   ZERO,COPTION                 * exit selected ?
+          GOTO      OPTN9500 IF EQUAL            * yes
+.
+          BRANCH    COPTION,OPTN9000:            * run c-isam fixit
+                            OPTN9000             * run oracle fixit
+.
+          BEEP
+          GOTO      OPTN0500
+.
+OPTN9000  MOVE      ZERO,EXIT
+          GOTO      OPTN9999
+.
+OPTN9200  DISPLAY   *P1:3,*EF,*P1:4," Oracle Option has not been set up ":
+                          "correctly":
+                    *P1:6," Program will terminate    - ";
+          MOVE      "Oracle Option has not been set up correctly",ERORTEXT
+          WRITE     LOGFILE,SEQ;*+,ERORTEXT
+          CALL      HITENTER
+.
+OPTN9500  MOVE      ONE,EXIT
+.
+OPTN9999  RETURN
++
+.********************************************************************
+.*                          KDIR0000                                *
+.*  Keyin directories                                               *
+.********************************************************************
+.
+KDIR0000  MOVE      ONE,SAVEFLG        * Default to keep file
+          KEYIN     *P1:10,*EL,"Do you want to save the original file (Y/N) ? ":
+                    ANS;
+          REP       "yYnN",ANS
+          CMATCH    "Y",ANS
+          GOTO      KDIR1000 IF EQUAL
+          MOVE      ZERO,SAVEFLG       * not to keep file
+          CMATCH    "N",ANS
+          GOTO      KDIR1000 IF EQUAL
+          BEEP
+          GOTO      KDIR0000
+.
+KDIR1000  CALL      DEFT0000                * Get the default path
+          BRANCH    EXIT,KDIR9999
+          MOVE      SP60,OLDPATH
+.
+          DISPLAY   *P1:24,*EL,"The directory path must end with a slash (/) ";
+.
+          MOVE      DEFPATH,OLDPATH
+          BRANCH    SAVEFLG,KDIR2000
+.
+.         Keyin the path for the original file
+.
+          KEYIN     *P1:12,*EL,"Keyin path for temporarily saving original ":
+                    "file: ":
+                    *P10:13,*EL,*DV,*RV,OLDPATH:
+                    *P10:13,OLDPATH;
+          GOTO      KDIR3000
+.
+KDIR2000  KEYIN     *P1:12,*EL,"Keyin path for saving original file: ":
+                    *P10:13,*EL,*DV,*RV,OLDPATH:
+                    *P10:13,OLDPATH;
+.
+KDIR3000  ENDSET    OLDPATH
+          APPEND    SP60,OLDPATH
+          RESET     OLDPATH
+.
+          MATCH     SP60,OLDPATH
+          IF        @EQUAL
+            PACK      OLDPATH,DEFPATH      * use the default
+            DISPLAY   *P10:13,*EL,*V2LON,OLDPATH;
+          ENDIF
+.
+          SQUEEZE   OLDPATH
+          CMATCH    EXITCHAR,OLDPATH
+          GOTO      KDIR9000 IF EQUAL
+.
+          PACK      DIM60,OLDPATH,SP60
+          CALL      VALD0000         * check if it's a valid directory
+          BRANCH    EXIT,KDIR1000
+.
+.         Keyin the path for the new file
+.
+KDIR5000  MOVE      SP60,NEWPATH
+          MOVE      DEFPATH,NEWPATH
+          KEYIN     *P1:15,*EL,"Keyin path for the new file: ":
+                    *P10:16,*EL,*DV,*RV,NEWPATH:
+                    *P10:16,NEWPATH;
+          ENDSET    NEWPATH
+          APPEND    SP60,NEWPATH
+          RESET     NEWPATH
+.
+          MATCH     SP60,NEWPATH
+          IF        @EQUAL
+            PACK      NEWPATH,DEFPATH      * use the default
+            DISPLAY   *P10:16,*V2LON,NEWPATH;
+          ENDIF
+.
+          SQUEEZE   NEWPATH
+          CMATCH    EXITCHAR,NEWPATH
+          GOTO      KDIR9000 IF EQUAL
+.
+          PACK      DIM60,NEWPATH,SP60
+          CALL      VALD0000         * check if it's a valid directory
+          BRANCH    EXIT,KDIR5000
+          GOTO      KDIR9999
+.
+KDIR9000  MOVE      ONE,EXIT
+.
+KDIR9999  DISPLAY   *P1:24,*EL;
+          RETURN
++
+.********************************************************************
+.*                          PREP0000                                *
+.*  Preparing files                                                 *
+.********************************************************************
+.
+PREP0000  CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P1:18,"Started : ",CDATE,SP1,CTIMEIS:
+                    *P1:20,"Record : "
+.
+          CALL      SLOG0000                      * write start to log file
+.
+          MOVE      "oprqueaf",INPFILE
+          CALL      CHEK0000             * check file exists or has been changed
+          BRANCH    EXIT,PREP9000
+.
+          CLOSE     OLDFILE1
+          DISPLAY   *P1:24,*EL,"Copying files ... Please wait !! ";
+.
+.         Copy old file to the keyin directory
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "cp `ldat oprqueaf.dat` ",CMDLINE
+          APPEND    OLDPATH,CMDLINE
+          APPEND    "soprquef.dat",CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            GOTO      PREP8000
+          ENDIF
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "cp `ldat oprqueaf.idx` ",CMDLINE
+          APPEND    OLDPATH,CMDLINE
+          APPEND    "soprquef.idx",CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            GOTO      PREP8000
+          ENDIF
+.
+.         Remove the original files
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "iserase ",CMDLINE
+          APPEND    DEFPATH,CMDLINE
+          APPEND    "oprqueaf",CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            MOVE      "Unable to remove the original file.  ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      PREP9000
+          ENDIF
+.
+.         Opening old file after being copied
+.
+          MOVE      SP60,DIM60
+          CLEAR     DIM60
+          APPEND    OLDPATH,DIM60
+          APPEND    "soprquef",DIM60
+          APPEND    SP60,DIM60
+          RESET     DIM60
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      OLDFILE1,DIM60
+          TRAPCLR   IO
+          IF        OVRCD = 1
+            MOVE      "Unable to open saved original file.  ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      PREP9000
+          ENDIF
+.
+.         Create the new file
+.
+          DISPLAY   *P1:24,*EL,"Creating new files ... Please wait !! ";
+          PACK      NEWFILE,SP60
+          CLEAR     NEWFILE
+          APPEND    NEWPATH,NEWFILE
+          APPEND    "oprqueaf",NEWFILE
+          APPEND    SP60,NEWFILE
+          RESET     NEWFILE
+          SQUEEZE   NEWFILE
+.
+PREP1000  PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "isbuild ",CMDLINE
+          APPEND    NEWFILE,CMDLINE
+.
+.  The files new record length and unique key must be written here
+.      eg    APPEND    " 195 UC9-16",CMDLINE
+.
+. Index 1
+          APPEND    " 969 UC1-20",CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+.  If the file has more than one index, this piece of code below has 
+.  to be repeated with for each individual index
+.
+          OPEN      OPRQUEA1,NEWFILE
+.
+          DISPLAY   *P1:24,*EL;
+          MOVE      ZERO,EXIT
+          GOTO      PREP9999
+.
+PREP5000  MOVE      "Old file not found.  ",ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+          CALL      HITENTER
+          GOTO      PREP9000
+.
+PREP8000  MOVE      "Unable to copy original file.  (Error: ",ERORTEXT
+          ENDSET    ERORTEXT
+          APPEND    TASKID,ERORTEXT
+          APPEND    ")  ",ERORTEXT
+          RESET     ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+          CALL      HITENTER
+.
+PREP9000  MOVE      ONE,EXIT
+.
+PREP9999  RETURN
++
+.********************************************************************
+.*                          CHEK0000                                *
+.*  Check if file exists, or has already been converted             *
+.********************************************************************
+.
+CHEK0000  MOVE      ZERO,EXIT
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND GIVING DIM60 IF IO
+          OPEN      OLDFILE1,INPFILE
+          TRAPCLR   IO
+          BRANCH    OVRCD,CHEK2000       * Original file does not exist
+          CLOSE     OLDFILE1
+          GOTO      CHEK9999
+.
+CHEK2000  RESET     DIM60
+          SCAN      "I * I",DIM60
+          DISPLAY   *P1:23,*EF,"File '",INPFILE,"' ";
+          IF        @EQUAL
+            DISPLAY   "does not exist - ";
+            MOVE      "File does not exist",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+          ELSE
+            RESET     DIM60
+            SCAN      "I * L",DIM60
+            IF        @EQUAL
+              DISPLAY   "has already been converted - ";
+              MOVE      "File has already been converted",ERORTEXT
+              WRITE     LOGFILE,SEQ;ERORTEXT
+            ELSE
+              DISPLAY   "has caused an IO error - ";
+              MOVE      "File has caused an IO Error",ERORTEXT
+              WRITE     LOGFILE,SEQ;ERORTEXT
+            ENDIF
+          ENDIF
+          MOVE      "File will be bypassed",ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *+,ERORTEXT
+.
+          CALL      HITENTER
+          DISPLAY   *P1:23,*EF;
+.
+CHEK9000  MOVE      ONE,EXIT
+.
+CHEK9999  RETURN
++
+.**********************************************************************
+.*                               READ0000                             *
+.*             loop thru old file and write each record               *
+.**********************************************************************
+.
+READ0000  DISPLAY   *P1:20,*EL,"Record No. : ";
+.
+          PACK      KEY20,SP60
+          CALL      READSOLD                      * position at start
+READ1000  CALL      READKOLD                      * read next record
+          BRANCH    OVRCD,READ6000                * no more records
+.
+          ADD       ONE,RECNUM                    * update record counter
+          ADD       ONE,DISNUM                    * Display counter
+.
+          IF        DISNUM = 5000  | RECNUM = 1
+            MOVE      ZERO,DISNUM
+            DISPLAY   *P15:20,*V2LON,RECNUM
+          ENDIF
+.
+.  All necessary changes to the files field lengths, date changes
+.  or any other sort of modification must be made here
+.
+.    eg    PACK      DSPARE,SP70
+.          PACK      PTDSDMDC,SP10
+.          PACK      PTDSDDRG,SP10
+.
+          MOVE      OLDASPAR,OPDAHOSP
+          MOVE      SP70,OPDASPAR
+.                                               * Pack key here
+          PACK      KEY20,DOPQUMES,SP70
+          CALL      WROPQUE1                    * write to new file
+.
+          GOTO      READ1000                      * get next record
+.
+READ6000  CLOSE     OPRQUEA1                      * close new file
+          CLOSE     OLDFILE1                      * close old file
+.
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P15:20,*V2LON,RECNUM,*HOFF:
+                    *P1:22,"Ended  : ",CDATE,SP1,CTIMEIS:
+                    *P1:24;
+.
+READ9999  RETURN
++
+.**********************************************************************
+.*                               VALD0000                             *
+.*        Check if it a valid directory                               *
+.**********************************************************************
+.
+VALD0000  MOVE      ZERO,EXIT
+.
+          SQUEEZE   DIM60
+          ENDSET    DIM60
+          CMATCH    SLASH,DIM60
+          IF        !@EQUAL
+            MOVE      "Directory path must end with a slash (/) ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      VALD9000
+          ENDIF
+          RESET     DIM60
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "cd ",CMDLINE
+          APPEND    DIM60,CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID      * check if exists
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            MOVE      "Directory does not exist ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      VALD9000
+          ENDIF
+          GOTO      VALD9999
+.
+VALD9000  MOVE      ONE,EXIT            * Not valid
+.
+VALD9999  RETURN
++
+.**********************************************************************
+.*                               ENDP0000                             *
+.*        Remove or zip save file                                     *
+.**********************************************************************
+.
+ENDP0000  MOVE      SP60,DIM60
+          CLEAR     DIM60
+          APPEND    OLDPATH,DIM60        * set up the saved file with path
+          APPEND    "soprquef*",DIM60
+          APPEND    SP60,DIM60
+          RESET     DIM60
+          SQUEEZE   DIM60
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          IF        SAVEFLG = 1
+            APPEND    "gzip -f ",CMDLINE
+            APPEND    DIM60,CMDLINE
+            APPEND    SP60,CMDLINE
+            RESET     CMDLINE
+            DISPLAY   *P1:24,*EL,"Compressing original file.. ":
+                      "Please wait !!  ";
+          ELSE
+            APPEND    "rm ",CMDLINE
+            APPEND    DIM60,CMDLINE
+            APPEND    SP60,CMDLINE
+            RESET     CMDLINE
+            DISPLAY   *P1:24,*EL,"Removing original file.. Please wait !!  ";
+          ENDIF
+          EXECUTE   CMDLINE,TASKID      * check if exists
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            MOVE      "Saved file not zipped or removed.  ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      ENDP9999
+          ENDIF
+.
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P1:24,*EL,*B,"Finished processing  ",CDATE,SP1,CTIMEIS:
+                    ".  ";
+          CALL      HITENTER
+.
+          CALL      ELOG0000                     * write an end log entry
+.
+ENDP9999  RETURN
++
+.**********************************************************************
+.*        DEFT0000 -  Get the default directory                       *
+.**********************************************************************
+.
+DEFT0000  EXECUTE   "ldat oprqueaf.dat > temp.txt",TASKID
+.
+          PACK      DEFPATH,SP30,SP30
+          CLOSE     FINDFILE
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      FINDFILE,"temp"
+          TRAPCLR   IO
+          BRANCH    OVRCD,DEFT3000
+.
+          READ      FINDFILE,SEQ;DEFPATH
+          GOTO      DEFT3000 IF OVER
+.
+          ENDSET    DEFPATH
+DEFT1000  CMATCH    "/",DEFPATH
+          GOTO      DEFT2000 IF EQUAL
+.
+          BUMP      DEFPATH,-1
+          GOTO      DEFT1000 IF NOT EOS
+          GOTO      DEFT3000
+.
+DEFT2000  LENSET    DEFPATH
+          RESET     DEFPATH
+.
+          PACK      DEFPATH,DEFPATH,SP30,SP30,SP30,SP30
+          STRIP     DEFPATH
+          ENDSET    DEFPATH
+          RESET     DEFPATH
+          CLOSE     FINDFILE
+          MOVE      ZERO,EXIT
+          GOTO      DEFT9999
+.
+DEFT3000  MOVE      "Error finding 'oprqueaf'.  ",ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+          CALL      HITENTER
+          CLOSE     FINDFILE
+          MOVE      ONE,EXIT
+.
+DEFT9999  RETURN
++
+.*****************************************************************************
+.*                            OLOG0000                                       *
+.*                    Open the log file                                      *
+.*****************************************************************************
+.
+OLOG0000  CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      LOGFILE,"x04opque.log"       * open log file
+          TRAPCLR   IO
+          IF        OVRCD = 1
+            PREP      LOGFILE,"x04opque.log"     * create and open log file
+            WRITE     LOGFILE,MINUS3;DASHLINE
+            WRITE     LOGFILE,SEQ;CREATEXT,CDATE,SP1,CTIMEIS
+          ELSE
+            WRITE     LOGFILE,MINUS3;DASHLINE
+            WRITE     LOGFILE,SEQ;OPENTEXT,CDATE,SP1,CTIMEIS
+          ENDIF
+.
+OLOG9999  RETURN
++
+.*****************************************************************************
+.*                            CLOG0000                                       *
+.*                    Close the log file                                     *
+.*****************************************************************************
+.
+CLOG0000  CLOSE     LOGFILE
+.
+CLOG9999  RETURN
++
+.*****************************************************************************
+.*                            SLOG0000                                       *
+.*                    Write a start log to the log file                      *
+.*****************************************************************************
+.
+SLOG0000  WRITE     LOGFILE,SEQ;DASHLINE
+          WRITE     LOGFILE,SEQ;STARTTXT,COPTION,RBRACK,SP1,CDATE,SP1:
+                                   CTIMEIS
+.
+SLOG9999  RETURN
++
+.*****************************************************************************
+.*                            ELOG0000                                       *
+.*                    Write an end log to the log file                       *
+.*****************************************************************************
+.
+ELOG0000  WRITE     LOGFILE,SEQ;ENDGTEXT,COPTION,RBRACK,SP1,CDATE,SP1:
+                                   CTIMEIS
+ELOG9999  RETURN
++
+.*****************************************************************************
+.*                            OFIX0000                                       *
+.*                    Oracle fix to "OPRQUEFD"                               *
+.*****************************************************************************
+.
+OFIX0000  DISPLAY   *P1:24,*EL;
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P1:18,"Started : ",CDATE,SP1,CTIMEIS:
+                    *P1:20,*EL,"Record No. :";
+.
+          CALL      SLOG0000                      * write start to log file
+.
+          OPEN      OPRQUEA1,"oprqueaf"
+.
+          PACK      KEY20,SP70
+          CALL      RSOPQUE1                      * position at start of file
+OFIX0500  CALL      RKOPQUE1                      * read next record
+          BRANCH    OVRCD,OFIX9000                * eof - finished
+.
+          ADD       ONE,RECNUM                    * increment record counter
+          ADD       ONE,DISNUM                    * Display counter
+.         
+          IF        DISNUM = 5000  | RECNUM = 1
+            MOVE      ZERO,DISNUM 
+            DISPLAY   *P15:20,*V2LON,RECNUM
+          ENDIF
+.
+.>>>>>>>  Add code here to populate/update variables
+.
+          CALL      UPOPQUE1
+.
+          GOTO      OFIX0500                     * get next record
+.         
+OFIX9000  CLOSE     OPRQUEA1
+.
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P15:20,*V2LON,RECNUM,*HOFF:
+                    *P1:22,"Update completed ",CDATE,SP1,CTIMEIS:
+                    *P1:24;
+          CALL      HITENTER
+.
+          CALL      ELOG0000                     * write an end log entry
+.
+OFIX9999  RETURN
+.
+OFDUMYIO  RETURN
++
+.*****************************************************************************
+.*        I/O Routines                                                       *
+.*****************************************************************************
+.
+.                  ******************************    OLD IO ROUTINES
+.                  Copy the Positional Read (RS or RDS) from original I/O file,
+.                  - change Label to READSOLD and the index name to OLDFILE1
+.
+READSOLD  MOVE      ZERO,OVRCD
+          READ      OLDFILE1,KEY20;;
+          RETURN
+.
+.                  Copy the Read Next (RK or RDK) from the original I/O file
+.                  - change Label to READKOLD and the index name to OLDFILE1
+.                  - change any fields that are changing to a prefix of OLD,
+.                    eg. PTEDSPAR becomes OLDDSPAR
+.
+READKOLD  MOVE      ZERO,OVRCD
+          READKS    OLDFILE1;DOPQUMES,OPDADATE,OPDATIME,OPDACLIN:
+                             OPDASTAT,OPDACASE,OPDAADMN,OPDAUNIQ:
+                             OPDAEXPS,OPDAEXPD,OPDAANAE,OPDATYPE:
+                             OPDATRAN,OPDAUSR1,OPDAUSR2,OPDAUSR3:
+                             OPDAUSR4,OPDAWAIT,OPDAPROV,OPDAPRV2:
+                             OPDAPRV3,OPDADES1,OPDADES2,OPDADES3:
+                             OPDACOMM,OPDACANC,OPDATHET,OPDAPRE1:
+                             OPDAPRE2,OPDAPRE3,OPDAPRE4,OPDAPRE5:
+                             OPDAPOS1,OPDAPOS2,OPDAPOS3,OPDAPOS4:
+                             OPDATDUR,OPDAKNOW,OPDACDAT,OPDAEQR1:
+                             OPDAEQR2,OPDALEQR,OPDAEQR3,OPDAUNIT:
+                             OPDAURNO,OPDAPROC,OPDACONT,OPDAASRC:
+                             OPDACSST,OPDACSDT,OPDACRDT,OPDACTIM:
+                             OPDAWEBC,OPDAUDAT,OPDAUTIM,OPDAWEBU:
+                             OPDAPCOM,OPDAVUN1,OPDAVUN2,OPDAPHMN:
+                             OPDAREQN,OPDADES4,OPDADES5,OPDADES6:
+                             OPDAFAST,OPDAAPRC,OPDAACPD,OPDARICM:
+                             OPDAMHRC,OPDAPOWD,OPDAPOBD,OPDACTYP:
+                             OPDAATYP,OPDADTFF,OPDADTFL,OPDAPRV4:
+                             OPDAPRV5,OPDAPRV6,OLDASPAR
+.
+          GOTO      OVERCOND IF OVER
+          RETURN
+.
+.                  ******************************    NEW IO ROUTINES
+.                  Copy the Write statement from the new I/O file           
+.                  (no changes are needed to this routine)               
+.
+.                  For Oracle fixits, you will probably also need to copy
+.                  the RS.., RK.... & UP.... I/O routines for the new FD.
+.
+RSOPQUE1  RESET     KEY20
+          READ      OPRQUEA1,KEY20;;
+          RETURN
+.
+RKOPQUE1  MOVE      ZERO,OVRCD
+          READKS    OPRQUEA1;DOPQUMES,OPDADATE,OPDATIME,OPDACLIN:
+                             OPDASTAT,OPDACASE,OPDAADMN,OPDAUNIQ:
+                             OPDAEXPS,OPDAEXPD,OPDAANAE,OPDATYPE:
+                             OPDATRAN,OPDAUSR1,OPDAUSR2,OPDAUSR3:
+                             OPDAUSR4,OPDAWAIT,OPDAPROV,OPDAPRV2:
+                             OPDAPRV3,OPDADES1,OPDADES2,OPDADES3:
+                             OPDACOMM,OPDACANC,OPDATHET,OPDAPRE1:
+                             OPDAPRE2,OPDAPRE3,OPDAPRE4,OPDAPRE5:
+                             OPDAPOS1,OPDAPOS2,OPDAPOS3,OPDAPOS4:
+                             OPDATDUR,OPDAKNOW,OPDACDAT,OPDAEQR1:
+                             OPDAEQR2,OPDALEQR,OPDAEQR3,OPDAUNIT:
+                             OPDAURNO,OPDAPROC,OPDACONT,OPDAASRC:
+                             OPDACSST,OPDACSDT,OPDACRDT,OPDACTIM:
+                             OPDAWEBC,OPDAUDAT,OPDAUTIM,OPDAWEBU:
+                             OPDAPCOM,OPDAVUN1,OPDAVUN2,OPDAPHMN:
+                             OPDAREQN,OPDADES4,OPDADES5,OPDADES6:
+                             OPDAFAST,OPDAAPRC,OPDAACPD,OPDARICM:
+                             OPDAMHRC,OPDAPOWD,OPDAPOBD,OPDACTYP:
+                             OPDAATYP,OPDADTFF,OPDADTFL,OPDAPRV4:
+                             OPDAPRV5,OPDAPRV6,OPDAHOSP,OPDASPAR
+          GOTO      OVERCOND IF OVER
+          RETURN
+.
+UPOPQUE1  MOVE      ZERO,OVRCD
+          UPDATE    OPRQUEA1;DOPQUMES,OPDADATE,OPDATIME,OPDACLIN:
+                             OPDASTAT,OPDACASE,OPDAADMN,OPDAUNIQ:
+                             OPDAEXPS,OPDAEXPD,OPDAANAE,OPDATYPE:
+                             OPDATRAN,OPDAUSR1,OPDAUSR2,OPDAUSR3:
+                             OPDAUSR4,OPDAWAIT,OPDAPROV,OPDAPRV2:
+                             OPDAPRV3,OPDADES1,OPDADES2,OPDADES3:
+                             OPDACOMM,OPDACANC,OPDATHET,OPDAPRE1:
+                             OPDAPRE2,OPDAPRE3,OPDAPRE4,OPDAPRE5:
+                             OPDAPOS1,OPDAPOS2,OPDAPOS3,OPDAPOS4:
+                             OPDATDUR,OPDAKNOW,OPDACDAT,OPDAEQR1:
+                             OPDAEQR2,OPDALEQR,OPDAEQR3,OPDAUNIT:
+                             OPDAURNO,OPDAPROC,OPDACONT,OPDAASRC:
+                             OPDACSST,OPDACSDT,OPDACRDT,OPDACTIM:
+                             OPDAWEBC,OPDAUDAT,OPDAUTIM,OPDAWEBU:
+                             OPDAPCOM,OPDAVUN1,OPDAVUN2,OPDAPHMN:
+                             OPDAREQN,OPDADES4,OPDADES5,OPDADES6:
+                             OPDAFAST,OPDAAPRC,OPDAACPD,OPDARICM:
+                             OPDAMHRC,OPDAPOWD,OPDAPOBD,OPDACTYP:
+                             OPDAATYP,OPDADTFF,OPDADTFL,OPDAPRV4:
+                             OPDAPRV5,OPDAPRV6,OPDAHOSP,OPDASPAR
+          RETURN
+.
+WROPQUE1  RESET     KEY20
+          WRITE     OPRQUEA1,KEY20;DOPQUMES,OPDADATE,OPDATIME,OPDACLIN:
+                                   OPDASTAT,OPDACASE,OPDAADMN,OPDAUNIQ:
+                                   OPDAEXPS,OPDAEXPD,OPDAANAE,OPDATYPE:
+                                   OPDATRAN,OPDAUSR1,OPDAUSR2,OPDAUSR3:
+                                   OPDAUSR4,OPDAWAIT,OPDAPROV,OPDAPRV2:
+                                   OPDAPRV3,OPDADES1,OPDADES2,OPDADES3:
+                                   OPDACOMM,OPDACANC,OPDATHET,OPDAPRE1:
+                                   OPDAPRE2,OPDAPRE3,OPDAPRE4,OPDAPRE5:
+                                   OPDAPOS1,OPDAPOS2,OPDAPOS3,OPDAPOS4:
+                                   OPDATDUR,OPDAKNOW,OPDACDAT,OPDAEQR1:
+                                   OPDAEQR2,OPDALEQR,OPDAEQR3,OPDAUNIT:
+                                   OPDAURNO,OPDAPROC,OPDACONT,OPDAASRC:
+                                   OPDACSST,OPDACSDT,OPDACRDT,OPDACTIM:
+                                   OPDAWEBC,OPDAUDAT,OPDAUTIM,OPDAWEBU:
+                                   OPDAPCOM,OPDAVUN1,OPDAVUN2,OPDAPHMN:
+                                   OPDAREQN,OPDADES4,OPDADES5,OPDADES6:
+                                   OPDAFAST,OPDAAPRC,OPDAACPD,OPDARICM:
+                                   OPDAMHRC,OPDAPOWD,OPDAPOBD,OPDACTYP:
+                                   OPDAATYP,OPDADTFF,OPDADTFL,OPDAPRV4:
+                                   OPDAPRV5,OPDAPRV6,OPDAHOSP,OPDASPAR
+          RETURN
+.
+          INC       STD001IO

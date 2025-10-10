@@ -1,0 +1,20 @@
+.---------------------------------------------------------------------------
+. Include Name : CLOPRDPF.PBL
+. Function     : Clear function for OPRDPFFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.04.01  15/02/2024  Thanh T          TSK 0923560
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLOPRDPF  MOVE      SP70,OPDFCODE      . Doctor Code     
+          MOVE      SP70,OPDFPREF      . Preference Code     
+          MOVE      SP70,OPDFCLSS      . Class Type (Cat OG)   
+          MOVE      SP70,OPDFTYPE      . Item Type     
+          MOVE      SP70,OPDFITEM      . Item Code     
+          MOVE      ZERO,OPDFQTY       . Quantity      
+          MOVE      SP70,OPDFHOSP      . Hospital ID (pathspaf)    
+          MOVE      SP70,OPDFSPAR      . Spare Variable     
+.
+          RETURN

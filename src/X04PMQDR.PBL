@@ -1,0 +1,1196 @@
+.*****************************************************************************
+. Program      : X04PMQDR
+. Description  : Conversion pmsqdraf to new File layout
+.*****************************************************************************
+. Modifications:
+.*****************************************************************************
+. V11.04.00  27/03/2024  Thanh T       TSK 0935314
+.            Initial Version
+.*****************************************************************************
+.
+.  using vi Global change command      :%s/FromString/ToString/g
+.
+.  Global change X04PMQDR  eg F57PTDOC
+.  Global change x04pmqdr  eg f57ptdoc
+.  Global change PMSQDRFD  eg PATDOCFD (new layout)
+.  Global change pmsqdraf  eg patdoctf
+.  Global change PMSQDRA1  eg PATDOCT1
+.  Global change KEY20     eg KEY20
+.  Global change KEY20     eg KEY9
+.  Global change WRPMQDR1  eg WRDOCT1
+.  Global change spmspdrf  eg sptdoctf
+.
+.  Global Change answeryn  to Yes
+.  Global change RSPMQDR1  eg RSPTDOC1
+.  Global change RKPMQDR1  eg RKPTDOC1
+.  Global change UPPMQDR1  eg UPPTDOC1
+.
+.  Global changes if Oracle Option is NOT required -
+
+.  Global Change answeryn  to No
+.  Global change RSPMQDR1  to OFDUMYIO
+.  Global change RKPMQDR1  to OFDUMYIO
+.  Global change UPPMQDR1  to OFDUMYIO
+.
+          INC       STD001FD
+.
+FINDFILE  FILE      ASCII, FIXED=256
+LOGFILE   FILE      ASCII, FIXED=256
+.
+. Enter the first or the shortest index from the original FD and rename
+. the index OLDFILE1
+.
+.                                     ******** copy the old FD here *******
+.                                     * comment out all continuing fields and
+.                                     * prefix changing fields with "OLD" -
+.                                     * remove old Indexes and Redefines     
+.
+..OLDFILE1  IFILE     SQL, FIXED=xxx, KEY="Uxx-xx"
+OLDFILE1    IFILE SQL, FIXED=1771, KEY="U1-20"
+.
+.Name      Type   Length  Physical Start Description
+.----      ----   ------  -------- ----- -----------
+.DPMQRMES   DIM       20     20       1     Message Id
+.
+.                   PMSHCPFD Variables
+.
+.PMHCHCPC  DIM       10     10       21    HCP Code
+.PMHCHCPT  DIM       2      2        31    Type of HCP D=Dentist G=GP
+.PMHCTITL  DIM       10     10       33    HCP Title
+.PMHCGNAM  DIM       35     35       43    HCP Given Names
+.PMHCSNAM  DIM       35     35       78    HCP Surname
+.PMHCINIT  DIM       5      5        113   HCP Initials
+.PMHCGNDR  DIM       1      1        118   HCP Gender (M,F,I,U)
+.PMHCDTOB  DIM       8      8        119   HCP Date of Birth (ccyymmdd)
+.PMHCSPC1  DIM       3      3        127   HCP Speciality 1 (Cat DT)
+.PMHCSPD1  DIM       8      8        130   HCP Speciality Date 1 (ccyymmdd)
+.PMHCSPC2  DIM       3      3        138   HCP Speciality 2 (Cat DT)
+.PMHCSPD2  DIM       8      8        141   HCP Speciality Date 2 (ccyymmdd)
+.PMHCSPC3  DIM       3      3        149   HCP Speciality 3 (Cat DT)
+.PMHCSPD3  DIM       8      8        152   HCP Speciality Date 3 (ccyymmdd)
+.PMHCSPC4  DIM       3      3        160   HCP Speciality 4 (Cat DT)
+.PMHCSPD4  DIM       8      8        163   HCP Speciality Date 4 (ccyymmdd)
+.PMHCSPC5  DIM       3      3        171   HCP Speciality 5 (Cat DT)
+.PMHCSPD5  DIM       8      8        174   HCP Speciality Date 5 (ccyymmdd)
+.PMHCRCPT  DIM       25     25       182   HCP Receptionist's Name
+.PMHCADR1  DIM       60     60       207   HCP Surgery Address Line 1
+.PMHCADR2  DIM       60     60       267   HCP Surgery Address Line 2
+.PMHCADR3  DIM       60     60       327   HCP Surgery Address Line 3
+.PMHCADR4  DIM       60     60       387   HCP Surgery Address Line 4
+.PMHCADR5  DIM       60     60       447   HCP Surgery Address Line 5
+.PMHCADR6  DIM       60     60       507   HCP Surgery Address Line 6
+.PMHCPOST  DIM       8      8        567   HCP Surgery PostCode
+.PMHCSTAT  DIM       4      4        575   HCP State
+.PMHCSEML  DIM       80     80       579   HCP Surgery Email Address
+.PMHCSTEL  DIM       20     20       659   Surgery Telephone
+.PMHCPAGR  DIM       20     20       679   HCP Pager Telephone
+.PMHCPAGN  DIM       20     20       699   HCP Pager Number
+.PMHCAHP1  DIM       25     25       719   Associated HCP 1
+.PMHCAHP2  DIM       25     25       744   Associated HCP 2
+.PMHCAHP3  DIM       25     25       769   Associated HCP 3
+.PMHCAHP4  DIM       25     25       794   Associated HCP 4
+.PMHCAHP5  DIM       25     25       819   Associated HCP 5
+.PMHCPRV1  DIM       10     10       844   Provider Number 1 - Reg. No. NZ
+.PMHCPRV2  DIM       10     10       854   Provider Number 2 - Prev Reg. No NZ
+.PMHCPRV3  DIM       10     10       864   Provider Number 3
+.PMHCPRV4  DIM       10     10       874   Provider Number 4
+.PMHCPRV5  DIM       10     10       884   Provider Number 5
+.PMHCHTEL  DIM       20     20       894   HCP Home Telephone
+.PMHCHAD1  DIM       60     60       914   HCP Home Address Line 1
+.PMHCHAD2  DIM       60     60       974   HCP Home Address Line 2
+.PMHCHAD3  DIM       60     60       1034  HCP Home Address Line 3
+.PMHCHAD4  DIM       60     60       1094  HCP Home Address Line 4
+.PMHCHAD5  DIM       60     60       1154  HCP Home Address Line 5
+.PMHCHAD6  DIM       60     60       1214  HCP Home Address Line 6
+.PMHCHPCD  DIM       8      8        1274  HCP Home Post Code
+.PMHCHEML  DIM       80     80       1282  HCP Home Email Address
+.                                          NZ - Healthlink Mailbox
+.PMHCDFAC  DIM       8      8        1362  Date of First Accred. (ccyymmdd)
+.PMHCDLAC  DIM       8      8        1370  Date of Last Accred. (ccyymmdd)
+.PMHCYACC  FORM      2      2        1378  Years Of Accreditation
+.PMHCATYP  DIM       3      3        1380  Accreditation Type (Cat AT)
+.PMHCHHCP  FORM      3      3        1383  H.C.S. HCP Code
+.PMHCOSLV  DIM       3      3        1386  Operating Supervision Level (cat DL
+.PMHCHCST  FORM      2      2        1389  HCP Status
+.                                          0 - Attending Doctor
+.                                          1 - Referring Doctor
+.                                          2 - Attending & Referring Doctor
+.                                          3 - GP
+.                                          4 - Attending Doctor & GP
+.                                          5 - Referring Doctor & GP
+.                                          6 - Attending, Referring & GP
+.                                          7 - Other
+.                                          8 - Other Attending
+.                                          9 - Other Referring
+.                                         10 - Other Attending & Referring
+.PMHCHCSD  DIM       8      8        1391  HCP Status Date (ccyymmdd)
+.PMHCFAXN  DIM       20     20       1399  HCP's Fax Number
+.PMHCHFXN  DIM       20     20       1419  HCP's Home Fax Number
+.PMHCMOBN  DIM       20     20       1439  HCP's Mobile Phone Number
+.PMHCCRDC  DIM       5      5        1459  Creditor Code (apsmasaf)
+.PMHCWAHC  DIM       10     10       1464  WA HDP HCP Code
+.PMHCMRBN  DIM       10     10       1474  Medical Registration Board Number
+.PMHCNHSN  DIM       10     10       1484  N.H.S. Proscriber Number
+.PMHCUDF1  DIM       3      3        1494  User Defined Field 1 (Cat R5)
+.PMHCUDF2  DIM       3      3        1497  User Defined Field 2 (Cat R6)
+.PMHCUDF3  DIM       3      3        1500  User Defined Field 3 (Cat R7)
+.PMHCUDF4  DIM       3      3        1503  User DEfined Field 4 (Cat R8)
+.PMHCUDF5  DIM       3      3        1506  User Defined Field 5 (Cat R9)
+.PMHCUYN1  DIM       1      1        1509  User def. Y/N field 1 (0=NO,1=YES)
+.PMHCUYN2  DIM       1      1        1510  User def. Y/N field 2 (0=NO,1=YES)
+.PMHCUYN3  DIM       1      1        1511  User def. Y/N field 3 (0=NO,1=YES)
+.PMHCUYN4  DIM       1      1        1512  User def. Y/N field 4 (0=NO,1=YES)
+.PMHCUYN5  DIM       1      1        1513  User def. Y/N field 5 (0=NO,1=YES)
+.PMHCINSC  DIM       6      6        1514  Insurance Code (patin1af)
+.PMHCIPLN  DIM       20     20       1520  Insurance Policy Number
+.PMHCIDTF  DIM       8      8        1540  Insurance Date From (ccyymmdd)
+.PMHCIDTT  DIM       8      8        1548  Insurance Date To (ccyymmdd)
+.PMHCMPGN  DIM       20     20       1556  MPG Certificate Number
+.PMHCAPCI  DIM       1      1        1576  APC (0=NO,1=YES) - NZ
+.PMHCREGT  DIM       3      3        1577  Registration Type (Cat HR) - NZ
+.PMHCRGDF  DIM       8      8        1580  Reg. Date From - Gen Reg Date (NZ)
+.PMHCRGDT  DIM       8      8        1588  Reg. Date To - Gen Reg Date (NZ)
+.PMHCPRDF  DIM       8      8        1596  Probation. Reg. Date From ccyymmdd
+.PMHCPRDT  DIM       8      8        1604  Probation. Reg. Date To ccyymmdd
+.PMHCTSDF  DIM       8      8        1612  Temp. Start Date From (ccyymmdd)
+.PMHCTFDT  DIM       8      8        1620  Temp. Finish Date To (ccyymmdd)
+.PMHCVISD  DIM       8      8        1628  Visa Date (ccyymmdd)
+.PMHCPRFC  DIM       3      3        1636  HCP's Preferd Communication (Cat CZ
+.PMHCPRFN  DIM       30     30       1639  HCP's Preferred Name
+.PMHCABNN  DIM       11     11       1669  ABN Number
+.PMHCUPDF  DIM       1      1        1680  Update Flag M=manual, A=Automatic
+.PMHCPRMK  DIM       1      1        1681  Processed Record Marker 1=Processed
+.PMHCSTTS  DIM       1      1        1682  HCP rec status (0=Active/1=Inactive
+.PMHCDLMI  DIM       8      8        1683  Date Last Made Inactive (ccyymmdd)
+.PMHCDLMA  DIM       8      8        1691  Date Last Made Active (ccyymmdd)
+.PMHCCDTE  DIM       8      8        1699  Date Record Created (ccyymmdd)
+.PMHCCTIM  DIM       8      8        1707  Time Record Created (hh:mm:ss)
+.PMHCWEBC  DIM       10     10       1715  WEB User Id creator (websecaf)
+.PMHCLUPD  DIM       8      8        1725  Last Update Date (ccyymmdd)
+.PMHCLUPT  DIM       8      8        1733  Last Update Time (hh:mm:ss)
+.PMHCWEBU  DIM       10     10       1741  WEB User Id updated (websecaf)
+.PMHCSLGP  DIM       1      1        1751  Show Local GP on PMI (plocdoc)
+.                                          0=No 1=Yes
+OLDRSPAR   DIM       19     19       1752  Spare Variable
+.
+.End of Record                       1771
+.
+.                                     ******** copy the new FD here *******
+.
+PMSQDRA1   IFILE SQL, FIXED=1935, KEY="U1-20"
+.
+.Name      Type   Length  Physical Start Description
+.----      ----   ------  -------- ----- -----------
+DPMQRMES   DIM       20     20       1     Message Id
+.
+.                   PMSHCPFD Variables
+.
+PMHCHCPC  DIM       10     10       21    HCP Code
+PMHCHCPT  DIM       2      2        31    Type of HCP D=Dentist G=GP
+PMHCTITL  DIM       10     10       33    HCP Title
+PMHCGNAM  DIM       35     35       43    HCP Given Names
+PMHCSNAM  DIM       35     35       78    HCP Surname
+PMHCINIT  DIM       5      5        113   HCP Initials
+PMHCGNDR  DIM       1      1        118   HCP Gender (M,F,I,U)
+PMHCDTOB  DIM       8      8        119   HCP Date of Birth (ccyymmdd)
+PMHCSPC1  DIM       3      3        127   HCP Speciality 1 (Cat DT)
+PMHCSPD1  DIM       8      8        130   HCP Speciality Date 1 (ccyymmdd)
+PMHCSPC2  DIM       3      3        138   HCP Speciality 2 (Cat DT)
+PMHCSPD2  DIM       8      8        141   HCP Speciality Date 2 (ccyymmdd)
+PMHCSPC3  DIM       3      3        149   HCP Speciality 3 (Cat DT)
+PMHCSPD3  DIM       8      8        152   HCP Speciality Date 3 (ccyymmdd)
+PMHCSPC4  DIM       3      3        160   HCP Speciality 4 (Cat DT)
+PMHCSPD4  DIM       8      8        163   HCP Speciality Date 4 (ccyymmdd)
+PMHCSPC5  DIM       3      3        171   HCP Speciality 5 (Cat DT)
+PMHCSPD5  DIM       8      8        174   HCP Speciality Date 5 (ccyymmdd)
+PMHCRCPT  DIM       25     25       182   HCP Receptionist's Name
+PMHCADR1  DIM       60     60       207   HCP Surgery Address Line 1
+PMHCADR2  DIM       60     60       267   HCP Surgery Address Line 2
+PMHCADR3  DIM       60     60       327   HCP Surgery Address Line 3
+PMHCADR4  DIM       60     60       387   HCP Surgery Address Line 4
+PMHCADR5  DIM       60     60       447   HCP Surgery Address Line 5
+PMHCADR6  DIM       60     60       507   HCP Surgery Address Line 6
+PMHCPOST  DIM       8      8        567   HCP Surgery PostCode
+PMHCSTAT  DIM       4      4        575   HCP State
+PMHCSEML  DIM       80     80       579   HCP Surgery Email Address
+PMHCSTEL  DIM       20     20       659   Surgery Telephone
+PMHCPAGR  DIM       20     20       679   HCP Pager Telephone
+PMHCPAGN  DIM       20     20       699   HCP Pager Number
+PMHCAHP1  DIM       25     25       719   Associated HCP 1
+PMHCAHP2  DIM       25     25       744   Associated HCP 2
+PMHCAHP3  DIM       25     25       769   Associated HCP 3
+PMHCAHP4  DIM       25     25       794   Associated HCP 4
+PMHCAHP5  DIM       25     25       819   Associated HCP 5
+PMHCPRV1  DIM       10     10       844   Provider Number 1 - Reg. No. NZ
+PMHCPRV2  DIM       10     10       854   Provider Number 2 - Prev Reg. No NZ
+PMHCPRV3  DIM       10     10       864   Provider Number 3
+PMHCPRV4  DIM       10     10       874   Provider Number 4
+PMHCPRV5  DIM       10     10       884   Provider Number 5
+PMHCHTEL  DIM       20     20       894   HCP Home Telephone
+PMHCHAD1  DIM       60     60       914   HCP Home Address Line 1
+PMHCHAD2  DIM       60     60       974   HCP Home Address Line 2
+PMHCHAD3  DIM       60     60       1034  HCP Home Address Line 3
+PMHCHAD4  DIM       60     60       1094  HCP Home Address Line 4
+PMHCHAD5  DIM       60     60       1154  HCP Home Address Line 5
+PMHCHAD6  DIM       60     60       1214  HCP Home Address Line 6
+PMHCHPCD  DIM       8      8        1274  HCP Home Post Code
+PMHCHEML  DIM       80     80       1282  HCP Home Email Address
+.                                          NZ - Healthlink Mailbox
+PMHCDFAC  DIM       8      8        1362  Date of First Accred. (ccyymmdd)
+PMHCDLAC  DIM       8      8        1370  Date of Last Accred. (ccyymmdd)
+PMHCYACC  FORM      2      2        1378  Years Of Accreditation
+PMHCATYP  DIM       3      3        1380  Accreditation Type (Cat AT)
+PMHCHHCP  FORM      3      3        1383  H.C.S. HCP Code
+PMHCOSLV  DIM       3      3        1386  Operating Supervision Level (cat DL
+PMHCHCST  FORM      2      2        1389  HCP Status
+.                                          0 - Attending Doctor
+.                                          1 - Referring Doctor
+.                                          2 - Attending & Referring Doctor
+.                                          3 - GP
+.                                          4 - Attending Doctor & GP
+.                                          5 - Referring Doctor & GP
+.                                          6 - Attending, Referring & GP
+.                                          7 - Other
+.                                          8 - Other Attending
+.                                          9 - Other Referring
+.                                         10 - Other Attending & Referring
+PMHCHCSD  DIM       8      8        1391  HCP Status Date (ccyymmdd)
+PMHCFAXN  DIM       20     20       1399  HCP's Fax Number
+PMHCHFXN  DIM       20     20       1419  HCP's Home Fax Number
+PMHCMOBN  DIM       20     20       1439  HCP's Mobile Phone Number
+PMHCCRDC  DIM       5      5        1459  Creditor Code (apsmasaf)
+PMHCWAHC  DIM       10     10       1464  WA HDP HCP Code
+PMHCMRBN  DIM       10     10       1474  Medical Registration Board Number
+PMHCNHSN  DIM       10     10       1484  N.H.S. Proscriber Number
+PMHCUDF1  DIM       3      3        1494  User Defined Field 1 (Cat R5)
+PMHCUDF2  DIM       3      3        1497  User Defined Field 2 (Cat R6)
+PMHCUDF3  DIM       3      3        1500  User Defined Field 3 (Cat R7)
+PMHCUDF4  DIM       3      3        1503  User DEfined Field 4 (Cat R8)
+PMHCUDF5  DIM       3      3        1506  User Defined Field 5 (Cat R9)
+PMHCUYN1  DIM       1      1        1509  User def. Y/N field 1 (0=NO,1=YES)
+PMHCUYN2  DIM       1      1        1510  User def. Y/N field 2 (0=NO,1=YES)
+PMHCUYN3  DIM       1      1        1511  User def. Y/N field 3 (0=NO,1=YES)
+PMHCUYN4  DIM       1      1        1512  User def. Y/N field 4 (0=NO,1=YES)
+PMHCUYN5  DIM       1      1        1513  User def. Y/N field 5 (0=NO,1=YES)
+PMHCINSC  DIM       6      6        1514  Insurance Code (patin1af)
+PMHCIPLN  DIM       20     20       1520  Insurance Policy Number
+PMHCIDTF  DIM       8      8        1540  Insurance Date From (ccyymmdd)
+PMHCIDTT  DIM       8      8        1548  Insurance Date To (ccyymmdd)
+PMHCMPGN  DIM       20     20       1556  MPG Certificate Number
+PMHCAPCI  DIM       1      1        1576  APC (0=NO,1=YES) - NZ
+PMHCREGT  DIM       3      3        1577  Registration Type (Cat HR) - NZ
+PMHCRGDF  DIM       8      8        1580  Reg. Date From - Gen Reg Date (NZ)
+PMHCRGDT  DIM       8      8        1588  Reg. Date To - Gen Reg Date (NZ)
+PMHCPRDF  DIM       8      8        1596  Probation. Reg. Date From ccyymmdd
+PMHCPRDT  DIM       8      8        1604  Probation. Reg. Date To ccyymmdd
+PMHCTSDF  DIM       8      8        1612  Temp. Start Date From (ccyymmdd)
+PMHCTFDT  DIM       8      8        1620  Temp. Finish Date To (ccyymmdd)
+PMHCVISD  DIM       8      8        1628  Visa Date (ccyymmdd)
+PMHCPRFC  DIM       3      3        1636  HCP's Preferd Communication (Cat CZ
+PMHCPRFN  DIM       30     30       1639  HCP's Preferred Name
+PMHCABNN  DIM       11     11       1669  ABN Number
+PMHCUPDF  DIM       1      1        1680  Update Flag M=manual, A=Automatic
+PMHCPRMK  DIM       1      1        1681  Processed Record Marker 1=Processed
+PMHCSTTS  DIM       1      1        1682  HCP rec status (0=Active/1=Inactive
+PMHCDLMI  DIM       8      8        1683  Date Last Made Inactive (ccyymmdd)
+PMHCDLMA  DIM       8      8        1691  Date Last Made Active (ccyymmdd)
+PMHCCDTE  DIM       8      8        1699  Date Record Created (ccyymmdd)
+PMHCCTIM  DIM       8      8        1707  Time Record Created (hh:mm:ss)
+PMHCWEBC  DIM       10     10       1715  WEB User Id creator (websecaf)
+PMHCLUPD  DIM       8      8        1725  Last Update Date (ccyymmdd)
+PMHCLUPT  DIM       8      8        1733  Last Update Time (hh:mm:ss)
+PMHCWEBU  DIM       10     10       1741  WEB User Id updated (websecaf)
+PMHCSLGP  DIM       1      1        1751  Show Local GP on PMI (plocdoc)
+.                                          0=No 1=Yes
+PMHCHOSS  DIM       1      1        1752  Hospital Specific HCP
+                                          (0=NO 1=YES) mlthcpaf
+PMHCPTYP  DIM       3      3        1753  Provider Type (nzpptyaf Cat pt)
+PMHCEXML  DIM       1      1        1756  Exclude from Mailing List 0=N 1=Y
+PMHCDEAC  DIM       8      8        1757  Accred. Expiry Date (ccyymmdd)
+PMHCCPER  DIM       6      6        1765  Common Person Number or HPN CPN
+PMHCAHC1  DIM       3      3        1771  AH Pref Contact Method 1 (Cat CZ)
+PMHCAHC2  DIM       3      3        1774  AH Pref Contact Method 2 (Cat CZ)
+PMHCAHC3  DIM       3      3        1777  AH Pref Contact Method 3 (Cat CZ)
+PMHCLDOC  DIM       6      6        1780  Linked Doctor Code (patdo1af)
+PMHCSDAT  DIM       8      8        1786  Start Date (ccyymmdd)
+PMHCEDAT  DIM       8      8        1794  End Date (ccyymmdd)
+PMHCNHTA  DIM       20     20       1802  NEHTA Identifier
+PMHCWWCN  DIM       20     20       1822  WWCC Number (state based format)
+PMHCWWCE  DIM       8      8        1842  WWCC Expiry Date (ccyymmdd)
+PMHCWWCS  DIM       3      3        1850  WWCC Status (Cat HW)
+PMHCSMD1  DIM       16     16       1853  SMD GUID value 1
+PMHCSMD2  DIM       16     16       1869  SMD GUID value 2
+PMQRSPAR  DIM       50     50       1885  Spare Variable
+
+.
+.End of Record                       1935
+.
+. LOCAL VARIABLES
+. ---------------
+CMDLINE   DIM       200
+.
+DEFPATH   DIM       60
+DIM60     DIM       60
+DISNUM    FORM      4
+.
+ERORTEXT  DIM       80
+.
+INPFILE   DIM       8
+.
+MINUS3    FORM      "-3"
+.
+NEWFILE   DIM       60
+NEWPATH   DIM       60
+.
+OLDPATH   DIM       60
+.
+RECNUM    FORM      8
+.
+SAVEFLG   FORM      1
+.
+USINGORC  DIM       1
+.
+.
+. PROGRAM CONSTANTS
+. -----------------
+CREATEXT  INIT    "Log file created "
+DASHLINE  INIT    "--------------------------------------------------":
+                  "------------------------------"
+ENDGTEXT  INIT    "Ending   fixit (Option "
+OPENTEXT  INIT    "Log file opened "
+SP60      INIT    "                                                            "
+STARTTXT  INIT    "Starting fixit (Option "
+.
+.
+.
+PRGNAM    INIT      "CONVERSION PMSQDRFD"
+PRGID     INIT      "X04PMQDR"
+VERSION   INIT      "V12.00.00"
++
+.*****************************************************************************
+.*                             MAIN0000                                      *
+.*                         Program Mainline                                  *
+.*****************************************************************************
+.
+MAIN0000  CALL      INIT0000                      * init and open files
+.
+          CALL      OLOG0000                      * create/open log file
+MAIN0500  CALL      OPTN0000                      * get option
+          BRANCH    COPTION,MAIN1000:             * run c-isam fixit
+                            MAIN2000              * run oracle fixit
+          GOTO      MAIN9999                      * exit selected
+.
+MAIN1000  CALL      KDIR0000                      * Keyin directory
+          BRANCH    EXIT,MAIN9000
+.
+MAIN2000  CALL      CONTQST                       * Ok to continue ?
+          BRANCH    CEXIT,MAIN5000:               * yes
+                          MAIN0500:               * no
+                          MAIN9000                * cancel
+.
+MAIN5000  BRANCH    COPTION,MAIN6000:             * c-isam fixit
+                            MAIN7000              * oracle fixit
+.
+.         Running c-isam fix
+.
+MAIN6000  CALL      PREP0000                      * preparing files
+          BRANCH    EXIT,MAIN9000
+.
+          CALL      READ0000                      * read old records and write
+          CALL      ENDP0000                      * save/zip saved file
+          GOTO      MAIN9000
+.
+.         Running oracle fix
+.
+MAIN7000  CALL      OFIX0000                      * run oracle fix
+.
+MAIN9000  CALL      CLOG0000                      * close log file
+.
+MAIN9999  CHAIN     PGM
++
+.********************************************************************
+.*                          INIT0000                                *
+.*  Display heading and check that the files needed exist&open them *
+.********************************************************************
+.
+INIT0000  CALL      DISPHEAD
+          MOVE      ZERO,RECNUM
+          MOVE      ZERO,DISNUM
+          
+INIT9999  RETURN
++
+.*****************************************************************************
+.*                                OPTN0000             Called by: MAIN0000   *
+.*                        Get user options or exit                           *
+.*    Returns:  EXIT    = FALSE (0)  Ok to proceed                           *
+.*                        TRUE  (1)  Exit option selected                    *
+.*              COPTION - option selected                                    *
+.*****************************************************************************
+.
+OPTN0000  MOVE      "No",USINGORC
+          REP       "yYnN",USINGORC
+          MOVE      USINGORC,KEY1
+          REP       "Y-N-",KEY1
+          MATCH     "-",KEY1
+          GOTO      OPTN9200 IF NOT EQUAL
+.
+          DISPLAY   *P1:3,*EF,*P1:4,*V2LON,ZERO,*HOFF,". Exit":
+                    *P1:5,*V2LON,ONE,*HOFF,". Run Fixit (c-isam only)"
+          MATCH     "Y",USINGORC
+          IF        @EQUAL
+            DISPLAY   *P1:6,*V2LON,TWO,*HOFF,". Run Fixit (Oracle only)"
+          ENDIF
+.
+OPTN0500  KEYIN     *P1:8,*EL,"Select Option : ":
+                    *P17:8,*V2LON,COPTION
+.
+          COMPARE   ZERO,COPTION                 * exit selected ?
+          GOTO      OPTN9500 IF EQUAL            * yes
+.
+          BRANCH    COPTION,OPTN9000:            * run c-isam fixit
+                            OPTN9000             * run oracle fixit
+.
+          BEEP
+          GOTO      OPTN0500
+.
+OPTN9000  MOVE      ZERO,EXIT
+          GOTO      OPTN9999
+.
+OPTN9200  DISPLAY   *P1:3,*EF,*P1:4," Oracle Option has not been set up ":
+                          "correctly":
+                    *P1:6," Program will terminate    - ";
+          MOVE      "Oracle Option has not been set up correctly",ERORTEXT
+          WRITE     LOGFILE,SEQ;*+,ERORTEXT
+          CALL      HITENTER
+.
+OPTN9500  MOVE      ONE,EXIT
+.
+OPTN9999  RETURN
++
+.********************************************************************
+.*                          KDIR0000                                *
+.*  Keyin directories                                               *
+.********************************************************************
+.
+KDIR0000  MOVE      ONE,SAVEFLG        * Default to keep file
+          KEYIN     *P1:10,*EL,"Do you want to save the original file (Y/N) ? ":
+                    ANS;
+          REP       "yYnN",ANS
+          CMATCH    "Y",ANS
+          GOTO      KDIR1000 IF EQUAL
+          MOVE      ZERO,SAVEFLG       * not to keep file
+          CMATCH    "N",ANS
+          GOTO      KDIR1000 IF EQUAL
+          BEEP
+          GOTO      KDIR0000
+.
+KDIR1000  CALL      DEFT0000                * Get the default path
+          BRANCH    EXIT,KDIR9999
+          MOVE      SP60,OLDPATH
+.
+          DISPLAY   *P1:24,*EL,"The directory path must end with a slash (/) ";
+.
+          MOVE      DEFPATH,OLDPATH
+          BRANCH    SAVEFLG,KDIR2000
+.
+.         Keyin the path for the original file
+.
+          KEYIN     *P1:12,*EL,"Keyin path for temporarily saving original ":
+                    "file: ":
+                    *P10:13,*EL,*DV,*RV,OLDPATH:
+                    *P10:13,OLDPATH;
+          GOTO      KDIR3000
+.
+KDIR2000  KEYIN     *P1:12,*EL,"Keyin path for saving original file: ":
+                    *P10:13,*EL,*DV,*RV,OLDPATH:
+                    *P10:13,OLDPATH;
+.
+KDIR3000  ENDSET    OLDPATH
+          APPEND    SP60,OLDPATH
+          RESET     OLDPATH
+.
+          MATCH     SP60,OLDPATH
+          IF        @EQUAL
+            PACK      OLDPATH,DEFPATH      * use the default
+            DISPLAY   *P10:13,*EL,*V2LON,OLDPATH;
+          ENDIF
+.
+          SQUEEZE   OLDPATH
+          CMATCH    EXITCHAR,OLDPATH
+          GOTO      KDIR9000 IF EQUAL
+.
+          PACK      DIM60,OLDPATH,SP60
+          CALL      VALD0000         * check if it's a valid directory
+          BRANCH    EXIT,KDIR1000
+.
+.         Keyin the path for the new file
+.
+KDIR5000  MOVE      SP60,NEWPATH
+          MOVE      DEFPATH,NEWPATH
+          KEYIN     *P1:15,*EL,"Keyin path for the new file: ":
+                    *P10:16,*EL,*DV,*RV,NEWPATH:
+                    *P10:16,NEWPATH;
+          ENDSET    NEWPATH
+          APPEND    SP60,NEWPATH
+          RESET     NEWPATH
+.
+          MATCH     SP60,NEWPATH
+          IF        @EQUAL
+            PACK      NEWPATH,DEFPATH      * use the default
+            DISPLAY   *P10:16,*V2LON,NEWPATH;
+          ENDIF
+.
+          SQUEEZE   NEWPATH
+          CMATCH    EXITCHAR,NEWPATH
+          GOTO      KDIR9000 IF EQUAL
+.
+          PACK      DIM60,NEWPATH,SP60
+          CALL      VALD0000         * check if it's a valid directory
+          BRANCH    EXIT,KDIR5000
+          GOTO      KDIR9999
+.
+KDIR9000  MOVE      ONE,EXIT
+.
+KDIR9999  DISPLAY   *P1:24,*EL;
+          RETURN
++
+.********************************************************************
+.*                          PREP0000                                *
+.*  Preparing files                                                 *
+.********************************************************************
+.
+PREP0000  CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P1:18,"Started : ",CDATE,SP1,CTIMEIS:
+                    *P1:20,"Record : "
+.
+          CALL      SLOG0000                      * write start to log file
+.
+          MOVE      "pmsqdraf",INPFILE
+          CALL      CHEK0000             * check file exists or has been changed
+          BRANCH    EXIT,PREP9000
+.
+          CLOSE     OLDFILE1
+          DISPLAY   *P1:24,*EL,"Copying files ... Please wait !! ";
+.
+.         Copy old file to the keyin directory
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "cp `ldat pmsqdraf.dat` ",CMDLINE
+          APPEND    OLDPATH,CMDLINE
+          APPEND    "spmspdrf.dat",CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            GOTO      PREP8000
+          ENDIF
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "cp `ldat pmsqdraf.idx` ",CMDLINE
+          APPEND    OLDPATH,CMDLINE
+          APPEND    "spmspdrf.idx",CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            GOTO      PREP8000
+          ENDIF
+.
+.         Remove the original files
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "iserase ",CMDLINE
+          APPEND    DEFPATH,CMDLINE
+          APPEND    "pmsqdraf",CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            MOVE      "Unable to remove the original file.  ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      PREP9000
+          ENDIF
+.
+.         Opening old file after being copied
+.
+          MOVE      SP60,DIM60
+          CLEAR     DIM60
+          APPEND    OLDPATH,DIM60
+          APPEND    "spmspdrf",DIM60
+          APPEND    SP60,DIM60
+          RESET     DIM60
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      OLDFILE1,DIM60
+          TRAPCLR   IO
+          IF        OVRCD = 1
+            MOVE      "Unable to open saved original file.  ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      PREP9000
+          ENDIF
+.
+.         Create the new file
+.
+          DISPLAY   *P1:24,*EL,"Creating new files ... Please wait !! ";
+          PACK      NEWFILE,SP60
+          CLEAR     NEWFILE
+          APPEND    NEWPATH,NEWFILE
+          APPEND    "pmsqdraf",NEWFILE
+          APPEND    SP60,NEWFILE
+          RESET     NEWFILE
+          SQUEEZE   NEWFILE
+.
+PREP1000  PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "isbuild ",CMDLINE
+          APPEND    NEWFILE,CMDLINE
+.
+.  The files new record length and unique key must be written here
+.      eg    APPEND    " 195 UC9-16",CMDLINE
+.
+. Index 1
+          APPEND    " 1935 UC1-20",CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+.  If the file has more than one index, this piece of code below has 
+.  to be repeated with for each individual index
+.
+          OPEN      PMSQDRA1,NEWFILE
+.
+          DISPLAY   *P1:24,*EL;
+          MOVE      ZERO,EXIT
+          GOTO      PREP9999
+.
+PREP5000  MOVE      "Old file not found.  ",ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+          CALL      HITENTER
+          GOTO      PREP9000
+.
+PREP8000  MOVE      "Unable to copy original file.  (Error: ",ERORTEXT
+          ENDSET    ERORTEXT
+          APPEND    TASKID,ERORTEXT
+          APPEND    ")  ",ERORTEXT
+          RESET     ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+          CALL      HITENTER
+.
+PREP9000  MOVE      ONE,EXIT
+.
+PREP9999  RETURN
++
+.********************************************************************
+.*                          CHEK0000                                *
+.*  Check if file exists, or has already been converted             *
+.********************************************************************
+.
+CHEK0000  MOVE      ZERO,EXIT
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND GIVING DIM60 IF IO
+          OPEN      OLDFILE1,INPFILE
+          TRAPCLR   IO
+          BRANCH    OVRCD,CHEK2000       * Original file does not exist
+          CLOSE     OLDFILE1
+          GOTO      CHEK9999
+.
+CHEK2000  RESET     DIM60
+          SCAN      "I * I",DIM60
+          DISPLAY   *P1:23,*EF,"File '",INPFILE,"' ";
+          IF        @EQUAL
+            DISPLAY   "does not exist - ";
+            MOVE      "File does not exist",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+          ELSE
+            RESET     DIM60
+            SCAN      "I * L",DIM60
+            IF        @EQUAL
+              DISPLAY   "has already been converted - ";
+              MOVE      "File has already been converted",ERORTEXT
+              WRITE     LOGFILE,SEQ;ERORTEXT
+            ELSE
+              DISPLAY   "has caused an IO error - ";
+              MOVE      "File has caused an IO Error",ERORTEXT
+              WRITE     LOGFILE,SEQ;ERORTEXT
+            ENDIF
+          ENDIF
+          MOVE      "File will be bypassed",ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *+,ERORTEXT
+.
+          CALL      HITENTER
+          DISPLAY   *P1:23,*EF;
+.
+CHEK9000  MOVE      ONE,EXIT
+.
+CHEK9999  RETURN
++
+.**********************************************************************
+.*                               READ0000                             *
+.*             loop thru old file and write each record               *
+.**********************************************************************
+.
+READ0000  DISPLAY   *P1:20,*EL,"Record No. : ";
+.
+          PACK      KEY20,SP70
+          CALL      READSOLD                      * position at start
+READ1000  CALL      READKOLD                      * read next record
+          BRANCH    OVRCD,READ6000                * no more records
+.
+          ADD       ONE,RECNUM                    * update record counter
+          ADD       ONE,DISNUM                    * Display counter
+.
+          IF        DISNUM = 5000  | RECNUM = 1
+            MOVE      ZERO,DISNUM
+            DISPLAY   *P15:20,*V2LON,RECNUM
+          ENDIF
+.
+.  All necessary changes to the files field lengths, date changes
+.  or any other sort of modification must be made here
+.
+.    eg    PACK      DSPARE,SP70
+.          PACK      PTDSDMDC,SP10
+.          PACK      PTDSDDRG,SP10
+.
+          MOVE      SP70,PMHCHOSS
+          MOVE      SP70,PMHCPTYP
+          MOVE      SP70,PMHCEXML
+          MOVE      SP70,PMHCDEAC
+          MOVE      SP70,PMHCCPER
+          MOVE      SP70,PMHCAHC1
+          MOVE      SP70,PMHCAHC2
+          MOVE      SP70,PMHCAHC3
+          MOVE      SP70,PMHCLDOC
+          MOVE      SP70,PMHCSDAT
+          MOVE      SP70,PMHCEDAT
+          MOVE      SP70,PMHCNHTA
+          MOVE      SP70,PMHCWWCN
+          MOVE      SP70,PMHCWWCE
+          MOVE      SP70,PMHCWWCS
+          MOVE      SP70,PMHCSMD1
+          MOVE      SP70,PMHCSMD2
+          PACK      PMQRSPAR,SP70
+.                                               * Pack key here
+          PACK      KEY20,DPMQRMES,SP70
+          CALL      WRPMQDR1                    * write to new file
+.
+          GOTO      READ1000                      * get next record
+.
+READ6000  CLOSE     PMSQDRA1                      * close new file
+          CLOSE     OLDFILE1                      * close old file
+.
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P15:20,*V2LON,RECNUM,*HOFF:
+                    *P1:22,"Ended  : ",CDATE,SP1,CTIMEIS:
+                    *P1:24;
+.
+READ9999  RETURN
++
+.**********************************************************************
+.*                               VALD0000                             *
+.*        Check if it a valid directory                               *
+.**********************************************************************
+.
+VALD0000  MOVE      ZERO,EXIT
+.
+          SQUEEZE   DIM60
+          ENDSET    DIM60
+          CMATCH    SLASH,DIM60
+          IF        !@EQUAL
+            MOVE      "Directory path must end with a slash (/) ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      VALD9000
+          ENDIF
+          RESET     DIM60
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "cd ",CMDLINE
+          APPEND    DIM60,CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID      * check if exists
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            MOVE      "Directory does not exist ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      VALD9000
+          ENDIF
+          GOTO      VALD9999
+.
+VALD9000  MOVE      ONE,EXIT            * Not valid
+.
+VALD9999  RETURN
++
+.**********************************************************************
+.*                               ENDP0000                             *
+.*        Remove or zip save file                                     *
+.**********************************************************************
+.
+ENDP0000  MOVE      SP60,DIM60
+          CLEAR     DIM60
+          APPEND    OLDPATH,DIM60        * set up the saved file with path
+          APPEND    "spmspdrf*",DIM60
+          APPEND    SP60,DIM60
+          RESET     DIM60
+          SQUEEZE   DIM60
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          IF        SAVEFLG = 1
+            APPEND    "gzip -f ",CMDLINE
+            APPEND    DIM60,CMDLINE
+            APPEND    SP60,CMDLINE
+            RESET     CMDLINE
+            DISPLAY   *P1:24,*EL,"Compressing original file.. ":
+                      "Please wait !!  ";
+          ELSE
+            APPEND    "rm ",CMDLINE
+            APPEND    DIM60,CMDLINE
+            APPEND    SP60,CMDLINE
+            RESET     CMDLINE
+            DISPLAY   *P1:24,*EL,"Removing original file.. Please wait !!  ";
+          ENDIF
+          EXECUTE   CMDLINE,TASKID      * check if exists
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            MOVE      "Saved file not zipped or removed.  ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      ENDP9999
+          ENDIF
+.
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P1:24,*EL,*B,"Finished processing  ",CDATE,SP1,CTIMEIS:
+                    ".  ";
+          CALL      HITENTER
+.
+          CALL      ELOG0000                     * write an end log entry
+.
+ENDP9999  RETURN
++
+.**********************************************************************
+.*        DEFT0000 -  Get the default directory                       *
+.**********************************************************************
+.
+DEFT0000  EXECUTE   "ldat pmsqdraf.dat > temp.txt",TASKID
+.
+          PACK      DEFPATH,SP30,SP30
+          CLOSE     FINDFILE
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      FINDFILE,"temp"
+          TRAPCLR   IO
+          BRANCH    OVRCD,DEFT3000
+.
+          READ      FINDFILE,SEQ;DEFPATH
+          GOTO      DEFT3000 IF OVER
+.
+          ENDSET    DEFPATH
+DEFT1000  CMATCH    "/",DEFPATH
+          GOTO      DEFT2000 IF EQUAL
+.
+          BUMP      DEFPATH,-1
+          GOTO      DEFT1000 IF NOT EOS
+          GOTO      DEFT3000
+.
+DEFT2000  LENSET    DEFPATH
+          RESET     DEFPATH
+.
+          PACK      DEFPATH,DEFPATH,SP30,SP30,SP30,SP30
+          STRIP     DEFPATH
+          ENDSET    DEFPATH
+          RESET     DEFPATH
+          CLOSE     FINDFILE
+          MOVE      ZERO,EXIT
+          GOTO      DEFT9999
+.
+DEFT3000  MOVE      "Error finding 'pmsqdraf'.  ",ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+          CALL      HITENTER
+          CLOSE     FINDFILE
+          MOVE      ONE,EXIT
+.
+DEFT9999  RETURN
++
+.*****************************************************************************
+.*                            OLOG0000                                       *
+.*                    Open the log file                                      *
+.*****************************************************************************
+.
+OLOG0000  CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      LOGFILE,"x04pmqdr.log"       * open log file
+          TRAPCLR   IO
+          IF        OVRCD = 1
+            PREP      LOGFILE,"x04pmqdr.log"     * create and open log file
+            WRITE     LOGFILE,MINUS3;DASHLINE
+            WRITE     LOGFILE,SEQ;CREATEXT,CDATE,SP1,CTIMEIS
+          ELSE
+            WRITE     LOGFILE,MINUS3;DASHLINE
+            WRITE     LOGFILE,SEQ;OPENTEXT,CDATE,SP1,CTIMEIS
+          ENDIF
+.
+OLOG9999  RETURN
++
+.*****************************************************************************
+.*                            CLOG0000                                       *
+.*                    Close the log file                                     *
+.*****************************************************************************
+.
+CLOG0000  CLOSE     LOGFILE
+.
+CLOG9999  RETURN
++
+.*****************************************************************************
+.*                            SLOG0000                                       *
+.*                    Write a start log to the log file                      *
+.*****************************************************************************
+.
+SLOG0000  WRITE     LOGFILE,SEQ;DASHLINE
+          WRITE     LOGFILE,SEQ;STARTTXT,COPTION,RBRACK,SP1,CDATE,SP1:
+                                   CTIMEIS
+.
+SLOG9999  RETURN
++
+.*****************************************************************************
+.*                            ELOG0000                                       *
+.*                    Write an end log to the log file                       *
+.*****************************************************************************
+.
+ELOG0000  WRITE     LOGFILE,SEQ;ENDGTEXT,COPTION,RBRACK,SP1,CDATE,SP1:
+                                   CTIMEIS
+ELOG9999  RETURN
++
+.*****************************************************************************
+.*                            OFIX0000                                       *
+.*                    Oracle fix to "PMSQDRFD"                               *
+.*****************************************************************************
+.
+OFIX0000  DISPLAY   *P1:24,*EL;
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P1:18,"Started : ",CDATE,SP1,CTIMEIS:
+                    *P1:20,*EL,"Record No. :";
+.
+          CALL      SLOG0000                      * write start to log file
+.
+          OPEN      PMSQDRA1,"pmsqdraf"
+.
+          PACK      KEY20,SP70
+          CALL      RSPMQDR1                      * position at start of file
+OFIX0500  CALL      RKPMQDR1                      * read next record
+          BRANCH    OVRCD,OFIX9000                * eof - finished
+.
+          ADD       ONE,RECNUM                    * increment record counter
+          ADD       ONE,DISNUM                    * Display counter
+.         
+          IF        DISNUM = 5000  | RECNUM = 1
+            MOVE      ZERO,DISNUM 
+            DISPLAY   *P15:20,*V2LON,RECNUM
+          ENDIF
+.
+.>>>>>>>  Add code here to populate/update variables
+.
+          MOVE      SP70,PMHCHOSS
+          MOVE      SP70,PMHCPTYP
+          MOVE      SP70,PMHCEXML
+          MOVE      SP70,PMHCDEAC
+          MOVE      SP70,PMHCCPER
+          MOVE      SP70,PMHCAHC1
+          MOVE      SP70,PMHCAHC2
+          MOVE      SP70,PMHCAHC3
+          MOVE      SP70,PMHCLDOC
+          MOVE      SP70,PMHCSDAT
+          MOVE      SP70,PMHCEDAT
+          MOVE      SP70,PMHCNHTA
+          MOVE      SP70,PMHCWWCN
+          MOVE      SP70,PMHCWWCE
+          MOVE      SP70,PMHCWWCS
+          MOVE      SP70,PMHCSMD1
+          MOVE      SP70,PMHCSMD2
+          PACK      PMQRSPAR,SP70
+.
+          CALL      UPPMQDR1
+.
+          GOTO      OFIX0500                     * get next record
+.         
+OFIX9000  CLOSE     PMSQDRA1
+.
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P15:20,*V2LON,RECNUM,*HOFF:
+                    *P1:22,"Update completed ",CDATE,SP1,CTIMEIS:
+                    *P1:24;
+          CALL      HITENTER
+.
+          CALL      ELOG0000                     * write an end log entry
+.
+OFIX9999  RETURN
+.
+OFDUMYIO  RETURN
++
+.*****************************************************************************
+.*        I/O Routines                                                       *
+.*****************************************************************************
+.
+.                  ******************************    OLD IO ROUTINES
+.                  Copy the Positional Read (RS or RDS) from original I/O file,
+.                  - change Label to READSOLD and the index name to OLDFILE1
+.
+READSOLD  MOVE      ZERO,OVRCD
+          READ      OLDFILE1,KEY20;;
+          RETURN
+.
+.                  Copy the Read Next (RK or RDK) from the original I/O file
+.                  - change Label to READKOLD and the index name to OLDFILE1
+.                  - change any fields that are changing to a prefix of OLD,
+.                    eg. PTEDSPAR becomes OLDDSPAR
+.
+READKOLD  MOVE      ZERO,OVRCD
+          READKS    OLDFILE1;DPMQRMES:
+                        PMHCHCPC,PMHCHCPT,PMHCTITL,PMHCGNAM,PMHCSNAM:
+                        PMHCINIT,PMHCGNDR,PMHCDTOB,PMHCSPC1,PMHCSPD1,PMHCSPC2:
+                        PMHCSPD2,PMHCSPC3,PMHCSPD3,PMHCSPC4,PMHCSPD4,PMHCSPC5:
+                        PMHCSPD5,PMHCRCPT,PMHCADR1,PMHCADR2,PMHCADR3,PMHCADR4:
+                        PMHCADR5,PMHCADR6,PMHCPOST,PMHCSTAT,PMHCSEML,PMHCSTEL:
+                        PMHCPAGR,PMHCPAGN,PMHCAHP1,PMHCAHP2,PMHCAHP3,PMHCAHP4:
+                        PMHCAHP5,PMHCPRV1,PMHCPRV2,PMHCPRV3,PMHCPRV4,PMHCPRV5:
+                        PMHCHTEL,PMHCHAD1,PMHCHAD2,PMHCHAD3,PMHCHAD4,PMHCHAD5:
+                        PMHCHAD6,PMHCHPCD,PMHCHEML,PMHCDFAC,PMHCDLAC,PMHCYACC:
+                        PMHCATYP,PMHCHHCP,PMHCOSLV,PMHCHCST,PMHCHCSD,PMHCFAXN:
+                        PMHCHFXN,PMHCMOBN,PMHCCRDC,PMHCWAHC,PMHCMRBN,PMHCNHSN:
+                        PMHCUDF1,PMHCUDF2,PMHCUDF3,PMHCUDF4,PMHCUDF5,PMHCUYN1:
+                        PMHCUYN2,PMHCUYN3,PMHCUYN4,PMHCUYN5,PMHCINSC,PMHCIPLN:
+                        PMHCIDTF,PMHCIDTT,PMHCMPGN,PMHCAPCI,PMHCREGT,PMHCRGDF:
+                        PMHCRGDT,PMHCPRDF,PMHCPRDT,PMHCTSDF,PMHCTFDT,PMHCVISD:
+                        PMHCPRFC,PMHCPRFN,PMHCABNN,PMHCUPDF,PMHCPRMK,PMHCSTTS:
+                        PMHCDLMI,PMHCDLMA,PMHCCDTE,PMHCCTIM,PMHCWEBC,PMHCLUPD:
+                        PMHCLUPT,PMHCWEBU,PMHCSLGP,OLDRSPAR
+          GOTO      OVERCOND IF OVER
+          RETURN
+.
+.                  ******************************    NEW IO ROUTINES
+.                  Copy the Write statement from the new I/O file           
+.                  (no changes are needed to this routine)               
+.
+.                  For Oracle fixits, you will probably also need to copy
+.                  the RS.., RK.... & UP.... I/O routines for the new FD.
+.
+RSPMQDR1  RESET     KEY20
+          READ      PMSQDRA1,KEY20;;
+          RETURN
+.
+RKPMQDR1  MOVE      ZERO,OVRCD
+          READKS    PMSQDRA1;DPMQRMES:
+                        PMHCHCPC,PMHCHCPT,PMHCTITL,PMHCGNAM,PMHCSNAM:
+                        PMHCINIT,PMHCGNDR,PMHCDTOB,PMHCSPC1,PMHCSPD1,PMHCSPC2:
+                        PMHCSPD2,PMHCSPC3,PMHCSPD3,PMHCSPC4,PMHCSPD4,PMHCSPC5:
+                        PMHCSPD5,PMHCRCPT,PMHCADR1,PMHCADR2,PMHCADR3,PMHCADR4:
+                        PMHCADR5,PMHCADR6,PMHCPOST,PMHCSTAT,PMHCSEML,PMHCSTEL:
+                        PMHCPAGR,PMHCPAGN,PMHCAHP1,PMHCAHP2,PMHCAHP3,PMHCAHP4:
+                        PMHCAHP5,PMHCPRV1,PMHCPRV2,PMHCPRV3,PMHCPRV4,PMHCPRV5:
+                        PMHCHTEL,PMHCHAD1,PMHCHAD2,PMHCHAD3,PMHCHAD4,PMHCHAD5:
+                        PMHCHAD6,PMHCHPCD,PMHCHEML,PMHCDFAC,PMHCDLAC,PMHCYACC:
+                        PMHCATYP,PMHCHHCP,PMHCOSLV,PMHCHCST,PMHCHCSD,PMHCFAXN:
+                        PMHCHFXN,PMHCMOBN,PMHCCRDC,PMHCWAHC,PMHCMRBN,PMHCNHSN:
+                        PMHCUDF1,PMHCUDF2,PMHCUDF3,PMHCUDF4,PMHCUDF5,PMHCUYN1:
+                        PMHCUYN2,PMHCUYN3,PMHCUYN4,PMHCUYN5,PMHCINSC,PMHCIPLN:
+                        PMHCIDTF,PMHCIDTT,PMHCMPGN,PMHCAPCI,PMHCREGT,PMHCRGDF:
+                        PMHCRGDT,PMHCPRDF,PMHCPRDT,PMHCTSDF,PMHCTFDT,PMHCVISD:
+                        PMHCPRFC,PMHCPRFN,PMHCABNN,PMHCUPDF,PMHCPRMK,PMHCSTTS:
+                        PMHCDLMI,PMHCDLMA,PMHCCDTE,PMHCCTIM,PMHCWEBC,PMHCLUPD:
+                        PMHCLUPT,PMHCWEBU,PMHCSLGP,PMHCHOSS,PMHCPTYP,PMHCEXML:
+                        PMHCDEAC,PMHCCPER,PMHCAHC1,PMHCAHC2,PMHCAHC3,PMHCLDOC:
+                        PMHCSDAT,PMHCEDAT,PMHCNHTA,PMHCWWCN,PMHCWWCE,PMHCWWCS:
+                        PMHCSMD1,PMHCSMD2,PMQRSPAR
+          GOTO      OVERCOND IF OVER
+          RETURN
+.
+UPPMQDR1  MOVE      ZERO,OVRCD 
+          UPDATE    PMSQDRA1;DPMQRMES:
+                        PMHCHCPC,PMHCHCPT,PMHCTITL,PMHCGNAM,PMHCSNAM:
+                        PMHCINIT,PMHCGNDR,PMHCDTOB,PMHCSPC1,PMHCSPD1,PMHCSPC2:
+                        PMHCSPD2,PMHCSPC3,PMHCSPD3,PMHCSPC4,PMHCSPD4,PMHCSPC5:
+                        PMHCSPD5,PMHCRCPT,PMHCADR1,PMHCADR2,PMHCADR3,PMHCADR4:
+                        PMHCADR5,PMHCADR6,PMHCPOST,PMHCSTAT,PMHCSEML,PMHCSTEL:
+                        PMHCPAGR,PMHCPAGN,PMHCAHP1,PMHCAHP2,PMHCAHP3,PMHCAHP4:
+                        PMHCAHP5,PMHCPRV1,PMHCPRV2,PMHCPRV3,PMHCPRV4,PMHCPRV5:
+                        PMHCHTEL,PMHCHAD1,PMHCHAD2,PMHCHAD3,PMHCHAD4,PMHCHAD5:
+                        PMHCHAD6,PMHCHPCD,PMHCHEML,PMHCDFAC,PMHCDLAC,PMHCYACC:
+                        PMHCATYP,PMHCHHCP,PMHCOSLV,PMHCHCST,PMHCHCSD,PMHCFAXN:
+                        PMHCHFXN,PMHCMOBN,PMHCCRDC,PMHCWAHC,PMHCMRBN,PMHCNHSN:
+                        PMHCUDF1,PMHCUDF2,PMHCUDF3,PMHCUDF4,PMHCUDF5,PMHCUYN1:
+                        PMHCUYN2,PMHCUYN3,PMHCUYN4,PMHCUYN5,PMHCINSC,PMHCIPLN:
+                        PMHCIDTF,PMHCIDTT,PMHCMPGN,PMHCAPCI,PMHCREGT,PMHCRGDF:
+                        PMHCRGDT,PMHCPRDF,PMHCPRDT,PMHCTSDF,PMHCTFDT,PMHCVISD:
+                        PMHCPRFC,PMHCPRFN,PMHCABNN,PMHCUPDF,PMHCPRMK,PMHCSTTS:
+                        PMHCDLMI,PMHCDLMA,PMHCCDTE,PMHCCTIM,PMHCWEBC,PMHCLUPD:
+                        PMHCLUPT,PMHCWEBU,PMHCSLGP,PMHCHOSS,PMHCPTYP,PMHCEXML:
+                        PMHCDEAC,PMHCCPER,PMHCAHC1,PMHCAHC2,PMHCAHC3,PMHCLDOC:
+                        PMHCSDAT,PMHCEDAT,PMHCNHTA,PMHCWWCN,PMHCWWCE,PMHCWWCS:
+                        PMHCSMD1,PMHCSMD2,PMQRSPAR
+          RETURN
+.
+WRPMQDR1  RESET     KEY20
+          WRITE     PMSQDRA1,KEY20;DPMQRMES:
+                        PMHCHCPC,PMHCHCPT,PMHCTITL,PMHCGNAM,PMHCSNAM:
+                        PMHCINIT,PMHCGNDR,PMHCDTOB,PMHCSPC1,PMHCSPD1,PMHCSPC2:
+                        PMHCSPD2,PMHCSPC3,PMHCSPD3,PMHCSPC4,PMHCSPD4,PMHCSPC5:
+                        PMHCSPD5,PMHCRCPT,PMHCADR1,PMHCADR2,PMHCADR3,PMHCADR4:
+                        PMHCADR5,PMHCADR6,PMHCPOST,PMHCSTAT,PMHCSEML,PMHCSTEL:
+                        PMHCPAGR,PMHCPAGN,PMHCAHP1,PMHCAHP2,PMHCAHP3,PMHCAHP4:
+                        PMHCAHP5,PMHCPRV1,PMHCPRV2,PMHCPRV3,PMHCPRV4,PMHCPRV5:
+                        PMHCHTEL,PMHCHAD1,PMHCHAD2,PMHCHAD3,PMHCHAD4,PMHCHAD5:
+                        PMHCHAD6,PMHCHPCD,PMHCHEML,PMHCDFAC,PMHCDLAC,PMHCYACC:
+                        PMHCATYP,PMHCHHCP,PMHCOSLV,PMHCHCST,PMHCHCSD,PMHCFAXN:
+                        PMHCHFXN,PMHCMOBN,PMHCCRDC,PMHCWAHC,PMHCMRBN,PMHCNHSN:
+                        PMHCUDF1,PMHCUDF2,PMHCUDF3,PMHCUDF4,PMHCUDF5,PMHCUYN1:
+                        PMHCUYN2,PMHCUYN3,PMHCUYN4,PMHCUYN5,PMHCINSC,PMHCIPLN:
+                        PMHCIDTF,PMHCIDTT,PMHCMPGN,PMHCAPCI,PMHCREGT,PMHCRGDF:
+                        PMHCRGDT,PMHCPRDF,PMHCPRDT,PMHCTSDF,PMHCTFDT,PMHCVISD:
+                        PMHCPRFC,PMHCPRFN,PMHCABNN,PMHCUPDF,PMHCPRMK,PMHCSTTS:
+                        PMHCDLMI,PMHCDLMA,PMHCCDTE,PMHCCTIM,PMHCWEBC,PMHCLUPD:
+                        PMHCLUPT,PMHCWEBU,PMHCSLGP,PMHCHOSS,PMHCPTYP,PMHCEXML:
+                        PMHCDEAC,PMHCCPER,PMHCAHC1,PMHCAHC2,PMHCAHC3,PMHCLDOC:
+                        PMHCSDAT,PMHCEDAT,PMHCNHTA,PMHCWWCN,PMHCWWCE,PMHCWWCS:
+                        PMHCSMD1,PMHCSMD2,PMQRSPAR
+          RETURN
+.
+          INC       STD001IO

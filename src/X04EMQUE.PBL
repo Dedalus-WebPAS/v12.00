@@ -1,0 +1,1398 @@
+.*****************************************************************************
+. Program      : X04EMQUE
+. Description  : Conversion emrqueaf to new File layout
+.*****************************************************************************
+. Modifications:
+.*****************************************************************************
+. V11.04.01  24/01/2024  Thanh T       TSK 0936282
+.            Changed OPTN0000 to move 'No' to USINGORC instead of 'Yes'
+. V11.04.00  04/12/2023  Thanh T       TSK 0936282
+.            Initial Version
+.*****************************************************************************
+.
+.  using vi Global change command      :%s/FromString/ToString/g
+.
+.  Global change X04EMQUE  eg F57PTDOC
+.  Global change x04emque  eg f57ptdoc
+.  Global change EMRQUEFD  eg PATDOCFD (new layout)
+.  Global change emrqueaf  eg patdoctf
+.  Global change EMRQUEA1  eg PATDOCT1
+.  Global change KEY20     eg KEY20
+.  Global change KEY20     eg KEY9
+.  Global change WREMQUE1  eg WRDOCT1
+.  Global change semrquef  eg sptdoctf
+.
+.  Global Change answeryn  to Yes
+.  Global change RSEMQUE1  eg RSPTDOC1
+.  Global change RKEMQUE1  eg RKPTDOC1
+.  Global change UPEMQUE1  eg UPPTDOC1
+.
+.  Global changes if Oracle Option is NOT required -
+
+.  Global Change answeryn  to No
+.  Global change RSEMQUE1  to OFDUMYIO
+.  Global change RKEMQUE1  to OFDUMYIO
+.  Global change UPEMQUE1  to OFDUMYIO
+.
+          INC       STD001FD
+.
+FINDFILE  FILE      ASCII, FIXED=256
+LOGFILE   FILE      ASCII, FIXED=256
+.
+. Enter the first or the shortest index from the original FD and rename
+. the index OLDFILE1
+.
+.                                     ******** copy the old FD here *******
+.                                     * comment out all continuing fields and
+.                                     * prefix changing fields with "OLD" -
+.                                     * remove old Indexes and Redefines     
+.
+..OLDFILE1  IFILE     SQL, FIXED=xxx, KEY="Uxx-xx"
+OLDFILE1   IFILE    SQL, FIXED=1647, KEY="U1-20" 
+.
+.Name     Type      Length Physical Start Description
+.----     ----      ------ -------- ----- -----------
+.DEMQUMES   DIM       20     20       1     Message Id
+.
+.          EMRVISFD variables
+.
+.EMVIADMN  FORM      8      5        21    Visit Number
+.EMVISTAT  FORM      1      2        26    Status
+.                                              1 = Current Patient
+.                                              2 = Discharged Incomplete
+.                                              3 = Discharged Complete
+.                                              4 = Cancelled
+.EMVIURNO  DIM       8      8        28    Patient U/R Number
+.EMVIDATE  DIM       8      8        36    Arrival Date (CCYYMMDD)
+.EMVITIME  DIM       8      8        44    Arrival Time (HH:MM:SS)
+.EMVITRIG  DIM       3      3        52    Triage Code (category AA)
+.EMVICOM1  DIM       50     50       55    Complaint Line 1
+.EMVICOM2  DIM       50     50       105   Complaint Line 2
+.EMVILOCN  DIM       3      3        155   Location (emrlocaf)
+.EMVIDOCT  DIM       10     10       158   Attending Doctor
+.EMVICOMP  DIM       3      3        168   Compensation Code (category CL)
+.EMVICLAS  DIM       3      3        171   Patient Classification (category A)
+.EMVIINSR  DIM       3      3        174   Insurance Status (category U1)
+.EMVISRCE  DIM       3      3        177   Source of Referal (category S)
+.EMVISITN  DIM       3      3        180   Situation (category ES)
+.EMVIMODE  DIM       3      3        183   Mode of Arrival (category EA)
+.EMVIADMT  FORM      1      2        186   Admitted to Hospital
+.                                          0 = No
+.                                          1 = Yes
+.EMVIDURN  FORM      4      3        188   Duration of Waiting (in minutes)
+.EMVIEMPL  DIM       20     20       191   Employer (Workcover)
+.EMVIWAIT  DIM       3      3        211   Completion Wait Code (category EW)
+.EMVIPREV  DIM       3      3        214   Previous A&E Attendance (cat. EP)
+.EMVIFUND  DIM       6      6        217   Health Fund
+.EMVITABL  DIM       8      8        223   Health Fund Table
+.EMVIREFG  DIM       10     10       231   Referring GP
+.EMVIREFD  DIM       10     10       241   Referring Doctor
+.EMVIPLIN  DIM       3      3        251   Place of Incident (category AP)
+.EMVIINIT  DIM       3      3        254   Initiator (category AI)
+.EMVIRTAS  DIM       3      3        257   RTA Seatbelt Details (category AR)
+.EMVIDDAT  DIM       8      8        260   Discharge Date (CCYYMMDD)
+.EMVIDTIM  DIM       8      8        268   Discharge Time (HH:MM:SS)
+.EMVIDSTA  DIM       3      3        276   Discharge Status (category ED)
+.EMVIOPR1  DIM       10     10       279   Web Operator - event (websecaf)
+.EMVIOPR2  DIM       10     10       289   Web Operator - discharge (websecaf)
+.EMVIUC01  DIM       3      3        299   User Defined Code 1  (category A1)
+.EMVIUC02  DIM       3      3        302   User Defined Code 2  (category A2)
+.EMVIUC03  DIM       3      3        305   User Defined Code 3  (category A3)
+.EMVIUC04  DIM       3      3        308   User Defined Code 4  (category A4)
+.EMVIUC05  DIM       3      3        311   User Defined Code 5  (category A5)
+.EMVIUC06  DIM       3      3        314   User Defined Code 6  (category A6)
+.EMVIUC07  DIM       3      3        317   User Defined Code 7  (category A7)
+.EMVIUC08  DIM       3      3        320   User Defined Code 8  (category A8)
+.EMVIUC09  DIM       3      3        323   Transport Mode       (category ea)
+.EMVIUC10  DIM       3      3        326   Escort Source        (category eb)
+.EMVIUC11  DIM       3      3        329   Referred to on Disch (category ec)
+.EMVIUC12  DIM       3      3        332   Reason for Transfer  (category ed)
+.EMVIUC13  DIM       3      3        335   Type of Visit        (category ee)
+.EMVIUC14  DIM       3      3        338   Human Intent         (category ef)
+.EMVIUC15  DIM       3      3        341   Activity when Injured(category eg)
+.EMVIUC16  DIM       3      3        344   Nurse Code           (category eh)
+.EMVIUC17  DIM       3      3        347   Injury Cause         (category ei)
+.EMVIUC18  DIM       3      3        350   User Defined Code 18 (category ej)
+.EMVIUC19  DIM       3      3        353   User Defined Code 19 (category ek)
+.EMVIUC20  DIM       3      3        356   Presenting Complaint (category el)
+.EMVIUC21  DIM       3      3        359   User Defined Code 21 (category em)
+.EMVIUC22  DIM       3      3        362   User Defined Code 22 (category en)
+.EMVIUC23  DIM       3      3        365   User Defined Code 23 (category eo)
+.EMVIUC24  DIM       3      3        368   User Defined Code 24 (category ep)
+.EMVIUC25  DIM       3      3        371   User Defined Code 25 (category eq)
+.EMVIUC26  DIM       3      3        374   User Defined Code 26 (category er)
+.EMVIUC27  DIM       3      3        377   User Defined Code 27 (category es)
+.EMVIUC28  DIM       3      3        380   User Defined Code 28 (category et)
+.EMVIUC29  DIM       3      3        383   User Defined Code 20 (category eu)
+.EMVIUC30  DIM       3      3        386   User Defined Code 30 (category ev)
+.EMVIUD01  DIM       8      8        389   User Defined Date 1  (CCYYMMDD)
+.EMVIUD02  DIM       8      8        397   User Defined Date 2  (CCYYMMDD)
+.EMVIUD03  DIM       8      8        405   User Defined Date 3  (CCYYMMDD)
+.EMVIUD04  DIM       8      8        413   User Defined Date 4  (CCYYMMDD)
+.EMVIUD05  DIM       8      8        421   User Defined Date 5  (CCYYMMDD)
+.EMVIUD06  DIM       8      8        429   User Defined Date 6  (CCYYMMDD)
+.EMVIUD07  DIM       8      8        437   User Defined Date 7  (CCYYMMDD)
+.EMVIUD08  DIM       8      8        445   User Defined Date 8  (CCYYMMDD)
+.EMVIUD09  DIM       8      8        453   User Defined Date 9  (CCYYMMDD)
+.EMVIUD10  DIM       8      8        461   User Defined Date 10 (CCYYMMDD)
+.EMVIUT01  DIM       8      8        469   User Defined Time 1  (CCYYMMDD)
+.EMVIUT02  DIM       8      8        477   User Defined Time 2  (HH:MM:SS)
+.EMVIUT03  DIM       8      8        485   User Defined Time 3  (HH:MM:SS)
+.EMVIUT04  DIM       8      8        493   User Defined Time 4  (HH:MM:SS)
+.EMVIUT05  DIM       8      8        501   User Defined Time 5  (HH:MM:SS)
+.EMVIUT06  DIM       8      8        509   User Defined Time 6  (HH:MM:SS)
+.EMVIUT07  DIM       8      8        517   User Defined Time 7  (HH:MM:SS)
+.EMVIUT08  DIM       8      8        525   User Defined Time 8  (HH:MM:SS)
+.EMVIUT09  DIM       8      8        533   User Defined Time 9  (HH:MM:SS)
+.EMVIUT10  DIM       8      8        541   User Defined Time 10 (HH:MM:SS)
+.EMVIYN01  FORM      1      2        549   User Defined Y/N Field 1
+.                                          0 = No
+.                                          1 = Yes
+.EMVIYN02  FORM      1      2        551   User Defined Y/N Field 2
+.                                          0 = No
+.                                          1 = Yes
+.EMVIYN03  FORM      1      2        553   User Defined Y/N Field 3
+.                                          0 = No
+.                                          1 = Yes
+.EMVIYN04  FORM      1      2        555   User Defined Y/N Field 4
+.                                          0 = No
+.                                          1 = Yes
+.EMVIYN05  FORM      1      2        557   User Defined Y/N Field 5
+.                                          0 = No
+.                                          1 = Yes
+.EMVIYN06  FORM      1      2        559   User Defined Y/N Field 6
+.                                          0 = No
+.                                          1 = Yes
+.EMVIYN07  FORM      1      2        561   User Defined Y/N Field 7
+.                                          0 = No
+.                                          1 = Yes
+.EMVIYN08  FORM      1      2        563   User Defined Y/N Field 8
+.                                          0 = No
+.                                          1 = Yes
+.EMVIYN09  FORM      1      2        565   User Defined Y/N Field 9
+.                                          0 = No
+.                                          1 = Yes
+.EMVIYN10  FORM      1      2        567   Ongoing Care Communication
+.                                          0 = No
+.                                          1 = Yes
+.EMVITXT1  DIM       50     50       569   User Defined Text Field 1
+.EMVITXT2  DIM       50     50       619   User Defined Text Field 2
+.EMVITXT3  DIM       50     50       669   User Defined Text Field 3
+.EMVITXT4  DIM       50     50       719   User Defined Text Field 4
+.EMVITXT5  DIM       50     50       769   User Defined Text Field 5
+.EMVIUN01  FORM      6      4        819   User Defined Numeric Field 1
+.EMVIUN02  FORM      6      4        823   User Defined Numeric Field 2
+.EMVIUN03  FORM      6      4        827   User Defined Numeric Field 3
+.EMVIUN04  FORM      6      4        831   User Defined Numeric Field 4
+.EMVIUN05  FORM      6      4        835   User Defined Numeric Field 5
+.EMVIELAP  DIM       3      3        839   Elapsed Since Accident (cat. AE)
+.EMVINSDT  DIM       8      8        842   Date First Seen by Nurse (CCYYMMDD)
+.EMVINSTM  DIM       8      8        850   Time First Seen by Nurse (HH:MM:SS)
+.EMVIDRDT  DIM       8      8        858   Date First Seen by Doct. (CCYYMMDD)
+.EMVIDRTM  DIM       8      8        866   Time First Seen by Doct. (HH:MM:SS)
+.EMVIPATT  FORM      3      3        874   Number of Previous Attendences
+.EMVITSRC  DIM       5      5        877   Transfer Source Code
+.EMVIDEST  DIM       5      5        882   Discharge Destination Code
+.EMVIAMBL  DIM       15     15       887   Ambulance Case Number
+.EMVIREGN  DIM       2      2        902   Body Region
+.EMVISENT  DIM       1      1        904   Extract Sent
+.                                          0 = No
+.                                          1 = Yes
+.EMVIUR01  DIM       6      6        905   User Defined Doctor Field 1
+.EMVIUR02  DIM       6      6        911   User Defined Doctor Field 2
+.EMVIUR03  DIM       6      6        917   User Defined Doctor Field 3
+.EMVIUR04  DIM       6      6        923   User Defined Doctor Field 4
+.EMVIUR05  DIM       6      6        929   User Defined Doctor Field 5
+.EMVIPADM  DIM       8      8        935   Patient System Admission Number
+.                                          (if admitted to hospital)
+.EMVIEWRD  DIM       3      3        943   Expected Ward (Patient System)
+.EMVIEBED  DIM       3      3        946   Expected Bed  (Patient System)
+OLDIHFMN  DIM       10     10       949   Health Fund Member Number
+.EMVIACLS  DIM       3      3        959   Admission Class (category P)
+.EMVICCLS  DIM       3      3        962   Care Class      (category CC)
+.EMVITRNS  DIM       10     10       965   Triage Nurse
+.EMVIDUM1  DIM       3      3        975   Dummy Field 1
+.EMVITRDT  DIM       8      8        978   Triage Date
+.EMVITRTM  DIM       8      8        986   Triage Time
+.EMVIATNS  DIM       10     10       994   Attending Nurse
+.EMVIDUM2  DIM       3      3        1004  Dummy Field 2
+.EMVIEXLC  DIM       3      3        1007  External Location Code (emrlocaf)
+.EMVISITE  DIM       3      3        1010  Emergency Site Code
+.EMVIUNIT  DIM       3      3        1013  Unit (category AC)
+.EMVICOM3  DIM       50     50       1016  Complaint Line 3
+.EMVICOM4  DIM       50     50       1066  Complaint Line 4
+.EMVICOM5  DIM       50     50       1116  Complaint Line 5
+.EMVICOM6  DIM       50     50       1166  Complaint Line 6
+.EMVIINJ1  DIM       50     50       1216  Injury Description Line 1
+.EMVIINJ2  DIM       50     50       1266  Injury Description Line 2
+.EMVINATI  DIM       3      3        1316  Nature of Main Injury (category ex)
+.EMVIINJC  DIM       3      3        1319  Injury Cause          (category ey)
+.EMVIHUMI  DIM       3      3        1322  Human Intent          (category ez)
+.EMVIACTI  DIM       3      3        1325  Activity When Injured (category EY)
+.EMVILOCO  DIM       25     25       1328  Other Location Description
+.EMVIPRLO  DIM       3      3        1353  Previous Location (emrlocaf)
+.EMVIPRTM  DIM       8      8        1356  Time Left Previous Location (hh:mm:
+.EMVIDPDT  DIM       8      8        1364  Departure Date (CCYYMMDD)
+.EMVIDPTM  DIM       8      8        1372  Departure Time (HH:MM:SS)
+.EMVIEXRS  DIM       3      3        1380  Extended Visit Reason (Cat RX)
+.EMVIDLRS  DIM       3      3        1383  Departure Delay Reason (Cat RY)
+.EMVISPDT  DIM       8      8        1386  Speciality Date (CCYYMMDD)
+.EMVISPTM  DIM       8      8        1394  Speciality Time (HH:MM:SS)
+.EMVISADT  DIM       8      8        1402  Speciality Arrival Date (CCYYMMDD)
+.EMVISATM  DIM       8      8        1410  Speciality Arrival Time (HH:MM:SS)
+.EMVIMPRA  DIM       10     10       1418  Mental Health Practitioner (pmshcpa
+.EMVIMPDT  DIM       8      8        1428  Date First Seen by MH Prac.(CCYYMMD
+.EMVIMPTM  DIM       8      8        1436  Time First Seen by MH Prac.(HH:MM:S
+.EMVIAADT  DIM       8      8        1444  Ambulance Arrival Date (CCYYMMDD)
+.EMVIAATM  DIM       8      8        1452  Ambulance Arrival Time (HH:MM:SS)
+.EMVIAHDT  DIM       8      8        1460  Ambulance Handover Date (CCYYMMDD)
+.EMVIAHTM  DIM       8      8        1468  Ambulance Handover Time (HH:MM:SS)
+.EMVIDADT  DIM       8      8        1476  Decision to Admit Date (CCYYMMDD)
+.EMVIDATM  DIM       8      8        1484  Decision to Admit Time (HH:MM:SS)
+.EMVIPURC  DIM       3      3        1492  Health Purchaser (Cat HP)
+.EMVIMNCD  DIM       10     10       1495  Meet & Greet Assessment Nurse Code
+.EMVIMNDT  DIM       8      8        1505  Meet & Greet Ass. Nurse Date Seen
+.EMVIMNTM  DIM       8      8        1513  Meet & Greet Ass. Nurse Time Seen
+.EMVIMDCD  DIM       10     10       1521  Meet & Greet Ass. Doctor Code
+.EMVIMDDT  DIM       8      8        1531  Meet & Greet Ass. Doctor Date Seen
+.EMVIMDTM  DIM       8      8        1539  Meet & Greet Ass. Doctor Time Seen
+.EMVIUC31  DIM       3      3        1547  User Defined Code 31 (category YN)
+.EMVIUC32  DIM       3      3        1550  Call Attempt 2 Status (category YO)
+.EMVIUC33  DIM       3      3        1553  Call Attempt 3 Status (category YP)
+.EMVIUC34  DIM       3      3        1556  Patient Follow Up Outcome(categoryYQ)
+.EMVIUC35  DIM       3      3        1559  Call Attempt 1 Status (category YR)
+.EMVIREFP  DIM       3      3        1562  Referral Period (Category RF)
+.EMVIREPM  DIM       2      2        1565  Referring Period Month
+.                                          (1-98 months, right justified)
+.EMVIREDT  DIM       8      8        1567  Referral Date
+.EMVIBNAA  DIM       1      1        1575  Benefit Assignment Authorised
+.                                          0 or Blank - No
+.                                          1 - Yes
+OLDISPAR  DIM        71     71       1576  Spare Variables
+.
+.End of Record                       1647
+.
+.                                     ******** copy the new FD here *******
+.
+EMRQUEA1   IFILE SQL, FIXED=1647, KEY="U1-20"
+.
+.Name      Type   Length  Physical Start Description
+.----      ----   ------  -------- ----- -----------
+DEMQUMES   DIM       20     20       1     Message Id
+.
+.          EMRVISFD variables
+.
+EMVIADMN  FORM      8      5        21    Visit Number
+EMVISTAT  FORM      1      2        26    Status
+.                                              1 = Current Patient
+.                                              2 = Discharged Incomplete
+.                                              3 = Discharged Complete
+.                                              4 = Cancelled
+EMVIURNO  DIM       8      8        28    Patient U/R Number
+EMVIDATE  DIM       8      8        36    Arrival Date (CCYYMMDD)
+EMVITIME  DIM       8      8        44    Arrival Time (HH:MM:SS)
+EMVITRIG  DIM       3      3        52    Triage Code (category AA)
+EMVICOM1  DIM       50     50       55    Complaint Line 1
+EMVICOM2  DIM       50     50       105   Complaint Line 2
+EMVILOCN  DIM       3      3        155   Location (emrlocaf)
+EMVIDOCT  DIM       10     10       158   Attending Doctor
+EMVICOMP  DIM       3      3        168   Compensation Code (category CL)
+EMVICLAS  DIM       3      3        171   Patient Classification (category A)
+EMVIINSR  DIM       3      3        174   Insurance Status (category U1)
+EMVISRCE  DIM       3      3        177   Source of Referal (category S)
+EMVISITN  DIM       3      3        180   Situation (category ES)
+EMVIMODE  DIM       3      3        183   Mode of Arrival (category EA)
+EMVIADMT  FORM      1      2        186   Admitted to Hospital
+.                                          0 = No
+.                                          1 = Yes
+EMVIDURN  FORM      4      3        188   Duration of Waiting (in minutes)
+EMVIEMPL  DIM       20     20       191   Employer (Workcover)
+EMVIWAIT  DIM       3      3        211   Completion Wait Code (category EW)
+EMVIPREV  DIM       3      3        214   Previous A&E Attendance (cat. EP)
+EMVIFUND  DIM       6      6        217   Health Fund
+EMVITABL  DIM       8      8        223   Health Fund Table
+EMVIREFG  DIM       10     10       231   Referring GP
+EMVIREFD  DIM       10     10       241   Referring Doctor
+EMVIPLIN  DIM       3      3        251   Place of Incident (category AP)
+EMVIINIT  DIM       3      3        254   Initiator (category AI)
+EMVIRTAS  DIM       3      3        257   RTA Seatbelt Details (category AR)
+EMVIDDAT  DIM       8      8        260   Discharge Date (CCYYMMDD)
+EMVIDTIM  DIM       8      8        268   Discharge Time (HH:MM:SS)
+EMVIDSTA  DIM       3      3        276   Discharge Status (category ED)
+EMVIOPR1  DIM       10     10       279   Web Operator - event (websecaf)
+EMVIOPR2  DIM       10     10       289   Web Operator - discharge (websecaf)
+EMVIUC01  DIM       3      3        299   User Defined Code 1  (category A1)
+EMVIUC02  DIM       3      3        302   User Defined Code 2  (category A2)
+EMVIUC03  DIM       3      3        305   User Defined Code 3  (category A3)
+EMVIUC04  DIM       3      3        308   User Defined Code 4  (category A4)
+EMVIUC05  DIM       3      3        311   User Defined Code 5  (category A5)
+EMVIUC06  DIM       3      3        314   User Defined Code 6  (category A6)
+EMVIUC07  DIM       3      3        317   User Defined Code 7  (category A7)
+EMVIUC08  DIM       3      3        320   User Defined Code 8  (category A8)
+EMVIUC09  DIM       3      3        323   Transport Mode       (category ea)
+EMVIUC10  DIM       3      3        326   Escort Source        (category eb)
+EMVIUC11  DIM       3      3        329   Referred to on Disch (category ec)
+EMVIUC12  DIM       3      3        332   Reason for Transfer  (category ed)
+EMVIUC13  DIM       3      3        335   Type of Visit        (category ee)
+EMVIUC14  DIM       3      3        338   Human Intent         (category ef)
+EMVIUC15  DIM       3      3        341   Activity when Injured(category eg)
+EMVIUC16  DIM       3      3        344   Nurse Code           (category eh)
+EMVIUC17  DIM       3      3        347   Injury Cause         (category ei)
+EMVIUC18  DIM       3      3        350   User Defined Code 18 (category ej)
+EMVIUC19  DIM       3      3        353   User Defined Code 19 (category ek)
+EMVIUC20  DIM       3      3        356   Presenting Complaint (category el)
+EMVIUC21  DIM       3      3        359   User Defined Code 21 (category em)
+EMVIUC22  DIM       3      3        362   User Defined Code 22 (category en)
+EMVIUC23  DIM       3      3        365   User Defined Code 23 (category eo)
+EMVIUC24  DIM       3      3        368   User Defined Code 24 (category ep)
+EMVIUC25  DIM       3      3        371   User Defined Code 25 (category eq)
+EMVIUC26  DIM       3      3        374   User Defined Code 26 (category er)
+EMVIUC27  DIM       3      3        377   User Defined Code 27 (category es)
+EMVIUC28  DIM       3      3        380   User Defined Code 28 (category et)
+EMVIUC29  DIM       3      3        383   User Defined Code 20 (category eu)
+EMVIUC30  DIM       3      3        386   User Defined Code 30 (category ev)
+EMVIUD01  DIM       8      8        389   User Defined Date 1  (CCYYMMDD)
+EMVIUD02  DIM       8      8        397   User Defined Date 2  (CCYYMMDD)
+EMVIUD03  DIM       8      8        405   User Defined Date 3  (CCYYMMDD)
+EMVIUD04  DIM       8      8        413   User Defined Date 4  (CCYYMMDD)
+EMVIUD05  DIM       8      8        421   User Defined Date 5  (CCYYMMDD)
+EMVIUD06  DIM       8      8        429   User Defined Date 6  (CCYYMMDD)
+EMVIUD07  DIM       8      8        437   User Defined Date 7  (CCYYMMDD)
+EMVIUD08  DIM       8      8        445   User Defined Date 8  (CCYYMMDD)
+EMVIUD09  DIM       8      8        453   User Defined Date 9  (CCYYMMDD)
+EMVIUD10  DIM       8      8        461   User Defined Date 10 (CCYYMMDD)
+EMVIUT01  DIM       8      8        469   User Defined Time 1  (CCYYMMDD)
+EMVIUT02  DIM       8      8        477   User Defined Time 2  (HH:MM:SS)
+EMVIUT03  DIM       8      8        485   User Defined Time 3  (HH:MM:SS)
+EMVIUT04  DIM       8      8        493   User Defined Time 4  (HH:MM:SS)
+EMVIUT05  DIM       8      8        501   User Defined Time 5  (HH:MM:SS)
+EMVIUT06  DIM       8      8        509   User Defined Time 6  (HH:MM:SS)
+EMVIUT07  DIM       8      8        517   User Defined Time 7  (HH:MM:SS)
+EMVIUT08  DIM       8      8        525   User Defined Time 8  (HH:MM:SS)
+EMVIUT09  DIM       8      8        533   User Defined Time 9  (HH:MM:SS)
+EMVIUT10  DIM       8      8        541   User Defined Time 10 (HH:MM:SS)
+EMVIYN01  FORM      1      2        549   User Defined Y/N Field 1
+.                                          0 = No
+.                                          1 = Yes
+EMVIYN02  FORM      1      2        551   User Defined Y/N Field 2
+.                                          0 = No
+.                                          1 = Yes
+EMVIYN03  FORM      1      2        553   User Defined Y/N Field 3
+.                                          0 = No
+.                                          1 = Yes
+EMVIYN04  FORM      1      2        555   User Defined Y/N Field 4
+.                                          0 = No
+.                                          1 = Yes
+EMVIYN05  FORM      1      2        557   User Defined Y/N Field 5
+.                                          0 = No
+.                                          1 = Yes
+EMVIYN06  FORM      1      2        559   User Defined Y/N Field 6
+.                                          0 = No
+.                                          1 = Yes
+EMVIYN07  FORM      1      2        561   User Defined Y/N Field 7
+.                                          0 = No
+.                                          1 = Yes
+EMVIYN08  FORM      1      2        563   User Defined Y/N Field 8
+.                                          0 = No
+.                                          1 = Yes
+EMVIYN09  FORM      1      2        565   User Defined Y/N Field 9
+.                                          0 = No
+.                                          1 = Yes
+EMVIYN10  FORM      1      2        567   Ongoing Care Communication
+.                                          0 = No
+.                                          1 = Yes
+EMVITXT1  DIM       50     50       569   User Defined Text Field 1
+EMVITXT2  DIM       50     50       619   User Defined Text Field 2
+EMVITXT3  DIM       50     50       669   User Defined Text Field 3
+EMVITXT4  DIM       50     50       719   User Defined Text Field 4
+EMVITXT5  DIM       50     50       769   User Defined Text Field 5
+EMVIUN01  FORM      6      4        819   User Defined Numeric Field 1
+EMVIUN02  FORM      6      4        823   User Defined Numeric Field 2
+EMVIUN03  FORM      6      4        827   User Defined Numeric Field 3
+EMVIUN04  FORM      6      4        831   User Defined Numeric Field 4
+EMVIUN05  FORM      6      4        835   User Defined Numeric Field 5
+EMVIELAP  DIM       3      3        839   Elapsed Since Accident (cat. AE)
+EMVINSDT  DIM       8      8        842   Date First Seen by Nurse (CCYYMMDD)
+EMVINSTM  DIM       8      8        850   Time First Seen by Nurse (HH:MM:SS)
+EMVIDRDT  DIM       8      8        858   Date First Seen by Doct. (CCYYMMDD)
+EMVIDRTM  DIM       8      8        866   Time First Seen by Doct. (HH:MM:SS)
+EMVIPATT  FORM      3      3        874   Number of Previous Attendences
+EMVITSRC  DIM       5      5        877   Transfer Source Code
+EMVIDEST  DIM       5      5        882   Discharge Destination Code
+EMVIAMBL  DIM       15     15       887   Ambulance Case Number
+EMVIREGN  DIM       2      2        902   Body Region
+EMVISENT  DIM       1      1        904   Extract Sent
+.                                          0 = No
+.                                          1 = Yes
+EMVIUR01  DIM       6      6        905   User Defined Doctor Field 1
+EMVIUR02  DIM       6      6        911   User Defined Doctor Field 2
+EMVIUR03  DIM       6      6        917   User Defined Doctor Field 3
+EMVIUR04  DIM       6      6        923   User Defined Doctor Field 4
+EMVIUR05  DIM       6      6        929   User Defined Doctor Field 5
+EMVIPADM  DIM       8      8        935   Patient System Admission Number
+.                                          (if admitted to hospital)
+EMVIEWRD  DIM       3      3        943   Expected Ward (Patient System)
+EMVIEBED  DIM       3      3        946   Expected Bed  (Patient System)
+EMVIHFMN  DIM       19     19       949   Health Fund Member Number
+EMVIACLS  DIM       3      3        968   Admission Class (category P)
+EMVICCLS  DIM       3      3        971   Care Class      (category CC)
+EMVITRNS  DIM       10     10       974   Triage Nurse
+EMVIDUM1  DIM       3      3        984   Dummy Field 1
+EMVITRDT  DIM       8      8        987   Triage Date
+EMVITRTM  DIM       8      8        995   Triage Time
+EMVIATNS  DIM       10     10       1003  Attending Nurse
+EMVIDUM2  DIM       3      3        1013  Dummy Field 2
+EMVIEXLC  DIM       3      3        1016  External Location Code (emrlocaf)
+EMVISITE  DIM       3      3        1019  Emergency Site Code
+EMVIUNIT  DIM       3      3        1022  Unit (category AC)
+EMVICOM3  DIM       50     50       1025  Complaint Line 3
+EMVICOM4  DIM       50     50       1075  Complaint Line 4
+EMVICOM5  DIM       50     50       1125  Complaint Line 5
+EMVICOM6  DIM       50     50       1175  Complaint Line 6
+EMVIINJ1  DIM       50     50       1225  Injury Description Line 1
+EMVIINJ2  DIM       50     50       1275  Injury Description Line 2
+EMVINATI  DIM       3      3        1325  Nature of Main Injury (category ex)
+EMVIINJC  DIM       3      3        1328  Injury Cause          (category ey)
+EMVIHUMI  DIM       3      3        1331  Human Intent          (category ez)
+EMVIACTI  DIM       3      3        1334  Activity When Injured (category EY)
+EMVILOCO  DIM       25     25       1337  Other Location Description
+EMVIPRLO  DIM       3      3        1362  Previous Location (emrlocaf)
+EMVIPRTM  DIM       8      8        1365  Time Left Previous Location (hh:mm:
+EMVIDPDT  DIM       8      8        1373 Departure Date (CCYYMMDD)
+EMVIDPTM  DIM       8      8        1381  Departure Time (HH:MM:SS)
+EMVIEXRS  DIM       3      3        1389  Extended Visit Reason (Cat RX)
+EMVIDLRS  DIM       3      3        1392  Departure Delay Reason (Cat RY)
+EMVISPDT  DIM       8      8        1395  Speciality Date (CCYYMMDD)
+EMVISPTM  DIM       8      8        1403  Speciality Time (HH:MM:SS)
+EMVISADT  DIM       8      8        1411  Speciality Arrival Date (CCYYMMDD)
+EMVISATM  DIM       8      8        1419  Speciality Arrival Time (HH:MM:SS)
+EMVIMPRA  DIM       10     10       1427  Mental Health Practitioner (pmshcpa
+EMVIMPDT  DIM       8      8        1437  Date First Seen by MH Prac.(CCYYMMD
+EMVIMPTM  DIM       8      8        1445  Time First Seen by MH Prac.(HH:MM:S
+EMVIAADT  DIM       8      8        1453  Ambulance Arrival Date (CCYYMMDD)
+EMVIAATM  DIM       8      8        1461  Ambulance Arrival Time (HH:MM:SS)
+EMVIAHDT  DIM       8      8        1469  Ambulance Handover Date (CCYYMMDD)
+EMVIAHTM  DIM       8      8        1477  Ambulance Handover Time (HH:MM:SS)
+EMVIDADT  DIM       8      8        1485  Decision to Admit Date (CCYYMMDD)
+EMVIDATM  DIM       8      8        1493  Decision to Admit Time (HH:MM:SS)
+EMVIPURC  DIM       3      3        1501  Health Purchaser (Cat HP)
+EMVIMNCD  DIM       10     10       1504  Meet & Greet Assessment Nurse Code
+EMVIMNDT  DIM       8      8        1514  Meet & Greet Ass. Nurse Date Seen
+EMVIMNTM  DIM       8      8        1522  Meet & Greet Ass. Nurse Time Seen
+EMVIMDCD  DIM       10     10       1530  Meet & Greet Ass. Doctor Code
+EMVIMDDT  DIM       8      8        1540  Meet & Greet Ass. Doctor Date Seen
+EMVIMDTM  DIM       8      8        1548  Meet & Greet Ass. Doctor Time Seen
+EMVIUC31  DIM       3      3        1556  User Defined Code 31 (category YN)
+EMVIUC32  DIM       3      3        1559  Call Attempt 2 Status (category YO)
+EMVIUC33  DIM       3      3        1562  Call Attempt 3 Status (category YP)
+EMVIUC34  DIM       3      3        1565  Patient Follow Up Outcome(categoryYQ)
+EMVIUC35  DIM       3      3        1568  Call Attempt 1 Status (category YR)
+EMVIREFP  DIM       3      3        1571  Referral Period (Category RF)
+EMVIREPM  DIM       2      2        1574  Referring Period Month
+.                                          (1-98 months, right justified)
+EMVIREDT  DIM       8      8        1576 Referral Date
+EMVIBNAA  DIM       1      1        1584  Benefit Assignment Authorised
+.                                          0 or Blank - No
+.                                          1 - Yes
+EMVISPAR  DIM        62     62       1585  Spare Variables
+.
+.End of Record                       1647
+.
+. LOCAL VARIABLES
+. ---------------
+CMDLINE   DIM       200
+.
+DEFPATH   DIM       60
+DIM60     DIM       60
+DISNUM    FORM      4
+.
+ERORTEXT  DIM       80
+.
+INPFILE   DIM       8
+.
+MINUS3    FORM      "-3"
+.
+NEWFILE   DIM       60
+NEWPATH   DIM       60
+.
+OLDPATH   DIM       60
+.
+RECNUM    FORM      8
+.
+SAVEFLG   FORM      1
+.
+USINGORC  DIM       1
+.
+.
+. PROGRAM CONSTANTS
+. -----------------
+CREATEXT  INIT    "Log file created "
+DASHLINE  INIT    "--------------------------------------------------":
+                  "------------------------------"
+ENDGTEXT  INIT    "Ending   fixit (Option "
+OPENTEXT  INIT    "Log file opened "
+SP60      INIT    "                                                            "
+STARTTXT  INIT    "Starting fixit (Option "
+.
+.
+.
+PRGNAM    INIT      "CONVERSION EMRQUEFD"
+PRGID     INIT      "X04EMQUE"
+VERSION   INIT      "V12.00.00"
++
+.*****************************************************************************
+.*                             MAIN0000                                      *
+.*                         Program Mainline                                  *
+.*****************************************************************************
+.
+MAIN0000  CALL      INIT0000                      * init and open files
+.
+          CALL      OLOG0000                      * create/open log file
+MAIN0500  CALL      OPTN0000                      * get option
+          BRANCH    COPTION,MAIN1000:             * run c-isam fixit
+                            MAIN2000              * run oracle fixit
+          GOTO      MAIN9999                      * exit selected
+.
+MAIN1000  CALL      KDIR0000                      * Keyin directory
+          BRANCH    EXIT,MAIN9000
+.
+MAIN2000  CALL      CONTQST                       * Ok to continue ?
+          BRANCH    CEXIT,MAIN5000:               * yes
+                          MAIN0500:               * no
+                          MAIN9000                * cancel
+.
+MAIN5000  BRANCH    COPTION,MAIN6000:             * c-isam fixit
+                            MAIN7000              * oracle fixit
+.
+.         Running c-isam fix
+.
+MAIN6000  CALL      PREP0000                      * preparing files
+          BRANCH    EXIT,MAIN9000
+.
+          CALL      READ0000                      * read old records and write
+          CALL      ENDP0000                      * save/zip saved file
+          GOTO      MAIN9000
+.
+.         Running oracle fix
+.
+MAIN7000  CALL      OFIX0000                      * run oracle fix
+.
+MAIN9000  CALL      CLOG0000                      * close log file
+.
+MAIN9999  CHAIN     PGM
++
+.********************************************************************
+.*                          INIT0000                                *
+.*  Display heading and check that the files needed exist&open them *
+.********************************************************************
+.
+INIT0000  CALL      DISPHEAD
+          MOVE      ZERO,RECNUM
+          MOVE      ZERO,DISNUM
+          
+INIT9999  RETURN
++
+.*****************************************************************************
+.*                                OPTN0000             Called by: MAIN0000   *
+.*                        Get user options or exit                           *
+.*    Returns:  EXIT    = FALSE (0)  Ok to proceed                           *
+.*                        TRUE  (1)  Exit option selected                    *
+.*              COPTION - option selected                                    *
+.*****************************************************************************
+.
+OPTN0000  MOVE      "No",USINGORC
+          REP       "yYnN",USINGORC
+          MOVE      USINGORC,KEY1
+          REP       "Y-N-",KEY1
+          MATCH     "-",KEY1
+          GOTO      OPTN9200 IF NOT EQUAL
+.
+          DISPLAY   *P1:3,*EF,*P1:4,*V2LON,ZERO,*HOFF,". Exit":
+                    *P1:5,*V2LON,ONE,*HOFF,". Run Fixit (c-isam only)"
+          MATCH     "Y",USINGORC
+          IF        @EQUAL
+            DISPLAY   *P1:6,*V2LON,TWO,*HOFF,". Run Fixit (Oracle only)"
+          ENDIF
+.
+OPTN0500  KEYIN     *P1:8,*EL,"Select Option : ":
+                    *P17:8,*V2LON,COPTION
+.
+          COMPARE   ZERO,COPTION                 * exit selected ?
+          GOTO      OPTN9500 IF EQUAL            * yes
+.
+          BRANCH    COPTION,OPTN9000:            * run c-isam fixit
+                            OPTN9000             * run oracle fixit
+.
+          BEEP
+          GOTO      OPTN0500
+.
+OPTN9000  MOVE      ZERO,EXIT
+          GOTO      OPTN9999
+.
+OPTN9200  DISPLAY   *P1:3,*EF,*P1:4," Oracle Option has not been set up ":
+                          "correctly":
+                    *P1:6," Program will terminate    - ";
+          MOVE      "Oracle Option has not been set up correctly",ERORTEXT
+          WRITE     LOGFILE,SEQ;*+,ERORTEXT
+          CALL      HITENTER
+.
+OPTN9500  MOVE      ONE,EXIT
+.
+OPTN9999  RETURN
++
+.********************************************************************
+.*                          KDIR0000                                *
+.*  Keyin directories                                               *
+.********************************************************************
+.
+KDIR0000  MOVE      ONE,SAVEFLG        * Default to keep file
+          KEYIN     *P1:10,*EL,"Do you want to save the original file (Y/N) ? ":
+                    ANS;
+          REP       "yYnN",ANS
+          CMATCH    "Y",ANS
+          GOTO      KDIR1000 IF EQUAL
+          MOVE      ZERO,SAVEFLG       * not to keep file
+          CMATCH    "N",ANS
+          GOTO      KDIR1000 IF EQUAL
+          BEEP
+          GOTO      KDIR0000
+.
+KDIR1000  CALL      DEFT0000                * Get the default path
+          BRANCH    EXIT,KDIR9999
+          MOVE      SP60,OLDPATH
+.
+          DISPLAY   *P1:24,*EL,"The directory path must end with a slash (/) ";
+.
+          MOVE      DEFPATH,OLDPATH
+          BRANCH    SAVEFLG,KDIR2000
+.
+.         Keyin the path for the original file
+.
+          KEYIN     *P1:12,*EL,"Keyin path for temporarily saving original ":
+                    "file: ":
+                    *P10:13,*EL,*DV,*RV,OLDPATH:
+                    *P10:13,OLDPATH;
+          GOTO      KDIR3000
+.
+KDIR2000  KEYIN     *P1:12,*EL,"Keyin path for saving original file: ":
+                    *P10:13,*EL,*DV,*RV,OLDPATH:
+                    *P10:13,OLDPATH;
+.
+KDIR3000  ENDSET    OLDPATH
+          APPEND    SP60,OLDPATH
+          RESET     OLDPATH
+.
+          MATCH     SP60,OLDPATH
+          IF        @EQUAL
+            PACK      OLDPATH,DEFPATH      * use the default
+            DISPLAY   *P10:13,*EL,*V2LON,OLDPATH;
+          ENDIF
+.
+          SQUEEZE   OLDPATH
+          CMATCH    EXITCHAR,OLDPATH
+          GOTO      KDIR9000 IF EQUAL
+.
+          PACK      DIM60,OLDPATH,SP60
+          CALL      VALD0000         * check if it's a valid directory
+          BRANCH    EXIT,KDIR1000
+.
+.         Keyin the path for the new file
+.
+KDIR5000  MOVE      SP60,NEWPATH
+          MOVE      DEFPATH,NEWPATH
+          KEYIN     *P1:15,*EL,"Keyin path for the new file: ":
+                    *P10:16,*EL,*DV,*RV,NEWPATH:
+                    *P10:16,NEWPATH;
+          ENDSET    NEWPATH
+          APPEND    SP60,NEWPATH
+          RESET     NEWPATH
+.
+          MATCH     SP60,NEWPATH
+          IF        @EQUAL
+            PACK      NEWPATH,DEFPATH      * use the default
+            DISPLAY   *P10:16,*V2LON,NEWPATH;
+          ENDIF
+.
+          SQUEEZE   NEWPATH
+          CMATCH    EXITCHAR,NEWPATH
+          GOTO      KDIR9000 IF EQUAL
+.
+          PACK      DIM60,NEWPATH,SP60
+          CALL      VALD0000         * check if it's a valid directory
+          BRANCH    EXIT,KDIR5000
+          GOTO      KDIR9999
+.
+KDIR9000  MOVE      ONE,EXIT
+.
+KDIR9999  DISPLAY   *P1:24,*EL;
+          RETURN
++
+.********************************************************************
+.*                          PREP0000                                *
+.*  Preparing files                                                 *
+.********************************************************************
+.
+PREP0000  CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P1:18,"Started : ",CDATE,SP1,CTIMEIS:
+                    *P1:20,"Record : "
+.
+          CALL      SLOG0000                      * write start to log file
+.
+          MOVE      "emrqueaf",INPFILE
+          CALL      CHEK0000             * check file exists or has been changed
+          BRANCH    EXIT,PREP9000
+.
+          CLOSE     OLDFILE1
+          DISPLAY   *P1:24,*EL,"Copying files ... Please wait !! ";
+.
+.         Copy old file to the keyin directory
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "cp `ldat emrqueaf.dat` ",CMDLINE
+          APPEND    OLDPATH,CMDLINE
+          APPEND    "semrquef.dat",CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            GOTO      PREP8000
+          ENDIF
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "cp `ldat emrqueaf.idx` ",CMDLINE
+          APPEND    OLDPATH,CMDLINE
+          APPEND    "semrquef.idx",CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            GOTO      PREP8000
+          ENDIF
+.
+.         Remove the original files
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "iserase ",CMDLINE
+          APPEND    DEFPATH,CMDLINE
+          APPEND    "emrqueaf",CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            MOVE      "Unable to remove the original file.  ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      PREP9000
+          ENDIF
+.
+.         Opening old file after being copied
+.
+          MOVE      SP60,DIM60
+          CLEAR     DIM60
+          APPEND    OLDPATH,DIM60
+          APPEND    "semrquef",DIM60
+          APPEND    SP60,DIM60
+          RESET     DIM60
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      OLDFILE1,DIM60
+          TRAPCLR   IO
+          IF        OVRCD = 1
+            MOVE      "Unable to open saved original file.  ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      PREP9000
+          ENDIF
+.
+.         Create the new file
+.
+          DISPLAY   *P1:24,*EL,"Creating new files ... Please wait !! ";
+          PACK      NEWFILE,SP60
+          CLEAR     NEWFILE
+          APPEND    NEWPATH,NEWFILE
+          APPEND    "emrqueaf",NEWFILE
+          APPEND    SP60,NEWFILE
+          RESET     NEWFILE
+          SQUEEZE   NEWFILE
+.
+PREP1000  PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "isbuild ",CMDLINE
+          APPEND    NEWFILE,CMDLINE
+.
+.  The files new record length and unique key must be written here
+.      eg    APPEND    " 195 UC9-16",CMDLINE
+.
+. Index 1
+          APPEND    " 1647 UC1-20",CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+.
+.  If the file has more than one index, this piece of code below has 
+.  to be repeated with for each individual index
+.
+. Index 2
+.
+          OPEN      EMRQUEA1,NEWFILE
+.
+          DISPLAY   *P1:24,*EL;
+          MOVE      ZERO,EXIT
+          GOTO      PREP9999
+.
+PREP5000  MOVE      "Old file not found.  ",ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+          CALL      HITENTER
+          GOTO      PREP9000
+.
+PREP8000  MOVE      "Unable to copy original file.  (Error: ",ERORTEXT
+          ENDSET    ERORTEXT
+          APPEND    TASKID,ERORTEXT
+          APPEND    ")  ",ERORTEXT
+          RESET     ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+          CALL      HITENTER
+.
+PREP9000  MOVE      ONE,EXIT
+.
+PREP9999  RETURN
++
+.********************************************************************
+.*                          CHEK0000                                *
+.*  Check if file exists, or has already been converted             *
+.********************************************************************
+.
+CHEK0000  MOVE      ZERO,EXIT
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND GIVING DIM60 IF IO
+          OPEN      OLDFILE1,INPFILE
+          TRAPCLR   IO
+          BRANCH    OVRCD,CHEK2000       * Original file does not exist
+          CLOSE     OLDFILE1
+          GOTO      CHEK9999
+.
+CHEK2000  RESET     DIM60
+          SCAN      "I * I",DIM60
+          DISPLAY   *P1:23,*EF,"File '",INPFILE,"' ";
+          IF        @EQUAL
+            DISPLAY   "does not exist - ";
+            MOVE      "File does not exist",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+          ELSE
+            RESET     DIM60
+            SCAN      "I * L",DIM60
+            IF        @EQUAL
+              DISPLAY   "has already been converted - ";
+              MOVE      "File has already been converted",ERORTEXT
+              WRITE     LOGFILE,SEQ;ERORTEXT
+            ELSE
+              DISPLAY   "has caused an IO error - ";
+              MOVE      "File has caused an IO Error",ERORTEXT
+              WRITE     LOGFILE,SEQ;ERORTEXT
+            ENDIF
+          ENDIF
+          MOVE      "File will be bypassed",ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *+,ERORTEXT
+.
+          CALL      HITENTER
+          DISPLAY   *P1:23,*EF;
+.
+CHEK9000  MOVE      ONE,EXIT
+.
+CHEK9999  RETURN
++
+.**********************************************************************
+.*                               READ0000                             *
+.*             loop thru old file and write each record               *
+.**********************************************************************
+.
+READ0000  DISPLAY   *P1:20,*EL,"Record No. : ";
+.
+          PACK      KEY20,SP60
+          CALL      READSOLD                      * position at start
+READ1000  CALL      READKOLD                      * read next record
+          BRANCH    OVRCD,READ6000                * no more records
+.
+          ADD       ONE,RECNUM                    * update record counter
+          ADD       ONE,DISNUM                    * Display counter
+.
+          IF        DISNUM = 5000  | RECNUM = 1
+            MOVE      ZERO,DISNUM
+            DISPLAY   *P15:20,*V2LON,RECNUM
+          ENDIF
+.
+.  All necessary changes to the files field lengths, date changes
+.  or any other sort of modification must be made here
+.
+.    eg    PACK      DSPARE,SP70
+.          PACK      PTDSDMDC,SP10
+.          PACK      PTDSDDRG,SP10
+.
+          PACK      EMVIHFMN,OLDIHFMN,SP70
+          MOVE      SP70,EMVISPAR
+.                                               * Pack key here
+          PACK      KEY20,DEMQUMES,SP70
+          CALL      WREMQUE1                    * write to new file
+.
+          GOTO      READ1000                      * get next record
+.
+READ6000  CLOSE     EMRQUEA1                      * close new file
+          CLOSE     OLDFILE1                      * close old file
+.
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P15:20,*V2LON,RECNUM,*HOFF:
+                    *P1:22,"Ended  : ",CDATE,SP1,CTIMEIS:
+                    *P1:24;
+.
+READ9999  RETURN
++
+.**********************************************************************
+.*                               VALD0000                             *
+.*        Check if it a valid directory                               *
+.**********************************************************************
+.
+VALD0000  MOVE      ZERO,EXIT
+.
+          SQUEEZE   DIM60
+          ENDSET    DIM60
+          CMATCH    SLASH,DIM60
+          IF        !@EQUAL
+            MOVE      "Directory path must end with a slash (/) ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      VALD9000
+          ENDIF
+          RESET     DIM60
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          APPEND    "cd ",CMDLINE
+          APPEND    DIM60,CMDLINE
+          APPEND    SP60,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID      * check if exists
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            MOVE      "Directory does not exist ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      VALD9000
+          ENDIF
+          GOTO      VALD9999
+.
+VALD9000  MOVE      ONE,EXIT            * Not valid
+.
+VALD9999  RETURN
++
+.**********************************************************************
+.*                               ENDP0000                             *
+.*        Remove or zip save file                                     *
+.**********************************************************************
+.
+ENDP0000  MOVE      SP60,DIM60
+          CLEAR     DIM60
+          APPEND    OLDPATH,DIM60        * set up the saved file with path
+          APPEND    "semrquef*",DIM60
+          APPEND    SP60,DIM60
+          RESET     DIM60
+          SQUEEZE   DIM60
+.
+          PACK      CMDLINE,SP60,SP60
+          CLEAR     CMDLINE
+          IF        SAVEFLG = 1
+            APPEND    "gzip -f ",CMDLINE
+            APPEND    DIM60,CMDLINE
+            APPEND    SP60,CMDLINE
+            RESET     CMDLINE
+            DISPLAY   *P1:24,*EL,"Compressing original file.. ":
+                      "Please wait !!  ";
+          ELSE
+            APPEND    "rm ",CMDLINE
+            APPEND    DIM60,CMDLINE
+            APPEND    SP60,CMDLINE
+            RESET     CMDLINE
+            DISPLAY   *P1:24,*EL,"Removing original file.. Please wait !!  ";
+          ENDIF
+          EXECUTE   CMDLINE,TASKID      * check if exists
+.
+          CMATCH    "0",TASKID
+          IF        !@EQUAL
+            MOVE      "Saved file not zipped or removed.  ",ERORTEXT
+            WRITE     LOGFILE,SEQ;ERORTEXT
+            DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+            CALL      HITENTER
+            GOTO      ENDP9999
+          ENDIF
+.
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P1:24,*EL,*B,"Finished processing  ",CDATE,SP1,CTIMEIS:
+                    ".  ";
+          CALL      HITENTER
+.
+          CALL      ELOG0000                     * write an end log entry
+.
+ENDP9999  RETURN
++
+.**********************************************************************
+.*        DEFT0000 -  Get the default directory                       *
+.**********************************************************************
+.
+DEFT0000  EXECUTE   "ldat emrqueaf.dat > temp.txt",TASKID
+.
+          PACK      DEFPATH,SP30,SP30
+          CLOSE     FINDFILE
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      FINDFILE,"temp"
+          TRAPCLR   IO
+          BRANCH    OVRCD,DEFT3000
+.
+          READ      FINDFILE,SEQ;DEFPATH
+          GOTO      DEFT3000 IF OVER
+.
+          ENDSET    DEFPATH
+DEFT1000  CMATCH    "/",DEFPATH
+          GOTO      DEFT2000 IF EQUAL
+.
+          BUMP      DEFPATH,-1
+          GOTO      DEFT1000 IF NOT EOS
+          GOTO      DEFT3000
+.
+DEFT2000  LENSET    DEFPATH
+          RESET     DEFPATH
+.
+          PACK      DEFPATH,DEFPATH,SP30,SP30,SP30,SP30
+          STRIP     DEFPATH
+          ENDSET    DEFPATH
+          RESET     DEFPATH
+          CLOSE     FINDFILE
+          MOVE      ZERO,EXIT
+          GOTO      DEFT9999
+.
+DEFT3000  MOVE      "Error finding 'emrqueaf'.  ",ERORTEXT
+          WRITE     LOGFILE,SEQ;ERORTEXT
+          DISPLAY   *P1:24,*EL,*B,*+,ERORTEXT;
+          CALL      HITENTER
+          CLOSE     FINDFILE
+          MOVE      ONE,EXIT
+.
+DEFT9999  RETURN
++
+.*****************************************************************************
+.*                            OLOG0000                                       *
+.*                    Open the log file                                      *
+.*****************************************************************************
+.
+OLOG0000  CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      LOGFILE,"x04emque.log"       * open log file
+          TRAPCLR   IO
+          IF        OVRCD = 1
+            PREP      LOGFILE,"x04emque.log"     * create and open log file
+            WRITE     LOGFILE,MINUS3;DASHLINE
+            WRITE     LOGFILE,SEQ;CREATEXT,CDATE,SP1,CTIMEIS
+          ELSE
+            WRITE     LOGFILE,MINUS3;DASHLINE
+            WRITE     LOGFILE,SEQ;OPENTEXT,CDATE,SP1,CTIMEIS
+          ENDIF
+.
+OLOG9999  RETURN
++
+.*****************************************************************************
+.*                            CLOG0000                                       *
+.*                    Close the log file                                     *
+.*****************************************************************************
+.
+CLOG0000  CLOSE     LOGFILE
+.
+CLOG9999  RETURN
++
+.*****************************************************************************
+.*                            SLOG0000                                       *
+.*                    Write a start log to the log file                      *
+.*****************************************************************************
+.
+SLOG0000  WRITE     LOGFILE,SEQ;DASHLINE
+          WRITE     LOGFILE,SEQ;STARTTXT,COPTION,RBRACK,SP1,CDATE,SP1:
+                                   CTIMEIS
+.
+SLOG9999  RETURN
++
+.*****************************************************************************
+.*                            ELOG0000                                       *
+.*                    Write an end log to the log file                       *
+.*****************************************************************************
+.
+ELOG0000  WRITE     LOGFILE,SEQ;ENDGTEXT,COPTION,RBRACK,SP1,CDATE,SP1:
+                                   CTIMEIS
+ELOG9999  RETURN
++
+.*****************************************************************************
+.*                            OFIX0000                                       *
+.*                    Oracle fix to "EMRQUEFD"                               *
+.*****************************************************************************
+.
+OFIX0000  DISPLAY   *P1:24,*EL;
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P1:18,"Started : ",CDATE,SP1,CTIMEIS:
+                    *P1:20,*EL,"Record No. :";
+.
+          CALL      SLOG0000                      * write start to log file
+.
+          OPEN      EMRQUEA1,"emrqueaf"
+.
+          PACK      KEY20,SP70
+          CALL      RSEMQUE1                      * position at start of file
+OFIX0500  CALL      RKEMQUE1                      * read next record
+          BRANCH    OVRCD,OFIX9000                * eof - finished
+.
+          ADD       ONE,RECNUM                    * increment record counter
+          ADD       ONE,DISNUM                    * Display counter
+.         
+          IF        DISNUM = 5000  | RECNUM = 1
+            MOVE      ZERO,DISNUM 
+            DISPLAY   *P15:20,*V2LON,RECNUM
+          ENDIF
+.
+.>>>>>>>  Add code here to populate/update variables
+.
+          CALL      UPEMQUE1
+.
+          GOTO      OFIX0500                     * get next record
+.         
+OFIX9000  CLOSE     EMRQUEA1
+.
+          CALL      IBACLOCK
+          REP       " 0",CDATE
+          REP       " 0",CTIMEIS
+          DISPLAY   *P15:20,*V2LON,RECNUM,*HOFF:
+                    *P1:22,"Update completed ",CDATE,SP1,CTIMEIS:
+                    *P1:24;
+          CALL      HITENTER
+.
+          CALL      ELOG0000                     * write an end log entry
+.
+OFIX9999  RETURN
+.
+OFDUMYIO  RETURN
++
+.*****************************************************************************
+.*        I/O Routines                                                       *
+.*****************************************************************************
+.
+.                  ******************************    OLD IO ROUTINES
+.                  Copy the Positional Read (RS or RDS) from original I/O file,
+.                  - change Label to READSOLD and the index name to OLDFILE1
+.
+READSOLD  MOVE      ZERO,OVRCD
+          READ      OLDFILE1,KEY20;;
+          RETURN
+.
+.                  Copy the Read Next (RK or RDK) from the original I/O file
+.                  - change Label to READKOLD and the index name to OLDFILE1
+.                  - change any fields that are changing to a prefix of OLD,
+.                    eg. PTEDSPAR becomes OLDDSPAR
+.
+READKOLD  MOVE      ZERO,OVRCD
+          READKS    OLDFILE1;DEMQUMES,EMVIADMN,EMVISTAT,EMVIURNO:
+                                  EMVIDATE,EMVITIME,EMVITRIG,EMVICOM1,EMVICOM2:
+                                  EMVILOCN,EMVIDOCT,EMVICOMP,EMVICLAS,EMVIINSR:
+                                  EMVISRCE,EMVISITN,EMVIMODE,EMVIADMT,EMVIDURN:
+                                  EMVIEMPL,EMVIWAIT,EMVIPREV,EMVIFUND,EMVITABL:
+                                  EMVIREFG,EMVIREFD,EMVIPLIN,EMVIINIT,EMVIRTAS:
+                                  EMVIDDAT,EMVIDTIM,EMVIDSTA,EMVIOPR1,EMVIOPR2:
+                                  EMVIUC01,EMVIUC02,EMVIUC03,EMVIUC04,EMVIUC05:
+                                  EMVIUC06,EMVIUC07,EMVIUC08,EMVIUC09,EMVIUC10:
+                                  EMVIUC11,EMVIUC12,EMVIUC13,EMVIUC14,EMVIUC15:
+                                  EMVIUC16,EMVIUC17,EMVIUC18,EMVIUC19,EMVIUC20:
+                                  EMVIUC21,EMVIUC22,EMVIUC23,EMVIUC24,EMVIUC25:
+                                  EMVIUC26,EMVIUC27,EMVIUC28,EMVIUC29,EMVIUC30:
+                                  EMVIUD01,EMVIUD02,EMVIUD03,EMVIUD04,EMVIUD05:
+                                  EMVIUD06,EMVIUD07,EMVIUD08,EMVIUD09,EMVIUD10:
+                                  EMVIUT01,EMVIUT02,EMVIUT03,EMVIUT04,EMVIUT05:
+                                  EMVIUT06,EMVIUT07,EMVIUT08,EMVIUT09,EMVIUT10:
+                                  EMVIYN01,EMVIYN02,EMVIYN03,EMVIYN04,EMVIYN05:
+                                  EMVIYN06,EMVIYN07,EMVIYN08,EMVIYN09,EMVIYN10:
+                                  EMVITXT1,EMVITXT2,EMVITXT3,EMVITXT4,EMVITXT5:
+                                  EMVIUN01,EMVIUN02,EMVIUN03,EMVIUN04,EMVIUN05:
+                                  EMVIELAP,EMVINSDT,EMVINSTM,EMVIDRDT,EMVIDRTM:
+                                  EMVIPATT,EMVITSRC,EMVIDEST,EMVIAMBL,EMVIREGN:
+                                  EMVISENT,EMVIUR01,EMVIUR02,EMVIUR03,EMVIUR04:
+                                  EMVIUR05,EMVIPADM,EMVIEWRD,EMVIEBED,OLDIHFMN:
+                                  EMVIACLS,EMVICCLS,EMVITRNS,EMVIDUM1,EMVITRDT:
+                                  EMVITRTM,EMVIATNS,EMVIDUM2,EMVIEXLC,EMVISITE:
+                                  EMVIUNIT,EMVICOM3,EMVICOM4,EMVICOM5,EMVICOM6:
+                                  EMVIINJ1,EMVIINJ2,EMVINATI,EMVIINJC,EMVIHUMI:
+                                  EMVIACTI,EMVILOCO,EMVIPRLO,EMVIPRTM,EMVIDPDT:
+                                  EMVIDPTM,EMVIEXRS,EMVIDLRS,EMVISPDT,EMVISPTM:
+                                  EMVISADT,EMVISATM,EMVIMPRA,EMVIMPDT,EMVIMPTM:
+                                  EMVIAADT,EMVIAATM,EMVIAHDT,EMVIAHTM,EMVIDADT:
+                                  EMVIDATM,EMVIPURC,EMVIMNCD,EMVIMNDT,EMVIMNTM:
+                                  EMVIMDCD,EMVIMDDT,EMVIMDTM,EMVIUC31,EMVIUC32:
+                                  EMVIUC33,EMVIUC34,EMVIUC35,EMVIREFP,EMVIREPM:
+                                  EMVIREDT,EMVIBNAA,OLDISPAR
+          GOTO      OVERCOND IF OVER
+          RETURN
+.
+.                  ******************************    NEW IO ROUTINES
+.                  Copy the Write statement from the new I/O file
+.                  (no changes are needed to this routine)
+.
+.                  For Oracle fixits, you will probably also need to copy
+.                  the RS.., RK.... & UP.... I/O routines for the new FD.
+.
+RSEMQUE1  RESET     KEY20
+          READ      EMRQUEA1,KEY20;;
+          RETURN
+.
+RKEMQUE1  MOVE      ZERO,OVRCD
+          READKS    EMRQUEA1;DEMQUMES,EMVIADMN,EMVISTAT,EMVIURNO:
+                                  EMVIDATE,EMVITIME,EMVITRIG,EMVICOM1,EMVICOM2:
+                                  EMVILOCN,EMVIDOCT,EMVICOMP,EMVICLAS,EMVIINSR:
+                                  EMVISRCE,EMVISITN,EMVIMODE,EMVIADMT,EMVIDURN:
+                                  EMVIEMPL,EMVIWAIT,EMVIPREV,EMVIFUND,EMVITABL:
+                                  EMVIREFG,EMVIREFD,EMVIPLIN,EMVIINIT,EMVIRTAS:
+                                  EMVIDDAT,EMVIDTIM,EMVIDSTA,EMVIOPR1,EMVIOPR2:
+                                  EMVIUC01,EMVIUC02,EMVIUC03,EMVIUC04,EMVIUC05:
+                                  EMVIUC06,EMVIUC07,EMVIUC08,EMVIUC09,EMVIUC10:
+                                  EMVIUC11,EMVIUC12,EMVIUC13,EMVIUC14,EMVIUC15:
+                                  EMVIUC16,EMVIUC17,EMVIUC18,EMVIUC19,EMVIUC20:
+                                  EMVIUC21,EMVIUC22,EMVIUC23,EMVIUC24,EMVIUC25:
+                                  EMVIUC26,EMVIUC27,EMVIUC28,EMVIUC29,EMVIUC30:
+                                  EMVIUD01,EMVIUD02,EMVIUD03,EMVIUD04,EMVIUD05:
+                                  EMVIUD06,EMVIUD07,EMVIUD08,EMVIUD09,EMVIUD10:
+                                  EMVIUT01,EMVIUT02,EMVIUT03,EMVIUT04,EMVIUT05:
+                                  EMVIUT06,EMVIUT07,EMVIUT08,EMVIUT09,EMVIUT10:
+                                  EMVIYN01,EMVIYN02,EMVIYN03,EMVIYN04,EMVIYN05:
+                                  EMVIYN06,EMVIYN07,EMVIYN08,EMVIYN09,EMVIYN10:
+                                  EMVITXT1,EMVITXT2,EMVITXT3,EMVITXT4,EMVITXT5:
+                                  EMVIUN01,EMVIUN02,EMVIUN03,EMVIUN04,EMVIUN05:
+                                  EMVIELAP,EMVINSDT,EMVINSTM,EMVIDRDT,EMVIDRTM:
+                                  EMVIPATT,EMVITSRC,EMVIDEST,EMVIAMBL,EMVIREGN:
+                                  EMVISENT,EMVIUR01,EMVIUR02,EMVIUR03,EMVIUR04:
+                                  EMVIUR05,EMVIPADM,EMVIEWRD,EMVIEBED,EMVIHFMN:
+                                  EMVIACLS,EMVICCLS,EMVITRNS,EMVIDUM1,EMVITRDT:
+                                  EMVITRTM,EMVIATNS,EMVIDUM2,EMVIEXLC,EMVISITE:
+                                  EMVIUNIT,EMVICOM3,EMVICOM4,EMVICOM5,EMVICOM6:
+                                  EMVIINJ1,EMVIINJ2,EMVINATI,EMVIINJC,EMVIHUMI:
+                                  EMVIACTI,EMVILOCO,EMVIPRLO,EMVIPRTM,EMVIDPDT:
+                                  EMVIDPTM,EMVIEXRS,EMVIDLRS,EMVISPDT,EMVISPTM:
+                                  EMVISADT,EMVISATM,EMVIMPRA,EMVIMPDT,EMVIMPTM:
+                                  EMVIAADT,EMVIAATM,EMVIAHDT,EMVIAHTM,EMVIDADT:
+                                  EMVIDATM,EMVIPURC,EMVIMNCD,EMVIMNDT,EMVIMNTM:
+                                  EMVIMDCD,EMVIMDDT,EMVIMDTM,EMVIUC31,EMVIUC32:
+                                  EMVIUC33,EMVIUC34,EMVIUC35,EMVIREFP,EMVIREPM:
+                                  EMVIREDT,EMVIBNAA,EMVISPAR
+          GOTO      OVERCOND IF OVER
+          RETURN
+.
+UPEMQUE1  UPDATE    EMRQUEA1;DEMQUMES,EMVIADMN,EMVISTAT,EMVIURNO:
+                                  EMVIDATE,EMVITIME,EMVITRIG,EMVICOM1,EMVICOM2:
+                                  EMVILOCN,EMVIDOCT,EMVICOMP,EMVICLAS,EMVIINSR:
+                                  EMVISRCE,EMVISITN,EMVIMODE,EMVIADMT,EMVIDURN:
+                                  EMVIEMPL,EMVIWAIT,EMVIPREV,EMVIFUND,EMVITABL:
+                                  EMVIREFG,EMVIREFD,EMVIPLIN,EMVIINIT,EMVIRTAS:
+                                  EMVIDDAT,EMVIDTIM,EMVIDSTA,EMVIOPR1,EMVIOPR2:
+                                  EMVIUC01,EMVIUC02,EMVIUC03,EMVIUC04,EMVIUC05:
+                                  EMVIUC06,EMVIUC07,EMVIUC08,EMVIUC09,EMVIUC10:
+                                  EMVIUC11,EMVIUC12,EMVIUC13,EMVIUC14,EMVIUC15:
+                                  EMVIUC16,EMVIUC17,EMVIUC18,EMVIUC19,EMVIUC20:
+                                  EMVIUC21,EMVIUC22,EMVIUC23,EMVIUC24,EMVIUC25:
+                                  EMVIUC26,EMVIUC27,EMVIUC28,EMVIUC29,EMVIUC30:
+                                  EMVIUD01,EMVIUD02,EMVIUD03,EMVIUD04,EMVIUD05:
+                                  EMVIUD06,EMVIUD07,EMVIUD08,EMVIUD09,EMVIUD10:
+                                  EMVIUT01,EMVIUT02,EMVIUT03,EMVIUT04,EMVIUT05:
+                                  EMVIUT06,EMVIUT07,EMVIUT08,EMVIUT09,EMVIUT10:
+                                  EMVIYN01,EMVIYN02,EMVIYN03,EMVIYN04,EMVIYN05:
+                                  EMVIYN06,EMVIYN07,EMVIYN08,EMVIYN09,EMVIYN10:
+                                  EMVITXT1,EMVITXT2,EMVITXT3,EMVITXT4,EMVITXT5:
+                                  EMVIUN01,EMVIUN02,EMVIUN03,EMVIUN04,EMVIUN05:
+                                  EMVIELAP,EMVINSDT,EMVINSTM,EMVIDRDT,EMVIDRTM:
+                                  EMVIPATT,EMVITSRC,EMVIDEST,EMVIAMBL,EMVIREGN:
+                                  EMVISENT,EMVIUR01,EMVIUR02,EMVIUR03,EMVIUR04:
+                                  EMVIUR05,EMVIPADM,EMVIEWRD,EMVIEBED,EMVIHFMN:
+                                  EMVIACLS,EMVICCLS,EMVITRNS,EMVIDUM1,EMVITRDT:
+                                  EMVITRTM,EMVIATNS,EMVIDUM2,EMVIEXLC,EMVISITE:
+                                  EMVIUNIT,EMVICOM3,EMVICOM4,EMVICOM5,EMVICOM6:
+                                  EMVIINJ1,EMVIINJ2,EMVINATI,EMVIINJC,EMVIHUMI:
+                                  EMVIACTI,EMVILOCO,EMVIPRLO,EMVIPRTM,EMVIDPDT:
+                                  EMVIDPTM,EMVIEXRS,EMVIDLRS,EMVISPDT,EMVISPTM:
+                                  EMVISADT,EMVISATM,EMVIMPRA,EMVIMPDT,EMVIMPTM:
+                                  EMVIAADT,EMVIAATM,EMVIAHDT,EMVIAHTM,EMVIDADT:
+                                  EMVIDATM,EMVIPURC,EMVIMNCD,EMVIMNDT,EMVIMNTM:
+                                  EMVIMDCD,EMVIMDDT,EMVIMDTM,EMVIUC31,EMVIUC32:
+                                  EMVIUC33,EMVIUC34,EMVIUC35,EMVIREFP,EMVIREPM:
+                                  EMVIREDT,EMVIBNAA,EMVISPAR
+          RETURN
+.
+WREMQUE1  RESET     KEY20
+          WRITE     EMRQUEA1,KEY20;DEMQUMES,EMVIADMN,EMVISTAT,EMVIURNO:
+                                  EMVIDATE,EMVITIME,EMVITRIG,EMVICOM1,EMVICOM2:
+                                  EMVILOCN,EMVIDOCT,EMVICOMP,EMVICLAS,EMVIINSR:
+                                  EMVISRCE,EMVISITN,EMVIMODE,EMVIADMT,EMVIDURN:
+                                  EMVIEMPL,EMVIWAIT,EMVIPREV,EMVIFUND,EMVITABL:
+                                  EMVIREFG,EMVIREFD,EMVIPLIN,EMVIINIT,EMVIRTAS:
+                                  EMVIDDAT,EMVIDTIM,EMVIDSTA,EMVIOPR1,EMVIOPR2:
+                                  EMVIUC01,EMVIUC02,EMVIUC03,EMVIUC04,EMVIUC05:
+                                  EMVIUC06,EMVIUC07,EMVIUC08,EMVIUC09,EMVIUC10:
+                                  EMVIUC11,EMVIUC12,EMVIUC13,EMVIUC14,EMVIUC15:
+                                  EMVIUC16,EMVIUC17,EMVIUC18,EMVIUC19,EMVIUC20:
+                                  EMVIUC21,EMVIUC22,EMVIUC23,EMVIUC24,EMVIUC25:
+                                  EMVIUC26,EMVIUC27,EMVIUC28,EMVIUC29,EMVIUC30:
+                                  EMVIUD01,EMVIUD02,EMVIUD03,EMVIUD04,EMVIUD05:
+                                  EMVIUD06,EMVIUD07,EMVIUD08,EMVIUD09,EMVIUD10:
+                                  EMVIUT01,EMVIUT02,EMVIUT03,EMVIUT04,EMVIUT05:
+                                  EMVIUT06,EMVIUT07,EMVIUT08,EMVIUT09,EMVIUT10:
+                                  EMVIYN01,EMVIYN02,EMVIYN03,EMVIYN04,EMVIYN05:
+                                  EMVIYN06,EMVIYN07,EMVIYN08,EMVIYN09,EMVIYN10:
+                                  EMVITXT1,EMVITXT2,EMVITXT3,EMVITXT4,EMVITXT5:
+                                  EMVIUN01,EMVIUN02,EMVIUN03,EMVIUN04,EMVIUN05:
+                                  EMVIELAP,EMVINSDT,EMVINSTM,EMVIDRDT,EMVIDRTM:
+                                  EMVIPATT,EMVITSRC,EMVIDEST,EMVIAMBL,EMVIREGN:
+                                  EMVISENT,EMVIUR01,EMVIUR02,EMVIUR03,EMVIUR04:
+                                  EMVIUR05,EMVIPADM,EMVIEWRD,EMVIEBED,EMVIHFMN:
+                                  EMVIACLS,EMVICCLS,EMVITRNS,EMVIDUM1,EMVITRDT:
+                                  EMVITRTM,EMVIATNS,EMVIDUM2,EMVIEXLC,EMVISITE:
+                                  EMVIUNIT,EMVICOM3,EMVICOM4,EMVICOM5,EMVICOM6:
+                                  EMVIINJ1,EMVIINJ2,EMVINATI,EMVIINJC,EMVIHUMI:
+                                  EMVIACTI,EMVILOCO,EMVIPRLO,EMVIPRTM,EMVIDPDT:
+                                  EMVIDPTM,EMVIEXRS,EMVIDLRS,EMVISPDT,EMVISPTM:
+                                  EMVISADT,EMVISATM,EMVIMPRA,EMVIMPDT,EMVIMPTM:
+                                  EMVIAADT,EMVIAATM,EMVIAHDT,EMVIAHTM,EMVIDADT:
+                                  EMVIDATM,EMVIPURC,EMVIMNCD,EMVIMNDT,EMVIMNTM:
+                                  EMVIMDCD,EMVIMDDT,EMVIMDTM,EMVIUC31,EMVIUC32:
+                                  EMVIUC33,EMVIUC34,EMVIUC35,EMVIREFP,EMVIREPM:
+                                  EMVIREDT,EMVIBNAA,EMVISPAR
+          RETURN
+.
+          INC       STD001IO

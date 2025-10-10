@@ -1,0 +1,159 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script language=javascript src=../js/mrtweb0118.js></script>
+<script type="text/javascript">
+function reSend() {
+document.SendForm.updttype.value="";
+document.SendForm.submit();
+}
+function set(medrec) {
+  if(medrec.checked==false) {
+    document.UpdateForm.medrecky.value="";
+    return;
+  }
+  for (var i=0; i < document.SendForm.length; i++) {
+    if (document.SendForm.elements[i].name.match(/medrecky/)) {
+      if (document.SendForm.elements[i].value!=medrec.value) {
+        document.SendForm.elements[i].checked=false;
+      }
+    }
+  }
+  document.UpdateForm.medrecky.value=medrec.value;
+}
+function AddLink() {
+
+  mrtvols = document.getElementsByName('medrecky');
+  mrtvolno = document.getElementsByName('mrtvolno');
+  marked = false;
+  concurrent = true;
+  previousMrtVol = 0;
+  volNo = 0;
+
+  for (var i=0;i<mrtvols.length;i++) {
+    if (mrtvols[i].checked==true) {
+      marked = true;
+
+      if ((previousMrtVol !=0) &&
+         (previousMrtVol-1 != (parseInt(mrtvolno[i].innerHTML)))) {
+         concurrent = false;
+      }
+      previousMrtVol = (parseInt(mrtvolno[i].innerHTML));
+
+      if (volNo == 0) {
+        document.getElementById("medrecky").value = mrtvols[i].value;
+        volNo +=1;
+      } else if (volNo <6) {
+        document.getElementById("medrcky"+volNo).value = mrtvols[i].value;
+        volNo +=1;
+      }
+    }
+  }
+
+  if(marked==false) {
+    alert("Please select a medical record to link");
+    return;
+  }
+
+  //Are the medical records concurrent
+  if (concurrent == false) {
+    response = "Place ensure the volumes selected are correct. Volume \n";
+    response += "numbers should be consecutive.\n\nPress OK to continue";
+    response += "\n\nPress Cancel to return";
+
+    if(!confirm(response)){
+      return;
+    }
+  }
+
+  SetLinks();
+  if(isWhitespace(Results.innerHTML)) {
+    alert("Please select a visit before linking medical records");
+    return;
+  }
+  setFormactn('B');
+}
+function init() {
+  for (var i=0; i < document.SendForm.length; i++) {
+    if (document.SendForm.elements[i].name.match(/medrecky/)) {
+      if (document.SendForm.elements[i].value ==
+          document.SendForm.mrtms006.value) {
+        document.SendForm.elements[i].checked=true;
+        document.UpdateForm.medrecky.value=document.SendForm.elements[i].value;
+      }
+    }
+  }
+//
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);init();">
+<div id=PageHeadingSection>
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon" 
+ src="../images/ExitIcon.gif" onclick="DFrameExit();">
+ Bulk Link Medical Record
+</span>
+
+<form name=SendForm method=post action=mrtweb01.pbl style="margin:0">
+<input type=hidden name=reportno value="18">
+<input type=hidden name=template value="001">
+<input type=hidden name=updttype value="U">
+<input type=hidden name=urnumber value="%MRTWEB01.18.111">
+<input type=hidden name=admissno value="%MRTWEB01.18.118">
+<input type=hidden name=mrtms008 value="%MRTWEB01.18.102.3">
+<input type=hidden name=mrtms001 value="%MRTWEB01.18.102.1">
+<input type=hidden name=mrtms002 value="%MRTWEB01.18.103.1">
+<input type=hidden name=mrtms003 value="%MRTWEB01.18.104">
+<input type=hidden name=mrtms006 value="%MRTWEB01.18.107">
+<input type=hidden name=mrcnrcty value="%STANDARD.01.025.060.088.0.3">
+
+<table align=center width=90%  cellspacing=1 cellpadding=0 border=0>
+<tr><td class=DataField colspan=3 align=center>Link to Details </td></tr>
+<tr><td class=DataLabel>Document Type </td>
+<td><select name=docmtype id=docmtype class=Mandatory title="Document Type"
+    onchange="reSend();">
+    <option></option>
+    %MRTWEB01.18.120.2
+    </select></td>
+</tr>
+</table>
+</div>
+<div id=PageBodySection>
+
+<table align=center cellspacing=0 cellpadding=0 border=0 width=90%>
+%MRTWEB01.18.119
+
+<tr><td colspan=4 align=center><br>
+    <input type=button value="Add" class="button" id="lnkbuttn"
+           onclick="tempDisable(this);AddLinks('B');">
+    <input type=button value=Close class="button" 
+           onclick="DFrameCloseRefresh();">
+</td></tr>
+</table>
+</form>
+</div>
+
+<form name=UpdateForm method=post action=mrtweb01.pbl>
+   <input type=hidden name=reportno value="18">
+   <input type=hidden name=template value="008">
+   <input type=hidden name=updttype value="B">
+   <input type=hidden name=urnumber value="%MRTWEB01.18.111">
+   <input type=hidden id=medrecky name=medrecky value="">
+   <input type=hidden id=medrcky1 name=medrcky1 value="">
+   <input type=hidden id=medrcky2 name=medrcky2 value="">
+   <input type=hidden id=medrcky3 name=medrcky3 value="">
+   <input type=hidden id=medrcky4 name=medrcky4 value="">
+   <input type=hidden id=medrcky5 name=medrcky5 value="">
+   <div id=Results></div>
+</form>
+<script type="text/javascript">
+ if (isWhitespace(document.SendForm.docmtype.value)) {
+  for (var i =0 ; i < document.SendForm.docmtype.length; i++) {
+   if (document.SendForm.docmtype.options[i].value.substr(0,3)==
+       document.SendForm.mrcnrcty.value) {
+       document.SendForm.docmtype.selectedIndex=i } };
+ }
+</script>

@@ -1,0 +1,1048 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="hea-nbh">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/emrweb0201004.js"></script>
+<script type="text/javascript" src="../js/EmergencyPrimaryDiagSearch.js"></script>
+<script type="text/javascript">
+function getemvis091Value() {
+  if(window.parent.menu.EmergencyFrame!= undefined) {
+    if (window.parent.menu.EmergencyFrame.UpdateForm != undefined) {
+      if (window.parent.menu.EmergencyFrame.UpdateForm.emvis091 != undefined) {
+        document.UpdateForm.emvis091.value =
+        window.parent.menu.EmergencyFrame.UpdateForm.emvis091.value;
+      }
+    }
+  }
+}
+function ReturnToMap(){
+  if(parent.TogglePanel==null){
+     parent.menu.location.href='emrweb01.pbl?reportno=1&template=1';
+  }
+  else{
+     parent.TogglePanel();
+  }
+}
+function displayAmbulanceFields() {
+ if (document.UpdateForm.ptcnhdps.value=="3") {
+   if (document.UpdateForm.emvis013.value.substr(3,1) != "A" &&
+       document.UpdateForm.emvis013.value.substr(4,1) != "N") {return;}
+ } else {
+   if (document.UpdateForm.emvis013.value.substr(3,1) != "A") {return;}
+ }
+
+ AmbCaseNoTitleDIV.innerHTML = AmbCaseNoTitleSPAN.innerHTML; 
+ AmbCaseNoFieldDIV.innerHTML = AmbCaseNoFieldSPAN.innerHTML;
+
+ if (document.UpdateForm.emvis013.value.substr(4,1) == "N") {
+   document.UpdateForm.emvis034.className="";
+ }
+
+ if (document.UpdateForm.emvis013.value.substr(5,1) != "C") {return;}
+
+ AmbCaseNoTimeDateDIV.innerHTML = AmbCaseNoTimeDateSPAN.innerHTML;
+}
+function enableFollowUp() {
+  if (document.HiddenFields.DischargeComplete.value != "2" &&
+      document.HiddenFields.DischargeComplete.value != "3") {
+    return;
+  }
+
+  if (document.HiddenFields.DischargeDestinat.value.substr(3,1) != "H") {
+    return;
+  }
+
+  document.UpdateForm.emvis076.disabled=false;
+  document.UpdateForm.emvis086.disabled=false;
+  document.UpdateForm.emvis171.disabled=false;
+  document.UpdateForm.emvis080.disabled=false;
+  document.UpdateForm.emvis090.disabled=false;
+  document.UpdateForm.emvis168.disabled=false;
+  document.UpdateForm.emvis078.disabled=false;
+  document.UpdateForm.emvis088.disabled=false;
+  document.UpdateForm.emvis169.disabled=false;
+  document.UpdateForm.emvis170.disabled=false;
+}
+function EnableBedReq() {
+  if(!VariableNameExists('PublicFacility')) {
+    return;
+  }
+  if(PublicFacility) {
+    if (isWhitespace(document.UpdateForm.emvis158.value) ||
+        isWhitespace(document.UpdateForm.emvis159.value)) {
+      document.UpdateForm.reqbuttn.disabled=true; 
+    } else {
+      document.UpdateForm.reqbuttn.disabled=false;
+    }
+  }
+}
+
+function SetDisableFields() {
+  f = document.UpdateForm;
+  f.emvis060.disabled = true;
+  f.emvis006.disabled = true;
+  if (f.emvcd005 != undefined) {
+    f.emvcd005.disabled = true;
+  }
+  if (f.emvis167 != undefined) {
+    f.emvis167.disabled = true;
+  }
+  if (f.emvis068 != undefined) {
+    f.emvis068.focus();
+  }
+  else {
+    f.updateBtn.focus();
+  }
+}
+function PublicFaclityFields() {
+  if(!VariableNameExists('PublicFacility')) {
+    return;
+  }
+  if(!PublicFacility) {
+   return;
+  }
+  document.getElementById("ObservationButton").style.display="none";
+  document.getElementById("ReturnButton").value="Exit";
+  document.getElementById("ClinicalButton").style.display="none";
+  document.getElementById("ProceduresButton").style.display="";
+  document.getElementById("PublicSpan1").innerHTML=
+  document.getElementById("ShowPublicSpan1").innerHTML;
+  document.getElementById("TriageNurseDate").style.display="";
+  document.getElementById("ShowManagementNotes").style.display="none";
+  document.getElementById("ShowStream").style.display="";
+  document.getElementById("field_emvis007").innerText="Treating Doctor";
+  document.getElementById("emvis007").title="Treating Doctor";
+
+  var diagCookieName = "diagnosisCookie-" + trim(UpdateForm.admissno.value);
+  var diagCookieVal = GetCookieData(diagCookieName);
+  if (!isWhitespace(document.HiddenFields.PrimaryDiagnosis.value)) {
+    document.UpdateForm.diagnosisSearch.value =
+    document.HiddenFields.PrimaryDiagnKeyw.value.substring(0,1);
+    if (diagCookieVal != "unknown") {
+      document.UpdateForm.diagnosisSearch.value = diagCookieVal;
+      ExpireCookiePath("diagnosisCookie-" + trim(UpdateForm.admissno.value));
+    }
+
+    getDiagnosis(UpdateForm.diagnosisSearch,
+                 UpdateForm.emvcd005,
+                 UpdateForm.emvcd033,
+                 SelectDiagList);
+  }
+  MandInitAssessor();
+  if(isWhitespace(document.HiddenFields.cat_YNdesc.value)) {
+    document.getElementById("InsertINTReason").innerHTML=
+    "<input type=hidden name=emvis167>";
+  }
+  if(!isWhitespace(document.UpdateForm.emvis164.value)) {
+    document.UpdateForm.emvis164.className="Readonly";
+    document.UpdateForm.emvis164.readOnly=true;
+  }
+}
+
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);
+              CheckPopUp();PublicFaclityFields();
+              PublicFaclityFieldDefaults();displayAmbulanceFields();
+              enableFollowUp();EnableBedReq();
+              SetDisableFields();" 
+    onunload="submitFormRedirect();">
+<div id=PatientHeading></div>
+<script type="text/javascript">
+PatientURN="%EMRWEB02.01.003";
+PatientVIS="%EMRWEB02.01.081";
+PatientNAM="%EMRWEB02.01.002";
+PatientSTA="%EMRWEB02.01.086.078";
+PatientALT="%EMRWEB02.01.084";
+PatientSEX="%EMRWEB02.01.019";
+PatientDOB="%EMRWEB02.01.020";
+PatientAGE="%EMRWEB02.01.021";
+PatientLOC="%EMRWEB02.01.083";
+PatientPRI="%EMRWEB02.01.086.066.1";
+PatientUNT="%EMRWEB02.01.066.0";
+PatientIND="%EMRWEB02.01.086.091";
+GpCOD="%EMRWEB02.01.086.084.001";
+GpNAM="%EMRWEB02.01.086.084.081";
+GpPRAC="%EMRWEB02.01.086.085.001";
+GpPRACCNT="%EMRWEB02.01.086.085.002";
+GpPRACNAM="%EMRWEB02.01.086.085.005";
+PatientARR="%EMRWEB02.01.101.0 %EMRWEB02.01.102";
+PatientSEE="%EMRWEB02.01.130.0 %EMRWEB02.01.131";
+PatientTRI="%EMRWEB02.01.103.3";
+PatientECLC="%EMRWEB02.01.484.1";
+PatientCLH="%STANDARD.01.017.CL";
+PatientEHFT="%EMRWEB02.01.485";
+InsertEmergencyHeader()
+if(VariableNameExists('ShowSingleClickPatientMenu')) {
+  document.write("<div id=PatientMenu></div>");
+}
+</script>
+<div id=PageBodySection style="overflow: auto;">
+
+<form name=UpdateForm action="emrweb02.pbl" method=post style="margin:0"
+ onsubmit='return validateMandatory(this);'>
+<input type=hidden name=reportno value="01">
+<input type=hidden name=resavail value="0">
+<input type=hidden name=template value="001">
+<input type=hidden name=admissno value="%EMRWEB02.01.081">
+<input type=hidden name=urnumber value="%EMRWEB02.01.003">
+<input type=hidden name=formactn value="C1">
+<input type=hidden name=redirect value="emrweb02.pbl?reportno=1&template=4">
+<input type=hidden name=updateky value="%EMRWEB02.01.404">
+<input type=hidden name=updttype value="UPDAT">
+<input type=hidden name=nextpage value=17>
+<input type=hidden name=pmpxi067 value="%EMRWEB02.01.667.0">
+<input type=hidden name=username>
+<input type=hidden name=password>
+<input type=hidden name=dummy1>
+<input type=hidden name=dummy2>
+<input type=hidden name=emvis004>
+<input type=hidden name=emvis005>
+<input type=hidden name=emvis091>
+<input type=hidden name=emvis135>
+<input type=hidden name=emvis136>
+<input type=hidden name=emvis137>
+<input type=hidden name=emvis138>
+<input type=hidden name=emvis147>
+<input type=hidden name=emvis118 value="%EMRWEB02.01.003">
+<input type=hidden name=savdesc1>
+<input type=hidden name=savmanag>
+<input type=hidden name=searchgn value="%EMRWEB02.01.009">
+<input type=hidden name=searchsn value="%EMRWEB02.01.010">
+<input type=hidden name=searchps value="%EMRWEB02.01.019">
+<input type=hidden name=searchpd value="%EMRWEB02.01.020">
+<input type=hidden name=discstat value="%EMRWEB02.01.147">
+<input type=hidden name=emcndoct value="%EMRWEB02.01.455">
+<input type=hidden name=webuseid value="%STANDARD.01.008">
+<input type=hidden name=webuseln value="%STANDARD.01.043">
+<input type=hidden name=arrvdate value="%EMRWEB02.01.101.0">
+<input type=hidden name=arrvtime value="%EMRWEB02.01.102">
+<input type=hidden name=emviprdd value="%EMRWEB02.01.575.1">
+<input type=hidden name=emviprdt value="%EMRWEB02.01.575.2">
+<input type=hidden name=emviprnd value="%EMRWEB02.01.577.1">
+<input type=hidden name=emviprnt value="%EMRWEB02.01.577.2">
+<input type=hidden name=curdtvar value="">
+<input type=hidden name=curtmvar value="">
+<input type=hidden name=emcnurse id=emcnurse
+       value="%STANDARD.01.025.122.008.0.1">
+<input type=hidden name=emvis013 value="%EMRWEB02.01.113.3">
+<input type=hidden name=heaedflg value="1">
+<input type=hidden name=ptcnhdps value="%STANDARD.01.025.080.250.1.1">
+
+<table width=100% align=center border=0 cellspacing=0 cellpadding=1>
+<tr valign=top><td class=DataLabel width=15%>Presenting Complaint</td>
+    <td width=20%>
+    <input type=hidden name=emrviscat value="el">
+    <input type="text" size=10 tabindex=7 name=test 
+      readonly class=Readonly title="Presenting Complaint Code"
+      value="%EMRWEB02.01.220.1">
+    <select name=emvis060 readonly class="SelectBig Readonly"
+     title="Presenting Complaint Description">
+    <option value="%EMRWEB02.01.220.1">%EMRWEB02.01.220.0</option>
+    </select>
+    </td>
+    <td colspan=4>
+    <textarea name=prcom001 wrap=hard cols=50 rows=6 
+      readonly class=Readonly title="Presenting Complaint Text"
+      style="resize:none"></textarea> 
+    </td></tr>
+
+<tr><td class=DataLabel valign=top>Location</td>
+    <td valign=top><input type=hidden name=name_emvis006
+         value="%EMRWEB02.01.106.0">
+    <table width=100% align=center border=0 cellspacing=0 cellpadding=0>
+    <tr><td>
+    <select readonly class="SelectBig Readonly" name=emvis006 title="Location"> 
+    <option value=" "></option>
+    %EMRWEB02.01.106.2
+    </select>
+    </td><td>
+    <div id=LocationNoteDIV>
+    <input type=text size=30 name=emvis149 readonly class=Readonly
+     title="Location Note"
+     value="%EMRWEB02.01.136">
+    </div>
+    </td></tr>
+    </table>
+    </td>
+    <td class=DataLabel valign=top>
+    <span id="ShowStream" style="display: none">
+        <table width=100% align=center border=0 cellspacing=0 cellpadding=1>
+        <tr><td width=14% align=right>
+            %STANDARD.01.035.eh
+            </td>
+            <td width=86% align=left>
+            <select name=emvis056 title="%STANDARD.01.035.eh" tabindex=90
+             class="SelectBig"
+             onchange="RemoteEmrUpdate(UpdateForm.admissno,this);">
+             <option></option>
+             %EMRWEB02.01.216.2
+            </select>
+            </td></tr>
+        </table>
+    </span>
+    <span id="ShowManagementNotes">
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    Management Notes<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <textarea name=dismnote rows=4 cols=60 wrap=hard readonly class=Readonly
+     title="Management Notes">%EMRWEB02.01.471.002.0</textarea>
+    </span>
+    </td>
+    </tr>
+
+<tr><td class="DataLabel" >
+    <div id="AmbulanceHandoverTitleDIV">
+     Ambulance Transfer of Care Date
+    </div>
+    </td>
+    <td>
+    <div id="AmbulanceHandoverFieldDIV">
+    <input type=text size=12 maxlength=11 name=emvis156 id=emvis156
+     readonly class=Readonly
+     value="%EMRWEB02.01.277"
+     title="Ambulance Transfer of Care Date">
+    Time
+    <input type=text size=8 maxlength=8 name=emvis157 id=emvis157
+     readonly class=Readonly
+     value="%EMRWEB02.01.278"
+     title="Ambulance Transfer of Care Time">
+     </div>
+     </td>
+
+     <td>
+     <table width=100% align=center border=0 cellspacing=0 cellpadding=1>
+     <tr><td align=right width=14%>
+     <div id="AmbCaseNoTitleDIV">
+     </div>
+     </td>
+     <td width=15%>
+     <div id="AmbCaseNoFieldDIV">
+     </div>
+     </td>
+     <td width=18%></td>
+     <td>
+     <div id="AmbCaseNoTimeDateDIV">
+     </div>
+     </td></tr>
+     </table>
+     </td>
+</tr>
+
+<tr><td class=DataLabel>
+     <div id="InitialAssessorTitleDIV">
+     Initial Assessor
+     </div>
+     </td>
+    <td class="nowrap">
+        <div id="InitialAssessorFieldDIV">
+        <input type=text name=emvis164 size=9 maxlength=10
+         readonly class=Readonly  
+         title="Initial Assessor Code"
+         value="%EMRWEB02.01.285.1">
+        <input type=text name=n_emvis164 size=15 
+         readonly class=Readonly  
+         title="Initial Assessor Name"
+         value="%EMRWEB02.01.285.0">
+        </div>
+    </td>
+    <td>
+        <div id="InitialAssessorDateDIV">
+        <table width=100% align=center border=0 cellspacing=0 cellpadding=1>
+        <tr><td width=14% align=right>
+        Date
+        </td>
+        <td width=15%>
+        <input type="text" name=emvis165 size="12"
+         readonly class="Readonly"
+         title="Initial Assessor Date"
+         value="%EMRWEB02.01.286">
+         </td>
+         <td width=18%>
+         Time
+        <input type="text" name=emvis166 size="8"
+         readonly class="ReadOnly"
+         title="Initial Assessor Time"
+         value="%EMRWEB02.01.287">
+        </td>
+        <td>
+        <span id=InsertINTReason>
+        %STANDARD.01.017.YN   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <select name=emvis167 title="%STANDARD.01.017.YN"
+         readonly class="SelectBig Readonly">
+         <option></option>
+         %EMRWEB02.01.288.2
+        </select>
+        </span>
+        </td></tr>
+        </table>
+        </div>
+    </td></tr>
+
+<tr><td class=DataLabel id="field_emvis007">Doctor</td>
+    <td><input type=text size=6 name=emvis007 id=emvis007
+         readonly class=Readonly  
+         title="Doctor Code"
+         value="%EMRWEB02.01.107.001">
+        <input type=text size=18 name=dummy3 title="Doctor Name"
+         readonly class=Readonly value="%EMRWEB02.01.107.003">
+     </td>
+     <td>
+        <div id="DoctorDateDIV">
+        <table width=100% align=center border=0 cellspacing=0 cellpadding=1>
+        <tr><td width=14% align=right>
+        Date
+        </td>
+        <td width=15%>
+          <input type="text" name=emvitrdd size="12"
+           readonly class=Readonly
+           title="Treating Doctor Date"
+           value="%EMRWEB02.01.574.1">
+         </td>
+         <td width=18%>
+          Time
+          <input type="text" name=emvitrdt size="8"
+           readonly class=Readonly
+           title="Treating Doctor Time"
+           value="%EMRWEB02.01.574.2">
+        </td>
+        <td>&nbsp;</td>
+        </tr>
+        </table>
+        </div>
+    </td>
+</tr>
+<tr><td class=DataLabel>Treating Nurse</td>
+    <td>
+    <input type=hidden name=gnm id=gnm>
+    <input type=text size=6 name=emvis130 id=emvis130
+         readonly class=Readonly
+         title="Treating Nurse Code"
+         value="%EMRWEB02.01.164.1">
+        <input type=text size=18 name=dummy5 id=dummy5
+         readonly class=Readonly
+         title="Treating Nurse Name"
+         value="%EMRWEB02.01.164.0">
+    </td>
+    <td>
+        <div id="NurseDateDIV">
+        <table width=100% align=center border=0 cellspacing=0 cellpadding=1>
+        <tr><td width=14% align=right>
+        Date
+        </td>
+        <td width=15%>
+          <input type="text" name=emvitndd size="12"
+           readonly class=Readonly
+           title="Treating Nurse Date"
+           value="%EMRWEB02.01.576.1">
+         </td>
+         <td width=18%>
+          Time
+          <input type="text" name=emvitndt size="8"
+           readonly class=Readonly
+           title="Treating Nurse Time"
+           value="%EMRWEB02.01.576.2">
+         </td>
+         <td>&nbsp;</td>
+        </tr>
+        </table>
+        </div>
+    </td>
+</tr>
+
+<tr><td class="DataLabel" >
+    <div id="MentalHealthPracTitleDIV">
+    Mental Health Practitioner
+    </div>
+    </td>
+    <td>
+        <div id="MentalHealthPracFieldDIV">
+        <input type=text size=6 maxlength=6 name=emvimpra
+         readonly class=Readonly
+         title="MH Practitioner"
+         value="%EMRWEB02.01.271.1">
+        <input type=text size=18 name=d_emvimpra title="MH Practitioner Name"
+         readonly class="Readonly" value="%EMRWEB02.01.271.0">
+        </div>
+    </td>
+    <td>
+        <div id="MentalHealthPracDateDIV">
+        <table width=100% align=center border=0 cellspacing=0 cellpadding=1>
+        <tr><td width=14% align=right>
+        Date
+        </td>
+        <td width=15%>
+          <input type="text" name=emvimpdt size="12"
+           readonly class=Readonly
+           title="MH Practitioner Seen Date"
+           value="%EMRWEB02.01.272"> 
+         </td>
+         <td width=18%>
+        Time
+        <input type="text" name=emvimptm size="8"
+         readonly class=Readonly
+         title="MH Practitioner Seen Time" 
+         value="%EMRWEB02.01.273">
+        </td>
+        <td>
+        </td></tr>
+        </table>
+        </div>
+    </td></tr>
+
+<tr><td>Triage Nurse</td>
+    <td>
+        <input type=text size=29 name=name_triage title="Triage Nurse" readonly 
+         Class=Readonly value="%EMRWEB02.01.161.0">
+    </td>
+    <td>
+        <span id="TriageNurseDate" style="display: none">
+        <table width=100% align=center border=0 cellspacing=0 cellpadding=1>
+        <tr><td width=14% align=right>
+         Triage Date
+        </td>
+        <td width=15%>
+        <input type="text" name=d_emvis128 size="12"
+         title="Triage Nurse Date"
+         value="%EMRWEB02.01.162.0"
+         class="Readonly" readonly>
+         </td>
+         <td width=18%>
+        Time
+        <input type="text" name=d_emvis129 size="8"
+          title="Triage Nurse Time"
+         value="%EMRWEB02.01.163"
+         class="Readonly" readonly>
+         </td>
+         <td>&nbsp;</td> 
+         </tr>
+         </table>
+         </span>
+    </td></tr>
+</table>
+
+<div id="PublicSpan1"></div>
+
+<table width=100% align=center border=0 cellspacing=0 cellpadding=1>
+<tr><td>&nbsp;</td></tr>
+<tr>
+  <td class=DataField>ED Patient Follow Up</td>
+</tr>
+<tr>
+  <td class=DataLabel width=10%>Call Attempt 1</td>
+  <td><input type="text" size="12" name="emvis076" disabled
+       title="Call Attempt 1 Date"
+       value="%EMRWEB02.01.236.0"
+       onblur="if (checkDate(this,this.title)) {
+             if (!isWhitespace(document.UpdateForm.emvis086.value) &&
+                 !CheckDateTimeRange(document.HiddenFields.DischargeDate,
+                                     document.HiddenFields.DischargeTime,
+                                     document.UpdateForm.emvis076,
+                                     document.UpdateForm.emvis086)) {
+         alert('Call Attempt Date/Time cannot be prior to Discharge Date/Time');
+             document.UpdateForm.emvis076.value='';
+             document.UpdateForm.emvis086.value='';
+             UpdateFieldEMR(document.UpdateForm.admissno,4,
+                            document.UpdateForm.emvis076);
+             UpdateFieldEMR(document.UpdateForm.admissno,5,this);
+             return;
+           }
+               UpdateFieldEMR(document.UpdateForm.admissno,4,this);}" />
+  <img notab src="../images/DateLookup.gif" id="Dategif" class=Icon
+       onclick="DateLookupFrame(UpdateForm.emvis076);" />
+       Time
+  <input type="text" name="emvis086" size="8" disabled
+   value="%EMRWEB02.01.246" title="Call Attempt 1 Time"
+   onblur="if (checkTime(this,this.title)) {
+             if (!CheckDateTimeRange(document.HiddenFields.DischargeDate,
+                                     document.HiddenFields.DischargeTime,
+                                     document.UpdateForm.emvis076,
+                                     document.UpdateForm.emvis086)) {
+         alert('Call Attempt Date/Time cannot be prior to Discharge Date/Time');
+             document.UpdateForm.emvis076.value='';
+             document.UpdateForm.emvis086.value='';
+             UpdateFieldEMR(document.UpdateForm.admissno,4,
+                            document.UpdateForm.emvis076);
+             UpdateFieldEMR(document.UpdateForm.admissno,5,this);
+             return;
+           }
+           UpdateFieldEMR(document.UpdateForm.admissno,5,this);}" >
+  <img notab src="../images/DateTimeStamp.gif" class=Icon id="CurrentTimegif"
+   onclick="SetCurrentDateTime(UpdateForm.emvis076,UpdateForm.emvis086);" />
+  <img notab src="../images/TimeLookup.gif" class=Icon
+   onclick="TimeLookupFrame(UpdateForm.emvis086);" id="Calendargif"/>
+  <select class="SelectBig" name=emvis171 title="%STANDARD.01.035.YR"
+   onchange="UpdateFieldEMR(document.UpdateForm.admissno,6,this);" disabled>
+  <option></option>
+   %EMRWEB02.01.292.2
+  </select>
+  </td>
+</tr>
+
+<tr>
+  <td class=DataLabel width=10%>Call Attempt 2</td>
+  <td><input type="text" size="12" name="emvis080" disabled
+       title="Call Attempt 2 Date"
+       value="%EMRWEB02.01.240.0"
+       onblur="if (checkDate(this,this.title)) {
+             if (!isWhitespace(document.UpdateForm.emvis090.value) &&
+                 !CheckDateTimeRange(document.HiddenFields.DischargeDate,
+                                     document.HiddenFields.DischargeTime,
+                                     document.UpdateForm.emvis080,
+                                     document.UpdateForm.emvis090)) {
+         alert('Call Attempt Date/Time cannot be prior to Discharge Date/Time');
+             document.UpdateForm.emvis080.value='';
+             document.UpdateForm.emvis090.value='';
+             UpdateFieldEMR(document.UpdateForm.admissno,7,
+                            document.UpdateForm.emvis080);
+             UpdateFieldEMR(document.UpdateForm.admissno,8,this);
+             return;
+           }
+               UpdateFieldEMR(document.UpdateForm.admissno,7,this);}" />
+  <img notab src="../images/DateLookup.gif" id="Dategif" class=Icon
+       onclick="DateLookupFrame(UpdateForm.emvis080);" />
+       Time
+  <input type="text" name="emvis090" size="8" disabled
+   value="%EMRWEB02.01.250" title="Call Attempt 2 Time"
+   onblur="if (checkTime(this,this.title)) {
+             if (!CheckDateTimeRange(document.HiddenFields.DischargeDate,
+                                     document.HiddenFields.DischargeTime,
+                                     document.UpdateForm.emvis080,
+                                     document.UpdateForm.emvis090)) {
+         alert('Call Attempt Date/Time cannot be prior to Discharge Date/Time');
+             document.UpdateForm.emvis080.value='';
+             document.UpdateForm.emvis090.value='';
+             UpdateFieldEMR(document.UpdateForm.admissno,7,
+                            document.UpdateForm.emvis080);
+             UpdateFieldEMR(document.UpdateForm.admissno,8,this);
+             return;
+           }
+           UpdateFieldEMR(document.UpdateForm.admissno,8,this);}" >
+  <img notab src="../images/DateTimeStamp.gif" class=Icon id="CurrentTimegif"
+   onclick="SetCurrentDateTime(UpdateForm.emvis080,UpdateForm.emvis090);" />
+  <img notab src="../images/TimeLookup.gif" class=Icon
+   onclick="TimeLookupFrame(UpdateForm.emvis090);" id="Calendargif"/>
+  <select class="SelectBig" name=emvis168 title="%STANDARD.01.035.YO"
+   onchange="UpdateFieldEMR(document.UpdateForm.admissno,9,this);" disabled>
+  <option></option>
+   %EMRWEB02.01.289.2
+  </select>
+  </td>
+</tr>
+
+<tr>
+  <td class=DataLabel width=10%>Call Attempt 3</td>
+  <td><input type="text" size="12" name="emvis078" disabled
+       title="Call Attempt 3 Date"
+       value="%EMRWEB02.01.238.0"
+       onblur="if (checkDate(this,this.title)) {
+             if (!isWhitespace(document.UpdateForm.emvis088.value) &&
+                 !CheckDateTimeRange(document.HiddenFields.DischargeDate,
+                                     document.HiddenFields.DischargeTime,
+                                     document.UpdateForm.emvis078,
+                                     document.UpdateForm.emvis088)) {
+         alert('Call Attempt Date/Time cannot be prior to Discharge Date/Time');
+             document.UpdateForm.emvis078.value='';
+             document.UpdateForm.emvis088.value='';
+             UpdateFieldEMR(document.UpdateForm.admissno,10,
+                            document.UpdateForm.emvis078);
+             UpdateFieldEMR(document.UpdateForm.admissno,11,this);
+             return;
+           }
+               UpdateFieldEMR(document.UpdateForm.admissno,10,this);}" />
+  <img notab src="../images/DateLookup.gif" id="Dategif" class=Icon
+       onclick="DateLookupFrame(UpdateForm.emvis078);" />
+       Time
+  <input type="text" name="emvis088" size="8" disabled
+   value="%EMRWEB02.01.248" title="Call Attempt 3 Time"
+   onblur="if (checkTime(this,this.title)) {
+             if (!CheckDateTimeRange(document.HiddenFields.DischargeDate,
+                                     document.HiddenFields.DischargeTime,
+                                     document.UpdateForm.emvis078,
+                                     document.UpdateForm.emvis088)) {
+         alert('Call Attempt Date/Time cannot be prior to Discharge Date/Time');
+             document.UpdateForm.emvis078.value='';
+             document.UpdateForm.emvis088.value='';
+             UpdateFieldEMR(document.UpdateForm.admissno,10,
+                            document.UpdateForm.emvis078);
+             UpdateFieldEMR(document.UpdateForm.admissno,11,this);
+             return;
+           }
+           UpdateFieldEMR(document.UpdateForm.admissno,11,this);}
+           " >
+  <img notab src="../images/DateTimeStamp.gif" class=Icon id="CurrentTimegif"
+   onclick="SetCurrentDateTime(UpdateForm.emvis078,UpdateForm.emvis088);" />
+  <img notab src="../images/TimeLookup.gif" class=Icon
+   onclick="TimeLookupFrame(UpdateForm.emvis088);" id="Calendargif"/>
+  <select class="SelectBig" name=emvis169 title="%STANDARD.01.035.YP"
+   onchange="UpdateFieldEMR(document.UpdateForm.admissno,12,this);" disabled>
+  <option></option>
+   %EMRWEB02.01.290.2
+  </select>
+  </td>
+</tr>
+
+<tr>
+  <td class=DataLabel>%STANDARD.01.035.YQ           </td>
+  <td>
+  <select class="SelectBig" name=emvis170 title="%STANDARD.01.035.YQ       "
+   disabled>
+  <option></option>
+   %EMRWEB02.01.291.9.2
+  </select>
+  </td>
+</tr>
+</table>
+
+<table width=100% align=center border=0 cellspacing=0 cellpadding=1>
+<tr><td colspan=6 align=center>
+    <span id="UpdateButton">
+    <input type=button class=button value="Update"
+     name=updateBtn id=updateBtn tabindex=100 
+     onclick="getemvis091Value();
+              if (validateMandatory(UpdateForm)) {
+                validateattendingdoctor(onUpdate);}"/>
+    </span>
+
+    <span id="ClinicalButton">
+    <input type=button class=button value="Clinical" tabindex=101 
+     onclick="PatientLink('emrweb02.pbl',1,100);"> 
+    </span>
+
+    <input type=button class=button value="Registration" tabindex=102 
+     onclick="checkurno();">
+    <input type=button class=button value="Injury Data" name=injbuttn
+     tabindex=103
+     onclick='SmallFrameEmr("71");'> 
+    <input type=button class=button value="Outstanding" tabindex=104 
+     onclick='SmallFrameEmr("51");'> 
+    <input type=button class=button value="Discharge" tabindex=105 
+     onclick="checkUR(document.UpdateForm.discstat.value);"> 
+    <input type=button class=button value="Labels & Forms" tabindex=106
+     onclick='SmallFrameEmr("5");'> 
+
+    <input type=button class=RedButton value="Return to Map" id=ReturnButton
+     tabindex=107  
+     onclick="ReturnToMap();">
+
+    <span id="ObservationButton">
+    <input type=button class=button value="Observations" name=obsbuttn
+     tabindex=108
+     onclick="PatientLink('cliweb02.pbl',1,001);">
+    </span>
+
+    <span id="ProceduresButton" style="display: none">
+    <input type=button class=button value="Procedures" tabindex=109
+       onclick='ProcedureLink();'>
+    </span>
+
+    <input type=button class=button value="Man. Notes" tabindex=110
+     onclick="AddMgtNote()">
+
+    </td></tr>
+</table>
+</form>
+</div>
+
+<form name=PatientLinks method=get style="margin:0">
+<input type=hidden name=reportno value=1>
+<input type=hidden name=template value=004>
+<input type=hidden name=regexstm value=102>
+<input type=hidden name=newstand value=1>
+<input type=hidden name=webuseid value="%STANDARD.01.008">
+<input type=hidden name=urnumber value="%EMRWEB02.01.003">
+<input type=hidden name=admissno value="%EMRWEB02.01.081">
+<input type=hidden name=MenuType value="11">
+<input type=hidden name=checksub value="0">
+<input type=hidden name=emvis147>
+</form>
+
+<form name=HiddenFields style="margin:0">
+<input type=hidden name=InjuryIndicator value="%EMRWEB02.01.447">
+<input type=hidden name=CheckUr value="%EMRWEB02.01.448">
+<input type=hidden name=DoctorCode value="%EMRWEB02.01.107.001">
+<input type=hidden name=DischargeDestinat value="%EMRWEB02.01.126.3">
+<input type=hidden name=DischargeDate value="%EMRWEB02.01.124.0">
+<input type=hidden name=DischargeTime value="%EMRWEB02.01.125">
+<input type=hidden name=NurseCode value="%EMRWEB02.01.164.1">
+<input type=hidden name=Location value="%EMRWEB02.01.083">
+<input type=hidden name=DischargeComplete value="%EMRWEB02.01.147">
+<input type=hidden name=emvis024 value="%EMRWEB02.01.124.0">
+<input type=hidden name=emvis025 value="%EMRWEB02.01.125">
+<input type=hidden name=Pres01 value="%EMRWEB02.01.104">
+<input type=hidden name=Pres02 value="%EMRWEB02.01.105">
+<input type=hidden name=Pres03 value="%EMRWEB02.01.174">
+<input type=hidden name=Pres04 value="%EMRWEB02.01.175">
+<input type=hidden name=Pres05 value="%EMRWEB02.01.176">
+<input type=hidden name=Pres06 value="%EMRWEB02.01.177">
+<input type=hidden name=linkadmn value="%EMRWEB02.01.081">
+<input type=hidden name=triagcat value="%EMRWEB02.01.103.1">
+<input type=hidden name=PrimaryDiagnosis value="%EMRWEB02.01.187">
+<input type=hidden name=PrimaryDiagnCode value="%EMRWEB02.01.196">
+<input type=hidden name=PrimaryDiagnFtxt value="%EMRWEB02.01.195">
+<input type=hidden name=PrimaryDiagnKeyw value="%EMRWEB02.01.490">
+<input type=hidden name=emvis001 value="%EMRWEB02.01.101.0">
+<input type=hidden name=emvis002 value="%EMRWEB02.01.102">
+<input type=hidden name=emvis128 value="%EMRWEB02.01.162.0">
+<input type=hidden name=emvis129 value="%EMRWEB02.01.163">
+<input type=hidden name=seendate value="%EMRWEB02.01.130.0">
+<input type=hidden name=seentime value="%EMRWEB02.01.131">
+<input type=hidden name=cat_YNdesc value="%STANDARD.01.017.YN">
+</form>
+
+<div id="ShowPublicSpan1" style="display: none">
+<table align=center width=100% border=0 cellspacing=0 cellpadding=1>
+<tr><td class=DataLabel width=15%>First Seen By Doctor</td>
+    <td width=20%>
+      <input type=text size=6 name=frsndoct
+       readonly class=Readonly
+       title="First Seen By Doctor"
+       value="%EMRWEB02.01.526"> 
+      <input type=text size=18 name=dummy4 title="First Seen Doctor Name"
+       readonly class=Readonly value="%EMRWEB02.01.527">
+    </td>
+    <td>
+        <table width=100% align=center border=0 cellspacing=0 cellpadding=1>
+        <tr><td width=14% align=right>
+     First Seen Date
+    </td><td width=15%>
+    <input type="text" size="12" name="frsndate"
+     readonly class=Readonly     
+     title="First Seen Date"
+     value="%EMRWEB02.01.130.0">
+    </td>
+    <td width=18%>
+    Time
+    <input type="text" name="frsntime" size="8"
+     readonly class=Readonly
+     title="First Seen Time"
+     value="%EMRWEB02.01.131">
+    </td>
+    <td>&nbsp;</td>
+    </tr>
+    </table>
+  </td>
+</tr>
+
+<tr><td class="DataLabel">%STANDARD.01.017.et</td>
+    <td class="DataField">
+    <select class="SelectBig" name=emvis068 tabindex=30
+     title="%STANDARD.01.017.et"
+     onchange="RemoteEmrUpdate(UpdateForm.admissno,this);">
+    <option></option>
+     %EMRWEB02.01.228.2
+    </select>
+    </td></tr>
+
+<tr><td class="DataLabel">Decision to Admit Date/Time</td>
+    <td>
+   <input type=text size=12 maxlength=11 name=emvis158 tabindex=31
+    value="%EMRWEB02.01.279"
+    onblur="DecisionToAdmitDate(event);EnableBedReq();"
+    onfocus="resetErrDTAD()"
+    title="Clinical Decision to Admit Date" class="PastDate">
+   <img notab src="../images/DateLookup.gif" class="Icon"
+    alt="Show Calendar" date="UpdateForm.emvis158">
+   <input type=text size=8 maxlength=8 name="emvis159" tabindex=32
+    value="%EMRWEB02.01.280"
+    onblur="DecisionToAdmitTime(event);EnableBedReq();"
+    onfocus="resetErrDTAT()"
+    title="Clinical Decision To Admit Time" class="">
+   <img notab src="../images/TimeLookup.gif" class="Icon"
+    alt="Time Select" time="UpdateForm.emvis159">
+   <img notab src="../images/DateTimeStamp.gif" class="Icon"
+    alt="Current" date="UpdateForm.emvis158" time="UpdateForm.emvis159">
+    </td></tr>
+    
+<tr><td class="DataLabel">Primary Diagnosis Search</td>
+    <td class="DataField" colspan=5>
+    <input type=text  name=diagnosisSearch
+     readonly class="SelectBig Readonly" >
+    <select name=emvcd005 readonly class="SelectXlrg Readonly">
+    </select>
+    <input type=hidden name=emvcd001 value="%EMRWEB02.01.081">
+    <input type=hidden name=emvcd002 value="005">
+    <input type=hidden name=emvcd003 value="%EMRWEB02.01.197">
+    <input type=hidden name=emvcd004 value="5">
+    <input type=hidden name=emvcd006 value="   ">
+    <input type=hidden name=emvcd031 value="1">
+    </td></tr>
+
+<tr><td class="DataLabel">Primary Diagnosis Free Format Desc</td>
+    <td class="DataField" colspan=5>
+    <input type=text name=emvcd033 maxlength=100 size=100
+     readonly class=Readonly>
+    </td></tr>
+
+<tr><td class="DataLabel">Admitting Doctor</td>
+    <td class="DataField">
+    <input type="text" size=8 maxlength=6 name=emvis106 tabindex=40
+     title="Admitting Doctor" value="%EMRWEB02.01.266.003"
+     onblur="UpCase(this);AdmDoctor();">
+    <input type=text readonly size=25 notab name=n_emvis106 tabindex=41
+     title="Admitting Doctor Name" value="%EMRWEB02.01.266.002">
+    <img notab src="../images/SearchIcon.gif" class=Icon
+     onclick="DoctorSearchFrame(UpdateForm.emvis106,UpdateForm.n_emvis106,
+              AdmDoctor)">
+    <img src="../images/erase.gif" class=Icon
+     onclick="ClrAdmDoctor();">
+    </td></tr>
+
+<tr><td class="DataLabel">Admitting Dr Contacted</td>
+    <td class="DataField">
+    <input type=checkbox name=d_emvis091 tabindex=42
+     title="Admitting Dr Contacted"
+     onblur="updateDrAdmitting();">
+    </tr>
+
+<tr><td>
+    <input type=button class=button name=reqbuttn tabindex=43
+     value="Ward/Bed Req."
+     onclick="BedReqLink();">
+    </td></tr>
+
+<tr><td class="DataLabel">Expected Ward</td>
+    <td class="DataLabel">%EMRWEB02.01.486</td>
+    </tr>
+
+</table>
+</div>
+
+<span id="LocationNoteSPAN" style="display: none">
+  <input type=hidden name=emvis149 value="%EMRWEB02.01.136">
+</span>
+
+<script type="text/javascript">
+ CTypeAdm="%EMRWEB02.01.252";
+ if ( CTypeAdm == "Yes") {
+   document.UpdateForm.emvis147.value=1; 
+   document.PatientLinks.emvis147.value=1; }
+ else { 
+   document.UpdateForm.emvis147.value=0; 
+   document.PatientLinks.emvis147.value=0; }
+ ShowReg="%EMRWEB02.01.461";
+ if(ShowReg=="1") {
+   checkurno();
+ }
+ InjData="%EMRWEB02.01.188";
+ if ( InjData =="1" ) {
+    document.UpdateForm.injbuttn.className="RedButton";
+ }
+ ObsData="%EMRWEB02.01.473";
+ if ( ObsData =="1" ) {
+    document.UpdateForm.obsbuttn.className="RedButton";
+ }
+//
+function CheckPopUp() {
+  LoadAlerts="%EMRWEB02.01.477"
+  if ( LoadAlerts =="1" ) {
+    linkurl = "cliweb02.pbl?reportno=2&template=301&urnumber=" +
+           document.UpdateForm.urnumber.value.replace(/ /g,"+") +
+          "&admissno=" + document.UpdateForm.admissno.value.replace(/ /g,"+")  +
+          "&secureid=" + document.UpdateForm.webuseln.value.replace(/ /g,"+") +
+          "&securety=1&triredir=2"
+    Left=(document.body.clientWidth-900)/2
+    DFrameLink(linkurl,0,Left,900,220)
+  }
+//
+  if ( LoadAlerts =="2" ) {
+    linkurl = "cliweb02.pbl?reportno=2&template=302&urnumber=" +
+           document.UpdateForm.urnumber.value.replace(/ /g,"+") +
+          "&admissno=" + document.UpdateForm.admissno.value.replace(/ /g,"+")  +
+          "&secureid=" + document.UpdateForm.webuseln.value.replace(/ /g,"+") +
+          "&securety=1&triredir=3"
+    Left=(document.body.clientWidth-900)/2
+    DFrameLink(linkurl,0,Left,900,220)
+  }
+//
+  if ( LoadAlerts =="3" ) {
+   parent.menu.EmergencyMenu.innerHTML=""
+    var url = "patweb98.pbl?reportno=1&template=003&urnumber=" +
+           document.UpdateForm.urnumber.value.replace(/ /g,"+") +
+          "&admissno=" + document.UpdateForm.admissno.value.replace(/ /g,"+")  +
+          "&secureid=" + document.UpdateForm.webuseln.value.replace(/ /g,"+") +
+          "&securety=1&triredir=3"
+   parent.menu.EmergencyFrameLink(url,0,0,1008,521)
+  }
+}
+if ("%EMRWEB02.01.251" == "Yes") {
+   document.UpdateForm.emvis091.value="1";
+} else {
+   document.UpdateForm.emvis091.value="0";
+}
+function PublicFaclityFieldDefaults() {
+  if(!VariableNameExists('PublicFacility')) {
+    return;
+  }
+  if(!PublicFacility) {
+
+   InitialAssessorTitleDIV.innerHTML = "";
+   InitialAssessorFieldDIV.innerHTML = "";   
+   InitialAssessorDateDIV.innerHTML = "";
+   MentalHealthPracTitleDIV.innerHTML = "";
+   MentalHealthPracFieldDIV.innerHTML = "";
+   MentalHealthPracDateDIV.innerHTML = "";
+   DoctorDateDIV.innerHTML =
+   "<table width=100% align=center border=0 cellspacing=0 cellpadding=0>" + 
+   "<td>" +
+   "</td></tr>" +
+   "</table>" +
+   "<input type=hidden name=emvitrdd value='%EMRWEB02.01.574.1'>" +
+   "<input type=hidden name=emvitrdt value='%EMRWEB02.01.574.2'>";
+   NurseDateDIV.innerHTML =
+   "<table width=100% align=center border=0 cellspacing=0 cellpadding=0>" +
+   "<td>" +
+   "</td></tr>" +
+   "</table>" +
+   "<input type=hidden name=emvitndd value='%EMRWEB02.01.576.1'>" +
+   "<input type=hidden name=emvitndt value='%EMRWEB02.01.576.2'>";
+
+   return;
+  }
+
+  if (document.UpdateForm.ptcnhdps.value == "3" &&
+      document.UpdateForm.emvis013.value.substr(3,1) == "A") {
+  }else {
+    if(!PublicFacility) {
+      AmbulanceHandoverTitleDIV.innerHTML = "";
+      AmbulanceHandoverFieldDIV.innerHTML = "";
+    }
+  }
+
+  if ("%EMRWEB02.01.251" == "Yes") {
+    document.UpdateForm.d_emvis091.checked=true;
+    document.UpdateForm.emvis091.value="1";
+  } else {
+    document.UpdateForm.d_emvis091.checked=false;
+    document.UpdateForm.emvis091.value="0";
+  }
+
+  LocationNoteDIV.innerHTML = LocationNoteSPAN.innerHTML
+}
+
+</script>
+
+<span id="AmbCaseNoTitleSPAN" style="display: none">
+Amb Case No
+</span>
+
+<span id="AmbCaseNoFieldSPAN" style="display: none">
+<input type=text size=10 maxlength=15 name=emvis034 
+ readonly class=Readonly 
+ value="%EMRWEB02.01.134" title="Amb Case No">
+</span>
+
+<span id="AmbCaseNoTimeDateSPAN" style="display: none">
+Date/Time Amb Case Created &nbsp;
+<input type="text" size="12" name="emvis079" 
+       readonly class=Readonly
+       title="Date Amb Case Created"
+       value="%EMRWEB02.01.239.0">
+       Time
+  <input type="text" name="emvis089" size="8" 
+   readonly class=Readonly
+   value="%EMRWEB02.01.249" title="Time Amb Case Created">
+</span>

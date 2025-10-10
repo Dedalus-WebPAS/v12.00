@@ -1,0 +1,27 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Web System Table 
+                      WebService DVAW Batch Header 
+  
+TABLE NAME         :  webdvbaf
+=====================================================================
+WBDBBTHN    char        8     1   Batch No  
+WBDBBTHL    decimal   14,2    9   Batch Total  
+WBDBTRIB    decimal     6    17   Total records in batch  
+WBDBDTBC    char        8    21   Date batch created (ccyymmdd)  
+WBDBTMBC    char        8    29   Time batch created (hh:mm:ss)  
+WBDBOPER    char       10    37   Web User Id  
+WBDBEFNM    char       18    47   Extract Filename  
+WBDBLOCN    char       65    65   Location Id  
+WBDBSNID    char       60   130   Sender Id (email)  
+WBDBSPAR    char      100   190   Spare variable  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+WBDBBTHN
+  
+UNIQUE INDEX 2
+WBDBDTBC
+WBDBBTHN
+  
+=====================================================================

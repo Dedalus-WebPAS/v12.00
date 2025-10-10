@@ -1,0 +1,89 @@
+.******************************************************************************
+.*                                  PMSHATRD                                  *
+.*                         Get Hospital Attribut record                       *
+.*                                                                            *
+.* Requires:   kEY29 populated with -                                         *
+.*                      - Hospital Id (pathspaf)                              *
+.*                      - Type of Attribute (KEY3)                            *
+.*                      - Key value                                           *
+.*                      - Date (defaults to current date)                     *
+.*                                                                            *
+.* Returns:    EXIT  0 = valid record                                         *
+.*                   1 = not valid                                            *
+.*             WKMCXXDT - Item date range -    0=OK,     1=out of range       *
+.*                                                                            *
+.* Modifications:                                                             *
+.*             V11.05.01 22/04/2025 J.Tan    TSK 0955910                      *
+.*                       Fixed reading previous record                        *
+.******************************************************************************
+PMSHATRD  MOVE      ZERO,EXIT
+          MOVE      ZERO,WKMCXXDT           * date range error flag
+.
+          UNPACK    KEY39,WKHATHOS,WKHTTYPE,WKHTKVAL,WKHTDATE
+          MATCH     SP8,WKHTDATE            * check blank date
+          IF        @EQUAL
+            PACK      WKHTDATE,CCC,CYY,CMM,CDD,SP10 * default to current date
+            REP       " 0",WKHTDATE
+            PACK      KEY39,WKHATHOS,WKHTTYPE,WKHTKVAL,WKHTDATE,SP70
+          ENDIF
+
+HATRE000  UNPACK    KEY39,KEY31,KEY8        * set up for validation
+          CALL      RDPMHAT1
+          BRANCH    OVRCD,HATRE200
+.
+          MATCH     "001",PMHTTYPE
+          IF        @EQUAL
+            MATCH     "1",PMHTIND1            * Active ?
+            GOTO      HATRE970 IF NOT EQUAL
+          ENDIF
+          GOTO      HATRE900
+.
+HATRE200  CALL      RPPMHAT1                  * try previous record
+          BRANCH    OVRCD,HATRE990
+.
+          PACK      SKEY31,PMHTHOSP,PMHTTYPE,PMHTKVAL,SP70
+          MATCH     KEY31,SKEY31
+          GOTO      HATRE990 IF NOT EQUAL
+.
+          MATCH     "001",PMHTTYPE
+          IF        @EQUAL
+            MATCH     "1",PMHTIND1            * Active ?
+            GOTO      HATRE970 IF NOT EQUAL
+          ENDIF
+.
+          MATCH     PMHTSDAT,WKHTDATE       * effective date => date ?
+          GOTO      HATRE980 IF LESS        * yes
+.
+          MATCH     SP8,PMHTEDAT
+          IF        !@EQUAL
+            MATCH     KEY8,PMHTEDAT         * service Date => Eff.To Date ?
+            GOTO      HATRE980 IF LESS
+          ENDIF
+.
+HATRE900  MOVE      ZERO,EXIT
+          GOTO      HATRE999
+.
+HATRE970  MOVE      ONE,WKMCINAC            * set Inactive flag
+          GOTO      HATRE990
+.
+HATRE980  MOVE      ONE,WKHTXXDT            * set Date Range error flag
+HATRE990  MOVE      ONE,EXIT
+          PACK      PMHTTXT1,SP70,SP70 . Text 1
+          PACK      PMHTTXT2,SP70,SP70 . Text 2
+          PACK      PMHTTXT3,SP70,SP70 . Text 3
+          PACK      PMHTTXT4,SP70,SP70 . Text 4
+          MOVE      SP70,PMHTVAL1      . Value 1
+          MOVE      SP70,PMHTVAL2      . Value 2
+          MOVE      SP70,PMHTVAL3      . Value 3
+          MOVE      SP70,PMHTVAL4      . Value 4
+          MOVE      SP70,PMHTIND1      . Yes/No 1
+          MOVE      SP70,PMHTIND2      . Yes/No 2
+          MOVE      SP70,PMHTIND3      . Yes/No 3
+          MOVE      SP70,PMHTIND4      . Yes/No 4
+          MOVE      SP70,PMHTCOD1      . Coded Value 1
+          MOVE      SP70,PMHTCOD2      . Coded Value 2
+          MOVE      SP70,PMHTCOD3      . Coded Value 3
+          MOVE      SP70,PMHTCOD4      . Coded Value 4
+.
+HATRE999  MOVE      EXIT,OVRCD              * just in case I miss one.
+          RETURN

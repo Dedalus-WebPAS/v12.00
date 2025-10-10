@@ -1,0 +1,541 @@
+.******************************************************************************
+.*  File          :  PATIX3TM.PBL                                             *
+.*                                                                            *
+.*  Function      :  ICD10 Ed.13 Coding Maintenance Routines for PATWEB88     *
+.*                                                                            *
+.*  Parameters    :                                                           *
+.*                                                                            *
+.*  Modifications :                                                           *
+.*                                                                            *
+.*       V11.05.00  17/03/2025  Davin            TSK 0956210                  *
+.*                  Created new - cloned from PATIX2TM.PBL                    *
+.******************************************************************************
+.
+.------------------------------------------------------------------------------
+. ICD10 Edition 13 Diagnosis Coding Maintenance: Display, Add, Update, Delete
+.------------------------------------------------------------------------------
+ICDX3D00  RESET     PTICD001
+          MOVE      "13",ICD10EDN
+.                                           * make sure files are open
+          OPEN      PATD13A1,"patd13af"     * Open ICD10 Ed.13 Diseases
+          OPEN      PATD13A2,"patd13af"     * Open ICD10 Ed.13 Diseases
+          OPEN      PTDK13A1,"patdk13f"     * ICD10 Ed.13 Key Word Diag.
+          OPEN      PTDK13A2,"patdk13f"     * ICD10 Ed.13 Key Word Diag.
+.
+          RESET     UPDTTYPE
+          MATCH     SP1,UPDTTYPE
+          GOTO      ICDX3D40 IF EQUAL
+.
+          MATCH     "A",UPDTTYPE    * Add formaction
+          GOTO      ICDX3D10 IF EQUAL
+.
+          MATCH     "U",UPDTTYPE    * Update formaction
+          GOTO      ICDX3D20 IF EQUAL
+.
+          MATCH     "D",UPDTTYPE    * Delete formaction
+          GOTO      ICDX3D30 IF EQUAL
+.
+          MATCH     "V",UPDTTYPE    * Validate Formaction
+          IF        @EQUAL
+            CALL      VALX1C00
+            GOTO      ICDX3D99
+          ENDIF
+.
+          GOTO      ICDX3D93
+.
+ICDX3D10  CALL      CHKDIS00  * Checks mandatory fields & checks for blank
+          BRANCH    EXIT,ICDX3D99
+          PACK      KEY9,PTICD001,SP70  * ADD FORMACTION
+          CALL      RDPD13A1
+          COMPARE   ZERO,OVRCD
+          GOTO      ICDX3D92 IF EQUAL
+          CALL      DISSAV00      * Moves input variables to file variables
+          CALL      WRPD13A1      * Writes away the data
+          PROC      PTDK13UP      * Update Keyword table
+.
+          CALL      ADDCAN00      * Add Cancer Code Record
+.
+          MOVE      ZERO,EXIT
+          GOTO      ICDX3D99
+.
+ICDX3D20  PACK      KEY9,PTICD001,SP70  * UPDATE FORMACTION
+          CALL      RDPD13A1
+          BRANCH    OVRCD,ICDX3D91
+          CALL      CHKDIS00      * Checks mandatory fields
+          BRANCH    EXIT,ICDX3D99
+          CALL      DISSAV00      * Moves input variables to file variables
+          CALL      UPPD13A1      * Writes away the data
+          PROC      PTDK13UP      * Update Key word Table
+.
+          CALL      UPDCAN00      * Update Cancer Code Record
+.
+          MOVE      ZERO,EXIT
+          GOTO      ICDX3D99
+.
+ICDX3D30  PACK      KEY9,PTICD001,SP70   * DELETE FORMACTION
+          CALL      RDPD13A1
+          BRANCH    OVRCD,ICDX3D91
+          CALL      DEPD13A1      * Deletes the data
+          PROC      PTDK13UP      * Update Key word Table
+.
+          CALL      DELCAN00      * Delete Cancer Code Record
+.
+          MOVE      ZERO,EXIT
+          GOTO      ICDX3D99
+.
+ICDX3D40  PACK      KEY9,PTICD001,SP70
+          CALL      RDPD13A1
+          IF        OVRCD=1
+            CALL      CLRDIS00    * Clear all the file variables
+          ENDIF
+.
+          MOVE      ONE,CANCERCD
+          PACK      KEY9,PTICD001,SP70
+          CALL      RDPTCAN1
+          IF        OVRCD=1
+            MOVE     ZERO,CANCERCD
+            MOVE     ZERO,PTCCLATR
+          ENDIF
+.
+          CLEAR     WEBTITLE
+          MOVE      "ICD10 Edition 13 Diagnosis Maintenance",WEBTITLE
+          RESET     WEBTITLE
+.
+          CALL      WEBHED00   * Create Output File and Write HTML Page Header
+          BRANCH    EXIT,ICDX3D99
+          CALL      WEBBOD00   * Process Web Body
+          CALL      WEBEND00   * Process End of HTML File
+          MOVE      ONE,EXIT
+          GOTO      ICDX3D99
+.
+ICDX3D91  MOVE      "ICD10 Edition 13 Diagnosis Code does not exist",WEBTITLE
+          CALL      WEBERR00
+          MOVE      ONE,EXIT
+          GOTO      ICDX3D99
+.
+ICDX3D92  MOVE      "ICD10 Edition 13 Diagnosis Code exists",WEBTITLE
+          CALL      WEBERR00
+          MOVE      ONE,EXIT
+          GOTO      ICDX3D99
+.
+ICDX3D93  MOVE      "Invalid Form Action.",WEBTITLE
+          CALL      WEBERR00
+          MOVE      ONE,EXIT
+          GOTO      ICDX3D99
+.
+ICDX3D99  RETURN
++
+.------------------------------------------------------------------------------
+. ICD10 Edition 13 Procedure Coding Maintenance: Display, Add, Update, Delete
+.------------------------------------------------------------------------------
+ICDX3P00  RESET     PTICO001
+          MOVE      "13",ICD10EDN
+.
+          OPEN      PATO13A1,"pato13af"     * Open ICD10 Ed.13 Procedures
+          OPEN      PATO13A2,"pato13af"     * Open ICD10 Ed.13 Procedures
+          OPEN      PTOK13A1,"patok13f"     * ICD10 Ed.13 Key Word Proc.
+          OPEN      PTOK13A2,"patok13f"     * ICD10 Ed.13 Key Word Proc.
+.
+          RESET     UPDTTYPE
+          MATCH     SP1,UPDTTYPE
+          GOTO      ICDX3P40 IF EQUAL
+.
+          MATCH     "A",UPDTTYPE    * Add formaction
+          GOTO      ICDX3P10 IF EQUAL
+.
+          MATCH     "U",UPDTTYPE    * Update formaction
+          GOTO      ICDX3P20 IF EQUAL
+.
+          MATCH     "D",UPDTTYPE    * Delete formaction
+          GOTO      ICDX3P30 IF EQUAL
+.
+          MATCH     "V",UPDTTYPE    * Validate formaction
+          IF        @EQUAL
+            CALL      VALX1C00
+            GOTO      ICDX3P99
+          ENDIF
+.
+          GOTO      ICDX3P93
+.
+ICDX3P10  CALL      CHKICD00  * Checks mandatory fields & checks for blank
+          BRANCH    EXIT,ICDX3P99
+          PACK      KEY9,PTICO001,SP70  * ADD FORMACTION
+          CALL      RDPO13A1
+          COMPARE   ZERO,OVRCD
+          GOTO      ICDX3P92 IF EQUAL
+          CALL      ICDSAV00      * Moves input variables to file variables
+          CALL      WRPO13A1      * Writes away the data
+          PROC      PTOK13UP      * Update Keyword table
+          MOVE      ZERO,EXIT
+          GOTO      ICDX3P99
+.
+ICDX3P20  PACK      KEY9,PTICO001,SP70  * UPDATE FORMACTION
+          CALL      RDPO13A1
+          BRANCH    OVRCD,ICDX3P91
+          CALL      CHKICD00      * Checks mandatory fields
+          BRANCH    EXIT,ICDX3P99
+          CALL      ICDSAV00      * Moves input variables to file variables
+          CALL      UPPO13A1      * Writes away the data
+          PROC      PTOK13UP      * Update Key word Table
+          MOVE      ZERO,EXIT
+          GOTO      ICDX3P99
+.
+ICDX3P30  PACK      KEY9,PTICO001,SP70   * DELETE FORMACTION
+          CALL      RDPO13A1
+          BRANCH    OVRCD,ICDX3P91
+          CALL      DEPO13A1      * Deletes the data
+          PROC      PTOK13UP      * Update Key word Table
+          MOVE      ZERO,EXIT
+          GOTO      ICDX3P99
+.
+ICDX3P40  PACK      KEY9,PTICO001,SP70
+          CALL      RDPO13A1
+          IF        OVRCD=1
+            CALL      CLRICD00    * Clear all the file variables
+          ENDIF
+.
+          CLEAR     WEBTITLE
+          MOVE      "ICD10 Edition 13 Procedure Maintenance",WEBTITLE
+          RESET     WEBTITLE
+.
+          CALL      WEBHED00   * Create Output File and Write HTML Page Header
+          BRANCH    EXIT,ICDX3P99
+          CALL      WEBBOD00   * Process Web Body
+          CALL      WEBEND00   * Process End of HTML File
+          MOVE      ONE,EXIT
+          GOTO      ICDX3P99
+.
+ICDX3P91  MOVE      "ICD10 Edition 13 Procedure Code does not exist",WEBTITLE
+          CALL      WEBERR00
+          MOVE      ONE,EXIT
+          GOTO      ICDX3P99
+.
+ICDX3P92  MOVE      "ICD10 Edition 13 Procedure Code exists",WEBTITLE
+          CALL      WEBERR00
+          MOVE      ONE,EXIT
+          GOTO      ICDX3P99
+.
+ICDX3P93  MOVE      "Invalid Form Action.",WEBTITLE
+          CALL      WEBERR00
+          MOVE      ONE,EXIT
+          GOTO      ICDX3P99
+.
+ICDX3P99  RETURN
++
+.------------------------------------------------------------------------------
+. Online ICD10 Edition 13 Code Validation
+.------------------------------------------------------------------------------
+VALX3C00  MOVE      SP70,VALDNAME
+          MATCH     SP70,VALDCODE
+          GOTO      VALX3C90 IF EQUAL
+.
+          MOVE      "Invalid Code Entered",VALDNAME
+          BRANCH    VALDTYPE,VALX3C10,VALX3C20
+          MOVE      "Invalid Validation Type",VALDNAME
+          GOTO      VALX3C90
+.
+VALX3C10  MOVE      VALDCODE,KEY9
+          CALL      RDPO13A1
+          IF        OVRCD=0
+            MOVE      PT0ODSC2,VALDNAME
+          ENDIF
+          GOTO      VALX3C90
+.
+VALX3C20  MOVE      VALDCODE,KEY9
+          CALL      RDPD13A1
+          IF        OVRCD=0
+            MOVE      PT0DDSC2,VALDNAME
+          ENDIF
+          GOTO      VALX3C90
+.
+VALX3C90  CALL      OPENHTML
+          BRANCH    EXIT,VALX3C99
+          WRITE     HTMLFILE;"<h3 align=center>Checking Database</h3>":
+                             "<script type=#"text/javascript#">":
+                             "{ opener.ValidateName.value=#"",VALDNAME,"#";":
+                             "  opener.ValidateCode.value=#"",VALDCODE,"#";"
+.
+          MATCH     "Invalid",VALDNAME
+          IF        @EQUAL
+            WRITE     HTMLFILE;"  alert(#"Invalid Code Entered#");";
+          ENDIF
+.
+          WRITE     HTMLFILE;"  close(); } </script>"
+          CALL      CLOSHTML
+.
+VALX3C99  RETURN
++
+.-----------------------------------------------------------
+. ICD10 Edition 13 Procedure Code: Search Table
+.-----------------------------------------------------------
+SRHX3P00  WRITE     HTMLFILE;"<tr align=center>":
+                             "<td class=HeadingCell colspan=2>":
+                             "<b>You Searched for ":
+                               KEYWORDS,"</td>":
+                             "</tr>":
+                             "<tr>":
+                             "<td class=HeadingCell width=15%><b>Code</b></td>":
+                             "<td class=HeadingCell><b>Description</b></td>":
+                             "</tr>"
+.
+          CALL      GETWRD00
+.
+          UNPACK    DIM127,D1,LINKPRG,DIM127
+          UNPACK    DIM127,D1,LINKREP,DIM127
+          UNPACK    DIM127,D1,LINKTEM,DIM127
+.
+          IF        NORECORD=0
+            MOVE      PTCNNRTD,NORECORD      * Set Default No Records to Display
+          ENDIF
+          MOVE      ZERO,RECNUMB
+          MOVE      ZERO,DISNUMB
+.
+....      UNPACK    PTCNGDVX,KEY4,KEY5
+....      MATCH     "9999",KEY4          * is ICD10 Ed.13 in use yet?
+....      GOTO      SRHX3P90 IF EQUAL
+.
+          STRIP     KEYWRD01
+          PACK      KEY24,KEYWRD01,SP70
+          CALL      RSOK13A2
+SRHX3P10  CALL      RKOK13A2
+          BRANCH    OVRCD,SRHX3P90
+.
+          CALL      SX3PRA00
+          BRANCH    OVRCD,SRHX3P10,SRHX3P90
+.
+          MOVE      PTCOITM,KEY9
+          CALL      RDPO13A1
+          BRANCH    OVRCD,SRHX3P10
+.
+          ADD       ONE,RECNUMB
+          IF        STARTNUM>=RECNUMB
+            GOTO      SRHX3P10
+          ENDIF
+.
+          BRANCH    LNK2PRT,SRHX3P20,SRHX3P30
+          GOTO      SRHX3P99
+.
+SRHX3P20  WRITE     HTMLFILE;"<tr><td nowrap><A HREF='javascript:showICD02":
+                             "(#"",LINKPRG,"#.pbl":
+                             "?reportno=",LINKREP:
+                             "&template=",LINKTEM:
+                             "&ptico001=",OPCODE,"#")'>":
+                             "<img src=../images/MaintenanceIcon.gif hspace=4":
+                             " border=0 align=absmiddle></a>":
+                             OPCODE,"</td>":
+                             "<td>",PT0ODSC2,"</td>":
+                             "</tr>"
+.
+          GOTO      SRHX3P80
+.
+SRHX3P30  WRITE     HTMLFILE;"<tr valign=top>":
+                              "<td><a href=#"#" ":
+                              "OnClick=#"updateParent('",PT0ODSC2:
+                              "','",OPCODE,"')#">":
+                              "<img src=../images/MaintenanceIcon.gif hspace=4":
+                              " border=0 align=absmiddle></a>":
+                              OPCODE,"</td>":
+                              "<td>",PT0ODSC2,"</td>":
+                             "</tr>"
+.
+SRHX3P80  ADD       ONE,DISNUMB
+          COMPARE   NORECORD,DISNUMB
+          GOTO      SRHX3P10 IF NOT EQUAL
+          GOTO      SRHX3P99
+.
+SRHX3P90  CALL      NOMORE00    * Display No More Records Message
+.
+SRHX3P99  RETURN
++
+.------------------------------------------------------------
+. Check ICD10 Edition 13 Procedure Record
+.------------------------------------------------------------
+SX3PRA00  MATCH     KEYWRD01,PTCOKWD
+          GOTO      SX3PRA92 IF NOT EQUAL
+          IF        KEYWRDNO>1
+            PACK      SAVKEY24,PTCOKWD,PTCOITM
+            CALL      SX3PRB00
+            BRANCH    EXIT,SX3PRA91
+            MOVE      SAVKEY24,KEY24
+            CALL      RDPO13A2
+          ENDIF
+.
+. Insert Other Check for Valid Record Here i.e. Suspended or In Active
+.   eg    COMPARE    ONE,INACTIVE
+.         GOTO       SX3PRA91 IF EQUAL
+.
+          GOTO      SX3PRA90
+.
+SX3PRA90  MOVE      ZERO,OVRCD
+          GOTO      SX3PRA99
+SX3PRA91  MOVE      ONE,OVRCD
+          GOTO      SX3PRA99
+SX3PRA92  MOVE      TWO,OVRCD
+SX3PRA99  RETURN
++
+.------------------------------------------------------------
+. Check for Matching ICD10 Edition 13 Procedure Words
+.------------------------------------------------------------
+SX3PRB00  MOVE      ONE,F2
+          MOVE      ZERO,EXIT
+          PACK      SAVKEY9,PTCOITM,SP70
+.
+SX3PRB10  COMPARE   KEYWRDNO,F2           * Loop through each Key Word in Search
+          GOTO      SX3PRB99 IF EQUAL     * Exit OK
+          ADD       ONE,F2
+          LOAD      KEYWRDXX,F2,KEYWRD01,KEYWRD02,KEYWRD03,KEYWRD04,KEYWRD05:
+                             KEYWRD06,KEYWRD07,KEYWRD08,KEYWRD09,KEYWRD10
+          PACK      KEY24,PTCOITM,KEYWRDXX
+          CALL      RDPO13A1              * Check for Exact Match
+          COMPARE   ZERO,OVRCD            * Ok so Continue Loop
+          GOTO      SX3PRB10 IF EQUAL
+.
+          CALL      RKPO13A1              * Not Exact so Read Next Record
+          BRANCH    OVRCD,SX3PRB90        * No Match So Exit No Match
+          PACK      KEY9,PTCOITM,SP70
+          MATCH     SAVKEY9,KEY9        * Match Key Fields
+          GOTO      SX3PRB90 IF NOT EQUAL * No Match So Exit
+          STRIP     KEYWRDXX
+          MATCH     PTCOKWD,KEYWRDXX         * Check Key Word
+          GOTO      SX3PRB90 IF NOT EQUAL * No Match So Exit
+          GOTO      SX3PRB10              * Check Next Search Word
+.
+SX3PRB90  MOVE      ONE,EXIT
+SX3PRB99  RETURN
++
+.-----------------------------------------------------------
+. ICD10 Edition 13 Diagnosis Code: Search Table
+.-----------------------------------------------------------
+SRHX3D00  WRITE     HTMLFILE;"<tr align=center>":
+                             "<td class=HeadingCell colspan=2>":
+                             "<b>You Searched for ":
+                               KEYWORDS,"</td></tr><tr>":
+                               "<td class=HeadingCell width=15%><b>Code</b>":
+                               "</td>":
+                               "<td class=HeadingCell><b>Description</b></td>":
+                             "</tr>"
+.
+          CALL      GETWRD00
+.
+          UNPACK    DIM127,D1,LINKPRG,DIM127
+          UNPACK    DIM127,D1,LINKREP,DIM127
+          UNPACK    DIM127,D1,LINKTEM,DIM127
+.
+          IF        NORECORD=0
+            MOVE      PTCNNRTD,NORECORD      * Set Default No Records to Display
+          ENDIF
+          MOVE      ZERO,RECNUMB
+          MOVE      ZERO,DISNUMB
+.
+....      UNPACK    PTCNGDVX,KEY4,KEY5
+....      MATCH     "9999",KEY4          * is ICD10 Ed.13 in use yet?
+....      GOTO      SRHX3D90 IF EQUAL
+.
+          STRIP     KEYWRD01
+          PACK      KEY24,KEYWRD01,SP70
+          CALL      RSDK13A2
+SRHX3D10  CALL      RKDK13A2
+          BRANCH    OVRCD,SRHX3D90
+.
+          CALL      SX3DRA00
+          BRANCH    OVRCD,SRHX3D10,SRHX3D90
+.
+          MOVE      PTCDITM,KEY9
+          CALL      RDPD13A1
+          BRANCH    OVRCD,SRHX3D10
+.
+          ADD       ONE,RECNUMB
+          IF        STARTNUM>=RECNUMB
+            GOTO      SRHX3D10
+          ENDIF
+.
+          BRANCH    LNK2PRT,SRHX3D20,SRHX3D30
+          GOTO      SRHX3D99
+.
+SRHX3D20  WRITE     HTMLFILE;"<tr><td nowrap><A HREF='javascript:showICD03":
+                             "(#"",LINKPRG,"#.pbl":
+                             "?reportno=",LINKREP:
+                             "&template=",LINKTEM:
+                             "&pticd001=",DPCODE,"#")'>":
+                             "<img src=../images/MaintenanceIcon.gif hspace=4":
+                             " border=0 align=absmiddle></a>":
+                             DPCODE,"</td>":
+                             "<td>",PT0DDSC2,"</td>":
+                             "</tr>"
+.
+          GOTO      SRHX3D80
+.
+SRHX3D30  WRITE     HTMLFILE;"<tr valign=top>":
+                              "<td><a href=#"#" ":
+                              "OnClick=#"updateParent('",PT0DDSC2:
+                              "','",DPCODE,"')#">":
+                              "<img src=../images/MaintenanceIcon.gif hspace=4":
+                              " border=0 align=absmiddle></a>":
+                              DPCODE,"</td>":
+                              "<td>",PT0DDSC2,"</td>":
+                             "</tr>"
+.
+SRHX3D80  ADD       ONE,DISNUMB
+          COMPARE   NORECORD,DISNUMB
+          GOTO      SRHX3D10 IF NOT EQUAL
+          GOTO      SRHX3D99
+.
+SRHX3D90  CALL      NOMORE00    * Display No More Records Message
+.
+SRHX3D99  RETURN
++
+.------------------------------------------------------------
+. Check ICD10 Edition 13 Diagnosis Record
+.------------------------------------------------------------
+SX3DRA00  MATCH     KEYWRD01,PTCDKWD
+          GOTO      SX3DRA92 IF NOT EQUAL
+          IF        KEYWRDNO>1
+            PACK      SAVKEY24,PTCDKWD,PTCDITM
+            CALL      SX3DRB00
+            BRANCH    EXIT,SX3DRA91
+            MOVE      SAVKEY24,KEY24
+            CALL      RDDK13A2
+          ENDIF
+.
+. Insert Other Check for Valid Record Here i.e. Suspended or In Active
+.   eg    COMPARE    ONE,INACTIVE
+.         GOTO       SX3DRA91 IF EQUAL
+.
+          GOTO      SX3DRA90
+.
+SX3DRA90  MOVE      ZERO,OVRCD
+          GOTO      SX3DRA99
+SX3DRA91  MOVE      ONE,OVRCD
+          GOTO      SX3DRA99
+SX3DRA92  MOVE      TWO,OVRCD
+SX3DRA99  RETURN
++
+.------------------------------------------------------------
+. Check for Matching ICD10 Edition 13 Diagnosis Words
+.------------------------------------------------------------
+SX3DRB00  MOVE      ONE,F2
+          MOVE      ZERO,EXIT
+          PACK      SAVKEY9,PTCDITM,SP70
+.
+SX3DRB10  COMPARE   KEYWRDNO,F2           * Loop through each Key Word in Search
+          GOTO      SX3DRB99 IF EQUAL     * Exit OK
+          ADD       ONE,F2
+          LOAD      KEYWRDXX,F2,KEYWRD01,KEYWRD02,KEYWRD03,KEYWRD04,KEYWRD05:
+                             KEYWRD06,KEYWRD07,KEYWRD08,KEYWRD09,KEYWRD10
+          PACK      KEY24,PTCDITM,KEYWRDXX
+          CALL      RDDK13A1              * Check for Exact Match
+          COMPARE   ZERO,OVRCD            * Ok so Continue Loop
+          GOTO      SX3DRB10 IF EQUAL
+.
+          CALL      RKDK13A1              * Not Exact so Read Next Record
+          BRANCH    OVRCD,SX3DRB90        * No Match So Exit No Match
+          PACK      KEY9,PTCDITM,SP70
+          MATCH     SAVKEY9,KEY9        * Match Key Fields
+          GOTO      SX3DRB90 IF NOT EQUAL * No Match So Exit
+          STRIP     KEYWRDXX
+          MATCH     PTCDKWD,KEYWRDXX         * Check Key Word
+          GOTO      SX3DRB90 IF NOT EQUAL * No Match So Exit
+          GOTO      SX3DRB10              * Check Next Search Word
+.
+SX3DRB90  MOVE      ONE,EXIT
+SX3DRB99  RETURN

@@ -1,0 +1,17 @@
+Version Control
+---------------
+
+Server Name   : RSHWEB02
+Option Name   :
+Template      : ibahos18001
+
+Creation Date : 07.09.2001
+
+Version   Date        Responsible/Changes Made
+--------  ----------  ------------------------
+V11.01.01 14/04/2021  Sunny          TSK 0896456  
+                      Added Cross Browser Meta tag 
+V9.02.01  30.01.2002  B.G.Ackland
+                      Mods for single record movement screen.
+V9.02.00  07.09.2001  Dean Cramer
+                      New Template - Bank Deposit Summary List

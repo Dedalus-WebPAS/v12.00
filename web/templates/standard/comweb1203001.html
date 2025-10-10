@@ -1,0 +1,407 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/TableSort.js"></script>
+<script type="text/javascript" src="../js/comweb12.js"></script>
+<script type="text/javascript"> 
+  function InitTable() {
+    t = new Table(1,0,2,"100%","center",30,30);
+    t.addColumn("Field No.","String",3,3,"left","","",15);
+    t.addColumn("Field Name","String",0,0,"left","","",20);
+    t.addColumn("Field Description","String",1,1,"left","","",60);
+    t.addColumn("Field Value","String",2,2,"left","","",80);
+    AddTableRows();
+    TableOutput(0,1);
+  }
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);InitTable();">
+<div id=HeadingSection>
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon"
+ src="../images/ExitIcon.gif" onclick="DFrameExitRefresh();">
+<script type="text/javascript">
+
+</script>
+</span>
+</div>
+
+<div id=TableLocation></div>
+
+<div id=PageBodySection></div>
+
+<script type="text/javascript">
+  function AddTableRows() {
+t.addRow("dpmqpmes", "Message Id", "%COMWEB12.03.001","001");
+t.addRow("purno", "U/R #", "%COMWEB12.03.002","002");
+t.addRow("pmqpourn", "U/R # (Old)", "%COMWEB12.03.003","003");
+t.addRow("csalias", "Alias Status", "%COMWEB12.03.004","004");
+t.addRow("ptitl", "Title", "%COMWEB12.03.006","005");
+t.addRow("phosp", "Hospital In Last Twelve Months?", "%COMWEB12.03.007","006");
+t.addRow("pldays", "No. Days Last In Hospital", "%COMWEB12.03.008","007");
+t.addRow("pbdebt", "Bad Debtor", "%COMWEB12.03.009","008");
+t.addRow("psname", "Surname", "%COMWEB12.03.010","009");
+t.addRow("pgname", "Given Name", "%COMWEB12.03.011","010");
+t.addRow("ppsname", "Previous Surname", "%COMWEB12.03.012","011");
+t.addRow("padd1", "Address Line 1", "%COMWEB12.03.013","012");
+t.addRow("padd2", "Address Line 2", "%COMWEB12.03.014","013");
+t.addRow("psubrb", "Suburb", "%COMWEB12.03.015","014");
+t.addRow("padd4", "Address Line 4", "%COMWEB12.03.016","015");
+t.addRow("ppost", "Postcode", "%COMWEB12.03.017","016");
+t.addRow("ptelep", "Home Telephone", "%COMWEB12.03.018","017");
+t.addRow("pteleb", "Bus. Telephone", "%COMWEB12.03.019","018");
+t.addRow("psex", "Sex", "%COMWEB12.03.020","019");
+t.addRow("pmstat", "Marital Status (Cat M)", "%COMWEB12.03.021","020");
+t.addRow("pbdate", "Date of Birth", "%COMWEB12.03.022","021");
+t.addRow("psage", "Patients Age", "%COMWEB12.03.023","022");
+t.addRow("pcont", "Country of Birth (Cat C)", "%COMWEB12.03.024","023");
+t.addRow("preg", "Religion (Cat R)", "%COMWEB12.03.025","024");
+t.addRow("ptype", "Patient Type (Cat T)", "%COMWEB12.03.026","025");
+t.addRow("poccup", "Occupation", "%COMWEB12.03.027","026");
+t.addRow("plddate", "Last Discharge Date", "%COMWEB12.03.028","027");
+t.addRow("pmedi", "Medicare Number", "%COMWEB12.03.029","028");
+t.addRow("ppenno", "Pension Number", "%COMWEB12.03.030","029");
+t.addRow("ppndte", "Pension No. Expiry Date", "%COMWEB12.03.031","030");
+t.addRow("prepat", "Repatriation Number", "%COMWEB12.03.032","031");
+t.addRow("psmok", "Smoker", "%COMWEB12.03.033","032");
+t.addRow("pstat", "Patient Status", "%COMWEB12.03.034","033");
+t.addRow("pmicro", "Microfilm Address", "%COMWEB12.03.035","034");
+t.addRow("pcease", "Deceased", "%COMWEB12.03.036","035");
+t.addRow("pcase", "Case Notes", "%COMWEB12.03.037","036");
+t.addRow("pautopy", "Autopsy", "%COMWEB12.03.038","037");
+t.addRow("phigh1", "Highlight Code 1 (Cat H1)", "%COMWEB12.03.039","038");
+t.addRow("phigh2", "Highlight Code 2 (Cat H2)", "%COMWEB12.03.040","039");
+t.addRow("phigh3", "Highlight Code 3 (Cat H3)", "%COMWEB12.03.041","040");
+
+t.addRow("plocdoc", "Local Doctor", "%COMWEB12.03.042","041");
+t.addRow("pfundh", "Health Fund", "%COMWEB12.03.043","042");
+t.addRow("pfndtb", "Health Fund Table", "%COMWEB12.03.044","043");
+t.addRow("pusr1", "User Defined Field 1 (Cat P1)", "%COMWEB12.03.046","044");
+t.addRow("pusr2", "User Defined Field 2 (Cat P2)", "%COMWEB12.03.047","045");
+t.addRow("pusr3", "User Defined Field 3 (Cat P3)", "%COMWEB12.03.048","046");
+t.addRow("pusr4", "User Defined Field 4 (Cat P4)", "%COMWEB12.03.049","047");
+t.addRow("pusr5", "User Defined Field 5 (Cat P5)", "%COMWEB12.03.050","048");
+t.addRow("pusr6", "User Defined Field 6 (Cat P6)", "%COMWEB12.03.051","049");
+t.addRow("puyn1", "User Defined Y/N Field 1", "%COMWEB12.03.052","050");
+t.addRow("puyn2", "User Defined Y/N Field 2", "%COMWEB12.03.053","051");
+t.addRow("puyn3", "User Defined Y/N Field 3", "%COMWEB12.03.054","052");
+t.addRow("pyrres", "Number of Years Resident", "%COMWEB12.03.055","053");
+t.addRow("pnkname", "Next of Kin Name", "%COMWEB12.03.056","054");
+t.addRow("pnkadd1", "NoK Address Line 1", "%COMWEB12.03.057","055");
+t.addRow("pnkadd2", "NoK Address Line 2", "%COMWEB12.03.058","056");
+t.addRow("pnksubr", "NoK Suburb", "%COMWEB12.03.059","057");
+t.addRow("pnkadd4", "NoK Address Line 4", "%COMWEB12.03.060","058");
+t.addRow("pnkpost", "NoK Postcode", "%COMWEB12.03.061","059");
+t.addRow("pnktelp", "NoK Private Telephone", "%COMWEB12.03.062","060");
+t.addRow("pnktelb", "NoK Business Telephone", "%COMWEB12.03.063","061");
+t.addRow("pnkrelp", "NoK Relationship", "%COMWEB12.03.064","062");
+t.addRow("plstinp", "Last Inpatient", "%COMWEB12.03.065","063");
+t.addRow("plstout", "Last Outpatient Visit Number", "%COMWEB12.03.066","064");
+t.addRow("pnxray", "Number Of Previous X-Rays", "%COMWEB12.03.067","065");
+t.addRow("pfndyy", "Years Health Fund Membership", "%COMWEB12.03.068","066");
+t.addRow("pfndcg", "Health Fund Cover Change", "%COMWEB12.03.069","067");
+t.addRow("pdecdte", "Date of Death", "%COMWEB12.03.070","068");
+t.addRow("phcnotes", "Case Notes Indicators", "%COMWEB12.03.071","069");
+t.addRow("pdiet", "Default Diet Code (Cat DC)", "%COMWEB12.03.072","070");
+t.addRow("pinithos", "Hospital U/R Initiated From", "%COMWEB12.03.073","071");
+
+t.addRow("phkaduni", "Hong Kong Unique Address ID", "%COMWEB12.03.074","072");
+t.addRow("ptmaempc", "Patient Employer Code", "%COMWEB12.03.075","073");
+t.addRow("ptmanoko", "Next Of Kin Occupation", "%COMWEB12.03.076","074");
+t.addRow("ptmanoke", "Next Of Kin Employer Code", "%COMWEB12.03.077","075");
+t.addRow("ptmadcno", "Death Certificate Number", "%COMWEB12.03.078","076");
+t.addRow("ptmaukdb", "unknown date of birth (y/n)", "%COMWEB12.03.079","077");
+t.addRow("ptmaukdd", "unknown date of death (y/n)", "%COMWEB12.03.080","078");
+t.addRow("pfndmm", "Health Fund Membership No", "%COMWEB12.03.081","079");
+t.addRow("ptmadcdt", "Demographics Confirmed Date", "%COMWEB12.03.082","080");
+t.addRow("ptmahcp1", "HCP 1 (pmshcpaf)", "%COMWEB12.03.083","081");
+t.addRow("ptmahcl1", "HCP 1 Practice (pmshclaf)", "%COMWEB12.03.084","082");
+t.addRow("ptmahcg1", "HCP 1 Grp Count (pmshcgaf)", "%COMWEB12.03.085","083");
+t.addRow("ptmahcp2", "HCP 2 (pmshcpaf)", "%COMWEB12.03.086","084");
+t.addRow("ptmahcl2", "HCP 2 Practice (pmshclaf)", "%COMWEB12.03.087","085");
+t.addRow("ptmahcg2", "HCP 2 Grp Count (pmshcgaf)", "%COMWEB12.03.098.100","086");
+t.addRow("ptmahcp3", "HCP 3 (pmshcpaf)", "%COMWEB12.03.088","087");
+t.addRow("ptmahcl3", "HCP 3 Practice (pmshclaf)", "%COMWEB12.03.089","088");
+t.addRow("ptmahcg3", "HCP 3 Grp Count (pmshcgaf)", "%COMWEB12.03.090","089");
+t.addRow("ptmahcp4", "HCP 4 (pmshcpaf)", "%COMWEB12.03.091","090");
+t.addRow("ptmahcl4", "HCP 4 Practice (pmshclaf)", "%COMWEB12.03.092","091");
+t.addRow("ptmahcg4", "HCP 4 Grp Count (pmshcgaf", "%COMWEB12.03.093","092");
+t.addRow("ptmahcp5", "HCP 5 (pmshcpaf)", "%COMWEB12.03.094","093");
+t.addRow("ptmahcl5", "HCP 5 Practice (pmshclaf)", "%COMWEB12.03.095","094");
+t.addRow("ptmahcg5", "HCP 5 Grp Count (pmshcgaf", "%COMWEB12.03.096","095");
+t.addRow("ptmasnam", "Patient Surname", "%COMWEB12.03.097","096");
+t.addRow("ptmadcud", "Demog Conf Upd Date (ccyymmdd)", "%COMWEB12.03.098.001","097");
+t.addRow("ptmadcut", "Demog Conf Upd time (hh:mm:ss)", "%COMWEB12.03.098.002","098");
+t.addRow("ptmadcuu", "Demog Conf Upd User (websecaf)", "%COMWEB12.03.098.005","099");
+t.addRow("ptmauuid", "Web User Id Who Last Updated record", "%COMWEB12.03.098.006","100");
+t.addRow("ptmautim", "Time Record Last Updated (hh:mm:ss)", "%COMWEB12.03.098.007","101");
+t.addRow("ptmxrdat", "Registration Date", "%COMWEB12.03.098.008","102");
+t.addRow("ptmxmeal", "Special Meal Requirements", "%COMWEB12.03.098.009","103");
+t.addRow("ptmxlga", "LGA Code", "%COMWEB12.03.098.010","104");
+t.addRow("ptmxls", "Current Legal Status (Cat LS)", "%COMWEB12.03.098.011","105");
+t.addRow("ptmxlsdt", "Date of Legal Status", "%COMWEB12.03.098.012","106");
+t.addRow("ptmxfhmd", "Family hist. of mental disorder?", "%COMWEB12.03.098.013","107");
+t.addRow("ptmxmhu1", "M.H. User def. field 1 (Cat V6)", "%COMWEB12.03.098.014","108");
+t.addRow("ptmxmhu2", "M.H. User def. field 2 (Cat V7)", "%COMWEB12.03.098.015","109");
+t.addRow("ptmxmhu3", "M.H. User def. field 3 (Cat V8)", "%COMWEB12.03.098.016","110");
+t.addRow("ptmxecnm", "Emergency contact name", "%COMWEB12.03.098.017","111");
+t.addRow("ptmxeca1", "Emergency contact address line 1", "%COMWEB12.03.098.018","112");
+t.addRow("ptmxeca2", "Emergency contact address line 2", "%COMWEB12.03.098.019","113");
+t.addRow("ptmxeca3", "Emergency contact address line 3", "%COMWEB12.03.098.020","114");
+t.addRow("ptmxeca4", "Emergency contact address line 4", "%COMWEB12.03.098.021","115");
+t.addRow("ptmxecpc", "Emergency contact postcode", "%COMWEB12.03.098.022","116");
+t.addRow("ptmxecpp", "Emergency contact private phone", "%COMWEB12.03.098.023","117");
+t.addRow("ptmxecbp", "Emergency contact business phone", "%COMWEB12.03.098.024","118");
+t.addRow("ptmxecre", "Emergency contact relationship", "%COMWEB12.03.098.025","119");
+t.addRow("ptmxnrnm", "Nearest relative name ", "%COMWEB12.03.098.026","120");
+t.addRow("ptmxnra1", "Nearest relative address line 1", "%COMWEB12.03.098.027","121");
+t.addRow("ptmxnra2", "Nearest relative address line 2", "%COMWEB12.03.098.028","122");
+t.addRow("ptmxnra3", "Nearest relative address line 3", "%COMWEB12.03.098.029","123");
+t.addRow("ptmxnra4", "Nearest relative address line 4", "%COMWEB12.03.098.030","124");
+t.addRow("ptmxnrpc", "Nearest relative postcode", "%COMWEB12.03.098.031","125");
+t.addRow("ptmxnrpp", "Nearest relative private phone", "%COMWEB12.03.098.032","126");
+t.addRow("ptmxnrbp", "Nearest relative business phone", "%COMWEB12.03.098.033","127");
+t.addRow("ptmxnrre", "Nearest relative relationship", "%COMWEB12.03.098.034","128");
+t.addRow("ptmx3bex", "3B certificate expiry date", "%COMWEB12.03.098.035","129");
+t.addRow("ptmxcard", "Card number (NZ billing)", "%COMWEB12.03.098.036","130");
+t.addRow("ptmxcexp", "Card expiry date (NZ billing)", "%COMWEB12.03.098.037","131");
+t.addRow("ptmxcxmp", "Card exemption type (Cat XM)", "%COMWEB12.03.098.038","132");
+t.addRow("ptmxfmly", "Family ID", "%COMWEB12.03.098.039","133");
+t.addRow("ptmxchnm", "Chinese Name", "%COMWEB12.03.098.040","134");
+
+t.addRow("ptmxdofr", "District of Residence (Cat DA)", "%COMWEB12.03.098.041","135");
+t.addRow("ptmxregp", "District of Residence", "%COMWEB12.03.098.042","136");
+t.addRow("ptmxgppc", "Registered GP", "%COMWEB12.03.098.043","137");
+t.addRow("ptmxspid", "GP Practice Code", "%COMWEB12.03.098.044","138");
+t.addRow("ptmxgppt", "Supplementary ID", "%COMWEB12.03.098.045","139");
+t.addRow("ptmxosdt", "Date Arrived from O/S", "%COMWEB12.03.098.046","140");
+t.addRow("ptmxoper", "Operator Code who Created Record", "%COMWEB12.03.098.047","141");
+t.addRow("ptmxukdo", "Unknown Date Arrived from O/S", "%COMWEB12.03.098.048","142");
+t.addRow("ptmxcell", "Cellular Phone Number", "%COMWEB12.03.098.049","143");
+t.addRow("ptmxadd1", "Postal Address Line 1", "%COMWEB12.03.098.050","144");
+t.addRow("ptmxadd2", "Postal Address Line 2", "%COMWEB12.03.098.051","145");
+t.addRow("ptmxadd3", "Postal Address Line 3", "%COMWEB12.03.098.052","146");
+t.addRow("ptmxadd4", "Postal Address Line 4", "%COMWEB12.03.098.053","147");
+t.addRow("ptmxpost", "Postal Address Postcode", "%COMWEB12.03.098.054","148");
+t.addRow("ptmxmccd", "Medicare Code", "%COMWEB12.03.098.055","149");
+t.addRow("ptmxsin1", "Status Ind 1 - Alerts Present(1=yes)", "%COMWEB12.03.098.056","150");
+t.addRow("ptmxsin2", "Status Ind 2 - Results present(1=yes)", "%COMWEB12.03.098.057","151");
+t.addRow("ptmxsin3", "Status Ind 3 - Clinical notes present", "%COMWEB12.03.098.058","152");
+t.addRow("ptmxsin4", "Status Ind 4 - Clinical Documentation", "%COMWEB12.03.098.059","153");
+t.addRow("ptmxsin5", "Status Ind 5 - Legacy Visits (1=yes)", "%COMWEB12.03.098.060","154");
+t.addRow("ptmxctim", "Time/Date Change(ccyymmdd hh:mm:ss:mmm)", "%COMWEB12.03.098.061","155");
+t.addRow("ptmxslac", "Year last Psych adm (was SLA Code)", "%COMWEB12.03.098.062","156");
+t.addRow("ptmxfiln", "Filing Required", "%COMWEB12.03.098.063","157");
+t.addRow("ptmxdeaf", "Deaf", "%COMWEB12.03.098.064","158");
+t.addRow("ptmxosms", "Opt Out of SMS", "%COMWEB12.03.098.065","159");
+t.addRow("ptmxuuid", "Web User ID who Updated Record", "%COMWEB12.03.098.066","160");
+t.addRow("ptninmpi", "National ID No", "%COMWEB12.03.098.067","161");
+t.addRow("nhmasurn", "Surname", "%COMWEB12.03.098.068","162");
+t.addRow("nhmagiv1", "Given Name 1", "%COMWEB12.03.098.069","163");
+t.addRow("nhmagiv2", "Given Name 2", "%COMWEB12.03.098.070","164");
+t.addRow("nhmagiv3", "Given Name 3", "%COMWEB12.03.098.071","165");
+t.addRow("nhmaprei", "Preferred Name Indicator", "%COMWEB12.03.098.072","166");
+t.addRow("nhmaadd1", "Address Line 1", "%COMWEB12.03.098.073","167");
+t.addRow("nhmaadd2", "Address Line 2", "%COMWEB12.03.098.074","168");
+t.addRow("nhmaadd3", "Suburb", "%COMWEB12.03.098.075","169");
+t.addRow("nhmaadd4", "City/Town", "%COMWEB12.03.098.076","170");
+t.addRow("nhmaadd5", "Country", "%COMWEB12.03.098.077","171");
+t.addRow("nhmadob", "Date of Birth", "%COMWEB12.03.098.078","172");
+t.addRow("nhmaddth", "Date of Death", "%COMWEB12.03.098.079","173");
+t.addRow("nhmadomc", "Domicile Code", "%COMWEB12.03.098.080","174");
+t.addRow("nhmares", "Residence Status", "%COMWEB12.03.098.081","175");
+t.addRow("nhmaeth", "Ethnicity", "%COMWEB12.03.098.082","176");
+t.addRow("nhmasex", "Gender", "%COMWEB12.03.098.083","177");
+t.addRow("nhmadat", "Date Last Updated", "%COMWEB12.03.098.084","178");
+t.addRow("nhmatim", "Time Last Updated", "%COMWEB12.03.098.085","179");
+t.addRow("nhmaeth2", "2nd Ethnicity", "%COMWEB12.03.098.086","180");
+t.addRow("nhmaeth3", "3rd Ethnicity", "%COMWEB12.03.098.087","181");
+t.addRow("nhmaeth4", "4th Ethnicity", "%COMWEB12.03.098.088","182");
+t.addRow("nhmaeth5", "5th Ethnicity", "%COMWEB12.03.098.089","183");
+t.addRow("nhmaeth6", "6th Ethnicity", "%COMWEB12.03.098.090","184");
+
+t.addRow("pmpxrhc1", "Registered HCP 1", "%COMWEB12.03.098.091","185");
+t.addRow("pmpxrh1g", "Registered HCP Practice 1", "%COMWEB12.03.098.092","186");
+t.addRow("pmpxr1gc", "Registered HCP Practice Count 1", "%COMWEB12.03.098.093","187");
+t.addRow("pmpxintr", "Interpreter Required?", "%COMWEB12.03.098.094","188");
+t.addRow("pmpxlng1", "Preferred Language 1 (Cat LA)", "%COMWEB12.03.098.095","189");
+t.addRow("pmpxlng2", "Preferred Language 2 (Cat LA)", "%COMWEB12.03.098.096","190");
+t.addRow("pmpxlng3", "Preferred Language 3 (Cat LA)", "%COMWEB12.03.098.097","191");
+t.addRow("pmpxpeml", "Patient Email Address", "%COMWEB12.03.098.098.001","192");
+t.addRow("pmpxedob", "Date of Birth Estimated?", "%COMWEB12.03.098.098.002","193");
+t.addRow("pmpxcmob", "Emergency Contact Mobile Number", "%COMWEB12.03.098.098.003","194");
+t.addRow("pmpxceml", "Emergency Contact Email Address", "%COMWEB12.03.098.098.004","195");
+t.addRow("pmpxccrp", "Emergency Contact Correct?", "%COMWEB12.03.098.098.005","196");
+t.addRow("pmpxkmob", "NOK Mobile Number", "%COMWEB12.03.098.098.006","197");
+t.addRow("pmpxkeml", "NOK Email Address", "%COMWEB12.03.098.098.007","198");
+t.addRow("pmpxkcrp", "NOK Correspondence", "%COMWEB12.03.098.098.008","199");
+t.addRow("pmpxrmob", "Nearest Relative Mobile Number", "%COMWEB12.03.098.098.009","200");
+t.addRow("pmpxreml", "Nearest Relative Email Address", "%COMWEB12.03.098.098.010","201");
+t.addRow("pmpxrcrp", "Nearest Relative Correct?", "%COMWEB12.03.098.098.011","202");
+t.addRow("pmpxmedc", "Medicare Card Valid to", "%COMWEB12.03.098.098.012","203");
+t.addRow("pmpxdety", "Death Type (Cat DY)", "%COMWEB12.03.098.098.013","204");
+t.addRow("pmpxpris", "PRISM Number", "%COMWEB12.03.098.098.014","205");
+t.addRow("pmpxcser", "Correctional Services Number", "%COMWEB12.03.098.098.015","206");
+t.addRow("pmpxphei", "Patient Height", "%COMWEB12.03.098.098.016","207");
+t.addRow("pmpxpwei", "Patient Weight", "%COMWEB12.03.098.098.017","208");
+t.addRow("pmpxdrec", "Date Weight/Height Recorded", "%COMWEB12.03.098.098.018","209");
+t.addRow("pmpxmsna", "Mother's Surname", "%COMWEB12.03.098.098.019","210");
+t.addRow("pmpxmgna", "Mother's Given Name", "%COMWEB12.03.098.098.020","211");
+t.addRow("pmpxmtle", "Mother's Title", "%COMWEB12.03.098.098.021","212");
+t.addRow("pmpxmad1", "Mother's Address Line 1", "%COMWEB12.03.098.098.022","213");
+t.addRow("pmpxmad2", "Mother's Address Line 2", "%COMWEB12.03.098.098.023","214");
+t.addRow("pmpxmad3", "Mother's Address Line 3", "%COMWEB12.03.098.098.024","215");
+t.addRow("pmpxmad4", "Mother's Address Line 4", "%COMWEB12.03.098.098.025","216");
+t.addRow("pmpxmpos", "Mother's Address Post Code", "%COMWEB12.03.098.098.026","217");
+t.addRow("pmpxmpno", "Mother's Private Number", "%COMWEB12.03.098.098.027","218");
+t.addRow("pmpxmbno", "Mother's Business Number", "%COMWEB12.03.098.098.028","219");
+t.addRow("pmpxmmno", "Mother's Mobile Number", "%COMWEB12.03.098.098.029","220");
+t.addRow("pmpxmeml", "Mother's Email Address", "%COMWEB12.03.098.098.030","221");
+t.addRow("pmpxmcnt", "Mother's Country of Birth (Cat C)", "%COMWEB12.03.098.098.031","222");
+t.addRow("pmpxmcrp", "Mother's Correspondence", "%COMWEB12.03.098.098.032","223");
+t.addRow("pmpxmlab", "Mother's Name on Labels", "%COMWEB12.03.098.098.033","224");
+t.addRow("pmpxmrel", "Relationship to Patient", "%COMWEB12.03.098.098.034","225");
+t.addRow("pmpxfsna", "Father's Surname", "%COMWEB12.03.098.098.035","226");
+t.addRow("pmpxfgna", "Father's Given Name", "%COMWEB12.03.098.098.036","227");
+t.addRow("pmpxftle", "Father's Title", "%COMWEB12.03.098.098.037","228");
+t.addRow("pmpxfad1", "Father's Address Line 1", "%COMWEB12.03.098.098.038","229");
+t.addRow("pmpxfad2", "Father's Address Line 2", "%COMWEB12.03.098.098.039","230");
+t.addRow("pmpxfad3", "Father's Address Line 3", "%COMWEB12.03.098.098.040","231");
+t.addRow("pmpxfad4", "Father's Address Line 4", "%COMWEB12.03.098.098.041","232");
+t.addRow("pmpxfpos", "Father's Address Post Code", "%COMWEB12.03.098.098.042","233");
+t.addRow("pmpxfpno", "Father's Private Number", "%COMWEB12.03.098.098.043","234");
+t.addRow("pmpxfbno", "Father's Business Number", "%COMWEB12.03.098.098.044","235");
+t.addRow("pmpxfmno", "Father's Mobile Number", "%COMWEB12.03.098.098.045","236");
+t.addRow("pmpxfeml", "Father's Email Address", "%COMWEB12.03.098.098.046","237");
+t.addRow("pmpxfcnt", "Father's Country of Birth (Cat C)", "%COMWEB12.03.098.098.047","238");
+t.addRow("pmpxfcrp", "Father's Correspondence", "%COMWEB12.03.098.098.048","239");
+t.addRow("pmpxflab", "Father's Name on Labels", "%COMWEB12.03.098.098.049","240");
+t.addRow("pmpxfrel", "Relationship to Patient", "%COMWEB12.03.098.098.050","241");
+
+t.addRow("pmpxtdig", "Terminal Digit (Last 2 chrs of U/R)", "%COMWEB12.03.098.098.051","242");
+t.addRow("pmpxwbid", "WEB User Id re. creator (websecaf)", "%COMWEB12.03.098.098.052","243");
+t.addRow("pmpxdvac", "DVA Card Colour (Cat DX)", "%COMWEB12.03.098.098.053","244");
+t.addRow("pmpxpnsd", "Pension Start Date", "%COMWEB12.03.098.098.054","245");
+t.addRow("pmpxuyn4", "User Def. Y/N field 4", "%COMWEB12.03.098.098.055","246");
+t.addRow("pmpxuyn5", "User Def. Y/N field 5", "%COMWEB12.03.098.098.056","247");
+t.addRow("pmpxuyn6", "Not for Resusitation. Y/N field 6", "%COMWEB12.03.098.098.057","248");
+t.addRow("pmpxabrg", "Aboriginality (Cat VA)", "%COMWEB12.03.098.098.058","249");
+t.addRow("pmpxprvi", "Privacy Indicator (Cat PV)", "%COMWEB12.03.098.098.059","250");
+t.addRow("pmpxcrin", "Consent Release of Info?", "%COMWEB12.03.098.098.060","251");
+t.addRow("pmpxhoml", "Homeless?", "%COMWEB12.03.098.098.061","252");
+t.addRow("pmpxudc1", "User Def. Comments 1", "%COMWEB12.03.098.098.062","253");
+t.addRow("pmpxudc2", "User Def. Comments 2", "%COMWEB12.03.098.098.063","254");
+t.addRow("pmpxudc3", "User Def. Comments 3", "%COMWEB12.03.098.098.064","255");
+t.addRow("pmpxusr7", "User Defined 7 (Cat P7)", "%COMWEB12.03.098.098.065","256");
+t.addRow("pmpxusr8", "User Defined 8 (Cat P8)", "%COMWEB12.03.098.098.066","257");
+t.addRow("pmpxusr9", "User Defined 9 (Cat P9)", "%COMWEB12.03.098.098.067","258");
+t.addRow("pmpxmsno", "Medicare Safety Net Number", "%COMWEB12.03.098.098.068","259");
+t.addRow("pmpxconp", "Which contact for PRA", "%COMWEB12.03.098.098.069","260");
+t.addRow("pmpxfldr", "Folder Selection (Category FS)", "%COMWEB12.03.098.098.070","261");
+t.addRow("pmpxiwi1", "Iwi 1 (Category iw)", "%COMWEB12.03.098.098.071","262");
+t.addRow("pmpxiwi2", "Iwi 2 (Category iw)", "%COMWEB12.03.098.098.072","263");
+t.addRow("pmpxiwi3", "Iwi 3 (Category iw)", "%COMWEB12.03.098.098.073","264");
+t.addRow("pmpxihos", "Hospital Initiating U/R", "%COMWEB12.03.098.098.074","265");
+t.addRow("pmpxpfsn", "Preferred Surname", "%COMWEB12.03.098.098.075","266");
+t.addRow("pmpxpfgn", "Preferred Given Name", "%COMWEB12.03.098.098.076","267");
+t.addRow("pmpxsin6", "Transport Required - 1=Yes", "%COMWEB12.03.098.098.077","268");
+t.addRow("pmpxsin7", "Medical Alert (wahealth) - 1=Yes", "%COMWEB12.03.098.098.078","269");
+t.addRow("pmpxsin8", "Micro Alert (wahealth) - 1=Yes", "%COMWEB12.03.098.098.079","270");
+t.addRow("pmpxsin9", "Risk Alert (wahealth) - 1=Yes", "%COMWEB12.03.098.098.080","271");
+t.addRow("pmpxsn10", "Status Ind 10 - 1=Yes", "%COMWEB12.03.098.098.081","272");
+t.addRow("pmpxsn11", "Status Ind 11 - 1=Yes", "%COMWEB12.03.098.098.082","273");
+t.addRow("pmpxsn12", "Patient Debt Only - 1=Yes", "%COMWEB12.03.098.098.083","274");
+t.addRow("pmpxsn13", "Set Payment Plan - 1=Yes", "%COMWEB12.03.098.098.084","275");
+t.addRow("pmpxsn14", "Debt Collection Agency - 1=Yes", "%COMWEB12.03.098.098.085","276");
+t.addRow("pmpxsn15", "Outstanding Debt Ind. 1=Yes", "%COMWEB12.03.098.098.086","277");
+t.addRow("pmpxpfax", "Patient Fax Number", "%COMWEB12.03.098.098.087","278");
+t.addRow("pmpxfnam", "Patient First Given Name", "%COMWEB12.03.098.098.088","279");
+t.addRow("pmpxsnam", "Patient Second Given Name", "%COMWEB12.03.098.098.089","280");
+t.addRow("pmpxhfgn", "Health Fund First Given Name Alias", "%COMWEB12.03.098.098.090","281");
+t.addRow("pmpxhfsn", "Health Fund Surname Alias", "%COMWEB12.03.098.098.091","282");
+t.addRow("pmpxfupi", "Health Fund UPI", "%COMWEB12.03.098.098.092","283");
+t.addRow("pmpxvgpc", "Verified GP Code (pmshcpaf)", "%COMWEB12.03.098.098.093","284");
+t.addRow("pmpxvgpp", "Verified GP Practice (pmshcgaf)", "%COMWEB12.03.098.098.094","285");
+t.addRow("pmpxvgpg", "Verified GP Group Count (pmshclaf)", "%COMWEB12.03.098.098.095","286");
+t.addRow("pmpxasno", "Ambulance Subscriber No.", "%COMWEB12.03.098.098.096","287");
+t.addRow("pmpxmaid", "Maiden Name", "%COMWEB12.03.098.098.097","288");
+t.addRow("pmpxethn", "Ethnicity (Cat EN)", "%COMWEB12.03.098.098.098.001","289");
+t.addRow("pmpxhfcn", "Health Fund Contributor Name", "%COMWEB12.03.098.098.098.002","290");
+t.addRow("pmpxlubh", "Hospital Last Updated U/R", "%COMWEB12.03.098.098.098.003","291");
+t.addRow("pmpxpmcn", "Preferred Method of Contact (Cat Pn)", "%COMWEB12.03.098.098.098.004","292");
+t.addRow("pmpxpmcr", "Preferred Method of Correspondence", "%COMWEB12.03.098.098.098.005","293");
+t.addRow("pmpxcrn1", "Consent of Release of Info to HCP1", "%COMWEB12.03.098.098.098.006","294");
+t.addRow("pmpxcrn2", "Consent of Release of Info to HCP2", "%COMWEB12.03.098.098.098.007","295");
+t.addRow("pmpxcrn3", "Consent of Release of Info to HCP3", "%COMWEB12.03.098.098.098.008","296");
+t.addRow("pmpxcrn4", "Consent of Release of Info to HCP4", "%COMWEB12.03.098.098.098.009","297");
+t.addRow("pmpxcrn5", "Consent of Release of Info to HCP5", "%COMWEB12.03.098.098.098.010","298");
+t.addRow("pmpxosms", "Opt out of SMS", "%COMWEB12.03.098.098.098.011","299");
+t.addRow("pmpxrper", "Retention Period (Cat rt)", "%COMWEB12.03.098.098.098.012","300");
+t.addRow("pmpxrdat", "Retention Date (ccyymmdd)", "%COMWEB12.03.098.098.098.013","301");
+t.addRow("pmpxuprf", "Usual PRFA Coded (Cat tc)", "%COMWEB12.03.098.098.098.014","302");
+t.addRow("pmpxuuid", "User Id who Last Updated Record", "%COMWEB12.03.098.098.098.015","303");
+t.addRow("pmpxudat", "Date Record Last Updated (ccyymmdd)", "%COMWEB12.03.098.098.098.016","304");
+t.addRow("pmpxutim", "Time Record Last Updated (hh:mm:ss)", "%COMWEB12.03.098.098.098.017","305");
+
+t.addRow("pmpxauf1", "Additional User Defined Field 1", "%COMWEB12.03.098.098.098.018","306");
+t.addRow("pmpxauf2", "Additional User Defined Field 2", "%COMWEB12.03.098.098.098.019","307");
+t.addRow("pmpxauf3", "Additional User Defined Field 3", "%COMWEB12.03.098.098.098.020","308");
+t.addRow("pmpxauf4", "Additional User Defined Field 4", "%COMWEB12.03.098.098.098.021","309");
+t.addRow("pmpxauf5", "Additional User Defined Field 5", "%COMWEB12.03.098.098.098.022","310");
+t.addRow("pmpxauf6", "Additional User Defined Field 6", "%COMWEB12.03.098.098.098.023","311");
+t.addRow("pmpxauf7", "Additional User Defined Field 7", "%COMWEB12.03.098.098.098.024","312");
+t.addRow("pmpxauf8", "Additional User Defined Field 8", "%COMWEB12.03.098.098.098.025","313");
+t.addRow("pmpxauf9", "Additional User Defined Field 9", "%COMWEB12.03.098.098.098.026","314");
+t.addRow("pmpxau10", "Additional User Defined Field 10", "%COMWEB12.03.098.098.098.027","315");
+
+t.addRow("pmpxsn16", "MyHR Consent Flag", "%COMWEB12.03.098.098.098.028","316");
+t.addRow("pmpxsn17", "SMR - Scanned Medical Record Exists", "%COMWEB12.03.098.098.098.029","317");
+t.addRow("pmpxsn18", "Status Indicator 18", "%COMWEB12.03.098.098.098.030","318");
+t.addRow("pmpxsn19", "Verified Address", "%COMWEB12.03.098.098.098.031","319");
+t.addRow("pmpxsn20", "Status Indicator 20", "%COMWEB12.03.098.098.098.032","320");
+t.addRow("pmpxsn21", "Status Indicator 21", "%COMWEB12.03.098.098.098.033","321");
+t.addRow("pmpxsn22", "Status Indicator 22", "%COMWEB12.03.098.098.098.034","322");
+t.addRow("pmpxsn23", "Status Indicator 23", "%COMWEB12.03.098.098.098.035","323");
+t.addRow("pmpxsn24", "Status Indicator 24", "%COMWEB12.03.098.098.098.036","324");
+t.addRow("pmpxsn25", "Status Indicator 25", "%COMWEB12.03.098.098.098.037","325");
+t.addRow("pmpxsn26", "Status Indicator 26", "%COMWEB12.03.098.098.098.038","326");
+t.addRow("pmpxsn27", "Status Indicator 27", "%COMWEB12.03.098.098.098.039","327");
+t.addRow("pmpxsn28", "Status Indicator 28", "%COMWEB12.03.098.098.098.040","328");
+t.addRow("pmpxsn29", "Status Indicator 29", "%COMWEB12.03.098.098.098.041","329");
+t.addRow("pmpxsn30", "Status Indicator 30", "%COMWEB12.03.098.098.098.042","330");
+t.addRow("pmpxucc1", "User Defined Category Code 1", "%COMWEB12.03.098.101","331");
+t.addRow("pmpxucc2", "User Defined Category Code 2", "%COMWEB12.03.098.102","332");
+t.addRow("pmpxucc3", "User Defined Category Code 3", "%COMWEB12.03.098.103","333");
+t.addRow("pmpxucc4", "Identifying Gender (Cat Gi)", "%COMWEB12.03.098.104","334");
+t.addRow("pmpxucc5", "Identifying Pronoun (Cat Gp)", "%COMWEB12.03.098.105","335");
+
+t.addRow("pmpxudt1", "User Defined Date 1 (ccyymmdd)", "%COMWEB12.03.098.098.098.047","336");
+t.addRow("pmpxutm1", "User Defined Time 1 (hh:mm:ss)", "%COMWEB12.03.098.098.098.048","337");
+t.addRow("pmpxudt2", "User Defined Date 2 (ccyymmdd)", "%COMWEB12.03.098.098.098.049","338");
+t.addRow("pmpxutm2", "User Defined Date 2 (ccyymmdd)", "%COMWEB12.03.098.098.098.050","339");
+t.addRow("pmpxudt3", "User Defined Time 3 (hh:mm:ss)", "%COMWEB12.03.098.098.098.051","340");
+t.addRow("pmpxutm3", "User Defined Time 3 (hh:mm:ss)", "%COMWEB12.03.098.098.098.052","341");
+t.addRow("pmpxudt4", "User Defined Date 4 (ccyymmdd)", "%COMWEB12.03.098.098.098.053","342");
+t.addRow("pmpxutm4", "User Defined Time 4 (hh:mm:ss)", "%COMWEB12.03.098.098.098.054","343");
+t.addRow("pmpxudt5", "User Defined Date 5 (ccyymmdd)", "%COMWEB12.03.098.098.098.055","344");
+t.addRow("pmpxutm5", "User Defined Time 5 (hh:mm:ss)", "%COMWEB12.03.098.098.098.056","345");
+t.addRow("pmpxahc1", "Additional HCP 1", "%COMWEB12.03.098.098.098.057","346");
+t.addRow("pmpxahg1", "Additional HCP Group 1", "%COMWEB12.03.098.098.098.058","347");
+t.addRow("pmpxagc1", "Additional HCP Group Count 1", "%COMWEB12.03.098.098.098.059","348");
+t.addRow("pmpxahc2", "Additional HCP 2", "%COMWEB12.03.098.098.098.060","349");
+t.addRow("pmpxahg2", "Additional HCP Group 2", "%COMWEB12.03.098.098.098.061","350");
+t.addRow("pmpxagc2", "Additional HCP Group Count 2", "%COMWEB12.03.098.098.098.062","351");
+t.addRow("pmpxatf1", "Identifying Gender Free Text", "%COMWEB12.03.098.098.098.063","352");
+t.addRow("pmpxatf2", "Identifying Pronoun Free Text", "%COMWEB12.03.098.098.098.064","353");
+t.addRow("pmpxatf3", "Additional Text Field 3", "%COMWEB12.03.098.098.098.065","354");
+t.addRow("pmpxatf4", "Additional Text Field 4", "%COMWEB12.03.098.098.098.066","355");
+t.addRow("pmpxatf5", "Additional Text Field 5", "%COMWEB12.03.098.098.098.067","356");
+t.addRow("pmpxeth1", "Ancestry/Ethnicity 1 (Cat EN)", "%COMWEB12.03.098.098.098.043","357");
+t.addRow("pmpxeth2", "Ancestry/Ethnicity 2 (Cat EN)", "%COMWEB12.03.098.098.098.044","358");
+t.addRow("pmpxlan1", "Main Language Spoken at Home 1 (Cat l1)", "%COMWEB12.03.098.098.098.045","359");
+t.addRow("pmpxlan2", "Main Language Spoken at Home 2 (Cat l1)", "%COMWEB12.03.098.098.098.046","360");
+
+  }
+</script>

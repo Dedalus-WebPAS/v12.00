@@ -1,0 +1,113 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript">
+function ProcessSubmit() {
+  var tid=document.getElementById("transcID").value;
+  var lid=document.getElementById("locatnID").value;
+  if(tid.length!==24){
+    alert("Transaction ID  must be 24 character long.");
+    return; 
+  }
+  if(lid.length!==8){
+    alert("Location ID  must be 8 character long.");
+    return;
+  }
+ if (validateMandatory(search)) {
+   var tid=document.getElementById("transcID").value;
+   var lid=document.getElementById("locatnID").value;
+   //Remote Scripting to check valid transaction ID and location Id
+   var serverURL= "../cgi-bin/hosweb01.pbl?reportno=2&valdtype=6" +
+       "&transcID=" + tid.replace(/ /g,"+") +
+       "&locatnID=" + lid.replace(/ /g,"+");
+  var returnValue = RSExecute(serverURL);
+  if (returnValue.status!=0) {
+      return; }
+  
+  ReturnValue=returnValue.return_value.split("|");
+  var rtid=ReturnValue[0];
+  var rlid=ReturnValue[1];
+  
+  if (isWhitespace(rtid) || isWhitespace(rlid) ) {
+      var r=confirm("Ensure the TransactionID and LocationID entered" +
+                    " are valid and correct\n\n");
+      if (r==true) {
+        document.search.submit();
+      }
+      else{ 
+            document.getElementById("transcID").focus(); 
+            return;
+      }
+  }
+   document.search.submit();
+ }
+}
+function validateIds(fieldel)
+{
+  fieldel.value=trim(fieldel.value); 
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);">
+
+<div id=HeadingSection>
+<form name=search action=hosweb01.pbl method=get style="margin:0">
+<input type=hidden name=reportno value=20>
+<input type=hidden name=template value=003>
+<input type=hidden name=updttype value="C">
+<input type=hidden name=nextpage value='1'>
+<input type=hidden name=redirect value="hosweb01.pbl?reportno=20&template=1">
+
+<table border=0 width=100% cellpadding=3 bgcolor=#CCCCCC>
+  <tr><td>
+       <table width=50% border=0 cellpadding=0 cellspacing=0 bgcolor=#CCCCCC
+              align=center>
+       <tr><td>&nbsp;</td></tr>
+       <tr>
+           <td class=DataLabel colspan=3>&nbsp;</td>
+           <td class=DataLabel colspan=3>Transaction ID<br>
+           <input type=text title="Transaction ID" id=transcID name=transcID
+            maxlength=24 size=26  value="" class="Mandatory" 
+            onblur="validateIds(this)">
+           </td>
+           <td colspan=3 class=DataLabel>Location ID<br>
+           <input type=text title="Location ID"  id=locatnID name=locatnID
+            maxlength=8 size=10  value="" class="Mandatory"
+            onblur="validateIds(this)">
+           </td>
+           <td class=DataLabel colspan=3></br>
+           <input type=button value=Resend class="button" 
+            onclick="tempDisable(this);ProcessSubmit();" ></td>
+           
+       </tr>
+       </table>
+      </td>
+  </tr>
+</table>
+<table cellspacing=0 cellpadding=2 border=1 width=100%>
+ <tr><td class="HeadingCell" align="center"
+         style="border-left:0px;border-right:0px">
+      WebServices Transaction Request</td></tr>
+</table>
+
+</form>
+</div>
+<script type="text/javascript">
+if (document.addEventListener) {
+  document.addEventListener('paste', function (evt) {
+    if (evt.target.tagName == 'INPUT') {
+      var txtInput = evt.target;
+ 
+      var clipboard = evt.clipboardData;
+      var clipData = clipboard.getData('text/plain');
+      var maxl=evt.target.getAttribute('maxlength');
+      txtInput.value = trim(clipData).substr(0,maxl);
+      txtInput.blur();
+    }
+  });
+}
+</script>
+
+

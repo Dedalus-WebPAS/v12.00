@@ -1,0 +1,83 @@
+<meta name="TemplateVersion" content="V12.00.03">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript">
+function GoBack() {
+  window.location.href = document.UpdateForm.redirect.value;
+}
+function PostForm() {
+  if(document.UpdateForm.d_patcn647.checked==true){
+     document.UpdateForm.patcn647.value="1";
+  } else{
+     document.UpdateForm.patcn647.value="0";
+  }
+  setFormactn('U');
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);">
+<form name=UpdateForm method=post action=comweb98.pbl>
+<input type=hidden name=reportno value="9">
+<input type=hidden name=template value="002">
+<input type=hidden name=redirect value="comweb98.pbl?reportno=09&template=001">
+<input type=hidden name=nextpage value="1">
+<input type=hidden name=updttype value=" ">
+<input type=hidden name=patcn647 value="0">
+
+<table align=center width=100% border=0 cellspacing=0 cellpadding=0>
+<tr><td class=HeadingCell align=center>
+     Vendor Controlled Screen 2 - Incremental Numbers</td>
+    </tr>
+<tr><td>
+</table>
+<table align=center width=95% border=0 cellspacing=0 cellpadding=0>
+
+<tr><td colspan=3 align=center><hr width=100%></td></tr>
+
+<tr><td class=DataLabel width=40%>Using Alphanumeric Visit Numbers</td>
+    <td class=DataItem><input type=checkbox id="d_patcn647" name="d_patcn647"
+     value="1" title="Using Alphanumeric Visit Numbers"
+     onclick="ShowNextAnVis();">
+    </td>
+    <td><div id="NextAlpanNumericVisit"></div></td> 
+    </tr>
+
+<tr><td colspan=3 align=center><hr width=100%></td></tr>
+
+<tr><td colspan=3 align=center>
+   <input type=button value="Update" class="button" onclick="PostForm();">
+   <input type=button value="Cancel" class="button" onclick="GoBack();">
+</td></tr>
+
+</table>
+</form>
+
+<span id=ShowNextAlpanNumericVisit style="display:none">
+  Next Alphanumeric Visit Number 
+  <input type=textname="d_patcn648" id="d_patcn648" class="Readonly"
+   readonly size=9 value="%COMWEB98.09.299.548">
+</span>
+
+<script type="text/javascript">
+ PTCNUANV="%COMWEB98.09.299.547";
+ if(PTCNUANV == "1") {
+   document.UpdateForm.d_patcn647.checked=true;
+   ShowNextAnVis();
+ }
+ function ShowNextAnVis() {
+   if(document.UpdateForm.d_patcn647.checked==true) {
+     document.getElementById("NextAlpanNumericVisit").innerHTML=
+     document.getElementById("ShowNextAlpanNumericVisit").innerHTML;
+     if(document.UpdateForm.d_patcn648.value=="00000000") {
+       document.UpdateForm.d_patcn648.value="AA000001";
+     }
+     if(document.UpdateForm.d_patcn648.value=="        ") {
+       document.UpdateForm.d_patcn648.value="AA000001";
+     }
+   } else {
+     document.getElementById("NextAlpanNumericVisit").innerHTML="";
+   }
+ }
+</script>

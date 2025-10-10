@@ -1,0 +1,239 @@
+. *----------------------------------------------------------------------
+. * Include Name  :   PATDDHTM.INC
+. *
+. * Function      :   CGI variables for PATDDHFD - patddhaf.dat
+. *
+. *----------------------------------------------------------------------
+. Modifications Done :
+.
+. V11.04.01 04/03/2024 Jacob Jackson TSK 0919335
+.           Created include
+.
+.------------------------------------------------------------------------
+.   Clear Parameters for Health Fund Table History
+.------------------------------------------------------------------------
+CPPTDH00  MOVE      Z70,PTDDH001
+          MOVE      Z70,PTDDH002
+          MOVE      Z70,PTDDH003
+          MOVE      Z70,PTDDH004
+          MOVE      Z70,PTDDH005
+          MOVE      Z70,PTDDH006
+          MOVE      Z70,PTDDH007
+          MOVE      ZERO,PTDDH008
+          MOVE      ZERO,PTDDH009
+          MOVE      Z70,PTDDH010
+          MOVE      Z70,PTDDH011
+          MOVE      Z70,PTDDH012
+          MOVE      Z70,PTDDH013
+          MOVE      Z70,PTDDH014
+          MOVE      Z70,PTDDH015
+          MOVE      Z70,PTDDH016
+.
+CPPTDH99  RETURN
+.-----------------------------------------------------------------------
+. Add Health Fund Table History Fields
+.-----------------------------------------------------------------------
+PTDH0000  BRANCH    FLDITMNO,PTDH0010,PTDH0020,PTDH0030,PTDH0040,PTDH0050:
+                             PTDH0060,PTDH0070,PTDH0080,PTDH0090,PTDH0100:
+                             PTDH0110,PTDH0120,PTDH0130,PTDH0140,PTDH0150:
+                             PTDH0160
+.
+          WRITE     HTMLFILE;"Invalid IBA Tag";
+          GOTO      PTDH9999
+.
+PTDH0010  WRITE     HTMLFILE;PTDDFUND;
+          GOTO      PTDH9999
+.
+PTDH0020  WRITE     HTMLFILE;PTDDFTYP;
+          GOTO      PTDH9999
+.
+PTDH0030  WRITE     HTMLFILE;PTDDDTTO;
+          GOTO      PTDH9999
+.
+PTDH0040  WRITE     HTMLFILE;PTDDFLD1;
+          GOTO      PTDH9999
+.
+PTDH0050  WRITE     HTMLFILE;PTDDFLD2;
+          GOTO      PTDH9999
+.
+PTDH0060  WRITE     HTMLFILE;PTDDCFD1;
+          GOTO      PTDH9999
+.
+PTDH0070  WRITE     HTMLFILE;PTDDCFD2;
+          GOTO      PTDH9999
+.
+PTDH0080  WRITE     HTMLFILE;PTDDFVL1;
+          GOTO      PTDH9999
+.
+PTDH0090  WRITE     HTMLFILE;PTDDFVL2;
+          GOTO      PTDH9999
+.
+PTDH0100  WRITE     HTMLFILE;PTDDCRBY;
+          GOTO      PTDH9999
+.
+PTDH0110  WRITE     HTMLFILE;PTDDCRDT;
+          GOTO      PTDH9999
+.
+PTDH0120  WRITE     HTMLFILE;PTDDCRTM;
+          GOTO      PTDH9999
+.
+PTDH0130  WRITE     HTMLFILE;PTDDUPBY;
+          GOTO      PTDH9999
+.
+PTDH0140  WRITE     HTMLFILE;PTDDUPDT;
+          GOTO      PTDH9999
+.
+PTDH0150  WRITE     HTMLFILE;PTDDUPTM;
+          GOTO      PTDH9999
+.
+PTDH0160  WRITE     HTMLFILE;PTDDDLEN;
+          GOTO      PTDH9999
+.
+PTDH9999  RETURN
+.----------------------------------------------------------------------
+. Set Parameters for Health Fund Table History file
+.----------------------------------------------------------------------
+SPPTD000  MOVE      ZERO,EXIT
+          UNPACK    QRYNAME,KEY5,KEY3
+          MOVE      KEY3,F3
+          BRANCH    F3,SPPTD001,SPPTD002,SPPTD003,SPPTD004,SPPTD005:
+                       SPPTD006,SPPTD007,SPPTD008,SPPTD009,SPPTD010:
+                       SPPTD011,SPPTD012,SPPTD013,SPPTD014,SPPTD015:
+                       SPPTD016
+.
+          MOVE      ONE,EXIT
+          GOTO      SPPTD999
+.
+SPPTD001  MOVE      QRYDATA,PTDDH001
+          GOTO      SPPTD999
+.
+SPPTD002  MOVE      QRYDATA,PTDDH002
+          GOTO      SPPTD999
+.
+SPPTD003  MOVE      QRYDATA,PTDDH003
+          GOTO      SPPTD999
+.
+SPPTD004  MOVE      QRYDATA,PTDDH004
+          GOTO      SPPTD999
+.
+SPPTD005  MOVE      QRYDATA,PTDDH005
+          GOTO      SPPTD999
+.
+SPPTD006  MOVE      QRYDATA,PTDDH006
+          GOTO      SPPTD999
+.
+SPPTD007  MOVE      QRYDATA,PTDDH007
+          GOTO      SPPTD999
+.
+SPPTD008  MOVE      QRYDATA,PTDDH008
+          GOTO      SPPTD999
+.
+SPPTD009  MOVE      QRYDATA,PTDDH009
+          GOTO      SPPTD999
+.
+SPPTD010  MOVE      QRYDATA,PTDDH010
+          GOTO      SPPTD999
+.
+SPPTD011  MOVE      QRYDATA,PTDDH011
+          GOTO      SPPTD999
+.
+SPPTD012  MOVE      QRYDATA,PTDDH012
+          GOTO      SPPTD999
+.
+SPPTD013  MOVE      QRYDATA,PTDDH013
+          GOTO      SPPTD999
+.
+SPPTD014  MOVE      QRYDATA,PTDDH014
+          GOTO      SPPTD999
+.
+SPPTD015  MOVE      QRYDATA,PTDDH015
+          GOTO      SPPTD999
+.
+SPPTD016  MOVE      QRYDATA,PTDDH016
+          GOTO      SPPTD999
+.
+SPPTD999  RETURN
+.----------------------------------------------------------------------
+. Update file with parameter data
+.----------------------------------------------------------------------
+MVPTDH00  MATCH     PTDDH001,Z70
+          IF        !@EQUAL
+            MOVE      PTDDH001,PTDDFUND
+          ENDIF
+.
+          MATCH     PTDDH002,Z70
+          IF        !@EQUAL
+            MOVE      PTDDH002,PTDDFTYP
+          ENDIF
+.
+          MATCH     PTDDH003,Z70
+          IF        !@EQUAL
+            MOVE      PTDDH003,PTDDDTTO
+          ENDIF
+.
+          MATCH     PTDDH004,Z70
+          IF        !@EQUAL
+            MOVE      PTDDH004,PTDDFLD1
+          ENDIF
+.
+          MATCH     PTDDH005,Z70
+          IF        !@EQUAL
+            MOVE      PTDDH005,PTDDFLD2
+          ENDIF
+.
+          MATCH     PTDDH006,Z70
+          IF        !@EQUAL
+            MOVE      PTDDH006,PTDDCFD1
+          ENDIF
+.
+          MATCH     PTDDH007,Z70
+          IF        !@EQUAL
+            MOVE      PTDDH007,PTDDCFD2
+          ENDIF
+.
+          COMPARE   PTDDH008,ZERO
+          IF        !@EQUAL
+            MOVE      PTDDH008,PTDDFVL1
+          ENDIF
+.
+          COMPARE   PTDDH009,ZERO
+          IF        !@EQUAL
+            MOVE      PTDDH009,PTDDFVL2
+          ENDIF
+.
+          MATCH     PTDDH010,Z70
+          IF        !@EQUAL
+            MOVE      PTDDH010,PTDDCRBY
+          ENDIF
+.
+          MATCH     PTDDH011,Z70
+          IF        !@EQUAL
+            MOVE      PTDDH011,PTDDCRDT
+          ENDIF
+.
+          MATCH     PTDDH012,Z70
+          IF        !@EQUAL
+            MOVE      PTDDH012,PTDDCRTM
+          ENDIF
+.
+          MATCH     PTDDH013,Z70
+          IF        !@EQUAL
+            MOVE      PTDDH013,PTDDUPBY
+          ENDIF
+.
+          MATCH     PTDDH014,Z70
+          IF        !@EQUAL
+            MOVE      PTDDH014,PTDDUPDT
+          ENDIF
+.
+          MATCH     PTDDH015,Z70
+          IF        !@EQUAL
+            MOVE      PTDDH015,PTDDUPTM
+          ENDIF
+.
+          MATCH     PTDDH016,Z70
+          IF        !@EQUAL
+            MOVE      PTDDH016,PTDDDLEN
+          ENDIF
+.
+MVPTDH99  RETURN

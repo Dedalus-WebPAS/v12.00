@@ -1,0 +1,52 @@
+.---------------------------------------------------------------------------
+. Include Name : CLMRTEXT.PBL
+. Function     : Clear function for MRTEXTFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.05.01  06/03/2025  Thanh T.      TSK 0949724
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLMRTEXT  MOVE      SP70,MREXEID       . Extract ID     
+          MOVE      SP70,MREXDESC      . Description      
+          MOVE      SP70,MREXDDFR      . Discharge Date From    
+          MOVE      SP70,MREXDDTO      . Discharge Date To    
+          MOVE      SP70,MREXADFR      . Admission Date From    
+          MOVE      SP70,MREXADTO      . Admission Date To    
+          MOVE      SP70,MREXUNIT      . Unit      
+          MOVE      SP70,MREXWARD      . Ward      
+          MOVE      SP70,MREXPDRG      . Provisional DRG     
+          MOVE      SP70,MREXPRCG      . Procedure Group     
+          MOVE      SP70,MREXWLPR      . Waiting List Procedure    
+          MOVE      SP70,MREXCONS      . Consultant      
+          MOVE      SP70,MREXINCD      . Include Deceased     
+          MOVE      SP70,MREXAUTC      . Automatic Coding Template    
+          MOVE      ZERO,MREXNUMR      . Number of Records Extracted   
+          MOVE      SP70,MREXINPR      . Extract in Progress Ind(0=NO 1=YES)  
+          MOVE      SP70,MREXANL1      . Analysis Level 1    
+          MOVE      SP70,MREXANL2      . Analysis Level 2    
+          MOVE      SP70,MREXANL3      . Analysis Level 3    
+          MOVE      SP70,MREXANL4      . Analysis Level 4    
+          MOVE      SP70,MREXANM1      . Analysis Measures 1    
+          MOVE      SP70,MREXANM2      . Analysis Measures 2    
+          MOVE      SP70,MREXANM3      . Analysis Measures 3    
+          MOVE      SP70,MREXCUID      . Created by User ID   
+          MOVE      SP70,MREXCDAT      . Date Created     
+          MOVE      SP70,MREXCTIM      . Time Created     
+          MOVE      SP70,MREXMUID      . Modified by User ID   
+          MOVE      SP70,MREXMDAT      . Modified Date     
+          MOVE      SP70,MREXMTIM      . Modified Time     
+          MOVE      SP70,MREXDIND      . Discharged Patients Only Indicator   
+          MOVE      SP70,MREXSDSC      . Sameday Discharge     
+          MOVE      SP70,MREXSUBR      . Suburb      
+          MOVE      SP70,MREXPCOD      . Postcode      
+          MOVE      SP70,MREXPSEX      . Sex      
+          MOVE      SP70,MREXCNTR      . Country of Birth    
+          MOVE      SP70,MREXATYP      . Patient Admission Type (CAT A)  
+          MOVE      SP70,MREXPTYP      . Patient Admission Class (CAT P)  
+          MOVE      SP70,MREXVHOS      . Hospital Id. (of Visit)   
+          MOVE      SP70,MREXURTT      . Unplanned Return To Theatre (ct KB) 
+          PACK      MREXSPAR,SP70,SP70 . Spare      
+.
+          RETURN

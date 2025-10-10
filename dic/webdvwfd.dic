@@ -1,0 +1,116 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Web System Table 
+                      WebService DVAW Table 
+  
+TABLE NAME         :  webdvwaf
+=====================================================================
+WBDWHOSP    char        3     1   Hospital ID (pathspaf)  
+DWBDWFLG    char        2     4   Eclipse Status Flag  
+                                   webPAS Processing  
+                                   0 = Not Sent  
+                                   1 = Error (PAS validation)  
+                                   2 = Extracted  
+                                   WebServices - Processing  
+                                   3 = Error (SA validation)  
+                                   4 = Posted  
+                                   5 = Received  
+                                   Eclipse - Reported  
+                                   6 = Complete - Reported  
+                                   Eclipse - Remittance  
+                                   7 = Reported  
+                                   8 = Closed  
+WBDWMODL    char        1     6   webPas Module  
+                                   1 = Emergency  
+                                   2 = Private Practice  
+                                   3 = Outpatient  
+WBDWUNIQ    char        8     7   Unique Identifier / Visit Number  
+WBDWINVN    char        8    15   Invoice Number  
+WBDWBATN    char        8    23   Batch Number  
+WBDWURNO    char        8    31   U/R/ Number  
+WBDWPBAT    char        8    39   Previous Batch Number  
+WBDWNBAT    char        8    47   Next Batch Number  
+WBDWTRID    char       24    55   Claim Transaction ID  
+DWBDWEET    char        1    79   WebServices extract type  
+                                   0 - DVA  
+                                   1 - DVA & Medicare  
+                                   2 - Medicare Only  
+WBDWAMTC    decimal   14,2   80   Amount Claimed  
+WBDWAMDP    decimal   14,2   88   Amount Paid by DVA  
+WBDWAMMP    decimal   14,2   96   Amount Paid by Medicare  
+WBDWPDAT    char        8   104   Payment Date  
+WBDWSTAT    char        2   112   Closed Status  
+                                   Spaces - not closed  
+                                   " 0" = Closed  
+                                   " 1" = Closed with Write Off  
+                                   " 2" = Closed with Payment  
+                                   " 3" = Closed with WO & Pymt  
+WBDWCLID    char        6   114   Claim ID  
+WBDWRKEY    char       24   120   Report Retrieval Key / Trans Id.  
+                                   Consists of:  
+                                   PayeeProviderNum (pppppppp)  
+                                   PMSClaimID (xxxxxx)  
+                                   Authorisation/Lodgement Date (ddmmyyy  
+                                   y)  
+                                   Format: ppppppppxxxxxxddmmyyyy  
+WBDWOKEY    char       36   144   O/P outbokaf key  
+WBDWPRAC    char       10   180   Medical Practice  
+WBDWMSID    char       36   190   Message Id  
+WBDWPROV    char        8   226   Provider Number  
+WBDWCTYP    char        2   234   DVAW Type  
+                                   O = General  
+                                   S = Specialist  
+                                   P = Pathology  
+WBDWCUID    char       10   236   Created By Web User ID (websecaf)  
+WBDWCDAT    char        8   246   Date Record Created (CCYYMMDD)  
+WBDWCTIM    char        8   254   Time Record Created (HH:MM:SS)  
+WBDWUUID    char       10   262   Updated By Web User ID (websecaf)  
+WBDWUDAT    char        8   272   Date Record Updated (CCYYMMDD)  
+WBDWUTIM    char        8   280   Time Record Updated (HH:MM:SS)  
+WBDWSPAR    char      100   288   Spare Variable  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+WBDWHOSP
+DWBDWFLG
+WBDWMODL
+WBDWUNIQ
+WBDWINVN
+WBDWBATN
+  
+UNIQUE INDEX 2
+WBDWINVN
+WBDWBATN
+WBDWMODL
+  
+UNIQUE INDEX 3
+WBDWBATN
+WBDWUNIQ
+WBDWINVN
+  
+UNIQUE INDEX 4
+WBDWUNIQ
+WBDWINVN
+WBDWBATN
+  
+UNIQUE INDEX 5
+WBDWHOSP
+WBDWURNO
+WBDWUNIQ
+WBDWINVN
+WBDWBATN
+  
+UNIQUE INDEX 6
+WBDWTRID
+WBDWINVN
+WBDWBATN
+  
+UNIQUE INDEX 7
+DWBDWFLG
+WBDWHOSP
+WBDWMODL
+WBDWUNIQ
+WBDWINVN
+WBDWBATN
+  
+=====================================================================

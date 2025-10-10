@@ -1,0 +1,42 @@
+.---------------------------------------------------------------------------
+. Include Name : CLPATDET.PBL
+. Function     : Clear function for PATDETFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.05.01 18/11/2024  Thanh T        TSK 0925576
+.                       Added PTDESDAT to PTDETXT2 fields
+. V10.04.01 05/03/2014  J.Tan          CAR 295681
+.                       Added new field for System
+. V10.01.00 18/11/2010  Mike Laming    CAR 233229
+.                       Created
+.---------------------------------------------------------------------------
+.
+CLPATDET  MOVE      SP70,PTDETYPE      . Patient Debt Type    
+          MOVE      SP70,PTDEINVN      . Invoice Number/Admission Number    
+          MOVE      SP70,PTDEAGNT      . Debt Collection Agency (Cat dc)  
+          MOVE      SP70,PTDEDTCL      . Date Debt Cleared    
+          MOVE      SP70,PTDECDAT      . Date Record Created (CCYYMMDD)   
+          MOVE      SP70,PTDECTIM      . Time Record Created (HH:MM:SS)   
+          MOVE      SP70,PTDECUID      . WEB User ID Created (websecaf)  
+          MOVE      SP70,PTDEUDAT      . Date Record Updated (CCYYMMDD)   
+          MOVE      SP70,PTDEUTIM      . Time Record Updated (HH:MM:SS)   
+          MOVE      SP70,PTDEUUID      . WEB User ID Updated (websecaf)  
+          MOVE      SP70,PTDEURNO      . UR Number     
+          MOVE      SP70,PTDESYST      . System      
+          MOVE      ZERO,PTDERPAY      . Amount to be repaid per period 
+          MOVE      SP70,PTDEFREQ      . Frequency of Payment (Cat FP)  
+          MOVE      SP70,PTDESDAT      . Payment Start Date (CCYYMMDD)   
+          MOVE      SP70,PTDEEDAT      . Payment End Date (CCYYMMDD)   
+          MOVE      ZERO,PTDENOFP      . No. of payments    
+          MOVE      SP70,PTDEDAT1      . Date field 1 (CCYYMMDD)   
+          MOVE      SP70,PTDEDAT2      . Date field 2 (CCYYMMDD)   
+          MOVE      SP70,PTDETIM1      . Time Field 1 (HH:MM:SS)   
+          MOVE      SP70,PTDETIM2      . Time Field 2 (HH:MM:SS)   
+          MOVE      SP70,PTDECOD1      . Code Field 1    
+          MOVE      SP70,PTDECOD2      . Code Field 2    
+          PACK      PTDETXT1,SP70,SP70 . Text Field 1    
+          PACK      PTDETXT2,SP70,SP70 . Text Field 2    
+          MOVE      SP70,PTDESPAR      . Spare      
+.
+          RETURN

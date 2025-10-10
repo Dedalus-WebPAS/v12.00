@@ -1,0 +1,413 @@
+.******************************************************************************
+.* System         : Patient Billing                                           *
+.* Include Name   : CMXRULES.PBL                                              *
+.* Author         : J.Tan                                                     *
+.* Date           : 11/07/2024  Task 0942678                                  *
+.*                                                                            *
+.* Function       : Pack up Casemix code Matrix rules to a one long variable  *
+.*                  casemix matrix (pmscmtaf)                                 *
+.*                                                                            *
+.* Requires       : a record of pmscmtaf                                      *
+.*                                                                            *
+.* Returns        : RULEDESC (DIM 600)                                        *
+.*                                                                            *
+.* Modifications  :                                                           *
+.*        V11.04.00 11/07/2024  J.Tan         TSK 0942678                     *
+.*                  Created                                                   *
+.******************************************************************************
+
+CMXRULES
+CMXRUL00  PACK      RULEDESC,SP70,SP70,SP70:
+                             SP70,SP70,SP70:
+                             SP70,SP70,SP70
+          COMPARE   ZERO,PMCCFTDG
+          GOTO      CMXRUL05 IF EQUAL
+.
+          LOAD      DESC,PMCCFTDG,STAT1,STAT2,STAT3
+          APPEND    "Disc.DRG",RULEDESC
+          APPEND    DESC,RULEDESC
+          APPEND    PMCCDDRG,RULEDESC
+.
+CMXRUL05  COMPARE   ZERO,PMCCFTCM
+          GOTO      CMXRUL10 IF EQUAL
+.
+          LOAD      DESC,PMCCFTCM,STAT1,STAT2,STAT3
+          MATCH     SP70,RULEDESC
+          IF        @EQUAL
+            CLEAR     RULEDESC
+            APPEND    "MBS",RULEDESC
+          ELSE
+            APPEND    " MBS",RULEDESC
+          ENDIF
+          APPEND    DESC,RULEDESC
+          APPEND    PMCCPCMF,RULEDESC
+          APPEND    "-",RULEDESC
+          APPEND    PMCCPCMT,RULEDESC
+.
+CMXRUL10  COMPARE   ZERO,PMCCFTSC
+          GOTO      CMXRUL15 IF EQUAL
+.
+          LOAD      DESC,PMCCFTSC,STAT1,STAT2,STAT3
+          APPEND    " Secondary MBS",RULEDESC
+          APPEND    DESC,RULEDESC
+          APPEND    PMCCSCMF,RULEDESC
+          APPEND    "-",RULEDESC
+          APPEND    PMCCSCMT,RULEDESC
+.
+CMXRUL15  COMPARE   ZERO,PMCCFTTC
+          GOTO      CMXRUL20 IF EQUAL
+.
+          LOAD      DESC,PMCCFTTC,STAT1,STAT2,STAT3
+          APPEND    " Tertiary MBS",RULEDESC
+          APPEND    DESC,RULEDESC
+          APPEND    PMCCTCMF,RULEDESC
+          APPEND    "-",RULEDESC
+          APPEND    PMCCTCMT,RULEDESC
+.
+CMXRUL20  IF        PMCCFTS4<>0
+            LOAD      DESC,PMCCFTS4,STAT1,STAT2,STAT3
+            APPEND    "4th MBS",RULEDESC
+            APPEND    DESC,RULEDESC
+            APPEND    PMCCPC4F,RULEDESC
+            APPEND    "-",RULEDESC
+            APPEND    PMCCPC4T,RULEDESC
+          ENDIF
+.
+          IF        PMCCFT5C<>0
+            LOAD      DESC,PMCCFT5C,STAT1,STAT2,STAT3
+            APPEND    "5th MBS",RULEDESC
+            APPEND    DESC,RULEDESC
+            APPEND    PMCCSC5F,RULEDESC
+            APPEND    "-",RULEDESC
+            APPEND    PMCCSC5T,RULEDESC
+          ENDIF
+.
+          IF        PMCCFT6C<>0
+            LOAD      DESC,PMCCFT6C,STAT1,STAT2,STAT3
+            APPEND    "6th MBS",RULEDESC
+            APPEND    DESC,RULEDESC
+            APPEND    PMCCTC6F,RULEDESC
+            APPEND    "-",RULEDESC
+            APPEND    PMCCTC6T,RULEDESC
+          ENDIF
+.
+          COMPARE   ZERO,PMCCFTDS
+          GOTO      CMXRUL25 IF EQUAL
+.
+          LOAD      DESC,PMCCFTDS,STAT1,STAT2,STAT3
+          APPEND    " Disc.Stat ",RULEDESC
+          APPEND    DESC,RULEDESC
+          APPEND    PMCCDSTA,RULEDESC 
+          MATCH     SP70,PMCCDST2
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCDST2,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCDST3
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCDST3,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCDST4
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCDST4,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCDST5
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCDST5,RULEDESC
+          ENDIF
+.
+CMXRUL25  COMPARE   ZERO,PMCCFTDD
+          GOTO      CMXRUL30 IF EQUAL
+.
+          LOAD      DESC,PMCCFTDD,STAT1,STAT2,STAT3
+          APPEND    " Disc.Dest.",RULEDESC
+          APPEND    DESC,RULEDESC
+          APPEND    PMCCDDES,RULEDESC
+          MATCH     SP70,PMCCDDE2
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCDDE2,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCDDE3
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCDDE3,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCDDE4
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCDDE4,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCDDE5
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCDDE5,RULEDESC
+          ENDIF
+.
+CMXRUL30  COMPARE   ZERO,PMCCFTAS
+          GOTO      CMXRUL35 IF EQUAL
+.
+          LOAD      DESC,PMCCFTAS,STAT1,STAT2,STAT3
+          APPEND    " Adm.Source",RULEDESC
+          APPEND    DESC,RULEDESC
+          APPEND    PMCCASRC,RULEDESC
+          MATCH     SP70,PMCCASR2
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCASR2,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCASR3
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCASR3,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCASR4
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCASR4,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCASR5
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCASR5,RULEDESC
+          ENDIF
+.
+CMXRUL35  COMPARE   ZERO,PMCCFT1C
+          GOTO      CMXRUL40 IF EQUAL
+.
+          LOAD      DESC,PMCCFT1C,STAT1,STAT2,STAT3
+          APPEND    " ICD Diag.",RULEDESC
+          APPEND    DESC,RULEDESC
+          APPEND    PMCCPICD,RULEDESC 
+          MATCH     SP70,PMCCPIC2
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCPIC2,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCPIC3
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCPIC3,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCPIC4
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCPIC4,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCPIC5
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCPIC5,RULEDESC
+          ENDIF
+.
+CMXRUL40  COMPARE   ZERO,PMCCFTAT
+          GOTO      CMXRUL45 IF EQUAL
+.
+          LOAD      DESC,PMCCFTAT,STAT1,STAT2,STAT3
+          APPEND    " Adm.Type",RULEDESC
+          APPEND    DESC,RULEDESC
+          APPEND    PMCCATYP,RULEDESC
+          MATCH     SP70,PMCCATY2 
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCATY2,RULEDESC 
+          ENDIF
+.         
+          MATCH     SP70,PMCCATY3
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCATY3,RULEDESC
+          ENDIF
+.         
+          MATCH     SP70,PMCCATY4
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCATY4,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCATY5
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCATY5,RULEDESC
+          ENDIF
+.
+CMXRUL45  COMPARE   ZERO,PMCCFTAU
+          GOTO      CMXRUL50 IF EQUAL
+.
+          LOAD      DESC,PMCCFTAU,STAT1,STAT2,STAT3
+          APPEND    " Adm.UDF",RULEDESC
+          APPEND    DESC,RULEDESC
+          APPEND    PMCCAUDF,RULEDESC
+          MATCH     SP70,PMCCAUD2
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCAUD2,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCAUD3
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCAUD3,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCAUD4
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCAUD4,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCAUD5
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCAUD5,RULEDESC
+          ENDIF
+.
+CMXRUL50  COMPARE   ZERO,PMCCFTDU
+          GOTO      CMXRUL55 IF EQUAL
+.
+          LOAD      DESC,PMCCFTDU,STAT1,STAT2,STAT3
+          APPEND    " Care Class",RULEDESC
+          APPEND    DESC,RULEDESC
+          APPEND    PMCCDUDF,RULEDESC
+          MATCH     SP70,PMCCDUD2
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCDUD2,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCDUD3
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCDUD3,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCDUD4
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCDUD4,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCDUD5
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCDUD5,RULEDESC
+          ENDIF
+.
+CMXRUL55  COMPARE   ZERO,PMCCICPF
+          GOTO      CMXRUL60 IF EQUAL
+.
+          LOAD      DESC,PMCCICPF,STAT1,STAT2,STAT3
+          APPEND    " ICD Proc.",RULEDESC
+          APPEND    DESC,RULEDESC
+          APPEND    PMCCICP1,RULEDESC
+          MATCH     SP70,PMCCICP2
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCICP2,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCICP3
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCICP3,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCICP4
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCICP4,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCICP5
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCICP5,RULEDESC
+          ENDIF
+.
+CMXRUL60  COMPARE   ZERO,PMCCFTAD
+          GOTO      CMXRUL62 IF EQUAL
+.
+          LOAD      DESC,PMCCFTAD,STAT1,STAT2,STAT3
+          APPEND    " Att.Doc.",RULEDESC
+          APPEND    DESC,RULEDESC
+          APPEND    PMCCADOC,RULEDESC
+.
+CMXRUL62  COMPARE   ZERO,PMCCFTCC
+          GOTO      CMXRUL64 IF EQUAL
+.
+          LOAD      DESC,PMCCFTCC,STAT1,STAT2,STAT3
+          APPEND    " Conc.Card Type",RULEDESC
+          APPEND    DESC,RULEDESC
+          APPEND    PMCCCCT1,RULEDESC
+          MATCH     SP70,PMCCCCT2
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCCCT2,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCCCT3
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCCCT3,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCCCT4
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCCCT4,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCCCT5
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCCCT5,RULEDESC
+          ENDIF
+.
+CMXRUL64  COMPARE   ZERO,PMCCFDDU
+          GOTO      CMXRUL80 IF EQUAL
+.
+          LOAD      DESC,PMCCFDDU,STAT1,STAT2,STAT3
+          APPEND    " Disc.UDF",RULEDESC
+          APPEND    DESC,RULEDESC
+          APPEND    PMCCUDF1,RULEDESC
+          MATCH     SP70,PMCCUDF2
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCUDF2,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCUDF3
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCUDF3,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCUDF4
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCUDF4,RULEDESC
+          ENDIF
+.
+          MATCH     SP70,PMCCUDF5
+          IF        !@EQUAL
+            APPEND    ",",RULEDESC
+            APPEND    PMCCUDF5,RULEDESC
+          ENDIF
+.
+CMXRUL80  RESET     RULEDESC
+CMXRUL99  RETURN

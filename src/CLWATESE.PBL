@@ -1,0 +1,34 @@
+.------------------------------------------------------------
+. Clear Waiting List ESIS Episode details
+.------------------------------------------------------------
+CLWATESE  MOVE      SP70,WTEEUNIQ    * Unique Key
+          MOVE      SP70,WTEEEDAT    * Extract sent date (CCYYMMDD)
+          MOVE      SP70,WTEEURNO    * UR Number
+          MOVE      SP70,WTEEADAT    * Admission Date (CCYYMMDD
+          MOVE      SP70,WTEEDEST    * Destination
+          MOVE      SP70,WTEEINSD    * Insurance Declaration (Cat CL)
+          MOVE      SP70,WTEEPLOS    * Cat XB or WMSTAY
+          MOVE      SP70,WTEEPROC    * Principal Procedure
+          MOVE      SP70,WTEEPDES    * PPP Description
+          MOVE      SP70,WTEERREM    * Reason for removal (Cat WR)
+          MOVE      SP70,WTEERDAT    * Registration Date
+          MOVE      SP70,WTEEREMD    * Removal Date
+          MOVE      SP70,WTEESREF    * Source of Referral
+          MOVE      SP70,WTEESSPC    * Surgical Specialty (Cat WU)
+          MOVE      SP70,WTEEPREV    * Previous Identifier
+          MOVE      SP70,WTEEREFR    * Referred From
+          MOVE      SP70,WTEEWEBC    * Web User ID Creator
+          MOVE      SP70,WTEECDAT    * Date record created
+          MOVE      SP70,WTEECTIM    * Time record created
+          MOVE      SP70,WTEEWEBU    * Web User ID Updated
+          MOVE      SP70,WTEEUDAT    * Date Updated (CCYYMMDD)
+          MOVE      SP70,WTEEUTIM    * Time Update (hh:mm:ss)
+          MOVE      SP70,WTEEARDT    * Date Keyed
+          MOVE      SP70,WTEEMANU    * Manually Added Record
+          MOVE      SP70,WTEEPTWT    * Previous Total Waiting Time (days)
+          MOVE      SP70,WTEESGID    * Surgeon Identifier (pmshcpaf)
+          MOVE      SP70,WTEERADT    * Referral Accepted Date
+          MOVE      SP70,WTEETCMP    * Treatment Campus Code
+          MOVE      SP70,WTEEASAS    * Waiting List ASA Score
+          MOVE      SP70,WTEESPAR    * Spare
+          RETURN

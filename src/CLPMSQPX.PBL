@@ -1,0 +1,45 @@
+.---------------------------------------------------------------------------
+. Include Name : CLPMSQPX.PBL
+. Function     : Clear function for PMSQPXFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.05.01 19/11/2024 Thanh T        TSK 0945766
+.           Added PMPXAHC1 to PMPXATF5
+. V11.04.02 11/06/2024 Thanh T        TSK 0941543
+.           Added Ethnicity 1-2 & Main Language Spoken At Home 1-2
+. V11.04.01 21/12/2023  Thanh T       TSK 0936263
+.           Initial Version
+.---------------------------------------------------------------------------
+.
+CLPMSQPX  MOVE      SP70,DPMQXMES      . Message Id     
+          MOVE      SP70,PMPXUDT1      . User Defined Date 1 (ccyymmdd)  
+          MOVE      SP70,PMPXUTM1      . User Defined Time 1 (hh:mm:ss)  
+          MOVE      SP70,PMPXUDT2      . User Defined Date 2 (ccyymmdd)  
+          MOVE      SP70,PMPXUTM2      . User Defined Time 2 (hh:mm:ss)  
+          MOVE      SP70,PMPXUDT3      . User Defined Date 3 (ccyymmdd)  
+          MOVE      SP70,PMPXUTM3      . User Defined Time 3 (hh:mm:ss)  
+          MOVE      SP70,PMPXUDT4      . User Defined Date 4 (ccyymmdd)  
+          MOVE      SP70,PMPXUTM4      . User Defined Time 4 (hh:mm:ss)  
+          MOVE      SP70,PMPXUDT5      . User Defined Date 5 (ccyymmdd)  
+          MOVE      SP70,PMPXUTM5      . User Defined Time 5 (hh:mm:ss)  
+          MOVE      SP70,PMPXAHC1      . Additional HCP 1
+          MOVE      SP70,PMPXAHG1      . Additional HCP Group 1
+          MOVE      SP70,PMPXAGC1      . Additional HCP Group Count 1
+          MOVE      SP70,PMPXAHC2      . Additional HCP 2
+          MOVE      SP70,PMPXAHG2      . Additional HCP Group 2
+          MOVE      SP70,PMPXAGC2      . Additional HCP Group Count 2
+          PACK      PMPXATF1,SP70,SP70 . Identifying Gender Free Text
+          PACK      PMPXATF2,SP70,SP70 . Identifying Pronoun Free Text
+          PACK      PMPXATF3,SP70,SP70 . Additional Text Field 3
+          PACK      PMPXATF4,SP70,SP70 . Additional Text Field 4
+          PACK      PMPXATF5,SP70,SP70 . Additional Text Field 5
+          MOVE      SP70,PMPXETH1      . Ethnicity 1
+          MOVE      SP70,PMPXETH2      . Ethnicity 2
+          MOVE      SP70,PMPXLAN1      . Main Language Spoken at Home 1
+          MOVE      SP70,PMPXLAN2      . Main Language Spoken at Home 2
+          PACK      PMQXSPAR,SP70,SP70 . Spare Variable
+.
+          MOVE      ZERO,PMQXMESI
+.
+          RETURN

@@ -1,0 +1,96 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Patient System 
+                      NIHC IHI Upload MyHR ResponseDetail 
+  
+TABLE NAME         :  pmsmhraf
+=====================================================================
+PMMJRTYP    char        2     1   Request Type  
+                                   "10" - Upload to MyHR  
+PMMJCODE    char       50     3   Request Code  
+                                   "10" - Unique Transaction ID  
+PMMJRDAT    char        8    53   Request Date (CCYYMMDD)  
+PMMJRTIM    char        8    61   Request Time (HH:MM:SS)  
+PMMJERRM    char      500    69   NIHC Error Message  
+                                   Error message returned from within NI  
+                                   HC's  
+                                   internal processes (if appropriate).  
+PMMJRCOD    char       20   569   Response Code  
+                                   Response from external system (HI  
+                                   Service/MyHR Service)  
+PMMJRDSC    char      100   589   Response Code Description  
+                                   Response Description from external sy  
+                                   stem (HI  
+                                   Service/MyHR Service)  
+PMMJRDET    char      100   689   Response Code Details  
+                                   Response details from external system  
+                                   (HI  
+                                   Service/MyHR Service).  
+PMMJSTAT    char        3   789   Status  
+                                   Error code that corresponds to intern  
+                                   al  
+                                   errors within NIHC.  
+PMMJHOSP    char        6   792   Hospital ID  
+PMMJHOSC    char       10   798   PasFacCd Hospital Code  
+PMMJPAID    char        8   808   Patient Id / Visit Number  
+PMMJPSID    char        8   816   MRN / UR Number  
+PMMJSEID    char        6   824   Source Episode Id  
+PMMJADAT    char       10   830   Admission Date  
+PMMJARES    char      200   840   Admission Reason  
+PMMJDDAT    char       10   1040   Discharge Date  
+PMMJRHCP    char       50   1050   Health Provider Identifier  
+PMMJAUTH    char       50   1100   Health Provider Identifier Auth Id  
+PMMJETYP    char      100   1150   Episode Type  
+PMMJELCI    char        5   1250   Episode Lifecycle ID  
+PMMJCONW    char        3   1255   Consent Withdrawn  
+PMMJWARD    char        5   1258   Ward  
+                                   Placeholder for future use  
+PMMJROOM    char        5   1263   Room  
+                                   Placeholder for future use.  
+PMMJABED    char        5   1268   Bed  
+                                   Placeholder for future use.  
+PMMJEDTC    char       10   1273   Episode Date Created  
+PMMJEDTM    char       10   1283   Episode Date Modified  
+PMMJCDAT    char        8   1293   Date Created  
+PMMJCTIM    char        8   1301   Time Created  
+PMMJCUID    char       10   1309   Created By  
+PMMJUDAT    char        8   1319   Date Updated  
+PMMJUTIM    char        8   1327   Time Updated  
+PMMJUUID    char       10   1335   Update By  
+PMMJSPAR    char      100   1345   Spare  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+PMMJRTYP
+PMMJCODE
+PMMJRDAT
+PMMJRTIM
+  
+UNIQUE INDEX 2
+PMMJHOSP
+PMMJRTYP
+PMMJCODE
+PMMJRDAT
+PMMJRTIM
+  
+UNIQUE INDEX 3
+PMMJPSID
+PMMJRTYP
+PMMJCODE
+PMMJRDAT
+PMMJRTIM
+  
+UNIQUE INDEX 4
+PMMJPAID
+PMMJRTYP
+PMMJCODE
+PMMJRDAT
+PMMJRTIM
+  
+UNIQUE INDEX 5
+PMMJCODE
+PMMJRTYP
+PMMJRDAT
+PMMJRTIM
+  
+=====================================================================

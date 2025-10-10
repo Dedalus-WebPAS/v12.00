@@ -1,0 +1,92 @@
+.------------------------------------------------------------------------------
+. Include Name  : GENANVIS.PBL
+.
+. Function      : Generate the next 8 character alphanumeric visit number
+.                 2 Aplha (AA-ZZ), 6 Numeric Zero Filled. Numeric Zero Skipped
+.                 eg AA000001
+.
+. Requires      : VISNPRFX - Visit prefix characters(A-Z)
+.                 VISNPOR1 - 1st character of visit number
+.                 VISNPOR2 - 2nd character of visit number
+.                 VISNPOR3 - Numeric component of visit number
+.                 VISNSAVE - Save next alphanumeric visit number
+.                                                             
+. Returns:      : PTCNNXTV - Next Alphanumeric Visit Number to use
+.                            2 Aplha (AA-ZZ), 6 Numeric Zero Filled
+. Modifications :
+.------------------------------------------------------------------------------
+. V12.00.01 04/06/2025 Ebon Clements   TSK 0961623
+.           Refactored so control file stores the next visit number
+. V12.00.00 28/05/2025 Ebon Clements   TSK 0955096
+.           Created include 
+.------------------------------------------------------------------------------
+.
+GANV0000  MOVE      "130",PRXCODE                * System Lock Sector 130
+          CALL      GETSLK00                     * Get System Lock of Sector 130
+.
+          READ      CONTROLF,HUND30;*76,PTCNNXTV
+.
+. Next visit parameter not set 
+.
+          MATCH     SP70,PTCNNXTV                * Next visit blank
+          GOTO      GANV8000 IF EQUAL            * start at AA000001
+.
+          MATCH     "00000000",PTCNNXTV          * Next visit not set 
+          GOTO      GANV8000 IF EQUAL            * start at AA000001
+.
+. Save the current parameter value to use as the next visit number
+.
+          MOVE      PTCNNXTV,VISNSAVE            * Save next visit number
+.
+. Unpack visit number into 1st character, 2nd character and numeric portion
+.
+          UNPACK    PTCNNXTV,VISNPOR1,VISNPOR2,VISNPOR3 
+.
+. Generate the next visit number
+.
+          MOVE      ZERO,F6         * Clear numeric component
+          MOVE      VISNPOR3,F6     * Convert dim to form
+          ADD       ONE,F6          * Add one to numeric component
+.
+          COMPARE   ZERO,F6         * End of the numeric portion ?
+          GOTO      GANV2000 IF NOT EQUAL
+.
+          ADD       ONE,F6          * Skip numeric component zero
+.
+.         Increment the 2nd letter
+.
+          REP       VISNPRFX,VISNPOR2   * Go to the next letter
+.
+          MATCH     ANSA,VISNPOR2       * Have we gone past all the letters ?
+          GOTO      GANV2000 IF NOT EQUAL 
+.
+.         Increment the first letter
+.
+          REP       VISNPRFX,VISNPOR1   * Go to the next letter
+.
+          MATCH     ANSA,VISNPOR1       * Have we gone past all the letters ?
+          GOTO      GANV8000 IF EQUAL   * Start back at AA000000              
+.
+GANV2000  MOVE      F6,VISNPOR3     * Move the numeric back to a dim field
+          REP       " 0",VISNPOR3   * Zero fill the numeric portion
+.
+          PACK      PTCNNXTV,VISNPOR1,VISNPOR2,VISNPOR3,SP70
+.
+          GOTO      GANV9000
+.
+.  Start at visit number AA000001
+.
+GANV8000  MOVE      "AA000002",PTCNNXTV      * Next visit number
+          MOVE      "AA000001",VISNSAVE      * Save start visit number
+.
+. Save next visit numer to control file
+.
+GANV9000  WRITAB    CONTROLF,HUND30;*76,PTCNNXTV
+.
+. Restore saved next visit number to be used by current transaction
+.
+          MOVE      VISNSAVE,PTCNNXTV       * Restore next visit number
+.
+          CALL      RELSLK00                * Release System Lock of Sector 130
+.
+GANV9999  RETURN

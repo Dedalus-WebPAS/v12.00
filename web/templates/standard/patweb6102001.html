@@ -1,0 +1,204 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<style>
+/*#SearchTable { display:block; }*/
+/*#SearchTable td { display:inline-block; }*/
+</style>
+<script type="text/javascript">
+function init() {
+  valCL();  // validate Claim Type field
+  valMBS(); // validate MBS field
+  if(!isWhitespace(SelectCode.ptec0010.value)) {
+     validateCode(16,SelectCode.ptec0010,funddesc)
+     SelectCode.ptec0010.className="Mandatory";
+     SelectCode.ptec0011.disabled=true;
+  }
+  if(isWhitespace(SelectCode.ptec0010.value)) {
+    SelectCode.ptec0010.value="";
+    SelectCode.funddesc.value="";
+    SelectCode.ptec0011.disabled=false;
+  } 
+  if(!isWhitespace(SelectCode.ptec0011.value)) {
+    SelectCode.ptec0011.className="Mandatory";
+    SelectCode.ptec0010.disabled=true;
+  }
+  if(isWhitespace(SelectCode.ptec0011.value)) {
+    SelectCode.ptec0011.className="";
+    SelectCode.ptec0011.value="";
+    SelectCode.ptec0010.disabled=false;
+  }
+}
+function valCL() {
+  if(!isWhitespace(SelectCode.ptec0001.value) & isWhitespace(SelectCode.ptec0003.value)) {
+    SelectCode.ptec0003.className="";
+  }
+  if(isWhitespace(SelectCode.ptec0001.value)) {
+    SelectCode.ptec0003.className="Mandatory";
+  }
+  if(isWhitespace(SelectCode.ptec0001.value) & !isWhitespace(SelectCode.ptec0003.value)) {
+    SelectCode.ptec0003.className="Mandatory";
+    SelectCode.ptec0001.className="";
+  }
+}
+
+function valMBS() {
+  if(!isWhitespace(SelectCode.ptec0003.value) & isWhitespace(SelectCode.ptec0001.value)) {
+    SelectCode.ptec0001.className="";
+  }
+  if(isWhitespace(SelectCode.ptec0003.value) ) {
+    SelectCode.ptec0001.className="Mandatory";
+  }
+  if(isWhitespace(SelectCode.ptec0003.value) & !isWhitespace(SelectCode.ptec0001.value)) {
+    SelectCode.ptec0001.className="Mandatory";
+    SelectCode.ptec0003.className="";
+  }
+}
+
+function valHfundtable(ReturnFund,FundName) {
+  if(!isWhitespace(ReturnFund.value)) {
+     validateCode(16,ReturnFund,FundName)
+     SelectCode.ptec0010.className="Mandatory";
+     SelectCode.ptec0011.disabled=true;
+  }
+  if(isWhitespace(ReturnFund.value)) {
+    ReturnFund.value="";
+    FundName.value="";
+    SelectCode.ptec0010.className="";
+    SelectCode.ptec0011.disabled=false;
+  }
+}
+
+function valHFG(ReturnFund) {
+  if(!isWhitespace(ReturnFund.value)) {
+    SelectCode.ptec0011.className="Mandatory";
+    SelectCode.ptec0010.disabled=true;
+  }
+  if(isWhitespace(ReturnFund.value)) {
+    SelectCode.ptec0011.className="";
+    ReturnFund.value="";
+    SelectCode.ptec0010.disabled=false;
+  }
+}
+
+function HFimgCheck() {
+  if(SelectCode.ptec0010.disabled) {
+    return;
+  } else {
+    HFundSearchFrame(ptec0010,funddesc);
+  }
+}
+function SetFocus() {
+   document.SelectCode.ptec0001.focus();
+}
+function ShowDetail01(linkurl) {
+  Left=(document.body.clientWidth-760)/2
+  DFrameLink(linkurl,0,Left,760,400)
+}
+function SubmitForm() {
+  if(validateMandatory(SelectCode)) {
+    SelectCode.submit();
+  }
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);init();">
+<form name=SelectCode action=patweb61.pbl method=get>
+<table width="100%" cellpadding=0 cellspacing=0 border=0>
+<input type=hidden name=reportno value=02>
+<input type=hidden name=template value=001>
+<input type=hidden name=updttype>
+<input type=hidden id=currdate name="currdate" value="%STANDARD.01.015">
+
+
+<tr><td>
+    <table id=SearchTable width=100% cellpadding=0 cellspacing=0 border=0 bgcolor=#CCCCCC>
+    <tr><td colspan=11 align=center class=HeadingCell>
+         MBS Item Explosion Charge Maintenance</td></tr>
+
+    <tr height=25>
+      <td class=DataLabel style="width:100px;">%STANDARD.01.017.CL</td>
+      <td class=DataField style="width:150px;">
+      <select name=ptec0001 class="SelectMed" 
+       title="%STANDARD.01.017.CL" onchange="valCL();">
+        <option></option>
+        %PATWEB61.02.004.9.1.10.2.X
+      </select></td>
+
+      <td class=DataLabel style="width:100px;"> Health Fund </td>
+      <td style="width:500px;"><input type=text id=ptec0010 name=ptec0010 size=9 
+       maxlength=6 title="Health Fund" class=SelectMed
+          value="%PATWEB61.02.018.0"
+          onblur='valHfundtable(ptec0010,funddesc);'>
+          <input type=text id=funddesc name=funddesc size=50 class=readonly 
+          readonly title="Health Fund Description" tabindex=-1
+          value="%PATWEB61.02.018.1">
+          <img src=../images/SearchIcon.gif class=Icon alt=search
+          onclick='HFimgCheck();'>
+          <img src=../images/erase.gif class=Icon alt=clear
+          onclick="clrDoc(ptec0010,funddesc);SelectCode.ptec0011.disabled=false;SelectCode.ptec0010.className='';">
+      </td>
+
+      <td>OR</td>
+    
+      <td class=DataLabel style="width:120px;">Health Fund Group </td>
+      <td class=DataField>
+      <select style="width:250px;" name=ptec0011 id=ptec0011 class="SelectMed" 
+      title="Health Fund Group" onchange="valHFG(ptec0011);">
+        <option value="      "></option>
+        %PATWEB61.02.015
+      </select></td>
+    </tr>
+   
+    <tr height=25>
+      <td class=DataLabel style="width:100px;">%STANDARD.01.017.A </td>
+        <td class=DataField style="width:150px;">
+        <select name=ptec0002 id=ptec0002 class="SelectMed"
+             title="%STANDARD.01.017.A "  >
+             <option value="   "></option>
+              %PATWEB61.02.005.2
+        </select></td>
+
+        <td class=DataLabel style="width:100px;">MBS Code</td>
+        <td style="width:450px;"><input type=text id=ptec0003 name=ptec0003 size=9 
+             value="%PATWEB61.02.006.1" maxlength=9 
+             onblur='validateCode(4,ptec0003,mbscdesc);valMBS();'
+             title="MBS Code" > 
+            <input type=text readonly class=readonly id=mbscdesc name=mbscdesc size=50  
+             value="%PATWEB61.02.006.0" 
+             title="MBS Code Description" tabindex=-1> 
+            <img src=../images/SearchIcon.gif class=Icon
+             onclick="MbsSearchFrame(ptec0003,mbscdesc,currdate)">
+            <img src=../images/erase.gif class=Icon alt=clear
+            onclick='clrDoc(ptec0003,mbscdesc);valMBS();'>
+        </td>
+        </td><td style="width:100px;"></td>
+        </td><td style="width:100px;"></td>
+        <td style="width:100px;" align=right><input type=button value="Search" class="button"
+             onclick="SubmitForm();">
+        </td>
+        <td></td></tr>
+    </table>   
+</td></tr>
+
+<table cellspacing=0 colspan=4 border=1 width=100%>
+%PATWEB61.02.003.patweb61.02.003
+</table>
+
+<tr><td colspan=8>
+    <table width=100% bgcolor=#CCCCCC>
+    <tr><td align=center>
+        <input type=button value="<< Previous" class="button" 
+         onclick='location.href="%PATWEB61.02.002.001"'>
+        <input type=button value=Add class="button" 
+         onclick="ShowDetail01('patweb61.pbl?reportno=02&template=002');">
+        <input type=button value="Next >>" class="button" 
+         onclick='location.href="%PATWEB61.02.001.001"'>
+    </td></tr>
+    </table>
+</td></tr>
+</table>
+</form>
+

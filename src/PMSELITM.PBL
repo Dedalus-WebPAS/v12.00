@@ -1,0 +1,294 @@
+. *----------------------------------------------------------------------
+. * Include Name  :   PMSELITM.PBL
+. *
+. * Function      :   CGI variables for PMSELIFD - pmseliaf.dat
+. *----------------------------------------------------------------------
+.  Modifications Done :
+.  V11.05.01  20/11/2024  J.Tan         TSK 0953918
+.             Added tag for Misc.item for HEA IFC
+.  V11.04.01  08/10/2024  J.Tan         TSK 0951331
+.             Created include
+. *----------------------------------------------------------------------
+.
+.------------------------------------------------------------------------
+.   Clear Parameters for visit based payor details file
+.------------------------------------------------------------------------
+.
+CLRELI00  MOVE      Z70,PMELI001
+          MOVE      Z70,PMELI002
+          MOVE      Z70,PMELI003
+          MOVE      Z70,PMELI004
+          MOVE      Z70,PMELI005
+          MOVE      Z70,PMELI006
+          MOVE      Z70,PMELI007
+          MOVE      Z70,PMELI008
+          MOVE      ZERO,PMELI009
+.
+CLRELI99  RETURN
++
+.------------------------------------------------------------
+. Add visit based payor details file
+.------------------------------------------------------------
+ELIA0000  COMPARE   ONE,PMELIFLG
+          GOTO      ELIA9999 IF NOT EQUAL
+.
+          UNPACK    SP70,KEY1,KEY3
+          UNPACK    DIM127,D1,KEY1,DIM127
+.
+          UNPACK    DIM127,D1,KEY3,DIM127
+          MOVE      ZERO,F3
+          MOVE      KEY3,F3
+          PACK      KEY12,ADMISSNO,KEY1,F3,SP70
+          CALL      RDPMELI1
+          IF        OVRCD=1
+            CALL      CLPMSELI
+          ENDIF
+.
+          MOVE      SP70,KEY3
+          UNPACK    DIM127,D1,KEY3,DIM127
+          MOVE      ZERO,F3
+          MOVE      KEY3,F3
+          BRANCH    F3,ELIA0010,ELIA0020,ELIA0030,ELIA0040,ELIA0050:
+                       ELIA0060,ELIA0070,ELIA0080,ELIA0090
+.
+          WRITE     HTMLFILE;"Invalid IBA Tag";
+          GOTO      ELIA9999
+.
+ELIA0010  WRITE     HTMLFILE;PMEIRTYP;     * record type
+          GOTO      ELIA9999
+.
+ELIA0020  WRITE     HTMLFILE;PMEICNTR;     * counter
+          GOTO      ELIA9999
+.
+ELIA0030  CALL      ITMC0000               * Misc./MBS item code
+          GOTO      ELIA9999
+.
+ELIA0040  IF        PMEISERV=0
+            MOVE      ONE,PMEISERV
+          ENDIF
+          WRITE     HTMLFILE;PMEISERV;     * No of items
+          GOTO      ELIA9999
+.
+ELIA0050  WRITE     HTMLFILE;PMEIGSTE;     * Disabled GST
+          GOTO      ELIA9999
+.
+ELIA0060  CALL      MGSTA000
+          GOTO      ELIA9999
+.
+ELIA0070  UNPACK    DIM127,D1,KEY1,DIM127
+          MOVE      ZERO,F1
+          MOVE      KEY1,F1
+          BRANCH    F1,ELIA0072
+.
+          WRITE     HTMLFILE;PMEIGSTC;
+          GOTO      ELIA9999
+.
+ELIA0072  CALL      GSTC0000               * GST code
+          GOTO      ELIA9999
+.
+ELIA0080  WRITE     HTMLFILE;PMEIKEYI;     * Keyin rebate ?
+          GOTO      ELIA9999
+.
+ELIA0090  UNPACK    DIM127,D1,KEY1,DIM127
+          MOVE      ZERO,F1
+          MOVE      KEY1,F1
+          BRANCH    F1,ELIA0092
+.
+          WRITE     HTMLFILE;PMEIAMNT;     * Keyed in item amount
+          GOTO      ELIA9999
+.
+ELIA0092  MOVE      PMEIAMNT,FORM12P2
+          MULT      PMEISERV,FORM12P2
+          WRITE     HTMLFILE;FORM12P2;
+          GOTO      ELIA9999
+.
+ELIA9999  RETURN
++
+.------------------------------------------------------------
+.         GST Applicable
+.------------------------------------------------------------
+MGSTA0000 MOVE      ZERO,F1
+          UNPACK    DIM127,D1,KEY1
+          MOVE      KEY1,F1
+          BRANCH    F1,MGST2000
+.
+          WRITE     HTMLFILE;PMEIGSTA;     * GST Applicable
+          GOTO      MGSTA999
+.
+MGST2000  MATCH     SP70,PMEIGSTA
+          GOTO      MGST4000 IF NOT EQUAL
+.
+          WRITE     HTMLFILE;"<option value=1>Yes</option>":
+                             "<option value=0>No</option>"
+          GOTO      MGSTA999
+.
+MGST4000  MATCH     "1",PMEIGSTA
+          IF        @EQUAL
+            WRITE     HTMLFILE;"<option value=1 selected>Yes</option>":
+                               "<option value=0>No</option>"
+          ELSE
+            WRITE     HTMLFILE;"<option value=1>Yes</option>":
+                               "<option value=0 selected>No</option>"
+          ENDIF
+.
+MGSTA999  RETURN
++
+.------------------------------------------------------------
+. Misc./MBS items
+.         @PATWEB78.99.999.3.X.YYY.Z
+.         3 = Misc/MBS item code/Desc
+.         X = 1 for MBS, 2 for Misc.item
+.         YYY = Counter
+.         Z = 0 for code 1 for Description, 2 for Selection
+.------------------------------------------------------------
+ITMC0000  UNPACK    DIM127,D1,KEY1,DIM127
+          MOVE      ZERO,F1
+          MOVE      KEY1,F1
+.
+          MATCH     "1",PMEIRTYP
+          GOTO      ITMC4000 IF EQUAL      * Miscellaneous/MBS item
+.
+          BRANCH    F1,ITMC2000
+          WRITE     HTMLFILE;PMEIITMN;     * Item code
+          GOTO      ITMC9999
+.
+.         Miscellaneous item
+.
+ITMC2000  READ      CONTROLF,TWENTY;*193,PTCNDCLM
+          PACK      KEY29,PTCNDCLM,SP6,SP3,PMEIITMN,CURRDATE,SP10
+          IF        IBCNMHOS=1
+            MOVE      SP10,KEY3
+            CALL      RSPTHSP1
+            CALL      RKPTHSP1
+            IF        OVRCD=0
+              PACK      KEY29,PTHSDCLM,SP6,SP3,PMEIITMN,CURRDATE,SP10
+            ENDIF
+          ENDIF
+          CALL      PATMCHRD
+          IF        OVRCD=0
+            WRITE     HTMLFILE;MDESC;       * item description
+          ENDIF
+          GOTO      ITMC9999
+.
+.         MBS/theatre item
+.
+ITMC4000  BRANCH    F1,ITMC5000
+          WRITE     HTMLFILE;PMEIITMN;     * Item code
+          GOTO      ITMC9999
+.
+ITMC5000  PACK      KEY17,PMEIITMN,SP70
+          CALL      PATITMRD
+          IF        OVRCD=0
+            WRITE     HTMLFILE;IDESC;       * item description
+          ENDIF
+          GOTO      ITMC9999
+.
+ITMC9999  RETURN
++
+.------------------------------------------------------------
+. GST Code Selection
+.------------------------------------------------------------
+GSTC0000  OPEN      IBAGSTA1,"ibagstaf"
+          PACK      KEY6,SP70
+          CALL      RAIBGS1
+GSTC1000  CALL      RKIBGS1
+          BRANCH    OVRCD,GSTC9999
+.
+          PACK      KEY8,QUOTE,IBGSCODE,QUOTE
+          MATCH     IBGSCODE,PMEIGSTC
+          IF        @EQUAL
+            WRITE     HTMLFILE;"<option value=",KEY8," selected>":
+                               IBGSDESC,"</option>"
+          ELSE
+            WRITE     HTMLFILE;"<option value=",KEY8,">":
+                               IBGSDESC,"</option>"
+          ENDIF
+          GOTO      GSTC1000
+
+GSTC9999  RETURN
++
+.------------------------------------------------------------
+.   Set Parameters for Eligibility Check Items details file
+.------------------------------------------------------------
+SPELI000  MOVE      ZERO,EXIT
+          UNPACK    QRYNAME,KEY5,KEY3
+          MOVE      KEY3,F3
+          BRANCH    F3,SPELI001,SPELI002,SPELI003,SPELI004,SPELI005:
+                       SPELI006,SPELI007,SPELI008,SPELI009
+.
+          MOVE      ONE,EXIT
+          GOTO      SPELI999
+.
+SPELI001  PACK      PMELI001,QRYDATA,SP70
+          GOTO      SPELI999
+.
+SPELI002  PACK      PMELI002,QRYDATA,SP70
+          GOTO      SPELI999
+.
+SPELI003  PACK      PMELI003,QRYDATA,SP70
+          GOTO      SPELI999
+.
+SPELI004  MOVE      QRYDATA,PMELI004
+          GOTO      SPELI999
+.
+SPELI005  MOVE      QRYDATA,PMELI005
+          GOTO      SPELI999
+.
+SPELI006  MOVE      QRYDATA,PMELI006
+          GOTO      SPELI999
+.
+SPELI007  MOVE      QRYDATA,PMELI007
+          GOTO      SPELI999
+.
+SPELI008  MOVE      QRYDATA,PMELI008
+          GOTO      SPELI999
+.
+SPELI009  MOVE      QRYDATA,PMELI009
+          GOTO      SPELI999
+.
+SPELI999  RETURN
+.
+.------------------------------------------------------------
+.  Update Eligibility Check items details file
+.------------------------------------------------------------
+MVELIA00  MATCH     PMELI001,Z70
+          IF        !@EQUAL
+            MOVE      PMELI001,PMEIRTYP
+          ENDIF
+.
+          MATCH     PMELI002,Z70
+          IF        !@EQUAL
+            MOVE      PMELI002,PMEICNTR
+          ENDIF
+.
+          MATCH     PMELI003,Z70
+          IF        !@EQUAL
+            MOVE      PMELI003,PMEIITMN
+          ENDIF
+.
+          MATCH     PMELI004,Z70
+          IF        !@EQUAL
+            MOVE      PMELI004,PMEISERV
+          ENDIF
+.
+          MATCH     PMELI005,Z70
+          IF        !@EQUAL
+            MOVE      PMELI005,PMEIGSTE
+          ENDIF
+.
+          MATCH     PMELI006,Z70
+          IF        !@EQUAL
+            MOVE      PMELI006,PMEIGSTA
+          ENDIF
+.
+          MATCH     PMELI007,Z70
+          IF        !@EQUAL
+            MOVE      PMELI007,PMEIGSTC
+          ENDIF
+          MATCH     PMELI008,Z70
+          IF        !@EQUAL
+            MOVE      PMELI008,PMEIKEYI
+          ENDIF
+.
+          MOVE      PMELI009,PMEIAMNT
+MVELIA99  RETURN

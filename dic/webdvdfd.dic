@@ -1,0 +1,48 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Web System Table 
+                      WebServices DVDW Assessment Re 
+  
+TABLE NAME         :  webdvdaf
+=====================================================================
+WBDDCLID    char        6     1   Claim ID  
+WBDDRPTC    char        3     7   Report counter (right just.)  
+WBDDCLBP    char        9    10   Claim Benefit Paid  
+WBDDCLCA    char        9    19   Claim Charge Amount  
+WBDDSRVP    char        8    28   Servicing Provider Num  
+WBDDSTAT    char       50    36   Status  
+WBDDTRID    char       24    86   Claim Transaction ID  
+WBDDMSID    char       36   110   Message ID  
+WBDDRKEY    char       24   146   Report Retrieval Key  
+WBDDCUID    char       10   170   Created By User ID  
+WBDDCDAT    char        8   180   Date Created  
+WBDDCTIM    char        8   188   Time Created  
+WBDDUUID    char       10   196   Update By User ID  
+WBDDUDAT    char        8   206   Date Updated  
+WBDDUTIM    char        8   214   Time Updated  
+WBDDSPAR    char      100   222   Spare Variable  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+WBDDCLID
+WBDDRPTC
+WBDDRKEY
+  
+UNIQUE INDEX 2
+WBDDTRID
+WBDDCLID
+WBDDRPTC
+WBDDRKEY
+  
+UNIQUE INDEX 3
+WBDDMSID
+WBDDCLID
+WBDDRPTC
+WBDDRKEY
+  
+UNIQUE INDEX 4
+WBDDRKEY
+WBDDCLID
+WBDDRPTC
+  
+=====================================================================

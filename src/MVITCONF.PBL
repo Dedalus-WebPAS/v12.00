@@ -1,0 +1,110 @@
+. *----------------------------------------------------------------------
+. * Include Name  :   MVITCONF.PBL
+. *
+. * Function      :   Check visit type and status to see if the MVIT
+. *               :   confirmation status can be updated
+. *                                                       
+. * Function      :   Returns D2 - Visit type and status                  
+. *----------------------------------------------------------------------
+.  Modifications Done :
+.------------------------------------------------------------------------
+.  V11.04.01  26/03/2024  Ebon Clements  TSK 0914658
+.             Created include
+.------------------------------------------------------------------------
+          DEFPROC   MVCONF00
+.
+          INC       EMRVISFD/INC
+          INC       OUTBOAFD/INC
+          INC       OUTPREFD/INC
+          INC       OUTSITFD/INC
+          INC       PATMI1FD/INC
+          INC       PATVISFD/INC
+.
+          OPEN      PATVISA1,"patvisaf"
+.
+          MOVE      SP70,D2                 * Clear visit type and status
+.
+          PACK      KEY8,ADMISSNO,SP70
+          CALL      RDVISA1                 * Get visit type
+          BRANCH    OVRCD,MVCF2000
+.
+          BRANCH    PVITYPE,MVCF1000,MVCF3000,MVCF6000
+.
+          GOTO      MVCF9000                * Invalid visit type
+.
+. Emergency
+.
+MVCF1000  OPEN      EMRVISA1,"emrvisaf"
+.
+          PACK      KEY8,ADMISSNO,SP70
+          CALL      RDEMVIS1
+          BRANCH    OVRCD,MVCF9000
+.
+          PACK      D2,PVITYPE,EMVISTAT,SP70
+          GOTO      MVCF9000            
+.
+. Outpatient Pre-Attendance
+.
+MVCF2000  OPEN      OUTPREA1,"outpreaf"
+.
+          PACK      KEY8,ADMISSNO,SP70
+          CALL      RDPREA1               * Check for Pre-Attendance
+          BRANCH    OVRCD,MVCF9000
+
+          PACK      D2,TWO,ONE,SP70
+          GOTO      MVCF9000            
+.
+. Outpatient 
+.
+MVCF3000  OPEN      OUTSITA1,"outsitaf"
+.
+          PACK      KEY6,PVISITE,SP70
+          CALL      RDSITA1
+          BRANCH    OVRCD,MVCF9000
+.
+          PACK      KEY8,OSTFILE,FILBOKA6 * Determine Location from Masterfile
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      OUTBOKA6,KEY8         * Master
+          TRAPCLR   IO
+          BRANCH    OVRCD,MVCF9000
+.
+          PACK      KEY36,ADMISSNO,SP70
+          CALL      RDSBOKA6
+          CALL      RDKBOKA6
+          BRANCH    OVRCD,MVCF9000
+.
+          MATCH     ADMISSNO,DOBAOUTN
+          GOTO      MVCF9000 IF NOT EQUAL
+.
+          PACK      D2,PVITYPE,OBASTAT,SP70
+          GOTO      MVCF9000            
+.
+. Inpatient
+.
+MVCF6000  OPEN      PATMI1A1,"patmi1af"
+.
+          PACK      KEY8,ADMISSNO,SP70
+          CALL      RDMISS1
+          BRANCH    OVRCD,MVCF9000
+.
+          PACK      D2,PVITYPE,ASTAT,SP70
+          GOTO      MVCF9000            
+.
+MVCF9000  CLOSE     EMRVISA1
+          CLOSE     OUTBOKA6
+          CLOSE     OUTPREA1
+          CLOSE     OUTSITA1
+          CLOSE     PATMI1A1
+          CLOSE     PATVISA1
+          GOTO      MVCF9999
+.
+          INC       IBAOVRIO/INC
+          INC       EMRVISIO/INC
+          INC       OUTBOAIO/INC
+          INC       OUTPREIO/INC
+          INC       OUTSITIO/INC
+          INC       PATMI1IO/INC
+          INC       PATVISIO/INC
+.     
+MVCF9999  ENDPROC

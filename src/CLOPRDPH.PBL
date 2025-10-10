@@ -1,0 +1,17 @@
+.---------------------------------------------------------------------------
+. Include Name : CLOPRDPH.PBL
+. Function     : Clear function for OPRDPHFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.04.01  15/02/2024  Thanh T          TSK 0923560
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLOPRDPH  MOVE      SP70,OPDHCODE      . Doctor Code     
+          MOVE      SP70,OPDHPREF      . Preference Code     
+          MOVE      SP70,OPDHDESC      . Preference Description     
+          MOVE      SP70,OPDHHOSP      . Hospital ID (pathspaf)    
+          MOVE      SP70,OPDHSPAR      . Spare Variable     
+.
+          RETURN

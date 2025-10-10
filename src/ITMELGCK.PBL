@@ -1,0 +1,116 @@
+.
+. Program : ITMELGCK
+.
+. Funciton: Checking item for Eligibility information
+.-----------------------------------------------------------------------------
+.
+          DEFPROC   ITMELGCK
+.
+          INC       PMSELIFD/INC
+          INC       PMSMTIFD/INC
+.
+KEY21A    DIM       21
+.
+ITMELGCK
+          READ      CONTROLF,HUND20;*160,PTCNIFCL
+          READ      CONTROLF,HUND30;*15,PTCNEITM
+.
+          MATCH     "1",PTCNIFCL
+          GOTO      ITEL9999 IF NOT EQUAL    * NOT HEA IFC
+.
+          MATCH     "1",PTCNEITM             * Using Misc.item on Elg.Check?
+          GOTO      ITEL9999 IF NOT EQUAL
+.
+          MOVE      ZERO,OVRCD               * assume file exists
+          TRAP      OVERCOND IF IO           * trap for error openning file
+          OPEN      PMSELIA1,"pmseliaf"      * open items from Eligibility check
+          TRAPCLR   IO
+          BRANCH    OVRCD,ITEL9999           * open failed
+.
+          OPEN      PMSMTIA1,"pmsmtiaf"
+.
+          MOVE      "2",KEY1              * Miscellaneous item Code
+          PACK      KEY12,ADMISSNO,KEY1,SP70
+          CALL      RSPMELI1
+          CALL      RKPMELI1
+          BRANCH    OVRCD,ITEL9999
+.
+          MATCH     ADMISSNO,PMEIVISN
+          GOTO      ITEL9999 IF NOT EQUAL
+.
+          MATCH     KEY1,PMEIRTYP
+          GOTO      ITEL9999 IF NOT EQUAL
+.
+          CALL      CLPMSMTI
+          MOVE      ADMISSNO,PMMIVISN
+          MOVE      URNUMBER,PMMIURNO
+          MOVE      "3",PMMISYST
+          PACK      PMMIITEM,PMEIITMN,SP10     * Miscellaneous item
+          REP       " 0",ADATE
+          MOVE      ADATE,PMMITDAT
+.
+ITEL1000  MOVE      ADMISSNO,KEY8              * get next transaction no
+          CALL      TRVISA1
+          MOVE      PVITRAN,PMMITRAN           * load transaction number
+.
+          PACK      KEY14,PMMIVISN,PMMITRAN
+          CALL      RAPMMTI1                   * transaction on file already ?
+          COMPARE   ZERO,OVRCD
+          GOTO      ITEL1000 IF EQUAL          * yes
+.
+          UNPACK    SP20,PTHFBCAT      * change "H/F Table" to "Table Type"
+          PACK      KEY14,AFUNDH,AFNDTB,SP20
+          CALL      RDFUND1            * "Table Type code" now in PTHFBCAT
+.
+          MOVE      PMEIITMN,KEY9
+          PACK      KEY29,ACLAIM,AFUNDH,PTHFBCAT,KEY9,ADATE,SP10
+          CALL      PATMCHRD                * find Miscellaneous Charge Item
+          IF        EXIT = 1
+            PACK      KEY29,ACLAIM,SP6,SP3,KEY9,ADATE,SP10
+            CALL      PATMCHRD              * find Miscellaneous Charge Item
+            IF        EXIT = 1
+              READ      CONTROLF,TWENTY;*193,PTCNDCLM
+              CALL      CCLM0000            * set Hospital default
+              PACK      KEY29,PTCNDCLM,SP6,SP3,KEY9,ADATE,SP10
+              CALL      PATMCHRD            * find Miscellaneous Charge Item
+              BRANCH    EXIT,ITEL9999       * not found or invalid
+            ENDIF
+          ENDIF
+.
+          MOVE      MDESC,PMMIDESC          * Miscellaneous item description
+          PACK      PMMIDES2,SP30,SP10      * 2nd item description
+          MOVE      MITMTYP,PMMIRTYP        * Record type
+.
+          MOVE      PMEISERV,PMMISERV
+          MOVE      PMEIGSTA,PMMIGSTA
+          MOVE      PMEIGSTC,PMMIGSTC
+.
+          MOVE      MPATPOR,PMMIAMTP
+          MOVE      MHFPOR,PMMIRBAT
+          MOVE      PMMIAMTP,PMMIAMTT
+          ADD       PMMIRBAT,PMMIAMTT
+          MULT      PMMISERV,PMMIAMTT
+          MOVE      MMSCGRP,PMMIMGRP        * Miscellaneous charge group
+          MOVE      "4",PMMIITYP            * Item from Eligibility Check
+.
+          MOVE      ONE,PMMIINVN            * No of invoices
+          MOVE      USERID,PMMIWUSR         * WEB user id
+          PACK      PMMIDTCR,CCC,CYY,CMM,CDD
+          REP       " 0",PMMIDTCR
+          MOVE      CTIMEIS,PMMITMCR
+          MOVE      USERID,PMMIIDCR
+.
+          CALL      WRPMMTI1
+ITEL9999  GOTO      NDEL9999
+.
+.
+          INC       CLPMSMTI
+          INC       PATMCHRD
+.
+          INC       PMSELIIO/INC
+          INC       PMSMTIIO/INC
+          INC       IBAOVRIO/INC
+.
+NDEL9999  ENDPROC
++
+

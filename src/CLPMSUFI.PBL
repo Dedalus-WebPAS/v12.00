@@ -1,0 +1,25 @@
+.---------------------------------------------------------------------------
+. Include Name : CLPMSUFI.PBL
+. Function     : Clear function for PMSUFIFD
+.---------------------------------------------------------------------------
+. Modifications :
+.---------------------------------------------------------------------------
+. V11.04.01  15/02/2024  Thanh T          TSK 0923560
+.            Initial Version
+.---------------------------------------------------------------------------
+.
+CLPMSUFI  MOVE      SP70,PMUFUOGR      . User Occupational Group (Cat w0)  
+          MOVE      SP70,PMUFUSER      . Web User (websecaf) blank for all 
+          MOVE      SP70,PMUFHOSP      . Hospital ID (pathspaf)    
+          MOVE      SP70,PMUFFAVG      . Favourite Group (Cat w4)   
+          MOVE      SP70,PMUFFAVD      . Default Favourite Group (Yes/No)   
+          MOVE      SP70,PMUFGHED      . Group Heading (Cat w5)   
+          MOVE      SP70,PMUFCODE      . Charge Code (patmchgf/nzpmchaf)    
+          MOVE      SP70,PMUFQUAN      . Quantity      
+          MOVE      SP70,PMUFCDAT      . Date Created     
+          MOVE      SP70,PMUFCTIM      . Time Created     
+          MOVE      SP70,PMUFCUSR      . Web User ID Created   
+          PACK      PMUFDESC,SP70,SP70 . Charge Code Description    
+          MOVE      SP70,PMUFSPAR      . Spare      
+.
+          RETURN

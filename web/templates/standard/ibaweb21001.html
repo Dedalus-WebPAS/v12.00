@@ -1,0 +1,278 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName"    content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/ReportStandard.js"></script>
+<script type="text/javascript">
+%START.OF.PAGE
+function ExtractTypeChange() {
+  p = document.ReportForm;
+  if (p.extrtype.value != 3) {
+    document.getElementById('DateRange').style.display="";
+    document.getElementById('DateRange').innerHTML=
+    document.getElementById('SetDateRange').innerHTML;
+    document.getElementById('LoadFile').innerHTML="";
+    document.getElementById('ReasonForChange').innerHTML="";
+    if(!isWhitespace(p.schdrdat.value)) {
+      document.getElementById('DateRange').innerHTML=
+      document.getElementById('SetScheduleRange').innerHTML;
+      SetReportDates()
+    }
+  } else {
+    if (!isWhitespace(p.schdrdat.value)) {
+      document.getElementById('LoadFile').innerHTML=
+      document.getElementById('ShowDateLoadFile').innerHTML;
+      SetReportDates();
+      document.getElementById('DateRange').style.display="";
+      document.getElementById('DateRange').innerHTML=
+      document.getElementById('SetScheduleRange2').innerHTML;
+      SetReportSchedule(ReportForm.datsch01);
+    } else {
+      document.getElementById('LoadFile').innerHTML=
+      document.getElementById('ShowLoadFile').innerHTML;
+      document.getElementById('DateRange').style.display="none";
+      document.getElementById('DateRange').innerHTML="";
+    }
+    document.getElementById('ReasonForChange').innerHTML=
+    document.getElementById('ShowReasonForChange').innerHTML;
+  }
+}
+
+function ProcessReport() {
+ SubmitPage=true
+ p = document.ReportForm
+ p.keystr01.value = p.extrtype.value;
+ if (p.extrtype.value != 3) {
+   if (p.schdrdat.value=="") {
+     p.keystr02.title="From Date";
+     p.keystr03.title="To Date";
+     p.keystr02.value=document.getElementById('datran01').value;
+     p.keystr03.value=document.getElementById('datran02').value;
+     SubmitPage=CheckDateRange(p.keystr02,p.keystr03); 
+     p.keystr04.value = "Y";
+     p.keystr05.value = " ";
+   } else {
+     p.keystr02.title="From Schedule"
+     p.keystr03.title="To Schedule" 
+     p.keystr04.value = "Y";
+     p.keystr05.value = " ";
+   }
+ } else {
+   if (!isWhitespace(p.schdrdat.value)) {
+     p.keystr01.value="4";
+     p.keystr02.title="To Schedule";
+   } else {
+     p.keystr02.title="Path & File Name";
+   }
+   p.keystr03.title="Reason for Change";
+   p.keystr03.value=document.getElementById('reasonchange').value.substring(0,3);
+   p.keystr04.value = p.userid.value;
+   p.keystr05.value = "Y";
+ }
+
+ if (SubmitPage) {
+  SubmitReport(p) 
+ }
+}
+
+</script>
+</head>
+<body onload="PageLoad(event);ReportLoad();ExtractTypeChange();
+              ReportForm.schddate.focus();">
+<form name=ReportForm method=post action=rshweb02.pbl style="margin:0" 
+  enctype="multipart/form-data">
+ <input type=hidden name=reportno value=4>
+ <input type=hidden name=template value=001>
+ <input type=hidden name=updttype value="A">
+ <input type=hidden name=setdfprg value="IBAWEB21">
+ <input type=hidden name=setdfrep value="01">
+ <input type=hidden name=schdpgid value="IBAWEB21">    
+ <input type=hidden name=schddesc value="ICWA Extract and Load">
+ <input type=hidden name=nextpage value="1">
+ <input type=hidden name=userid id=userid value="%STANDARD.01.008">
+ <input type=hidden name=keystr01 value=" ">
+ <input type=hidden name=keystr02 value="Import File Name">
+ <input type=hidden name=keystr03 value=" ">  
+ <input type=hidden name=keystr04 value=" ">  
+ <input type=hidden name=keystr05 value=" ">  
+ <input type=hidden name=keystr06 value=" ">  
+ <input type=hidden name=keystr07 value=" ">  
+ <input type=hidden name=keystr08 value=" ">  
+ <input type=hidden name=keystr09 value=" ">  
+ <input type=hidden name=redirect value="rshweb02.pbl?reportno=1&template=1">
+ <input type=hidden name=ibcnmhos value="%RSHWEB02.01.118.000.043.1.1">
+
+<table width=100% align=center border=0 cellspacing=0>
+<tr><td class=HeadingCell align=center colspan=2>
+       Insurance Council WA Event Extract and Load</td></tr>
+</table>
+
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+
+<tr><td class=DataLabel width=25%>Schedule Date</td>
+    <td class=DataLabel>
+    <input type=text name=schddate id=schddate size=12 title="Schedule Date"
+    value="%STANDARD.01.015"
+    onblur="checkDate(this,'Schedule Date');">
+    <img notab src="../images/DateLookup.gif" class="Icon" 
+     alt="Show Calendar" date="document.ReportForm.schddate">
+    Time
+    <input type=text name=schdtime id=schdtime size=12 title="Schedule Time"
+    value="%STANDARD.01.016">
+    <img notab src="../images/DateTimeStamp.gif" class="Icon"
+     alt="Current" date="document.ReportForm.schddate" 
+                   time="document.ReportForm.schdtime">
+    <img notab src="../images/TimeLookup.gif" class="Icon" 
+     alt="Time Select" time="document.ReportForm.schdtime">
+    </td></tr>
+
+<tr><td class=DataLabel>Printer</td>
+    <td><select name=schdprnt id=schdprnt title="Printer" class=Mandatory>
+        <option></option>
+        %STANDARD.01.001.IBAWEB21.01
+        </select>
+    </td></tr>
+ 
+<tr><td class=DataLabel>Number of Copies</td>
+    <td><select name=schdcopy id=schdcopy title='Number of Copies'
+                class=Mandatory>
+        </select>
+    </td></tr>
+ 
+<tr><td class=DataLabel>Re-schedule Type</td>
+    <td class=DataLabel colspan=3>
+    <select name=schdrdat id=schdrdat title="Schedule Type" 
+            onchange="SetReportDates();ExtractTypeChange();">
+    <option></option>
+    </select>
+    </td></tr>
+
+<tr><td class=DataLabel>Re-schedule Until Date</td>
+    <td class=DataLabel colspan=3>
+    <input type=text name=schdrend id=schdrend size=12
+     onblur="checkDate(this,'Schedule Until Date');">  
+    <img notab src="../images/DateTimeStamp.gif" class="Icon"
+     alt="Current" date="document.ReportForm.schdrend">
+    <img notab src="../images/DateLookup.gif" class="Icon" 
+     alt="Show Calendar" date="document.ReportForm.schdrend">
+    </td></tr>
+
+<tr><td colspan=2 align=center><hr width=80%></td></tr>
+
+<tr><td class=DataLabel>Report Option</td>
+    <td><select name=extrtype id=extrtype title="Report Option" class=Mandatory
+           onchange="ExtractTypeChange();">
+        <option value="1">Extract Event Data from webPAS</option>
+        <option value="2">Re-Submit all Event Data for Date Range</option>
+        <option value="3">Import Event Data from ICWA</option>
+        </select>
+    </td></tr>
+
+</table>
+
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+<span id=DateRange></span>
+<span id=ReasonForChange></span>
+<span id=LoadFile></span>
+</table>
+
+<table width=80% align=center border=0 cellspacing=0>
+
+<tr><td align=center colspan=2><br>
+    <input type=button value=Ok class="button" onclick='ProcessReport();'>
+    <input type=button value=Cancel class="button"
+     onclick='location.href="../lookups/blank.html"' >
+    </td></tr>
+</table>
+</form>
+
+<span id=SetDateRange style="display:none;">
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+  <tr>
+  <td class=DataLabel width=25%>Date From</td>
+  <td><input type=text size=15 maxlength=12 name=datran01 id=datran01
+    onblur="checkDate(this,'From Date')"  
+    class="Mandatory PastDate" title="From Date">
+    <img notab src="../images/DateTimeStamp.gif" class="Icon"
+     alt="Current" date="document.ReportForm.datran01">
+    <img notab src="../images/DateLookup.gif" class="Icon"
+     alt="Calendar" date="document.ReportForm.datran01">
+    To
+    <input type=text size=15 maxlength=12 name=datran02 id=datran02
+    onblur="checkDate(this,'To Date')" class="Mandatory PastDate"
+    title="To Date">
+    <img notab src="../images/DateTimeStamp.gif" class="Icon"
+     alt="Current" date="document.ReportForm.datran02">
+    <img notab src="../images/DateLookup.gif" class="Icon"
+     alt="Calendar" date="document.ReportForm.datran02">
+    </td>
+  </tr>
+</table>
+</span>
+
+<span id=SetScheduleRange style="display:none;">
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+  <tr>
+    <td class=DataLabel width=25%>Date Range</td>
+    <td><select name=datsch01 title="Schedule Range" class=Mandatory
+    onblur=UpReportSchedule(this,ReportForm.keystr02,ReportForm.keystr03)>
+    <option></option></select>
+    Sample Range
+    <input type=text name=SampleFrom size=12> To
+    <input type=text name=SampleTo size=12>
+    </td>
+  </tr>
+</table>
+</span>
+
+<span id=SetScheduleRange2 style="display:none;">
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+  <tr>
+    <td class=DataLabel width=25%>Date Range</td>
+    <td><select name=datsch01 title="Schedule Range" class=Mandatory
+    onblur=UpReportSchedule(this,ReportForm.SampleFrom,ReportForm.keystr02)>
+    <option></option></select>
+    Sample Range
+    <input type=hidden name=SampleFrom size=12>
+    <input type=text name=SampleTo size=12>
+    </td>
+  </tr>
+</table>
+</span>
+
+<span id=ShowLoadFile style="display:none;">
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+<tr>
+  <td class=DataLabel width=25%>Path & File Name</td>
+  <td><input type=file name=loadfnam id=loadfnam class=Mandatory
+       title="Path & File name"
+       size=40 maxlength=120>&nbsp;&nbsp;
+      <input type=hidden size=50 name=filedesc Readonly tabindex=-1
+       style=border:0;background:paper.gif;>
+  </td>
+</tr>
+</table>
+</span>
+
+<span id=ShowDateLoadFile style="display:none;">
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+<tr>
+  <td class=DataLabel width=25%>Path & File Name</td>
+  <td>../extracts/icwa/icwaimpCCYYMMDD.txt</td>
+</tr>
+</table>
+</span>
+
+<span id=ShowReasonForChange style="display:none;">
+<table width=80% align=center border=0 cellspacing=2 cellpadding=1>
+<tr>
+  <td class=DataLabel width=25%>%STANDARD.01.035.IZ</td>
+  <td><select name=reasonchange id=reasonchange title="Reason for Change" 
+       class=Mandatory>
+       <option></option>
+        %STANDARD.01.007.IZ
+       </select>
+    </td>
+</tr>
+</table>
+</span>

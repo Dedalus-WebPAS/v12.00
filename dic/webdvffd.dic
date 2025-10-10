@@ -1,0 +1,56 @@
+
+=====================================================================
+TABLE DESCRIPTION  :  File Def'n Include for Web System Table 
+                      WebServices DVAW Ass Med Evt Serv 
+  
+TABLE NAME         :  webdvfaf
+=====================================================================
+WBDFCLID    char        6     1   Claim ID  
+WBDFRPTC    char        3     7   Report counter (right just.)  
+WBDFMEVC    char        2    10   Medical Event counter (right just.)  
+WBDFACRF    char        8    12   Account Reference Number (InvoiceN)  
+WBDFSRVC    char        2    20   Service Counter (right just.)  
+WBDFASSC    char        4    22   Assessment Code  
+WBDFBEPD    char        9    26   Benefit Paid  
+WBDFCHAM    char        9    35   Charge Amount  
+WBDFSVID    char        4    44   Service Id  
+WBDFITMN    char        5    48   Item NUmber  
+WBDFNOFP    char        2    53   Number of Patients  
+WBDFPROV    char        8    55   Service Provider Number  
+WBDFTRID    char       24    63   Transaction ID  
+WBDFMSID    char       36    87   Message ID  
+WBDFRKEY    char       24   123   Report Retrieval Key  
+WBDFSPAR    char      150   147   Spare Variable  
+lf          char        1        Spare Blank
+=====================================================================
+UNIQUE INDEX 1
+WBDFCLID
+WBDFRPTC
+WBDFMEVC
+WBDFSRVC
+WBDFRKEY
+  
+UNIQUE INDEX 2
+WBDFTRID
+WBDFCLID
+WBDFRPTC
+WBDFMEVC
+WBDFSRVC
+WBDFRKEY
+  
+UNIQUE INDEX 3
+WBDFMSID
+WBDFCLID
+WBDFRPTC
+WBDFMEVC
+WBDFSRVC
+WBDFRKEY
+  
+UNIQUE INDEX 4
+WBDFRKEY
+WBDFCLID
+WBDFRPTC
+WBDFMEVC
+WBDFSRVC
+  
+=====================================================================

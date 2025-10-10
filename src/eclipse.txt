@@ -1,0 +1,64 @@
+      ECLWEB01  V11.04.00 Eclipse Server 1
+      ECLWEB02  V11.04.02 Eclipse Server 2
+      ECLWEB03  V11.04.01 Medicare WebServices PRODA Polling Server
+      ECLWEB04  V11.04.01 Medicare WebServices OPVW - PVM Request Extract Server
+      ECLWEB05  V11.04.01 Medicare WebServices OPVW - PVM Polling Response Server
+      ECLWEB06  V11.04.01 Medicare WebServices OVVW - PVV/PVP Request Extract Server
+      ECLWEB07  V11.04.01 Medicare WebServices OVVW - PVV/PVP Polling Response Server
+      ECLWEB08  V11.04.01 Medicare WebServices OECW - ECF Request Extract Server
+      ECLWEB09  V11.04.01 Medicare WebServices OECW - ECF Polling Response Server
+      ECLWEB10  V11.04.01 Medicare WebServices IMCW JSON Request Posting Server
+      ECLWEB11  V11.04.01 Medicare WebServices IMCW Polling Response Server
+      ECLWEB12  V11.04.01 Medicare WebServices IMCW STSW Request Polling Server
+      ECLWEB13  V11.04.01 Medicare WebServices IMCW JSON Request Posting Server
+      ECLWEB14  V11.04.01 Medicare WebServices IMCW STSW Polling Response Server
+      ECLWEB15  V11.04.01 Medicare WebServices IMCW RTVW Polling Server
+      ECLWEB16  V11.04.01 Medicare WebServices IMCW RTVW JSON Request Posting Server
+      ECLWEB14  V11.04.01 Medicare WebServices IMCW RTVW Polling Response Server
+      ECLWEB18  V11.04.01 Medicare WebServices ERAW STSW Request Polling Server
+      ECLWEB19  V11.04.01 Medicare WebServices ERAW STSW JSON Request Posting Server
+      ECLWEB20  V11.04.01 Medicare WebServices ERAW STSW Polling Response Server
+      ECLWEB21  V11.04.01 Medicare WebServices ERAW RTVW JSON Request Posting Server
+      ECLWEB22  V11.04.01 Medicare WebServices ERAW RTVW Polling Response Server
+      ECLWEB23  V11.04.01 Medicare WebServices IMCW Outstanding Ass Polling Server
+      ECLWEB24  V11.04.02 Webservices Claim Enquiries
+      ECLWEB25  V11.04.00 WebServices ERAW/BPYW Enquiry/Reciepting Release Server
+      ECLWEB26  V11.04.01 Medicare WebServices GPRW JSON Request Posting Server
+      ECLWEB27  V11.04.01 Medicare WebServices GPRW Polling Response Server
+      ECLWEB28  V11.04.01 Medicare WebServices IHCW JSON Request Posting Server
+      ECLWEB29  V11.04.01 Medicare WebServices IHCW Polling Response Server
+      ECLWEB30  V11.04.01 Medicare WebServices IHCW STSW Request Polling Server
+      ECLWEB31  V11.04.01 Medicare WebServices IHCW JSON Request Posting Server
+      ECLWEB32  V11.04.01 Medicare WebServices IHCW STSW Polling Response Server
+      ECLWEB33  V11.04.01 Medicare WebServices IHCW RTVW Polling Server
+      ECLWEB34  V11.04.01 Medicare WebServices IHCW RTVW JSON Request Posting Server
+      ECLWEB35  V11.04.01 Medicare WebServices IHCW RTVW Polling Response Server
+      ECLWEB36  V11.04.01 Medicare WebServices IHCW Outstanding Ass Polling Server
+      ECLWEB37  V11.04.01 Medicare WebServices IHCW JSON Request Posting Server
+      ECLWEB38  V11.04.01 Medicare WebServices PCIW Polling Response Server
+      ECLWEB39  V11.04.01 Medicare WebServices SDDWRequest Extract Server
+      ECLWEB40  V11.04.01 Medicare WebServices OPVW - PVM Polling Response Server
+      ECLWEB41  V11.04.01 Medicare WebServices BBSW JSON Request Posting Server
+      ECLWEB42  V11.04.01 Medicare WebServices BBSW Polling Response Server
+      ECLWEB43  V11.04.01 Medicare WebServices BBSW BPRW Polling Server
+      ECLWEB44  V11.04.01 Medicare WebServices BBSW BPRW JSON Request Posting Server
+      ECLWEB45  V11.04.01 Medicare WebServices BBSW BPRW Polling Response Server
+      ECLWEB46  V11.04.01 Medicare WebServices BBSW BPYW Polling Server
+      ECLWEB47  V11.04.01 Medicare WebServices BBSW BPYW JSON Request Posting Server
+      ECLWEB48  V11.04.01 Medicare WebServices BBSW BPYW Polling Response Server
+      ECLWEB13  V11.04.01 Medicare WebServices Multiple IMCW STSW Request Posting Server
+      ECLWEB50  V11.04.01 Medicare WebServices Multiple IMCW STSW Polling Response Server
+      ECLWEB51  V11.04.01 Medicare WebServices Multiple IMCW RTVW JSON Request Posting Server
+      ECLWEB52  V11.04.01 Medicare WebServices Multiple IMCW RTVW Polling Response Server
+      ECLWEB31  V11.04.01 Medicare WebServices Multiple IHCW JSON Request Posting Server
+      ECLWEB32  V11.04.01 Medicare WebServices Multiple IHCW STSW Polling Response Server
+      ECLWEB55  V11.04.01 Medicare WebServices Multiple IHCW RTVW JSON Request Posting Server
+      ECLWEB55  V11.04.01 Medicare WebServices Multiple IHCW RTVW Polling Response Server
+      ECLWEB57  V11.04.01 Medicare WebServices Multiple ERAW RTVW JSON Request Posting Server
+      ECLWEB58  V11.04.01 Medicare WebServices Multiple ERAW RTVW Polling Response Server
+      ECLWEB59  V11.04.01 Medicare WebServices IMCW STSW JSON Date Range Request
+      ECLWEB60  V11.04.01 Medicare WebServices Date Range IMCW STSW Polling
+      ECLWEB61  V11.04.01 Medicare WebServices IHCW STSW JSON Date Range Request
+      ECLWEB62  V11.04.01 Medicare WebServices Date Range IHCW STSW Polling
+      ECLWEB63  V11.04.01 Medicare WebServices OECW - ECM Request Extract Server
+      ECLWEB64  V11.04.01 Medicare WebServices OECW - ECM Polling Response Server

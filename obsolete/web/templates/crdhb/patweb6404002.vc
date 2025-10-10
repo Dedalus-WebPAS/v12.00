@@ -1,0 +1,46 @@
+Version Control
+---------------
+
+Server Name   : PATWEB64
+Option Name   : 04
+Template      : 002
+
+Creation Date : 05.05.2016
+
+Version   Date        Responsible/Changes Made
+--------  ----------  ------------------------
+V11.04.01 16/08/2024  Jacob Jackson  TSK 0911895
+                      Add "Booking" option to Type, and add other
+                      dropdowns to allow specific filtering of
+                      SMS bookings
+V11.01.01 26/11/2021  Don Nguyen     TSK 0913053 & 0913536
+                      Fixed js errors (missing element id's) in
+                      Edge/Chrome/Firefox on 'Message Type' selection changes.
+                      Fixed HTML so that filter selection values are preserved
+                      across selection period changes.
+V11.00.04 15/12/2020  Ebon Clements  TSK 0899308
+                      Added mobile column
+V11.00.03 07/12/2020  Sunny          TSK 0896467
+                      Added SetClinicType() for clinic type filter
+V11.00.02 01/12/2020  Sunny          TSK 0896467
+                      Added Speciality filter on message type - filtwlut, 
+                      filtcltp, filtadtp
+V11.00.01 25/06/2020  Thanh T          TSK 0892993
+                      Changed for cross browser compatibility
+V10.14.03 22/08/2019  Don Nguyen     TSK 0875542
+                      Increased width of 'Status' column.
+                      Added "Response" to list heading.
+V10.14.02 08/08/2019  Thanh T.       TSK 0867186
+                      Added hospital and ward filters
+V10.14.01 24/07/2019  Thanh T.       TSK 0867186
+                      Added hospital and ward filters
+V10.08.04 14.09.2016  Ebon Clements  TSK 0294154
+                      Added contact type
+V10.08.03 26.08.2016  Ebon Clements  TSK 0294154
+                      Fixed allvisit link
+V10.08.02 25.07.2016  Ebon Clements  TSK 0294154
+                      Update title of date & time sent
+V10.08.01 31.05.2016  Ebon Clements  TSK 0294154
+                      Added admissno to linkPatient() url
+V10.08.00 05.05.2016  Ebon Clements  TSK 0294154
+                      New hospital level SMS error list

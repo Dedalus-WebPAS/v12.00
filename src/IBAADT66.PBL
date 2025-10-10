@@ -1,0 +1,1680 @@
+.******************************************************************************
+.* System         :  Patient Billing                                          *
+.* Program        :  IBAADT66                                                 *
+.* Description    :  Upload MBS Item Explosion Charges                        *
+.******************************************************************************
+.* Date           :  16/01/2024                                               *
+.* Author         :  Bella Turco                                              *
+.* Function       :  Upload MBS Item Explosion Charges from ASCII file        *
+.* Modifications  :                                                           *
+.******************************************************************************
+.* V11.04.05 17/07/2024  Bella Turco   TSK 0919569                            *
+.*           Made Admission Type field in character program to be mandatory   *
+.* V11.04.04 09/07/2024  Bella Turco   TSK 0919569                            *
+.*           Fixed upload program rebounds bug report 7                       *
+.* V11.04.03 25/06/2024  Bella Turco   TSK 0919569                            *
+.*           Fixed upload program rebounds (POST0000 & VFLD0000)              *
+.* V11.04.02 04/06/2024  Bella Turco   TSK 0919569                            *
+.*           Fixed field validation checks VFLD0000                           *
+.* V11.04.01 21/05/2024  Bella Turco   TSK 0919569                            *
+.*           Fixed Upload Program rebounds                                    *
+.* V11.04.00 16/01/2024  Bella Turco   TSK 0919569                            *
+.*           Created Program                                                  *
+.******************************************************************************
+.
+          INC       STD001FD
+.
+          INC       IBACONFD/INC
+          INC       PATDINVS/INC
+          INC       PATECHFD/INC
+          INC       PATCONFD/INC
+          INC       PATCODFD/INC            * Codes file
+          INC       PATFN1FD/INC            * Health fund file
+          INC       PATFX1FD/INC            * Health fund file
+          INC       PATHGPFD/INC            * Health fund group
+          INC       PMSCIDFD/INC            * Contract ID file
+          INC       PATHSPFD/INC            * Hospital file
+          INC       PMSVX1FD/INC            * Master Extension file
+          INC       PATITMFD/INC            * Patient Item Details
+          INC       PATMCHFD/INC            * Misc Charges file
+          INC       UPLVALDW/INC
+.
+.         Temporary file for MBS Item Explosion Charges records which
+.         are loaded from the upload file provided by the customer (PROC0000)
+.
+.         MBS Explosion Charges file
+.
+TEMP1     FILE       HL7, FIXED=1000        * Upload file for explosion charges
+.
+.Name     Type     Size     Start
+.----     ----     ----     -----
+XCLAIMTY  DIM         3     Claim Type (Cat CL)
+XADMISTY  DIM         3     Admission Type (Cat A)
+XHLTFUND  DIM         6     Health Fund
+XFUNDGRP  DIM         6     Health Fund Group
+XMBSITEM  DIM         9     MBS Item       
+XMISITEM  DIM         9     Miscellaneous Item
+XQUNTITY  DIM         3     Quantity              
+XOPERPSN  DIM         3     Operating Personnel (Cat OP)
+XMISCFE1  FORM        3.2   1st Misc Fee %                 
+XMISCFE2  FORM        3.2   2nd Misc Fee %
+XMISCFE3  FORM        3.2   3rd Misc Fee %
+.
+.End of Record
+.
+. ----- Program Variables -----
+.
+ADDCOUNT  FORM      8
+BLANKFLG  FORM      1
+CMDLINE   DIM       127
+CURRDATE  DIM       8
+DIM4      DIM       4
+DIM30     DIM       30
+DIM100    DIM       100
+ERRCOUNT  FORM      8
+ERRORMSG  DIM       81
+ERRORFLG  FORM      1
+ERRADMIS  FORM      1
+RMVCOUNT  FORM      8
+FNAMEI    DIM       150
+HEADERR   FORM      1
+INVALDFL  FORM      1
+KYCLAIM   DIM       3
+KYADMISS  DIM       3
+KYHFGRP   DIM       6
+KYHFUND   DIM       6
+KRMVFIL   DIM       1
+KYHOSP    DIM       3
+CLDESC    DIM       20 
+ATDESC    DIM       20 
+HEADLINE  FORM      1
+HGDESC    DIM       50 
+HFDESC    DIM       40 
+HOSPDESC  DIM       50
+LINECNTR  FORM      8
+MISCFEE   FORM      1
+USERID    DIM       10
+UPDCOUNT  FORM      8
+IGNCOUNT  FORM      8
+VALDPASS  FORM      1
+MISCFEE1  FORM      3.2
+MISCFEE2  FORM      3.2
+MISCFEE3  FORM      3.2
+.
+XFLD0001  DIM       30
+XFLD0002  DIM       30
+XFLD0003  DIM       30
+XFLD0004  DIM       30
+XFLD0005  DIM       30
+XFLD0006  DIM       30
+XFLD0007  DIM       30
+XFLD0008  DIM       30
+XFLD0009  DIM       30
+XFLD0010  DIM       30
+XFLD0011  DIM       30
+ERRFLD1   DIM       3
+ERRFLD2   DIM       3
+ERRFLD3   DIM       6
+ERRFLD4   DIM       6
+ERRFLD5   DIM       9
+ERRFLD6   DIM       9
+.
+PRGID     INIT      "IBAADT66"
+PRGNAM    INIT      "Upload MBS Item Explosion Charges"
+VERSION   INIT      "V12.00.00"
++
+.******************************************************************************
+.*                                  ML0000                                    *
+.*                                Main Module                                 *
+.******************************************************************************
+ML0000    CALL      INIT0000                * Initailize variables & open files
+.
+          CALL      IBACLOCK 
+          PACK      CURRDATE,CCC,CYY,CMM,CDD
+          REP       " 0",CURRDATE
+.
+          CALL      KOPT0000                * Keyin Upload or Remove option
+          BRANCH    EXIT,ML9999
+.
+          BRANCH    COPTION,ML1000,ML2000   * 1 Upload 2 Remove
+          GOTO      ML9999
+.
+.         Upload MBS Explosion Charges
+.
+ML1000    CALL      KASC0000                * Keyin ascii file
+          BRANCH    EXIT,ML9900
+.
+          CALL      OPTN0000                * Choose HF options
+          BRANCH    EXIT,ML9999
+.
+ML1100    CALL      SCRD0000                * Display screen
+.
+          CALL      KFLD0000                * Keyin fields
+          BRANCH    EXIT,ML0000
+.
+          CALL      SFLD0000                * Post / Cancel
+          BRANCH    EXIT,ML1100
+.
+          CALL      PRHD0000                * Print header
+          CALL      CTOT0000                * Clear total vars
+.
+          MATCH     ANSY,KRMVFIL
+          IF        @EQUAL
+            CALL      RMVFIL00              * Remove All Existing Files
+          ENDIF
+.
+          MOVE      ONE,VALDPASS            * Validation Pass Set to Yes
+          CALL      POST0000         
+.
+          IF        ERRCOUNT=0
+            MOVE      ZERO,VALDPASS         * If no errors proceed
+            CALL      POST0000              * with Updating file
+          ENDIF
+.
+          CALL      PTOT0000                * Print report totals
+          GOTO      ML9999
+.
+.         Remove MBS Explosion Charges
+.
+ML2000    CALL      OPTN0000                * Choose HF options
+          BRANCH    EXIT,ML9999
+.
+          CALL      SCRD0000                * Display screen
+.
+          CALL      KFLD0000                * Keyin fields
+          BRANCH    EXIT,ML0000
+.
+          CALL      SFLD0000                * Post / Cancel
+          BRANCH    EXIT,ML1100
+.
+          CALL      PRHD0000                * Print header
+          CALL      CTOT0000                * Clear total vars
+          CALL      RMVFIL00                * Remove MBS Explosion Charges
+          CALL      PTOT0000                * Print report totals
+          GOTO      ML9999
+.
+ML9900    CALL      HEAD132
+          PRINT     *N,"Failed to open upload file. "
+.
+ML9999    CHAIN     PGM
++
+.******************************************************************************
+.*                                 INIT0000                                   *
+.*                     Initialize Variables & Open Files                      *
+.******************************************************************************
+INIT0000  CALL      DISPHEAD                * Display screen heading
+          CALL      IBACLOCK
+.
+          OPEN      PATCODE1,"patcodes"
+          OPEN      PATFN1A1,"patfn1af"
+          OPEN      PATHGRP1,"pathgrpf"
+          OPEN      PATITEM1,"patitemn"
+          OPEN      PATECHA1,"patechaf"
+          OPEN      PATMCHG1,"patmchgf"
+          OPEN      PATHSPA1,"pathspaf"
+.
+          OPEN      CONTROLF,"controlf"
+          READ      CONTROLF,TWENTY;*193,PTCNDCLM
+          READ      CONTROLF,ZERO;*43,IBCNMHOS
+.
+INIT9999  RETURN
++
+.******************************************************************************
+.*                                 KOPT0000                                   *
+.*                       Choose Upload or Remove files                        *
+.******************************************************************************
+KOPT0000  MOVE      ZERO,EXIT
+          MOVE      ZERO,COPTION
+          DISPLAY   *P1:6,*EF:
+                    *P1:6,*V2LON,"0",*HOFF," = Exit":
+                    *P1:7,*V2LON,"1",*HOFF," = Upload MBS Item Explosion Charges":
+                    *P1:8,*V2LON,"2",*HOFF," = Remove MBS Item Explosion Charges";
+          DISPLAY   *P1:9,"Select Option : ";
+.
+KOPT1000  KEYIN     *P17:9,*V2LON,COPTION;
+          BRANCH    COPTION,KOPT9999,KOPT9999
+.
+          COMPARE   ZERO,COPTION
+          GOTO      KOPT9000 IF EQUAL
+          BEEP
+          GOTO      KOPT1000
+.
+KOPT9000  MOVE      ONE,EXIT
+KOPT9999  RETURN
++
+.******************************************************************************
+.*                                 KASC0000                                   *
+.*                            Keyin ASCI file                                 *
+.******************************************************************************
+KASC0000  MOVE      ZERO,EXIT
+          PACK      FNAMEI WITH SP70,SP70,SP70
+.
+          DISPLAY   *P19:13,*EF,"MBS Explosion Charges Load File";
+.
+          KEYIN     *P1:14,*EL,"Keyin Path & File Name : ",*V2LON,FNAMEI
+.
+          PACK      FNAMEI,FNAMEI,SP70,SP70,SP70
+.
+          MATCH     SP70,FNAMEI
+          GOTO      KASC9000 IF EQUAL
+.
+          SCAN      ".txt",FNAMEI
+          IF        !@EQUAL
+            SQUEEZE   FNAMEI
+            ENDSET    FNAMEI
+            APPEND    ".txt",FNAMEI      * add ".txt" if there is a path
+            APPEND    SP70,FNAMEI
+            RESET     FNAMEI
+          ENDIF
+          RESET     FNAMEI
+.
+          DISPLAY   *P26:14,*V2LON,*EL,FNAMEI;
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      TEMP1,FNAMEI
+          TRAPCLR   IO
+          BRANCH    OVRCD,KASC8000
+.
+          CALL      EXCUS000
+          MOVE      ZERO,EXIT
+          GOTO      KASC9999
+.
+KASC8000  DISPLAY   *P1:24,*EL,*B,"File not found.  ";
+          CALL      HITENTER
+          GOTO      KASC0000
+.
+KASC9000  MOVE      ONE,EXIT
+.
+KASC9999  RETURN
++
+.******************************************************************************
+.*                                 OPTN0000                                   *
+.*                        Choose HF group or HF code                          *
+.******************************************************************************
+OPTN0000  MOVE      ZERO,EXIT
+          MOVE      ZERO,OPTION
+          DISPLAY   *P1:6,*EF:
+                    *P1:6,*V2LON,"0",*HOFF," = Exit":
+                    *P1:7,*V2LON,"1",*HOFF," = By Health Fund Group":
+                    *P1:8,*V2LON,"2",*HOFF," = By Health Fund Code":
+                    *P1:9,*V2LON,"3",*HOFF," = Blank HF & HF Group";
+          DISPLAY   *P1:10,"Select Option : ";
+.
+OPTN1000  KEYIN     *P17:10,*V2LON,OPTION;
+          BRANCH    OPTION,OPTN9999,OPTN9999,OPTN9999
+.
+          COMPARE   ZERO,OPTION
+          GOTO      OPTN9000 IF EQUAL
+          GOTO      OPTN1000
+.
+OPTN9000  MOVE      ONE,EXIT
+OPTN9999  RETURN
++
+.******************************************************************************
+.*                                 KFLD0000                                   *
+.*                               Keyin Fields                                 *
+.******************************************************************************
+KFLD0000  CALL      IVAR0000                * Initialise variables
+.
+          CALL      KCLM0000                * Keyin Claim Type
+          BRANCH    EXIT,KFLD9999
+.
+          CALL      KADM0000                * Keyin Admission Type
+          BRANCH    EXIT,KFLD9999
+.
+          IF        OPTION<>3
+            CALL      KFND0000                * Keyin HF code/ HF Group
+            BRANCH    EXIT,KFLD9999
+          ENDIF
+.
+          IF        COPTION=1
+            CALL      KRMV0000                * Keyin Remove Existing Files
+            BRANCH    EXIT,KFLD9999
+            CALL      KHOS0000                * Keyin Hospital ID
+            BRANCH    EXIT,KFLD9999
+          ENDIF
+.
+          CALL      KUSR0000                * Keyin user id
+          BRANCH    EXIT,KFLD9999
+.
+KFLD9999  RETURN
++
+.******************************************************************************
+.*                                 IVAR0000                                   *
+.*                            Initialise variable                             *
+.******************************************************************************
+IVAR0000  MOVE      SP70,KYCLAIM
+          MOVE      SP70,KYADMISS
+          MOVE      SP70,KYHFGRP
+          MOVE      SP70,KYHFUND
+          MOVE      SP70,KRMVFIL
+          MOVE      SP70,KYHOSP 
+          MOVE      SP70,CLDESC
+          MOVE      SP70,ATDESC
+          MOVE      SP70,HGDESC
+          MOVE      SP70,HFDESC
+          MOVE      SP70,HOSPDESC
+IVAR9999  RETURN
++
+.******************************************************************************
+.*                                 SCRD0000                                   *
+.*                            Screen display                                  *
+.******************************************************************************
+SCRD0000  COMPARE   ONE,COPTION
+          GOTO      SCRD1000 IF NOT EQUAL      * Remove option 
+.
+          IF        OPTION=1
+            DISPLAY   *P1:11,*EF:
+                      *P1:11," 1. Claim Type                      :":
+                      *P1:12," 2. Admission Type                  :":
+                      *P1:13," 3. Health Fund Group               :":
+                      *P1:14," 4. Remove All Existing Files (Y/N) :":
+                      *P1:15," 5. Hospital ID                     :":
+                      *P1:16," 6. Keyin User ID                   :";
+          ENDIF
+.
+          IF        OPTION=2
+            DISPLAY   *P1:11,*EF:
+                      *P1:11," 1. Claim Type                      :":
+                      *P1:12," 2. Admission Type                  :":
+                      *P1:13," 3. Health Fund                     :":
+                      *P1:14," 4. Remove All Existing Files (Y/N) :":
+                      *P1:15," 5. Hospital ID                     :":
+                      *P1:16," 6. Keyin User ID                   :";
+          ENDIF
+.
+          IF        OPTION=3
+            DISPLAY   *P1:11,*EF:
+                      *P1:11," 1. Claim Type                      :":
+                      *P1:12," 2. Admission Type                  :":
+                      *P1:14," 3. Remove All Existing Files (Y/N) :":
+                      *P1:15," 4. Hospital ID                     :":
+                      *P1:16," 5. Keyin User ID                   :";
+          ENDIF
+. 
+          GOTO      SCRD9999
+.
+SCRD1000  IF        OPTION=1
+            DISPLAY   *P1:11,*EF:
+                      *P1:11," 1. Claim Type                      :":
+                      *P1:12," 2. Admission Type                  :":
+                      *P1:13," 3. Health Fund Group               :":
+                      *P1:16," 4. Keyin User ID                   :";
+          ENDIF
+.
+          IF        OPTION=2
+            DISPLAY   *P1:11,*EF:
+                      *P1:11," 1. Claim Type                      :":
+                      *P1:12," 2. Admission Type                  :":
+                      *P1:13," 3. Health Fund                     :":
+                      *P1:16," 4. Keyin User ID                   :";
+          ENDIF
+.
+          IF        OPTION=3
+            DISPLAY   *P1:11,*EF:
+                      *P1:11," 1. Claim Type                      :":
+                      *P1:12," 2. Admission Type                  :":
+                      *P1:16," 3. Keyin User ID                   :";
+          ENDIF
+.
+SCRD9999  RETURN
++
+.******************************************************************************
+.*                                 KCLM0000                                   *
+.*                            Keyin Claim code                                *
+.******************************************************************************
+KCLM0000  MOVE      SP10,KYCLAIM
+          MOVE      ZERO,EXIT
+          KEYIN     *P39:11,*EL,*V2LON,KYCLAIM;
+          ENDSET    KYCLAIM
+          APPEND    SP3,KYCLAIM
+          RESET     KYCLAIM
+.
+          MATCH     SP3,KYCLAIM
+          GOTO      KCLM9000 IF EQUAL
+.
+          MOVE      "CL",TCODE
+          PACK      KEY5,TCODE,KYCLAIM,SP70
+          CALL      RDCODE1
+          BRANCH    OVRCD,KCLM2000
+.
+          DISPLAY   *P39:11,*V2LON,KYCLAIM,*P43:11,TDESC;
+          PACK      CLDESC,TDESC,SP70
+          MOVE      ZERO,EXIT
+          GOTO      KCLM9999
+.
+KCLM2000  DISPLAY   *P1:24,*EL,*B,*V2LON,"Invalid Claim code.  ";
+          CALL      HITENTER
+          GOTO      KCLM0000
+.
+KCLM9000  MOVE      ONE,EXIT
+KCLM9999  RETURN
++
+.******************************************************************************
+.*                                 KADM0000                                   *
+.*                            Keyin Admission Type                            *
+.******************************************************************************
+KADM0000  DISPLAY   *P1:24,*EL,"Type All - for All Admission Types";
+          MOVE      SP10,KYADMISS
+          MOVE      ZERO,EXIT
+          KEYIN     *P39:12,*EL,*V2LON,KYADMISS;
+          ENDSET    KYADMISS
+          APPEND    SP3,KYADMISS
+          RESET     KYADMISS
+.
+          MATCH     SP3,KYADMISS
+          GOTO      KADM2000 IF EQUAL
+          MATCH     "All",KYADMISS
+          IF        @EQUAL
+            DISPLAY   *P1:24,*EL,SP70;
+            GOTO      KADM9999
+          ENDIF
+.
+          MOVE      "A ",TCODE
+          PACK      KEY5,TCODE,KYADMISS,SP70
+          CALL      RDCODE1
+          BRANCH    OVRCD,KADM2000
+.
+          DISPLAY   *P39:12,*V2LON,KYADMISS,*P43:12,TDESC;
+          PACK      ATDESC,TDESC,SP70
+          DISPLAY   *P1:24,*EL,SP70;
+          MOVE      ZERO,EXIT
+          GOTO      KADM9999
+.
+KADM2000  DISPLAY   *P1:24,*EL,*B,*V2LON,"Invalid Admission Type.  ";
+          CALL      HITENTER
+          GOTO      KADM0000
+.
+KADM9000  MOVE      ONE,EXIT
+KADM9999  RETURN
++
+.******************************************************************************
+.*                                 KFGR0000                                   *
+.*                            Keyin Health fund group                         *
+.******************************************************************************
+KFGR0000  DISPLAY   *P1:24,*EL,"Type All - for All Health Fund Groups";
+          MOVE      SP10,KYHFGRP
+          MOVE      ZERO,EXIT
+          KEYIN     *P39:13,*EL,*V2LON,KYHFGRP;
+          ENDSET    KYHFGRP
+          APPEND    SP3,KYHFGRP
+          RESET     KYHFGRP
+.
+          MATCH     SP6,KYHFGRP
+          GOTO      KFGR0000 IF EQUAL
+          MATCH     "All",KYHFGRP
+          IF        @EQUAL
+            DISPLAY   *P1:24,*EL,SP70;
+            GOTO      KFGR9999
+          ENDIF
+.
+          PACK      KEY6,KYHFGRP
+          CALL      RDPAHGP1
+          BRANCH    OVRCD,KFGR2000
+.
+          DISPLAY   *P39:13,*V2LON,KYHFGRP,*P46:13,PTHGDESC;
+          PACK      HGDESC,PTHGDESC,SP70
+          DISPLAY   *P1:24,*EL,SP70;
+          GOTO      KFGR8000
+.
+KFGR2000  DISPLAY   *P1:24,*EL,*B,*V2LON,"Invalid Health Fund Group.  ";
+          CALL      HITENTER
+          GOTO      KFGR0000
+.
+KFGR8000  MOVE      ZERO,EXIT
+          GOTO      KFGR9999
+.
+KFGR9000  MOVE      ONE,EXIT
+KFGR9999  RETURN
++
+.******************************************************************************
+.*                                 KHFN0000                                   *
+.*                            Keyin Health fund code                          *
+.******************************************************************************
+KHFN0000  DISPLAY   *P1:24,*EL,"Type All - for All Health Fund Codes";
+          MOVE      SP10,KYHFUND
+          MOVE      ZERO,EXIT
+.
+          KEYIN     *P39:13,*EL,*EL,*V2LON,KYHFUND;
+          ENDSET    KYHFUND
+          APPEND    SP6,KYHFUND
+          RESET     KYHFUND
+.
+          MATCH     SP6,KYHFUND
+          GOTO      KHFN0000 IF EQUAL
+          MATCH     "All",KYHFUND
+          IF        @EQUAL
+            DISPLAY   *P1:24,*EL,SP70;
+            GOTO      KHFN9999
+          ENDIF
+.
+          PACK      KEY14,KYHFUND,ZERO8
+          CALL      RDFUND1
+          BRANCH    OVRCD,KHFN2000
+.
+          DISPLAY   *P39:13,*V2LON,KYHFUND,*P46:13,HFNAME;
+          PACK      HFDESC,HFNAME,SP70
+          DISPLAY   *P1:24,*EL,SP70;
+          GOTO      KHFN8000
+.
+KHFN2000  DISPLAY   *P1:24,*EL,*B,*V2LON,"Invalid Health Fund code.  ";
+          CALL      HITENTER
+          GOTO      KHFN0000        
+.
+KHFN8000  MOVE      ZERO,EXIT  
+          GOTO      KHFN9999
+.
+KHFN9000  MOVE      ONE,EXIT
+KHFN9999  RETURN
++
+.******************************************************************************
+.*                                 KRMV0000                                   *
+.*                      Keyin Remove All Existing Files                       *
+.******************************************************************************
+KRMV0000  MOVE      SP70,KRMVFIL
+          MOVE      ZERO,EXIT
+.
+          KEYIN     *P39:14,*EL,*EL,*V2LON,KRMVFIL;
+          PACK      KRMVFIL,KRMVFIL,SP70
+.
+          MATCH     SP70,KRMVFIL
+          IF        @EQUAL
+            MOVE      "N",KRMVFIL
+            DISPLAY   *P39:14,*V2LON,KRMVFIL;
+          ENDIF
+.
+          MATCH     "Y",KRMVFIL
+          GOTO      KRMV9999 IF EQUAL
+.
+          MATCH     "N",KRMVFIL
+          GOTO      KRMV9999 IF EQUAL
+.
+          GOTO      KRMV2000
+.
+KRMV2000  DISPLAY   *P1:24,*EL,*B,*V2LON,"Invalid Selection.  ";
+          CALL      HITENTER
+          GOTO      KRMV0000
+.
+KRMV9500  MOVE      ONE,EXIT
+.
+KRMV9999  RETURN
++
+.******************************************************************************
+.*                                 KHOS0000                                   *
+.*                            Keyin Hospital ID                               *
+.******************************************************************************
+KHOS0000  MOVE      SP70,KYHOSP 
+          MOVE      ZERO,EXIT
+.
+          COMPARE   IBCNMHOS,ONE
+          GOTO      KHOS3000 IF NOT EQUAL
+.
+          KEYIN     *P39:15,*EL,*EL,*V2LON,KYHOSP;
+          PACK      KYHOSP,KYHOSP,SP70
+.
+          MATCH     SP70,KYHOSP 
+          GOTO      KHOS2000 IF EQUAL
+.
+          PACK      KEY3,KYHOSP,SP70
+          CALL      RDPTHSP1
+          BRANCH    OVRCD,KHOS2000
+.
+          DISPLAY   *P39:15,*V2LON,KYHOSP,*P43:15,PTHSNAME;
+          PACK      HOSPDESC,PTHSNAME,SP70
+          DISPLAY   *P1:24,*EL,SP70;
+          GOTO      KHOS9000
+.
+KHOS2000  DISPLAY   *P1:24,*EL,*B,*V2LON,"Invalid Selection.  ";
+          CALL      HITENTER
+          GOTO      KHOS0000
+.
+KHOS3000  DISPLAY   *P39:15,*V2LON,"not required - single hospital";
+          MOVE      "not required - single hospital",HOSPDESC
+          DISPLAY   *P1:24,*EL,SP70;
+          GOTO      KHOS9000
+.
+KHOS9000  MOVE      ZERO,EXIT
+          GOTO      KHOS9999
+.
+KHOS9500  MOVE      ONE,EXIT
+.
+KHOS9999  RETURN
++
+.******************************************************************************
+.*                                  KUSR0000                                  *
+.*                               Keyin user id                                *
+.******************************************************************************
+KUSR0000  KEYIN     *P39:16,*EL,*V2LON,USERID;
+          PACK      USERID,USERID,SP70
+          MATCH     SP70,USERID
+          GOTO      KUSR9500 IF EQUAL
+.
+          MOVE      ZERO,EXIT
+          GOTO      KUSR9999
+.
+KUSR9500  MOVE      ONE,EXIT
+KUSR9999  RETURN
++
+.******************************************************************************
+.*                                  SFLD0000                                  *
+.*                                Select Field                                *
+.******************************************************************************
+SFLD0000  CALL      MAINQST                 * Select Item, (P)ost, (C)ancel ?
+.
+          COMPARE   ZERO,CCITEM
+          GOTO      SFLD9999 IF EQUAL
+          GOTO      SFLD1000 IF LESS
+.
+          MOVE      ZERO,EXIT
+          IF        COPTION=1
+            IF        OPTION=1
+              PERFORM   CCITEM,KCLM0000:           * Keyin Claim Code
+                             KADM0000:             * Keyin Admission Type 
+                             KFGR0000:             * Keyin Health Fund Group
+                             KRMV0000:             * Keyin Remove Files
+                             KHOS0000:             * Keyin Hospital ID
+                             KUSR0000              * Keyin User ID
+            ENDIF 
+            IF        OPTION=2
+              PERFORM   CCITEM,KCLM0000:           * Keyin Claim Code
+                             KADM0000:             * Keyin Admission Type
+                             KHFN0000:             * Keyin Health Fund
+                             KRMV0000:             * Keyin Remove Files
+                             KHOS0000:             * Keyin Hospital ID
+                             KUSR0000              * Keyin User ID
+            ENDIF
+            IF        OPTION=3
+              PERFORM   CCITEM,KCLM0000:           * Keyin Claim Code
+                             KADM0000:             * Keyin Admission Type
+                             KRMV0000:             * Keyin Remove Files
+                             KHOS0000:             * Keyin Hospital ID
+                             KUSR0000              * Keyin User ID
+            ENDIF
+          ENDIF
+.
+          IF        COPTION=2
+            IF        OPTION=1
+              PERFORM   CCITEM,KCLM0000:           * Keyin Claim Code
+                             KADM0000:             * Keyin Admission Type
+                             KFGR0000:             * Keyin Health Fund Group
+                             KUSR0000              * Keyin User ID
+            ENDIF
+            IF        OPTION=2
+              PERFORM   CCITEM,KCLM0000:           * Keyin Claim Code
+                             KADM0000:             * Keyin Admission Type
+                             KHFN0000:             * Keyin Health Fund
+                             KUSR0000              * Keyin User ID
+            ENDIF
+            IF        OPTION=3
+              PERFORM   CCITEM,KCLM0000:           * Keyin Claim Code
+                             KADM0000:             * Keyin Admission Type
+                             KUSR0000              * Keyin User ID
+            ENDIF
+          ENDIF
+          BRANCH    EXIT,SFLD9999
+          GOTO      SFLD0000
+.
+SFLD1000  MOVE      ONE,EXIT
+SFLD9999  RETURN
++
+.******************************************************************************
+.                 Keyin health fund group or health fund code                 *
+.******************************************************************************
+KFND0000  IF        OPTION=1
+            CALL      KFGR0000                * Keyin health fund group code
+          ELSE
+            CALL      KHFN0000                * Keyin health fund code
+          ENDIF
+.
+KFND9999  RETURN
++
+.******************************************************************************
+.*                          Remove All Existing Files                         *
+.******************************************************************************
+RMVFIL00  PACK      KEY30,KYCLAIM,SP70      
+RMVFIL05  CALL      RSPTECH1                 * position before key
+RMVFIL10  CALL      RKPTECH1                 * read next record
+          BRANCH    OVRCD,RMVFIL99
+.
+          MATCH     PTECCTYP,KYCLAIM         * claim code match?
+          GOTO      RMVFIL99 IF NOT EQUAL    
+.
+          MATCH     "All",KYADMISS
+          IF        !@EQUAL
+            MATCH     PTECATYP,KYADMISS      * admission type match?
+            GOTO      RMVFIL10 IF NOT EQUAL
+          ENDIF
+.
+          COMPARE   ONE,OPTION
+          IF        @EQUAL
+            MATCH     "All",KYHFGRP
+            IF        !@EQUAL
+              MATCH     PTECHGRP,KYHFGRP       * HF Group match?       
+              GOTO      RMVFIL10 IF NOT EQUAL
+            ENDIF
+          ENDIF
+.
+          COMPARE   TWO,OPTION
+          IF        @EQUAL
+            MATCH     "All",KYHFUND
+            IF        !@EQUAL
+              MATCH     PTECHFND,KYHFUND       * HF match?
+              GOTO      RMVFIL10 IF NOT EQUAL
+            ENDIF
+          ENDIF
+. 
+          COMPARE   ZERO,OPTION
+          IF        @EQUAL
+            MATCH     SP70,KYHFUND             * HF match?
+            GOTO      RMVFIL10 IF NOT EQUAL
+            MATCH     SP70,KYHFGRP             * HF Group match?
+            GOTO      RMVFIL10 IF NOT EQUAL
+          ENDIF  
+.
+          PACK      KEY30,PTECCTYP,PTECATYP,PTECHFND,PTECHGRP,PTECMBSC:
+                    DPTECUNI,SP70
+          CALL      DEPTECH1                 * delete record
+          ADD       ONE,RMVCOUNT             * increase deleted record counter
+          GOTO      RMVFIL05                 * next
+.
+RMVFIL99  RETURN
++
+.******************************************************************************
+.*                                  POST0000                                  *
+.*                                Post record                                 *
+.******************************************************************************
+POST0000  MOVE      ZERO,LINECNTR
+.          MOVE      ZERO,HEADLINE
+.
+          OPEN      TEMP1,FNAMEI
+POST1000  READ      TEMP1,SEQ;XFLD0001,XFLD0002,XFLD0003,XFLD0004,XFLD0005:
+                              XFLD0006,XFLD0007,XFLD0008,XFLD0009,XFLD0010:
+                              XFLD0011
+          GOTO      POST9000 IF OVER
+.
+          CALL      PFLD0000                * pack fields with spaces
+.
+          CALL      CHKBLK00                * check header/detail/blank record
+          BRANCH    BLANKFLG,POST9000       * exit if blank record
+.
+          ADD       ONE,LINECNTR            * Text file line counter for error
+.
+.          IF        BLANKFLG=2 & HEADLINE=1 
+.            ADD       ONE,IGNCOUNT
+.            GOTO      POST1000            * detail record & header skipped
+.          ENDIF
+.
+          IF        VALDPASS=1
+            CALL      VFLD0000                * Validation pass so
+            IF        ERRORFLG=1
+.              IF        HEADERR=1 & BLANKFLG=0
+.                MOVE      ONE,HEADLINE          * header record was skipped
+.              ENDIF
+              IF        BLANKFLG=0
+                CALL      MOVFLD00                * Move temp fields to vars
+              ENDIF
+              ADD       ONE,IGNCOUNT
+            ENDIF
+            GOTO      POST1000
+          ENDIF
+.
+          CALL      MOVFLD00                * Move temp fields to vars 
+          PACK      KEY30,XCLAIMTY,XADMISTY,XHLTFUND,XFUNDGRP,XMBSITEM,z70
+          CALL      RSPTECH1                * position after key
+POST1500  CALL      RPPTECH1                * read previous key
+          BRANCH    OVRCD,POST2000          * write new record if no match
+.
+          PACK      DIM30,PTECCTYP,PTECATYP,PTECHFND,PTECHGRP,PTECMBSC,z70 
+          MATCH     KEY30,DIM30
+          GOTO      POST2000 IF NOT EQUAL   * write new record if no match
+.
+          MATCH     PTECEMCH,XMISITEM       * does Misc Charge Code match
+          GOTO      POST1500 IF NOT EQUAL
+.
+          PACK      PTECOPPC,XOPERPSN,SP70  * operating personnel
+          PACK      PTECHFND,XHLTFUND,SP70  * health fund
+          PACK      PTECHGRP,XFUNDGRP,SP70  * health fund group
+          RJUSTIFY  XQUNTITY
+          PACK      PTECQNTY,XQUNTITY,SP70  * quantity
+          MOVE      XMISCFE1,PTEC1MCF       * 1st misc fee
+          MOVE      XMISCFE2,PTEC2MCF       * 2nd misc fee
+          MOVE      XMISCFE3,PTEC3MCF       * 3rd misc fee
+. 
+          CALL      UPPTECH1                * update MBS Explosion record
+          ADD       ONE,UPDCOUNT
+          GOTO      POST1000
+.          
+POST2000  PACK      KEY30,XCLAIMTY,XADMISTY,XHLTFUND,XFUNDGRP,XMBSITEM,z70
+          CALL      RSPTECH1                * position after key
+          CALL      RPPTECH1                * read previous key
+          BRANCH    OVRCD,POST4000
+          PACK      DIM30,PTECCTYP,PTECATYP,PTECHFND,PTECHGRP,PTECMBSC,z70
+          MATCH     KEY30,DIM30
+          GOTO      POST4000 IF NOT EQUAL
+          ADD       ONE,PTECUNIQ
+          MOVE      PTECUNIQ,DIM3
+          GOTO      POST5000
+.
+POST4000  MOVE      ONE,PTECUNIQ
+          MOVE      PTECUNIQ,DIM3
+.
+POST5000  CALL      CLPATECH                * clear patechaf fields
+          PACK      PTECCTYP,XCLAIMTY,SP70
+          PACK      PTECATYP,XADMISTY,SP70
+          PACK      PTECMBSC,XMBSITEM,SP70
+          RJUSTIFY  DIM3
+          MOVE      DIM3,PTECUNIQ
+          PACK      PTECEMCH,XMISITEM,SP70
+          PACK      PTECOPPC,XOPERPSN,SP70
+          MOVE      XMISCFE1,PTEC1MCF
+          MOVE      XMISCFE2,PTEC2MCF
+          MOVE      XMISCFE3,PTEC3MCF 
+          PACK      PTECHFND,XHLTFUND,SP70
+          PACK      PTECHGRP,XFUNDGRP,SP70
+          RJUSTIFY  XQUNTITY
+          PACK      PTECQNTY,XQUNTITY,SP70
+.
+          PACK      KEY30,PTECCTYP,PTECATYP,PTECHFND,PTECHGRP,PTECMBSC:
+                    DPTECUNI,SP70
+          CALL      RAPTECH1
+          IF        OVRCD=1
+            CALL      WRPTECH1                * write new MBS Explosion record
+            ADD       ONE,ADDCOUNT
+          ELSE
+            CALL      UPPTECH1
+            ADD       ONE,UPDCOUNT
+          ENDIF
+          GOTO      POST1000                * read next line
+.
+POST9000  CLOSE     TEMP1      
+.
+POST9999  RETURN
++
+.******************************************************************************
+.*                                  PRHD0000                                  *
+.*                        Print the selection details                         *
+.******************************************************************************
+PRHD0000  CALL      HEAD132
+.
+          IF        COPTION=1
+            PRINT     *N,"Upload MBS Item Explosion Charges"
+          ELSE
+            PRINT     *N,"Remove MBS Item Explosion Charges"
+          ENDIF
+.
+          PRINT     *N,"Date     : ",CDATE:
+                    *N,"Time     : ",CTIMEIS:
+                    *N,"User ID  : ",USERID
+.
+          BRANCH    COPTION,PRHD1000,PRHD2000
+          GOTO      PRHD9999
+.
+PRHD1000  PRINT     *N,"Claim Code              : ",KYCLAIM,SP1,CLDESC:
+                    *N,"Admission Type          : ",KYADMISS,SP1,ATDESC
+.
+          IF        OPTION=1
+            PRINT     *1,"By Health Fund Group    : ",KYHFGRP,SP1,HGDESC 
+          ENDIF
+          IF        OPTION=2
+            PRINT     *1,"By Health Fund          : ",KYHFUND,SP1,HFDESC
+          ENDIF
+          IF        OPTION=3
+            PRINT     *1,"Blank HF & HF Group"
+          ENDIF
+.
+          PACK      KEY3,SP70
+          MATCH     "N",KRMVFIL
+          IF         @EQUAL
+            MOVE       "No",KEY3
+          ELSE
+            MOVE       "Yes",KEY3
+          ENDIF
+          PRINT     *1,"Remove Existing Records : ",KEY3
+.
+          IF        IBCNMHOS=1
+            PRINT     *1,"Hospital ID             : ",HOSPDESC
+          ENDIF
+         
+.
+          PRINT     *N,"MBS Explosion Charges Load file : ":
+                    *N,"     ",FNAMEI   
+.
+          CALL      UND132
+          GOTO      PRHD9999
+.
+PRHD2000  PRINT     *N,"Claim Code           : ",KYCLAIM:
+                    *N,"Admission Type       : ",KYADMISS
+.
+          IF        OPTION=1
+            PRINT     *1,"By Health Fund Group : ",KYHFGRP
+          ENDIF
+          IF        OPTION=2
+            PRINT     *1,"By Health Fund       : ",KYHFUND
+          ENDIF
+          IF        OPTION=3
+            PRINT     *1,"Blank HF & HF Group"
+          ENDIF
+.
+PRHD9999  RETURN
++
+.--------------------------------------------------------------------------
+. Check if row in import file is blank 
+.--------------------------------------------------------------------------
+CHKBLK00  MOVE      ZERO,BLANKFLG
+.
+          MATCH     SP70,XFLD0001
+          GOTO      CHKBLK90 IF NOT EQUAL
+.
+          MATCH     SP70,XFLD0002
+          GOTO      CHKBLK90 IF NOT EQUAL
+.
+          MATCH     SP70,XFLD0003
+          GOTO      CHKBLK90 IF NOT EQUAL
+.
+          MATCH     SP70,XFLD0004
+          GOTO      CHKBLK90 IF NOT EQUAL
+.
+          MATCH     SP70,XFLD0005
+          GOTO      CHKBLK90 IF NOT EQUAL
+.
+          MATCH     SP70,XFLD0006
+          GOTO      CHKBLK95 IF NOT EQUAL
+.
+          MATCH     SP70,XFLD0007
+          GOTO      CHKBLK90 IF NOT EQUAL
+.
+          MATCH     SP70,XFLD0008
+          GOTO      CHKBLK90 IF NOT EQUAL
+.
+          MATCH     SP70,XFLD0009
+          GOTO      CHKBLK90 IF NOT EQUAL
+.
+          MATCH     SP70,XFLD0010
+          GOTO      CHKBLK90 IF NOT EQUAL
+.
+          MATCH     SP70,XFLD0011
+          IF        @EQUAL
+            MOVE      ONE,BLANKFLG                   * Blank Line
+            GOTO      CHKBLK99
+          ENDIF
+.
+CHKBLK90  MOVE      ZERO,BLANKFLG                    * Header Record
+.          MOVE      ZERO,HEADLINE                    * reset is header skipped
+          GOTO      CHKBLK99
+.
+CHKBLK95  MOVE      TWO,BLANKFLG                     * Detail Record
+          GOTO      CHKBLK99
+.
+CHKBLK99  RETURN
++
+.--------------------------------------------------------------------------
+. Pack fields with spaces
+.--------------------------------------------------------------------------
+PFLD0000  PACK      XFLD0001,XFLD0001,SP70
+          PACK      XFLD0002,XFLD0002,SP70
+          PACK      XFLD0003,XFLD0003,SP70
+          PACK      XFLD0004,XFLD0004,SP70
+          PACK      XFLD0005,XFLD0005,SP70
+          PACK      XFLD0006,XFLD0006,SP70
+          PACK      XFLD0007,XFLD0007,SP70
+          PACK      XFLD0008,XFLD0008,SP70
+          PACK      XFLD0009,XFLD0009,SP70
+          PACK      XFLD0010,XFLD0010,SP70
+          PACK      XFLD0011,XFLD0011,SP70
+.
+PFLD9999  RETURN
++
+.-----------------------------------------------------------------------------
+. Move fields from input loading file to temporary file
+.-----------------------------------------------------------------------------
+MOVFLD00  COMPARE   TWO,BLANKFLG
+          GOTO      MOVFLD60 IF EQUAL 
+.
+          PACK      XCLAIMTY,XFLD0001,SP70
+          PACK      XADMISTY,XFLD0002,SP70
+.
+          IF        OPTION=1
+            PACK      XFUNDGRP,XFLD0004,SP70        * By Health Fund Group
+            PACK      XHLTFUND,SP70                 * blank HF
+          ENDIF
+.
+          IF        OPTION=2
+            PACK      XHLTFUND,XFLD0003,SP70        * By Health Fund
+            PACK      XFUNDGRP,SP70                 * blank HFG
+          ENDIF
+.
+          IF        OPTION=3
+            PACK      XHLTFUND,SP70                 * blank HF
+            PACK      XFUNDGRP,SP70                 * blank HFG
+          ENDIF
+.
+          PACK      XMBSITEM,XFLD0005,SP70
+MOVFLD60  PACK      XMISITEM,XFLD0006,SP70
+          PACK      XQUNTITY,XFLD0007,SP70
+          PACK      XOPERPSN,XFLD0008,SP70
+          SQUEEZE   XFLD0009
+          MOVE      XFLD0009,XMISCFE1
+          SQUEEZE   XFLD0010
+          MOVE      XFLD0010,XMISCFE2
+          SQUEEZE   XFLD0011
+          MOVE      XFLD0011,XMISCFE3
+.          
+MOVFLD99  RETURN
++
+.******************************************************************************
+.         Execute us1 command before processing
+.******************************************************************************
+EXCUS000  CLEAR     CMDLINE
+          APPEND    "ibaadt66.us1 ",CMDLINE
+          APPEND    FNAMEI,CMDLINE
+          APPEND    SP70,CMDLINE
+          RESET     CMDLINE
+          EXECUTE   CMDLINE,TASKID
+EXCUS999  RETURN
++
+.******************************************************************************
+. Validate MBS Explosion Charges input text file fields
+.******************************************************************************
+VFLD0000  MOVE      ZERO,ERRORFLG
+          MOVE      ZERO,HEADERR
+          MOVE      ZERO,MISCFEE
+          MOVE      ZERO,ERRADMIS
+.
+          COMPARE   TWO,BLANKFLG
+          GOTO      VFLD0060 IF EQUAL      * skip some vald if Detail record
+.
+VFLD0010  MATCH     XFLD0001,KYCLAIM              * check matches keyin field
+          IF        !@EQUAL
+            MOVE      "Claim Type Mismatch",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,ERRORFLG
+            MOVE      ONE,HEADERR
+            GOTO      VFLD0020
+          ENDIF
+.         
+VFLD0020  MOVE      XFLD0002,VINFIELD
+          MOVE      3,VINTLEN
+          MOVE      "Admission Type",VFLDNAME
+          CALL      CCHLEN00                    * validate field length
+          IF        VERRFLAG = 0
+          MATCH     XFLD0002,KYADMISS             * check matches keyin field
+          IF        !@EQUAL
+            MATCH     "All",KYADMISS
+            IF        @EQUAL
+              MATCH     SP70,XFLD0002
+              GOTO      VFLD0030 IF EQUAL
+              PACK      KEY5,ANSA,SP1,XFLD0002,SP70
+              CALL      RDCODE1
+              IF        OVRCD=1
+                MOVE      "Invalid Admission Type",ERRORMSG
+                CALL      PERR0000
+                MOVE      ONE,ERRORFLG
+                MOVE      ONE,HEADERR
+                MOVE      ONE,ERRADMIS
+                GOTO      VFLD0030
+              ELSE
+                MATCH     "I",PTCOACTV
+                IF        @EQUAL
+                  MOVE      "Inactive Admission Type",ERRORMSG
+                  CALL      PERR0000
+                  MOVE      ONE,ERRORFLG
+                  MOVE      ONE,HEADERR
+                  MOVE      ONE,ERRADMIS
+                  GOTO      VFLD0030
+                ENDIF
+              ENDIF
+            ELSE
+              MOVE      "Admission Type Mismatch",ERRORMSG
+              CALL      PERR0000
+              MOVE      ONE,ERRORFLG
+              MOVE      ONE,HEADERR
+              MOVE      ONE,ERRADMIS
+              GOTO      VFLD0030
+            ENDIF
+          ENDIF
+          MATCH     "All",XFLD0002
+          IF        @EQUAL
+            MOVE      "Invalid Admission Type",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,ERRORFLG
+            MOVE      ONE,HEADERR
+            MOVE      ONE,ERRADMIS
+            GOTO      VFLD0030
+          ENDIF
+          ENDIF
+.
+VFLD0030  IF        OPTION=2
+            MOVE      SP70,XFLD0004              * Clear Health Fund Group
+            MATCH     XFLD0003,KYHFUND           * By Health Fund
+            IF        !@EQUAL
+              MATCH     "All",KYHFUND
+              IF        @EQUAL
+                MATCH     SP70,XFLD0003
+                GOTO      VFLD0040 IF EQUAL
+                MOVE      XFLD0003,KEY6
+                PACK      KEY14,KEY6,ZERO,ZERO,ZERO,ZERO,SP70
+                CALL      RDFUND1
+                IF        OVRCD=1
+                  MOVE      "Invalid Health Fund",ERRORMSG
+                  CALL      PERR0000
+                  MOVE      ONE,ERRORFLG
+                  MOVE      ONE,HEADERR
+                  GOTO      VFLD0050
+                ELSE
+                  MATCH     "1",DHFTACT
+                  IF        @EQUAL
+                    MOVE      "Inactive Health Fund",ERRORMSG
+                    CALL      PERR0000
+                    MOVE      ONE,ERRORFLG
+                    MOVE      ONE,HEADERR
+                    GOTO      VFLD0050
+                  ENDIF
+                ENDIF
+              ELSE
+                MOVE      "Health Fund Mismatch",ERRORMSG
+                CALL      PERR0000
+                MOVE      ONE,ERRORFLG
+                MOVE      ONE,HEADERR
+		GOTO      VFLD0050
+              ENDIF
+            ENDIF
+            GOTO      VFLD0050  
+          ENDIF
+. 
+VFLD0040  IF        OPTION=1
+            MOVE      SP70,XFLD0003             * Clear Health Fund
+            MATCH     XFLD0004,KYHFGRP          * By Health Fund Group
+            IF        !@EQUAL
+              MATCH     "All",KYHFGRP
+              IF        @EQUAL
+                MATCH     SP70,XFLD0004
+                GOTO      VFLD0045 IF EQUAL
+                PACK      KEY6,XFLD0004,SP70
+                CALL      RDPAHGP1
+                IF        OVRCD=1
+                  MOVE      "Invalid Health Fund Group",ERRORMSG
+                  CALL      PERR0000
+                  MOVE      ONE,ERRORFLG
+                  MOVE      ONE,HEADERR
+                  GOTO      VFLD0050
+                ENDIF
+              ELSE
+                MOVE      "Health Fund Group Mismatch",ERRORMSG
+                CALL      PERR0000
+                MOVE      ONE,ERRORFLG
+                MOVE      ONE,HEADERR
+                GOTO      VFLD0050
+              ENDIF
+            ENDIF
+            GOTO      VFLD0050
+          ENDIF
+.
+VFLD0045  IF          OPTION=3 
+            MATCH       SP70,XFLD0003          * By Blank HF & HFG
+            IF          !@EQUAL
+              MOVE      "By Blank HF & HF Group - invalid HF",ERRORMSG
+              CALL      PERR0000
+              MOVE      ONE,ERRORFLG
+              MOVE      ONE,HEADERR
+              GOTO      VFLD0050
+            ENDIF
+            MATCH       SP70,XFLD0004
+            IF          !@EQUAL
+              MOVE      "By Blank HF & HF Group - invalid HF Group",ERRORMSG
+              CALL      PERR0000
+              MOVE      ONE,ERRORFLG
+              MOVE      ONE,HEADERR
+              GOTO      VFLD0050
+            ENDIF
+          ENDIF
+. 
+VFLD0050  MATCH     SP70,XFLD0005
+          IF        !@EQUAL
+            MOVE      XFLD0005,VINFIELD
+            MOVE      9,VINTLEN
+            MOVE      "MBS Code",VFLDNAME
+            CALL      CCHLEN00                    * validate field length
+            IF        VERRFLAG = 0
+              MOVE      XFLD0005,KEY9
+              PACK      KEY17,KEY9,CURRDATE,SP70
+              CALL      PATITMRD                * Read the item file
+              IF        WKITINAC=1
+                MOVE      "MBS Code is inactive",ERRORMSG
+                CALL      PERR0000
+                MOVE      ONE,ERRORFLG
+                MOVE      ONE,HEADERR
+                GOTO      VFLD0060
+              ENDIF
+              IF        WKITEXDT=1
+                MOVE      "MBS Code not active for the date range selected",ERRORMSG
+                CALL      PERR0000
+                MOVE      ONE,ERRORFLG
+                MOVE      ONE,HEADERR
+                GOTO      VFLD0060
+              ENDIF
+              IF        OVRCD=1
+                MOVE      "MBS Code is invalid",ERRORMSG
+                CALL      PERR0000
+                MOVE      ONE,ERRORFLG
+                MOVE      ONE,HEADERR
+                GOTO      VFLD0060
+              ENDIF
+.
+              COMPARE   ZERO,ERRADMIS
+              GOTO      VFLD0060 IF NOT EQUAL
+.
+              MATCH     SP70,XFLD0002
+              GOTO      VFLD0060 IF EQUAL
+.
+              MATCH     ICLSS,XFLD0002      * Suggested class same as admin type
+              GOTO      VFLD0060 IF EQUAL
+.
+              PACK      KEY5,ANSA,SP1,XFLD0002
+              CALL      RDCODE1
+              BRANCH    OVRCD,VFLD0060
+.
+              MATCH     ANSX,TCINDC7            * Admission type excluded?
+              IF        !@EQUAL
+                MOVE      "Suggested Classification Different To Admission Type",ERRORMSG
+                CALL      PERR0000
+                MOVE      ONE,ERRORFLG
+                MOVE      ONE,HEADERR
+                GOTO      VFLD0060
+              ENDIF
+            ELSE
+              MOVE      ONE,ERRORFLG
+              MOVE      ONE,HEADERR
+              GOTO      VFLD0060
+            ENDIF
+          ELSE
+            MOVE      "MBS Code is blank",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,ERRORFLG
+            MOVE      ONE,HEADERR
+            GOTO      VFLD0060
+          ENDIF
+.
+VFLD0060  MATCH     SP70,XFLD0006
+          IF        !@EQUAL
+            MOVE      XFLD0006,VINFIELD
+            MOVE      9,VINTLEN
+            MOVE      "Misc Item",VFLDNAME
+            CALL      CCHLEN00                    * validate field length
+            IF        VERRFLAG = 0
+              MOVE      ZERO,INVALDFL
+              PACK      KEY9,XFLD0006,SP70
+              IF        IBCNMHOS=1
+                MATCH     SP10,KYHOSP                        
+                IF        @EQUAL
+                  PACK      KEY3,SP10
+                  CALL      RSPTHSP1
+                  CALL      RKPTHSP1
+                  IF        OVRCD=1
+                    MOVE      "Multi Hospital Default Claim Code not setup",ERRORMSG
+                    CALL      PERR0000
+                    MOVE      ONE,ERRORFLG
+                    GOTO      VFLD0070
+                  ENDIF
+                ELSE
+                  PACK      KEY3,KYHOSP             
+                  CALL      RDPTHSP1
+                  IF        OVRCD=1
+                    MOVE      "Multi Hospital Default Claim Code not setup",ERRORMSG
+                    CALL      PERR0000
+                    MOVE      ONE,ERRORFLG
+                    GOTO      VFLD0070
+                  ENDIF
+                ENDIF
+                PACK      KEY29,PTHSDCLM,SP6,SP3,KEY9,CURRDATE,SP10
+              ELSE
+                PACK      KEY29,PTCNDCLM,SP6,SP3,KEY9,CURRDATE,SP10
+              ENDIF
+              CALL      PATMCHRD          * find Miscellaneous Charge Item
+              IF        WKMCINAC=1
+                MOVE      "Misc Item Code is inactive",ERRORMSG
+                CALL      PERR0000
+                MOVE      ONE,ERRORFLG
+                GOTO      VFLD0070
+              ENDIF
+              IF        WKMCXXDT=1
+                MOVE      "Misc Item Code not active for the date range selected",ERRORMSG
+                CALL      PERR0000
+                MOVE      ONE,ERRORFLG
+                GOTO      VFLD0070
+              ENDIF
+              IF        EXIT=1
+                MOVE      "Misc Item Code is invalid",ERRORMSG
+                CALL      PERR0000
+                MOVE      ONE,ERRORFLG
+                GOTO      VFLD0070
+              ENDIF
+            ELSE
+              MOVE      ONE,ERRORFLG
+              GOTO      VFLD0070
+            ENDIF
+          ELSE
+            MOVE      "Misc Item Code is blank",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,ERRORFLG
+            GOTO      VFLD0070 
+          ENDIF
+.
+VFLD0070  MATCH     SP70,XFLD0007
+          IF        !@EQUAL
+            SQUEEZE   XFLD0007
+            TYPE      XFLD0007
+            IF        !@EQUAL | @EOS
+              MOVE      "Quantity is invalid - accepted range is whole numbers between 1-999",ERRORMSG
+              CALL      PERR0000
+              MOVE      ONE,ERRORFLG
+              GOTO      VFLD0080
+            ENDIF
+            MOVE      XFLD0007,VINFIELD
+            MOVE      3,VINTLEN
+            MOVE      "Quantity",VFLDNAME
+            CALL      CCHLEN00                    * validate field length
+            IF        VERRFLAG = 0
+              MATCH     "0",XFLD0007
+              IF        @EQUAL
+                MOVE      "Quantity is invalid - accepted range is whole numbers between 1-999",ERRORMSG
+                CALL      PERR0000
+                MOVE      ONE,ERRORFLG
+                GOTO      VFLD0080
+              ELSE
+                SCAN      ".",XFLD0007
+                IF        @EQUAL
+                  MOVE      "Quantity is invalid - accepted range is whole numbers between 1-999",ERRORMSG
+                  CALL      PERR0000
+                  MOVE      ONE,ERRORFLG
+                  GOTO      VFLD0080
+                ENDIF
+                SCAN      "-",XFLD0007
+                IF        @EQUAL
+                  MOVE      "Quantity is invalid - accepted range is whole numbers between 1-999",ERRORMSG
+                  CALL      PERR0000
+                  MOVE      ONE,ERRORFLG
+                  GOTO      VFLD0080
+                ENDIF
+              ENDIF
+            ELSE
+              MOVE      ONE,ERRORFLG
+              GOTO      VFLD0080
+            ENDIF
+          ELSE
+            MOVE      "Quantity is invalid - accepted range is whole numbers between 1-999",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,ERRORFLG
+            GOTO      VFLD0080
+          ENDIF 
+.
+VFLD0080  MATCH     SP70,XFLD0008
+          IF        !@EQUAL
+            MOVE      XFLD0008,VINFIELD
+            MOVE      3,VINTLEN
+            MOVE      "Operating Personnel",VFLDNAME
+            CALL      CCHLEN00                    * validate field length
+            IF        VERRFLAG = 0
+              PACK      KEY5,ANSO,ANSP,XFLD0008,SP70
+              CALL      RDCODE1
+              IF        OVRCD=1
+                MOVE      "Operating Personnel is invalid",ERRORMSG
+                CALL      PERR0000
+                MOVE      ONE,ERRORFLG
+                GOTO      VFLD0090
+              ELSE
+                MATCH     "I",PTCOACTV
+                IF        @EQUAL
+                  MOVE      "Operating Personnel is inactive",ERRORMSG
+                  CALL      PERR0000
+                  MOVE      ONE,ERRORFLG
+                  GOTO      VFLD0090
+                ENDIF
+              ENDIF
+            ELSE
+              MOVE      ONE,ERRORFLG
+              GOTO      VFLD0090
+            ENDIF
+          ELSE
+            MOVE      "Operating Personnel is blank",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,ERRORFLG
+            GOTO      VFLD0090
+          ENDIF
+.
+VFLD0090  MATCH     SP70,XFLD0009
+          IF        @EQUAL
+            PACK      XFLD0009,ZERO,SP70
+          ENDIF  
+.
+          UNPACK    SP70,KEY3,KEY1
+          UNPACK    XFLD0009,KEY3,KEY1
+          MATCH     SP70,KEY1
+          IF        @EQUAL
+            SQUEEZE   XFLD0009
+            TYPE      XFLD0009
+            IF        !@EQUAL | @EOS
+              MOVE      "Invalid 1st Misc fee %",ERRORMSG
+              CALL      PERR0000
+              MOVE      ONE,ERRORFLG
+              MOVE      ONE,MISCFEE
+              GOTO      VFLD0100
+            ELSE
+              MOVE      XFLD0009,MISCFEE1
+              COMPARE   HUNDRED,MISCFEE1
+              IF        !@EQUAL & !@LESS
+                MOVE      "Invalid 1st Misc fee % - more than 100",ERRORMSG
+                CALL      PERR0000
+                MOVE      ONE,ERRORFLG
+                MOVE      ONE,MISCFEE
+                GOTO      VFLD0100
+              ENDIF
+            ENDIF
+          ELSE
+            MOVE      "Invalid 1st Misc fee % - more than 100",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,ERRORFLG
+            MOVE      ONE,MISCFEE
+            GOTO      VFLD0100
+          ENDIF
+.
+VFLD0100  MATCH     SP70,XFLD0010
+          IF        @EQUAL
+            PACK      XFLD0010,ZERO,SP70
+          ENDIF
+.
+          UNPACK    SP70,KEY3,KEY1
+          UNPACK    XFLD0010,KEY3,KEY1
+          MATCH     SP70,KEY1
+          IF        @EQUAL
+            SQUEEZE   XFLD0010
+            TYPE      XFLD0010
+            IF        !@EQUAL | @EOS
+              MOVE      "Invalid 2nd Misc fee %",ERRORMSG
+              CALL      PERR0000
+              MOVE      ONE,ERRORFLG
+              MOVE      ONE,MISCFEE
+              GOTO      VFLD0110
+            ELSE
+              MOVE      XFLD0010,MISCFEE2
+              COMPARE   HUNDRED,MISCFEE2
+              IF        !@EQUAL & !@LESS
+                MOVE      "Invalid 2nd Misc fee % - more than 100",ERRORMSG
+                CALL      PERR0000
+                MOVE      ONE,ERRORFLG
+                MOVE      ONE,MISCFEE
+                GOTO      VFLD0110
+              ENDIF
+            ENDIF
+          ELSE
+            MOVE      "Invalid 2nd Misc fee % - more than 100",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,ERRORFLG
+            MOVE      ONE,MISCFEE
+            GOTO      VFLD0110
+          ENDIF
+.
+VFLD0110  MATCH     SP70,XFLD0011
+          IF        @EQUAL
+            PACK      XFLD0011,ZERO,SP70
+          ENDIF
+.
+          UNPACK    SP70,KEY3,KEY1
+          UNPACK    XFLD0011,KEY3,KEY1
+          MATCH     SP70,KEY1
+          IF        @EQUAL
+            SQUEEZE   XFLD0011
+            TYPE      XFLD0011
+            IF        !@EQUAL | @EOS
+              MOVE      "Invalid 3rd Misc fee %",ERRORMSG
+              CALL      PERR0000
+              MOVE      ONE,ERRORFLG
+              MOVE      ONE,MISCFEE
+              GOTO      VFLD0120
+            ELSE
+              MOVE      XFLD0011,MISCFEE3
+              COMPARE   HUNDRED,MISCFEE3
+              IF        !@EQUAL & !@LESS
+                MOVE      "Invalid 3rd Misc fee % - more than 100",ERRORMSG
+                CALL      PERR0000
+                MOVE      ONE,ERRORFLG
+                MOVE      ONE,MISCFEE
+                GOTO      VFLD0120
+              ENDIF
+            ENDIF
+          ELSE
+            MOVE      "Invalid 3rd Misc fee % - more than 100",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,ERRORFLG
+            MOVE      ONE,MISCFEE
+            GOTO      VFLD0120
+          ENDIF
+.
+          COMPARE   ZERO,MISCFEE
+          GOTO      VFLD0120 IF NOT EQUAL
+.
+          COMPARE   MISCFEE2,MISCFEE1
+          IF        @LESS & !@EQUAL
+            MOVE      "First Misc Fee % must be >= Second Misc Fee %",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,ERRORFLG
+          ENDIF
+.
+          COMPARE   MISCFEE3,MISCFEE1
+          IF        @LESS & !@EQUAL
+            MOVE      "First Misc Fee % must be >= Third  Misc Fee %",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,ERRORFLG
+          ENDIF
+.
+          COMPARE   MISCFEE3,MISCFEE2
+          IF        @LESS & !@EQUAL
+            MOVE      "Second Misc Fee % must be >= Third Misc Fee %",ERRORMSG
+            CALL      PERR0000
+            MOVE      ONE,ERRORFLG
+          ENDIF 
+          GOTO      VFLD0120
+.
+VFLD0120  GOTO      VFLD9999
+.
+VFLD9999  RETURN
++
+.******************************************************************************
+. Print error line
+.******************************************************************************
+PERR0000  COMPARE   ZERO,ERRCOUNT
+          IF        @EQUAL
+            PRINT     *1,"| Line",*12,"| Error ",*95,"| Record Detail":
+                    *132,"|"
+            CALL      UND132
+          ENDIF
+.
+          ADD       ONE,ERRCOUNT            * Total error count
+          IF        BLANKFLG<>2
+            PACK      ERRFLD1,XFLD0001
+            PACK      ERRFLD2,XFLD0002
+            PACK      ERRFLD3,XFLD0003
+            PACK      ERRFLD4,XFLD0004
+            PACK      ERRFLD5,XFLD0005
+            PACK      ERRFLD6,XFLD0006
+          ELSE
+            PACK      ERRFLD1,XCLAIMTY
+            PACK      ERRFLD2,XADMISTY
+            PACK      ERRFLD3,XHLTFUND
+            PACK      ERRFLD4,XFUNDGRP
+            PACK      ERRFLD5,XMBSITEM
+            PACK      ERRFLD6,XFLD0006
+          ENDIF
+          PACK      KEY36,ERRFLD1,ERRFLD2,ERRFLD3,ERRFLD4,ERRFLD5,ERRFLD6,SP70
+.
+          PRINT     *1,"|",LINECNTR,*12,"|",*14,ERRORMSG,*95,"|",KEY36:
+                    *132,"|"
+.
+PERR9999  RETURN
++
+.******************************************************************************
+. Clear total vars
+.******************************************************************************
+CTOT0000  MOVE      ZERO,ERRCOUNT
+          MOVE      ZERO,ADDCOUNT
+          MOVE      ZERO,UPDCOUNT
+          MOVE      ZERO,IGNCOUNT
+          MOVE      ZERO,RMVCOUNT
+.
+CTOT999   RETURN
++
+.******************************************************************************
+. Print total line
+.******************************************************************************
+PTOT0000  IF        ERRCOUNT=0 & COPTION=1
+            CALL      IBACLOCK
+            
+            PRINT     *1,"| Upload Successfully Completed at ":
+                      CDATE," Time: ",CTIMEIS,*132,"|"            
+          ENDIF
+          CALL      UND132
+.
+          IF        COPTION=1
+            PRINT     *1,"| Total Records Read    : ",LINECNTR,*132,"|"
+            PRINT     *1,"| Total Records Added   : ",ADDCOUNT,*132,"|"
+            PRINT     *1,"| Total Records Updated : ",UPDCOUNT,*132,"|"
+            PRINT     *1,"| Total Errors Found    : ",ERRCOUNT,*132,"|"
+          ELSE
+            PRINT     *1,"| Total Records Removed : ",RMVCOUNT,*132,"|"
+          ENDIF
+.
+          CALL      UND132
+.
+PTOT9999  RETURN
++
+.------------------------------------------------------------------------------
+. Write out error message(s)
+.------------------------------------------------------------------------------
+NERR0000  MOVE      ONE,VERRFLAG
+          STRIP     VFLDNAME
+          STRIP     VERRDESC
+.
+NERR1000  PACK      DIM100,CINVALID,SP1,VFLDNAME,SP1,HYPHEN,SP1,VERRDESC,SP70
+          PACK      ERRORMSG,DIM100,SP70
+          CALL      PERR0000
+.
+NERR9999  RETURN
++
+.------------------------------------------------------------------------------
+          INC       STD001IO
+          INC       UPLVALDS
+          INC       CLPATECH
+.
+          INC       PATCODIO/INC
+          INC       PATECHIO/INC
+          INC       PMSCIDIO/INC            * Contract ID file
+          INC       PATFN1IO/INC            * Health fund file
+          INC       PATFX1IO/INC            * Health fund file
+          INC       PATHGPIO/INC            * Health fund group
+          INC       PATHSPIO/INC            * Hospital file        
+          INC       PATITMIO/INC            * Patient Item Details
+          INC       PMSVX1IO/INC            * Master Extension file
+          INC       PATMCHIO/INC            * Misc Charges file
+.
+          INC       PATITMRD
+          INC       PATMCHRD
+.

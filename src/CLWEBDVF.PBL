@@ -1,0 +1,27 @@
+.*****************************************************************************
+.* Clear WEBDVFFD variables                                                  *
+.*****************************************************************************
+.* V12.00.01 19/06/2025 Peter Vela       TSK 0939466                         *
+.*           Added RETURN                                                    *
+.* V11.05.01 08/05/2025 Peter Vela       TSK 0939466                         *
+.*          Created include                                                  *
+.*****************************************************************************
+CLWEBDVF  MOVE      SP70,WBDFCLID
+          MOVE      SP70,WBDFRPTC
+          MOVE      SP70,WBDFMEVC
+          MOVE      SP70,WBDFACRF
+          MOVE      SP70,WBDFSRVC
+          MOVE      SP70,WBDFASSC
+          MOVE      SP70,WBDFBEPD
+          MOVE      SP70,WBDFCHAM
+          MOVE      SP70,WBDFSVID
+          MOVE      SP70,WBDFITMN
+          MOVE      SP70,WBDFNOFP
+          MOVE      SP70,WBDFPROV
+          MOVE      SP70,WBDFTRID
+          MOVE      SP70,WBDFMSID
+          MOVE      SP70,WBDFRKEY
+          MOVE      SP70,WBDFGSTI
+          PACK      WBDFSPAR,SP70,SP70
+.
+          RETURN
