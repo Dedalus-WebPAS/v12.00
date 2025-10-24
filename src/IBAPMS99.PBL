@@ -12,6 +12,9 @@
 .* Modifications  :                                                           *
 .*                                                                            *
 .******************************************************************************
+.*       V12.00.03  29/09/2025  Ebon Clements  TSK 0967473                    *
+.*                  Changed to only call the unix grouper script mrtweb02.ed8 *
+.*                  once per batch group - UNIXGR00                           *
 .*       V12.00.02  03/06/2025  Ebon Clements  TSK 0955096                    *
 .*                  Replace FORM8 with DIM8VISN                               *
 .*       V12.00.01  16/05/2025  Ebon Clements  TSK 0955096                    *
@@ -930,7 +933,7 @@ OBB       INIT      "("
 .---------------------------------------------------------------------
 PRGID     INIT      "IBAPMS99"
 PRGNAM    INIT      "DRG Grouper Interface"
-VERSION   INIT      "V12.00.02"
+VERSION   INIT      "V12.00.03"
 .---------------------------------------------------------------------
 .
 +
@@ -1316,7 +1319,8 @@ UNIXGR00  CLOSE     INPFIL41
 .
           MOVE      ONE,FILRFGRP       * No file returned
 .
-.  ***** Run Unix grouper with 12.0 DRG Version *****
+          CALL      EXECUT00           * Execute the UNIX Grouper
+.
 UNX120DR  MATCH     PTCNE120,TODATE8      * disc.date > DRG 12.0 effect.date?
           GOTO      UNX110DR IF LESS      * not using 12.0 grouper
 .
@@ -1324,19 +1328,11 @@ UNX120DR  MATCH     PTCNE120,TODATE8      * disc.date > DRG 12.0 effect.date?
           PACK      FILENAM2,KEY6,PORT,SP70
           REP       " 0",FILENAM2
 .
-          MOVE      "120",XDRGGRP    * Set DRG Version
-.
-          DISPLAY   *P1:24,*EL,"Grouping Using QUICKGROUP DRG 12.0 ... "
-.
-          CALL      EXECUT00         * Execute the UNIX Grouper
-.
-          REP       " 0",XDRGGRP     * Set from " NN" to "0NN"
-.
           CALL      UXCHK000         * check to see if anything returned
 .
-          DISPLAY   *P1:24,*EL,"Grouping QUICKGROUP DRG 12.0 ... Complete. ";
+          COMPARE   ZERO,FILRFGRP    * output from unix grouper found
+          GOTO      UNX41033 IF EQUAL
 .
-.  ***** Run Unix grouper with 11.0 DRG Version *****
 UNX110DR  MATCH     PTCNE110,TODATE8      * disc.date > DRG 11.0 effect.date?
           GOTO      UNX100DR IF LESS      * not using 11.0 grouper
 .
@@ -1344,19 +1340,11 @@ UNX110DR  MATCH     PTCNE110,TODATE8      * disc.date > DRG 11.0 effect.date?
           PACK      FILENAM2,KEY6,PORT,SP70
           REP       " 0",FILENAM2
 .
-          MOVE      "110",XDRGGRP    * Set DRG Version
-.
-          DISPLAY   *P1:24,*EL,"Grouping Using QUICKGROUP DRG 11.0 ... "
-.
-          CALL      EXECUT00         * Execute the UNIX Grouper
-.
-          REP       " 0",XDRGGRP     * Set from " NN" to "0NN"
-.
           CALL      UXCHK000         * check to see if anything returned
 .
-          DISPLAY   *P1:24,*EL,"Grouping QUICKGROUP DRG 11.0 ... Complete. ";
+          COMPARE   ZERO,FILRFGRP    * output from unix grouper found
+          GOTO      UNX41033 IF EQUAL
 .
-.  ***** Run Unix grouper with 10.0 DRG Version *****
 UNX100DR  MATCH     PTCNE100,TODATE8      * disc.date > DRG 10.0 effect.date?
           GOTO      UNX90DRG IF LESS      * not using 10.0 grouper
 .
@@ -1364,19 +1352,11 @@ UNX100DR  MATCH     PTCNE100,TODATE8      * disc.date > DRG 10.0 effect.date?
           PACK      FILENAM2,KEY6,PORT,SP70
           REP       " 0",FILENAM2
 .
-          MOVE      "100",XDRGGRP    * Set DRG Version
-.
-          DISPLAY   *P1:24,*EL,"Grouping Using QUICKGROUP DRG 10.0 ... "
-.
-          CALL      EXECUT00         * Execute the UNIX Grouper
-.
-          REP       " 0",XDRGGRP     * Set from " NN" to "0NN"
-.
           CALL      UXCHK000         * check to see if anything returned
 .
-          DISPLAY   *P1:24,*EL,"Grouping QUICKGROUP DRG 10.0 ... Complete. ";
+          COMPARE   ZERO,FILRFGRP    * output from unix grouper found
+          GOTO      UNX41033 IF EQUAL
 .
-.******************************************** start of addition       *I-284669
 UNX90DRG  MATCH     PTCNED90,TODATE8      * disc.date > DRG 9.0 effect.date?
           GOTO      UNX80DRG IF LESS      * not using 9.0 grouper
 .
@@ -1384,19 +1364,9 @@ UNX90DRG  MATCH     PTCNED90,TODATE8      * disc.date > DRG 9.0 effect.date?
           PACK      FILENAM2,KEY6,PORT,SP70
           REP       " 0",FILENAM2
 .
-          MOVE      " 90",XDRGGRP    * Set DRG Version
+          COMPARE   ZERO,FILRFGRP    * output from unix grouper found
+          GOTO      UNX41033 IF EQUAL
 .
-          DISPLAY   *P1:24,*EL,"Grouping Using QUICKGROUP DRG 9.0 ... "
-.
-          CALL      EXECUT00         * Execute the UNIX Grouper
-.
-          REP       " 0",XDRGGRP     * Set from " NN" to "0NN"
-.
-          CALL      UXCHK000         * check to see if anything returned
-.
-          DISPLAY   *P1:24,*EL,"Grouping QUICKGROUP DRG 9.0 ... Complete. ";
-.
-.******************************************** start of addition       *I-284669
 UNX80DRG  MATCH     PTCNED80,TODATE8      * disc.date > DRG 8.0 effect.date?
           GOTO      UNX70DRG IF LESS      * not using 8.0 grouper
 .
@@ -1404,18 +1374,10 @@ UNX80DRG  MATCH     PTCNED80,TODATE8      * disc.date > DRG 8.0 effect.date?
           PACK      FILENAM2,KEY6,PORT,SP70
           REP       " 0",FILENAM2
 .
-          MOVE      " 80",XDRGGRP    * Set DRG Version
-.
-          DISPLAY   *P1:24,*EL,"Grouping Using QUICKGROUP DRG 8.0 ... "
-.
-          CALL      EXECUT00         * Execute the UNIX Grouper
-.
-          REP       " 0",XDRGGRP     * Set from " NN" to "0NN"
-.
           CALL      UXCHK000         * check to see if anything returned
 .
-          DISPLAY   *P1:24,*EL,"Grouping QUICKGROUP DRG 8.0 ... Complete. ";
-.  ***** Run Unix grouper with 7.0 DRG Version *****
+          COMPARE   ZERO,FILRFGRP    * output from unix grouper found
+          GOTO      UNX41033 IF EQUAL
 .
 UNX70DRG  MATCH     PTCNED70,TODATE8      * disc.date > DRG 7.0 effect.date?
           GOTO      UNX62DRG IF LESS      * not using 7.0 grouper
@@ -1424,21 +1386,10 @@ UNX70DRG  MATCH     PTCNED70,TODATE8      * disc.date > DRG 7.0 effect.date?
           PACK      FILENAM2,KEY6,PORT,SP70
           REP       " 0",FILENAM2
 .
-          MOVE      " 70",XDRGGRP    * Set DRG Version
-.
-          DISPLAY   *P1:24,*EL,"Grouping Using QUICKGROUP DRG 7.0 ... "
-.
-          CALL      EXECUT00         * Execute the UNIX Grouper
-.
-          REP       " 0",XDRGGRP     * Set from " NN" to "0NN"
-.
           CALL      UXCHK000         * check to see if anything returned
 .
-          DISPLAY   *P1:24,*EL,"Grouping QUICKGROUP DRG 7.0 ... Complete. ";
-.********************************************   end of addition       *I-284669
-.
-.******************************************** start of addition       *I-267797
-.  ***** Run Unix grouper with 6.2 DRG Version *****
+          COMPARE   ZERO,FILRFGRP    * output from unix grouper found
+          GOTO      UNX41033 IF EQUAL
 .
 UNX62DRG  MATCH     PTCNED62,TODATE8      * disc.date > DRG 6.2 effect.date?
           GOTO      UNX60DRG IF LESS      * not using 6.2 grouper
@@ -1447,21 +1398,10 @@ UNX62DRG  MATCH     PTCNED62,TODATE8      * disc.date > DRG 6.2 effect.date?
           PACK      FILENAM2,KEY6,PORT,SP70
           REP       " 0",FILENAM2
 .
-          MOVE      " 62",XDRGGRP    * Set DRG Version
-.
-          DISPLAY   *P1:24,*EL,"Grouping Using QUICKGROUP DRG 6.2 ... "
-.
-          CALL      EXECUT00         * Execute the UNIX Grouper
-.
-          REP       " 0",XDRGGRP     * Set from " NN" to "0NN"
-.
           CALL      UXCHK000         * check to see if anything returned
 .
-          DISPLAY   *P1:24,*EL,"Grouping QUICKGROUP DRG 6.2 ... Complete. ";
-.********************************************   end of addition       *I-267797
-.
-.******************************************** start of addition       *I-197814
-.  ***** Run Unix grouper with 6.0 DRG Version *****
+          COMPARE   ZERO,FILRFGRP    * output from unix grouper found
+          GOTO      UNX41033 IF EQUAL
 .
 UNX60DRG  MATCH     PTCNED60,TODATE8      * disc.date > DRG 6.0 effect.date?
           GOTO      UNX52DRG IF LESS      * not using 6.0 grouper
@@ -1470,21 +1410,10 @@ UNX60DRG  MATCH     PTCNED60,TODATE8      * disc.date > DRG 6.0 effect.date?
           PACK      FILENAM2,KEY6,PORT,SP70
           REP       " 0",FILENAM2
 .
-          MOVE      " 60",XDRGGRP    * Set DRG Version
-.
-          DISPLAY   *P1:24,*EL,"Grouping Using QUICKGROUP DRG 6.0 ... "
-.
-          CALL      EXECUT00         * Execute the UNIX Grouper  (in WEBGROUP)
-.
-          REP       " 0",XDRGGRP     * Set from " NN" to "0NN"
-.
           CALL      UXCHK000         * check to see if anything returned
 .
-          DISPLAY   *P1:24,*EL,"Grouping QUICKGROUP DRG 6.0 ... Complete. ";
-.********************************************   end of addition       *I-197814
-.
-.******************************************** start of addition       *I-137125
-.  ***** Run Unix grouper with 5.2 DRG Version *****
+          COMPARE   ZERO,FILRFGRP    * output from unix grouper found
+          GOTO      UNX41033 IF EQUAL
 .
 UNX52DRG  MATCH     PTCNED52,TODATE8      * disc.date > DRG 5.2 effect.date?
           GOTO      UNX51DRG IF LESS      * not using 5.2 grouper
@@ -1493,21 +1422,10 @@ UNX52DRG  MATCH     PTCNED52,TODATE8      * disc.date > DRG 5.2 effect.date?
           PACK      FILENAM2,KEY6,PORT,SP70
           REP       " 0",FILENAM2
 .
-          MOVE      " 52",XDRGGRP    * Set DRG Version
-.
-          DISPLAY   *P1:24,*EL,"Grouping Using QUICKGROUP DRG 5.2 ... "
-.
-          CALL      EXECUT00         * Execute the UNIX Grouper  (in WEBGROUP)
-.
-          REP       " 0",XDRGGRP     * Set from " NN" to "0NN"
-.
           CALL      UXCHK000         * check to see if anything returned
 .
-          DISPLAY   *P1:24,*EL,"Grouping QUICKGROUP DRG 5.2 ... Complete. ";
-.********************************************   end of addition       *I-137125
-.
-.******************************************** start of addition        *I-61562
-.  ***** Run Unix grouper with 5.1 DRG Version *****
+          COMPARE   ZERO,FILRFGRP    * output from unix grouper found
+          GOTO      UNX41033 IF EQUAL
 .
 UNX51DRG  MATCH     PTCNED51,TODATE8      * disc.date > DRG 5.1 effect.date?
           GOTO      UNX50DRG IF LESS      * not using 5.1 grouper
@@ -1516,20 +1434,10 @@ UNX51DRG  MATCH     PTCNED51,TODATE8      * disc.date > DRG 5.1 effect.date?
           PACK      FILENAM2,KEY6,PORT,SP70
           REP       " 0",FILENAM2
 .
-          MOVE      " 51",XDRGGRP    * Set DRG Version
-.
-          DISPLAY   *P1:24,*EL,"Grouping Using QUICKGROUP DRG 5.1 ... "
-.
-          CALL      EXECUT00         * Execute the UNIX Grouper  (in WEBGROUP)
-.
-          REP       " 0",XDRGGRP     * Set from " NN" to "0NN"
-.
           CALL      UXCHK000         * check to see if anything returned
 .
-          DISPLAY   *P1:24,*EL,"Grouping QUICKGROUP DRG 5.1 ... Complete. ";
-.********************************************   end of addition        *I-61562
-.
-.  ***** Run Unix grouper with 5.0 DRG Version *****                   *I-50344
+          COMPARE   ZERO,FILRFGRP    * output from unix grouper found
+          GOTO      UNX41033 IF EQUAL
 .
 UNX50DRG  MATCH     PTCNED50,TODATE8      * disc.date > DRG 5.0 effect.date?
           GOTO      UNX41031 IF LESS      * not using 5.0 grouper
@@ -1538,20 +1446,10 @@ UNX50DRG  MATCH     PTCNED50,TODATE8      * disc.date > DRG 5.0 effect.date?
           PACK      FILENAM2,KEY6,PORT,SP70
           REP       " 0",FILENAM2
 .
-          MOVE      " 50",XDRGGRP    * Set DRG Version
-.
-          DISPLAY   *P1:24,*EL,"Grouping Using QUICKGROUP DRG 5.0 ... "
-.
-          CALL      EXECUT00         * Execute the UNIX Grouper  (in WEBGROUP)
-.
-          REP       " 0",XDRGGRP     * Set from " NN" to "0NN"
-.
           CALL      UXCHK000         * check to see if anything returned
 .
-          DISPLAY   *P1:24,*EL,"Grouping QUICKGROUP DRG 5.0 ... Complete. ";
-.
-
-.  ***** Run Unix grouper with 4.2 DRG Version *****
+          COMPARE   ZERO,FILRFGRP    * output from unix grouper found
+          GOTO      UNX41033 IF EQUAL
 .
 UNX41031  MATCH     PTCNED42,TODATE8      * disc.date > DRG 4.2 effect.date?
           GOTO      UNX41032 IF LESS      * not using 4.2 grouper
@@ -1560,20 +1458,10 @@ UNX41031  MATCH     PTCNED42,TODATE8      * disc.date > DRG 4.2 effect.date?
           PACK      FILENAM2,KEY6,PORT,SP70
           REP       " 0",FILENAM2
 .
-          MOVE      "042",XDRGGRP    * Set DRG Version
-          REP       "0 ",XDRGGRP     * Set from "0NN" to " NN"
-.
-          DISPLAY   *P1:24,*EL,"Grouping Using QUICKGROUP DRG 4.2 ... "
-.
-          CALL      EXECUT00         * Execute the UNIX Grouper  (in WEBGROUP)
-.
-          REP       " 0",XDRGGRP     * Set from " NN" to "0NN"
-.
           CALL      UXCHK000         * check to see if anything returned
 .
-          DISPLAY   *P1:24,*EL,"Grouping QUICKGROUP DRG 4.2 ... Complete. ";
-.
-.  ***** Run Unix grouper with 4.1 DRG Version *****
+          COMPARE   ZERO,FILRFGRP    * output from unix grouper found
+          GOTO      UNX41033 IF EQUAL
 .
 UNX41032  MATCH     PTCNED41,TODATE8      * disc.date > DRG 4.1 effect.date?
           GOTO      UNX41033 IF LESS      * not using 4.1 grouper
@@ -1582,18 +1470,10 @@ UNX41032  MATCH     PTCNED41,TODATE8      * disc.date > DRG 4.1 effect.date?
           PACK      FILENAM2,KEY6,PORT,SP70
           REP       " 0",FILENAM2
 .
-          MOVE      "041",XDRGGRP    * Set DRG Version
-          REP       "0 ",XDRGGRP     * Set from "0NN" to " NN"
-.
-          DISPLAY   *P1:24,*EL,"Grouping Using QUICKGROUP DRG 4.1 ... "
-.
-          CALL      EXECUT00         * Execute the UNIX Grouper  (in WEBGROUP)
-.
-          REP       " 0",XDRGGRP     * Set from " NN" to "0NN"
-.
           CALL      UXCHK000         * check to see if anything returned
 .
-          DISPLAY   *P1:24,*EL,"Grouping QUICKGROUP DRG 4.1 ... Complete. ";
+          COMPARE   ZERO,FILRFGRP    * output from unix grouper found
+          GOTO      UNX41033 IF EQUAL
 .
 UNX41033  DISPLAY   *P1:24,*EL,"Grouping Using QUICKGROUP ... Complete. ";
           CALL      HITENTER

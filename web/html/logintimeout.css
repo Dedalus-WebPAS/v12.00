@@ -1,0 +1,24 @@
+/* -------------------------------------------------------------
+   cssVersion : V12.00.01
+
+/*------------------------------------------------------------------------------
+   V12.00.01  09/10/2025  Alina Bhari    TSK 0949393
+              Added Timeout functionality in main menu page
+-----------------------------------------------------------*/
+#PopUpScreen {
+position: relative;
+background: url(../../images/transparent_grey_1x1.png);
+//padding:2px;
+//margin:2px;
+width:20%;
+height:20%;
+top:0;
+bottom:0;
+left:0;
+right:0;
+margin:auto;
+-webkit-border-radius:5px;
+}
+#PopUpScreen {
+ position: absolute;
+}

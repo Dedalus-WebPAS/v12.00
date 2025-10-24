@@ -5,6 +5,12 @@
 .  
 . Modifications  :
 .----------------------------------------------------------------------------
+. V12.00.13 10/10/2025  J.Tan          TSK 0946593
+.           Recompiled for PATCATBI-Sort Casepayment Theatre fee items
+. V12.00.12 06/10/2025  J.Tan          TSK 0966784
+.           Recompiled for PATCATAI - Fixed printing ICD10 on reprint
+. V12.00.11 30/09/2025  Thanh T        TSK 0937505
+.           Recompiled for PATINVHL changes
 . V12.00.10 24/09/2025  J.Tan          TSK 0966921
 .           Recompiled for ISBINVS - remove tempfiles (KT2P0000)
 . V12.00.09 17/09/2025  Bella Turco    TSK 0966761
@@ -3050,7 +3056,7 @@ CFPAYCOD  DIM       3        * 3M Codefinder PAY Code
 .------------------------------------------------------------------------------
 PRGID     INIT      "PATWEB71"
 PRGNAM    INIT      "Patient Invoice Print Server"      
-VERSION   INIT      "V12.00.10"
+VERSION   INIT      "V12.00.13"
 .------------------------------------------------------------------------------
 .
           CALL      WEBINT00       * Initialise Fifo Etc.

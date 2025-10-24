@@ -7,6 +7,8 @@
 .                 Copied from ECLWEB24
 . Modifications :
 .----------------------------------------------------------------------
+. V12.00.03 16/10/2025  Peter Vela     TSK 0939466
+.           Fixed DVAW Assessment Report hyperlinks
 . V12.00.02 18/08/2025  Peter Vela     TSK 0939466
 .           Added Eclipse DVAW Claim Full Details fucntionality
 . V12.00.01 16/07/2025  Peter Vela     TSK 0939466
@@ -1200,7 +1202,7 @@ TILDA30   INIT      "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 .
 .------------------------------------------------------------------------
 PRGID     INIT      "ECLWEB73"
-VERSION   INIT      "V12.00.02"
+VERSION   INIT      "V12.00.03"
 PRGNAM    INIT      "Webservices Claim Enquiries"
 .------------------------------------------------------------------------
           CALL      WEBINT00       * Initialise Fifo Etc.
@@ -33921,7 +33923,7 @@ WDEVRW00  MOVE      ZERO,FORM1
           WRITE     HTMLFILE;"<td align=center valign=top>":
                              "<img src=#"../images/CommentIcon.gif#"":
                              " onclick='location.href=#"eclweb73.pbl":
-                             "?reportno=09":
+                             "?reportno=11":
                              "&template=005":
                              "&urnumber=",URNUMBER:
                              "&uniqnumb=",UNIQNUMB:
@@ -34105,7 +34107,7 @@ WDARRW50    WRITE     HTMLFILE;"<td valign=top>",WBDDSRVP,"</td>";
           WRITE     HTMLFILE;"<td align=center valign=top>":
                              "<img src=#"../images/CommentIcon.gif#"":
                              " onclick='location.href=#"eclweb73.pbl":
-                             "?reportno=09":
+                             "?reportno=11":
                              "&template=004":
                              "&urnumber=",URNUMBER:
                              "&uniqnumb=",UNIQNUMB:
@@ -34123,7 +34125,7 @@ WDARRW50    WRITE     HTMLFILE;"<td valign=top>",WBDDSRVP,"</td>";
           WRITE     HTMLFILE;"<td align=center valign=top>":
                              "<img src=#"../images/CommentIcon.gif#"":
                              " onclick='displayJSON(#"../cgi-bin/eclweb73.pbl":
-                             "?reportno=09":
+                             "?reportno=11":
                              "&template=006":
                              "&urnumber=",URNUMBER:
                              "&uniqnumb=",UNIQNUMB:

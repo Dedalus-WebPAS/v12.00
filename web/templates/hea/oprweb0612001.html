@@ -1,10 +1,93 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.02">
 <meta name="TemplateHome" content="hea">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
 <script type="text/javascript" src="../js/oprweb06.js"> </script>
 <script type="text/javascript" src="../js/TheatreScreensHoverInfo.js"> </script>
+<style>
+.AddInfoTop { border-top: 1px solid black; }
+.AddInfoBottom { border-bottom: 1px solid black; }
+.AddInfoLeft { border-left: 1px solid black; }
+.AddInfoRight { border-right: 1px solid black; }
+.AddInfoTit { text-align: center; }
+</style>
 <script type="text/javascript">
+function init() {
+  f=document.UpdateForm;
+  if(!isWhitespace(f.opsrg081.value)) {     // Patient Out of Theatre
+    f.opard061.classList.add("Mandatory");  // Anaesthetic Time Out
+  }
+  if(f.d_opard026.checked==true) {
+    f.opard061.classList.remove("Mandatory");
+    f.opard061.classList.add("Readonly");
+    f.opard061.value="";
+  }
+}
+function CheckDateTimeRangeCustom(FromDate,FromTime,ToDate,ToTime) {
+ FromDate=SetDateYYYYMMDD(FromDate.value);
+ fyyyy = FromDate.substr(0,4);
+ fmm = FromDate.substr(4,2);
+ fdd = FromDate.substr(6,2);
+ fhh = FromTime.value.substr(0,2);
+ fmi = FromTime.value.substr(3,2);
+ fse = FromTime.value.substr(6,2);
+ from_date_time=new Date(fyyyy,parseInt(fmm,10)-1,fdd,fhh,fmi,fse);
+//
+ ToDate=SetDateYYYYMMDD(ToDate.value);
+ tyyyy = ToDate.substr(0,4);
+ tmm = ToDate.substr(4,2);
+ tdd = ToDate.substr(6,2);
+ thh = ToTime.value.substr(0,2);
+ tmi = ToTime.value.substr(3,2);
+ tse = ToTime.value.substr(6,2);
+ to_date_time=new Date(tyyyy,parseInt(tmm,10)-1,tdd,thh,tmi,tse);
+//
+  if (from_date_time >= to_date_time) {
+    return false ;
+  }
+  return true;
+}
+function ChkPrevPatient() {
+  f=document.UpdateForm;
+  if(f.opcnasot.value=="1") {
+    var serverURL = "../cgi-bin/oprweb06.pbl?reportno=16&updatety=T" +
+                    "&uniqueky=" + f.uniqueky.value.replace(/ /g,"+") +
+                    "&teamnumb=" + f.teamnumb.value.replace(/ /g,"+")
+    var returnValue = RSExecute(serverURL);
+    var sessDate = SetDateDDMMMYYYY(returnValue.return_value.substr(0,8));
+    var time = returnValue.return_value.substr(8,8);
+    var booking = returnValue.return_value.substr(16,8);
+    f.sessdate.value=sessDate;
+    f.sesstime.value=time;
+
+    if(!CheckDateTimeRangeCustom(f.sessdate,f.sesstime,f.opsework,f.opard042)) {
+      alert("Anaesthetic Started time must be after Patient Out of Theatre "
+            + "time for the previous patient:\n"
+            + "Booking Number: " + booking + "   Time: " + time);
+      f.opard042.value="";
+      f.opard042.focus();
+    }
+  }
+}
+
+function chkAnaesTimeOutNotApplicable() {
+  f=document.UpdateForm;
+
+  if(f.d_opard026.checked==true) {
+    f.opard026.value="1";
+    f.opard061.classList.remove("Mandatory");
+    f.opard061.classList.add("Readonly");
+    f.opard061.value="";
+  } else {
+    if(!isWhitespace(f.opsrg081.value)) {
+      f.opard061.classList.add("Mandatory");
+      f.opard026.value="0";
+    } else {
+      f.opard026.value="0";
+      f.opard061.classList.remove("Readonly");
+    }
+  }
+}
 function validateNurse(code,name) {
   var hcpnurse = chkHcpOTNurse();
   if  (hcpnurse==true){
@@ -31,7 +114,7 @@ function chkTime(field){
 
   endTime=UpdateForm.opsrg006.value.replace(/:/g,"");
   if(isWhitespace(endTime)){
-     alert("Surgery End Time must be entered first");
+     alert("Surgery Completed Time must be entered first");
      field.value=""
      return;
   }
@@ -40,7 +123,7 @@ function chkTime(field){
     return;
   }
   if(field.value.replace(/:/g,"")<=endTime){
-    if(!confirm(""+field.title+" must be after Surgery End Time." +
+    if(!confirm(""+field.title+" must be after Surgery Completed Time." +
                 "\n Do you want to override?")) {
       field.value="";
     }
@@ -85,7 +168,7 @@ function showChgOpr() {
 function AddItem() {
   if (document.UpdateForm.d_opsrg074.checked == false) {
     if(document.UpdateForm.opsrg005.value=="") {
-      alert("Surgery Start Time must be entered first.");
+      alert("Surgery Started Time must be entered first.");
       return;
     }
   }
@@ -128,19 +211,15 @@ function SetPrinter(SelectList) {
 
 // Update Day Procedure Details
 function UpdateDayProc() {
-
    if (!checkVisitDatesTimes()) {return;}
 
    document.UpdateForm.updatety.value="U";
 
-   // Set Anaesthetic Prep Time to be equal to Anaesthetic Start Time.  
-//   document.UpdateForm.opard041.value = document.UpdateForm.opard042.value;
-
-   // Set Prep Time to be equal to Surgery Start Time. This is required
+   // Set Prep Time to be equal to Surgery Started Time. This is required
    // for calculation of Actual Operation Minutes.
    document.UpdateForm.opsrg003.value = document.UpdateForm.opsrg005.value;
 
-   // Set Dressing Time to be equal to Surgery End Time. This is required
+   // Set Dressing Time to be equal to Surgery Completed Time. This is required
    // for calculation of Actual Operation Minutes.
    document.UpdateForm.opsrg004.value = document.UpdateForm.opsrg006.value;
 
@@ -210,7 +289,7 @@ function chkAnaesTime() {
     ArrivT= UpdateForm.opard002.value.replace(/:/g,"");
     AnaesT= UpdateForm.opard042.value.replace(/:/g,"");
     if(AnaesT < ArrivT) {
-      if(confirm("Anaesthetic Administration should be greater than Arrival Time."
+      if(confirm("Anaesthetic Started should be greater than Arrival Time."
                  + "\n Do you want to override?")) {
         return;
       }
@@ -220,7 +299,7 @@ function chkAnaesTime() {
   }
 }
 
-// Validate Surgery Start Time
+// Validate Surgery Started Time
 function chkSurgStart() {
   if(!isWhitespace(UpdateForm.opsrg005.value)) {
     if(isWhitespace(UpdateForm.opard042.value)) {
@@ -236,7 +315,7 @@ function chkSurgStart() {
     anaeTime=anaeTime - 0;
     surgStrt=surgStrt - 0;
     if(anaeTime > surgStrt) {
-      if(!confirm("Surgery Start Time should be greater than Anaesthetic/Prep"+
+      if(!confirm("Surgery Started Time should be greater than Anaesthetic/Prep"+
                   " Time.\n Do you want to override?")) {
         UpdateForm.opsrg005.value="";
         UpdateForm.opsrg005.focus()
@@ -246,11 +325,11 @@ function chkSurgStart() {
   }
 }
 
-// Validate Surgery End Time
+// Validate Surgery Completed Time
 function chkSurgEnd() {
   if(!isWhitespace(UpdateForm.opsrg006.value)) {
     if(isWhitespace(UpdateForm.opsrg005.value)) {
-      alert("Surgery Start Time must be entered first.");
+      alert("Surgery Started Time must be entered first.");
       UpdateForm.opsrg006.value="";
       UpdateForm.opsrg005.focus(); 
       return;
@@ -271,12 +350,11 @@ function setRTDTime(extime) {
   }
 }
 
-// Validate Admitting Nurse Start Time/End Time/Anaesthetic Cannulation
+// Validate Admitting Nurse Start Time/End Time
 function chkAdmStartTimeEndTimeAneaCannTime() {
   f = document.UpdateForm;
   if (isWhitespace(f.opard115.value) &&
-      isWhitespace(f.opard116.value) &&
-      isWhitespace(f.opard041.value)) {
+      isWhitespace(f.opard116.value)) {
     return true;
   }
 
@@ -289,35 +367,15 @@ function chkAdmStartTimeEndTimeAneaCannTime() {
     else {
       if (f.opard116.value == f.opard115.value) {
         alert(f.opard116.title + " must be after the " +
-              f.opard115.title + " and must be prior to " +
-              f.opard041.title)
+              f.opard115.title)
         return false;
       }
       else {
         if (!checkTimes(f.opard115,f.opard116)) {
           alert(f.opard116.title + " must be after the " +
-                f.opard115.title + " and must be prior to " +
-                f.opard041.title)
+                f.opard115.title)
           return false;
         }
-      }
-    }
-  }
-
-  if (!isWhitespace(f.opard041.value) &&
-      !isWhitespace(f.opard116.value)) {
-    if (f.opard041.value == f.opard116.value) {
-      alert(f.opard116.title + " must be after the " +
-            f.opard115.title + " and must be prior to " +
-            f.opard041.title)
-      return false;
-    }
-    else {
-      if (!checkTimes(f.opard116,f.opard041)) {
-        alert(f.opard116.title + " must be after the " +
-              f.opard115.title + " and must be prior to " +
-              f.opard041.title)
-        return false;
       }
     }
   }
@@ -345,7 +403,64 @@ function chkAdmNurseStartTimePatAdmTime() {
 
   return true;
 }
-// Validate Arrival Time/Wheels In Time
+function chkSurgicalTimeOut() {
+  f=document.UpdateForm;
+  if(compareTimes(f.opard002.value,f.opard029.value) &&
+     !isWhitespace(f.opard029.value)) {
+    alert("Time of Arrival must be before Surgical Time Out");
+  }
+}
+function checkATO() {
+  f=document.UpdateForm;
+  if(compareTimes(f.opard061.value,f.opsrg081.value) &&
+     !isWhitespace(f.opard061.value)) {
+    alert("Patient Out of Theatre must be after Anaesthetic Time Out");
+  }
+}
+function checkSTO() {
+  f=document.UpdateForm;
+  if(compareTimes(f.opard029.value,f.opsrg081.value) &&
+     !isWhitespace(f.opard029.value)) {
+    alert("Patient Out of Theatre must be after Surgical Time Out");
+  }
+}
+function checkTimeArrival() {
+  f=document.UpdateForm;
+  if(compareTimes(f.opard002.value,f.opard061.value) &&
+     !isWhitespace(f.opard002.value)) {
+    alert("Anaesthetic Time Out must be after Time of Arrival");
+  }
+  if(isWhitespace(f.opard002.value)) {
+    alert("Time of Arrival must be entered before Anaesthetic Time Out");
+    f.opard061.value="";
+  }
+  if(compareTimes(f.opard061.value,f.opsrg081.value) &&
+     !isWhitespace(f.opsrg081.value)) {
+    alert("Anaesthetic Time Out must be before Patient Out of Theatre");
+  }
+}
+function checkPOOT() {
+  f=document.UpdateForm;
+  if(compareTimes(f.opard029.value,f.opsrg081.value) &&
+     !isWhitespace(f.opsrg081.value)) {
+    alert("Surgical Time Out must be before Patient Out of Theatre");
+  }
+}
+function checkTOA() {
+  f=document.UpdateForm;
+  if(compareTimes(f.opard002.value,f.opard029.value) &&
+     !isWhitespace(f.opard002.value)) {
+    alert("Surgical Time Out must be after Time of Arrival");
+  }
+}
+function chkPatientIntoAnaesStarted() {
+  f=document.UpdateForm;
+  if(compareTimes(f.opsrg080.value,f.opard042.value) &&
+     !isWhitespace(f.opsrg080.value)) {
+    alert("Patient Into Theatre time must be before Anaesthetic Started time");
+  }
+}
+// Validate Arrival Time/Patient Into Theatre Time
 function chkArrivalTimeWheelsInTime() {
   f = document.UpdateForm;
 
@@ -386,12 +501,19 @@ function checkTimes (field1,field2) {
   }
 }
 
-// Validate Wheels Out Time/Time in Recovery-Day Procedure/Surgery End
+// Validate Patient Out of Theatre Time/Time in PACU/Surgery Completed
 function chkWheelsOutTimeInRecoverySurgeryEnd() {
   f = document.UpdateForm;
 
   // Wheel out is blank
   if (isWhitespace(f.opsrg081.value)) {
+    f.opard061.classList.remove("Mandatory"); // Anaes Time Out not mandatory
+    f.opard061.classList.remove("Readonly"); 
+//    f.opard061.disabled=false;
+    if(f.d_opard026.checked==true) {
+//      f.opard061.disabled=true;
+      f.opard061.classList.add("Readonly");
+    }
     if (isWhitespace(f.opard077.value)) {
       return true;
     }
@@ -419,6 +541,11 @@ function chkWheelsOutTimeInRecoverySurgeryEnd() {
   }
   // Wheel out is not blank
   else {
+    if(f.d_opard026.checked==true) { // Anaes Time Out Not Applicable
+      f.opard061.classList.remove("Mandatory");
+    } else {
+      f.opard061.classList.add("Mandatory");
+    }
     if (isWhitespace(f.opard077.value)) {
       return true;
     }
@@ -518,8 +645,11 @@ function formSubmit(){
       casekey=casekey.replace(/ /g,"+");
       uniqkey=UpdateForm.uniqueky.value;
       uniqkey=uniqkey.replace(/ /g,"+");
+      suplevel=UpdateForm.suprlevl.value;
+      suplevel=suplevel.replace(/ /g,"+");
       if(isWhitespace(UpdateForm.redirect.value)){
-         UpdateForm.redirect.value="oprweb06.pbl?reportno=12&template=001&uniqueky="+uniqkey+"&teamnumb="; 
+         UpdateForm.redirect.value="oprweb06.pbl?reportno=12&template=001&uniqueky="
+         +uniqkey+"&suprlevl="+suplevel+"&teamnumb=";
       }
       if(UpdateForm.d_opsrg074.checked == true){
          UpdateForm.opsrg074.value = "1";
@@ -545,7 +675,7 @@ function ProcMan() {
   }
 }
 
-// Validate Prep Start/Surgery Start and Dressing/Surgery End Times
+// Validate Prep Start/Surgery Started and Dressing/Surgery Completed Times
 function valPrepDress() {
   var prepTime = trim(document.UpdateForm.opsrg005.value.replace(/:/g,""));
   var dressTime = trim(document.UpdateForm.opsrg006.value.replace(/:/g,""));
@@ -553,7 +683,7 @@ function valPrepDress() {
     return;
 
   if ((dressTime < prepTime) && (UpdateForm.ovrnight.checked != true)) {
-    if(confirm("Is Surgery End the day after Surgery Start time?")){
+    if(confirm("Is Surgery Completed the day after Surgery Started time?")){
       UpdateForm.ovrnight.checked=true;
       displayReasonOvernight();
     }
@@ -565,7 +695,7 @@ function valPrepDress() {
 
   if ((dressTime >= prepTime) && (UpdateForm.ovrnight.checked == true)) {
     if(!confirm("Warning: The Overnight Indicator is set - Time difference " +
-       "between\nSurgery Start time and Surgery End time is greater than " +
+       "between\nSurgery Started time and Surgery Completed time is greater than " +
        "24 hours!")) {
       UpdateForm.ovrnight.focus();
       return;
@@ -804,6 +934,9 @@ function ShowDetail01(linkurl)
   DFrameLink(linkurl,0,Left,900,700)
 }
 function checkDisableAllTimes() {
+  f = document.UpdateForm;
+  if(f.suprlevl.value=="1") { return; }
+
   if (isWhitespace(document.UpdateForm.opard080.value)) { return; }
 
   document.UpdateForm.distimes.value = "1";
@@ -814,11 +947,9 @@ function checkDisableAllTimes() {
   document.UpdateForm.opard002.className="Readonly";
   document.UpdateForm.opard002.readOnly=true;
 
-  document.UpdateForm.opard041.className="Readonly";
-  document.UpdateForm.opard041.readOnly=true;
-
   document.UpdateForm.opard061.className="Readonly";
   document.UpdateForm.opard061.readOnly=true;
+  document.UpdateForm.d_opard026.disable=true;
 
   document.UpdateForm.opard042.className="Readonly";
   document.UpdateForm.opard042.readOnly=true;
@@ -878,15 +1009,14 @@ function checkDisableAllTimes() {
 
   document.UpdateForm.opsrg081.className="Readonly";
   document.UpdateForm.opsrg081.readOnly=true;
-
 }
 function validateSurgStart() {
-  // validate Surgery Start
+  // validate Surgery Started
   chkSurgStart();
   ChkDelaySurg();
 }
 function validateSurgEnd() {
-  // validate Surgery End
+  // validate Surgery Completed
   chkSurgEnd();
   AnaestheticMand();
   ChkRecoveryInDelay();
@@ -897,20 +1027,41 @@ function validateTOA() {
   chkAnaesTime();
   ChkDelay();
   chkArrivalTimeWheelsInTime();
+  chkSurgicalTimeOut();
 }
 function validateStartTime() {
   // validate Start Time
   chkAdmNurseStartTimePatAdmTime();
   chkAdmStartTimeEndTimeAneaCannTime();
 }
+function compareTimesCustom(FromInput,ToInput) {
+  FromInput = trim(FromInput.replace(/:/g,""))-0;
+  ToInput = trim(ToInput.replace(/:/g,""))-0;
+
+  if (FromInput < ToInput)
+  {
+    return false;
+  }
+
+  return true;
+}
 function validateAnesAdmin() {
-  // validate Anaesthetic Administration
+  // validate Anaesthetic Started
   chkAnaesTime();
   ChkDelayAnaes();
   ChkDelaySurg();
+  ChkPatIntoThtre();
+  ChkPrevPatient();
+}
+function ChkPatIntoThtre() {
+  f=document.UpdateForm;
+  if(compareTimes(f.opsrg080.value,f.opard042.value) &&
+     !isWhitespace(f.opard042.value)) {
+    alert("Anaesthetic Started time must be after Patient Into Theatre time");
+  }
 }
 function validateTIRDP() {
-  // validate Time in Recovery-Day Procedure
+  // validate Time in PACU 
   ProcMan();
   ChkRecoveryInDelay();
   chkWheelsOutTimeInRecoverySurgeryEnd();
@@ -997,6 +1148,7 @@ EventExist="%OPRWEB06.12.843";
 <input type=hidden name=opard071 value="%OPRWEB06.12.571">
 <input type=hidden name=opard074 value="%OPRWEB06.12.574">
 <input type=hidden name=old_opard077 value="%OPRWEB06.12.577">
+<input type=hidden name=opard026 value="%OPRWEB06.12.526">
 <input type=hidden name=opsrg003>
 <input type=hidden name=opsrg004>
 <input type=hidden name=opsrg071 value=" ">
@@ -1024,10 +1176,13 @@ EventExist="%OPRWEB06.12.843";
 <input type=hidden name="opcnpacu" id="opcnpacu" value="%STANDARD.01.025.113.059.0.1">
 <input type=hidden name="opcnsetr" id="opcnsetr" value="%STANDARD.01.025.113.057.0.2">
 <input type=hidden name="opcnvrrd" id="opcnvrrd" value="%STANDARD.01.025.113.017.0.2">
+<input type=hidden name="opcnasot" id="opcnasot" value="%STANDARD.01.025.113.068.0.1">
 <input type=hidden name=d_opsrg022 id=d_opsrg022 value="%OPRWEB06.12.365">
 <input type=hidden name=d_opsrg028 id=d_opsrg028 value="%OPRWEB06.12.366">
 <input type=hidden name=errcode  value="0">
 <input type=hidden name=distimes id=distimes value="0">
+<input type=hidden name=sessdate id=distimes value="">
+<input type=hidden name=sesstime id=distimes value="">
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%" align=center>
 <tr><td class=HeadingCell align=left>
@@ -1074,9 +1229,12 @@ EventExist="%OPRWEB06.12.843";
 <hr>
 
 <table border="0" cellpadding="1" cellspacing="0" width="100%" align=center>
-<tr><td class=DataLabel>Procedure&nbsp;</td>
-    <td> <input type=text size=116 name=opdea014 maxlength=80 tabindex=1
-          title="Procedure Description" value="%OPRWEB06.12.305"></td></tr>
+<tr><td width=8% class=DataLabel>Procedure&nbsp;</td>
+    <td><input type=text size=116 name=opdea014 maxlength=80 tabindex=1
+          title="Procedure Description" value="%OPRWEB06.12.305"></td>
+    <td width=2%><img src="../images/HelpIcon.gif" class=Icon
+     onmouseover='showPopUp(ProcedureDescInfo);'></td>
+    <td width=100%></td></tr>
 <tr><td class=DataLabel>&nbsp;&nbsp;</td>
     <td> <input type=text size=116 name=opdea015 maxlength=80 tabindex=1
      title="Procedure Description" value="%OPRWEB06.12.343"></td></tr> 
@@ -1090,10 +1248,10 @@ EventExist="%OPRWEB06.12.843";
 <table border="0" cellpadding="1" cellspacing="0" width="100%" align=center>
 <tr><td width=2%><img src="../images/HelpIcon.gif" class=Icon
      onmouseover='showPopUp(TimeCalledForInfo);'></td>
-    <td width=11%>Time Called For</td>
+    <td width=11%>Time Sent For</td>
     <td width=11%> 
     <input type=text name=opard039 id=opard039 size=8 maxlength=8
-     title="Time Called For" value="%OPRWEB06.12.539" tabindex=2
+     title="Time Sent For" value="%OPRWEB06.12.539" tabindex=2
      onchange="checkTime(this,this.title);ChkDelay();">
     <img src="../images/DateTimeStamp.gif" class=Icon 
      onclick="SetCurrentDateTime(null,opard039,ChkDelay);">
@@ -1130,22 +1288,23 @@ EventExist="%OPRWEB06.12.843";
        id=name_opard003>
       <img src="../images/SearchIcon.gif" class=icon
        onclick="SearchOTNurse(opard003,name_opard003);"></td>
-    <td class=DataLabel>&nbsp;</td>
+    <td width=8% class=DataLabel>&nbsp;</td>
     <td class=DataField>&nbsp;</td>
 </tr>  
 
 <tr><td width=2%><img src="../images/HelpIcon.gif" class=Icon
-     onmouseover='showPopUp(AnaestheticCannulationInfo);'></td>
-    <td class=DataLabel>Anaesthetic Cannulation</td>
-    <td class=DataField>
-      <input type=text name=opard041 id=opard041 size=8 maxlength=8
-       title="Anaesthetic Cannulation" value="%OPRWEB06.12.541" tabindex=8
+     onmouseover='showPopUp(WheelsInTimeInfo);'></td>
+    <td class=DataLabel>Patient Into Theatre</td>
+    <td class=DataField><input type=text name=opsrg080 id=opsrg080 size=8
+       maxlength=8 title="Patient Into Theatre" value="%OPRWEB06.12.680"
+       tabindex=8
        onchange="checkTime(this,this.title);
-                 chkAdmStartTimeEndTimeAneaCannTime();">
-      <img src="../images/DateTimeStamp.gif" class=Icon 
-       onclick="SetCurrentDateTime(null,opard041,chkAdmStartTimeEndTimeAneaCannTime);">
-      <img src=../images/TimeLookup.gif class=Icon 
-       onclick="TimeLookupFrame(opard041);"></td>
+                 chkArrivalTimeWheelsInTime();
+                 chkPatientIntoAnaesStarted();">
+      <img src="../images/DateTimeStamp.gif" class=Icon
+       onclick="SetCurrentDateTime(null,UpdateForm.opsrg080,chkArrivalTimeWheelsInTime);">
+      <img src=../images/TimeLookup.gif class=Icon
+       onclick="TimeLookupFrame(UpdateForm.opsrg080);"></td>
     <td class=DataLabel>&nbsp;</td>
     <td class=DataField>&nbsp;</td>
     <td class=DataLabel width=9%>Start Time</td>
@@ -1170,41 +1329,59 @@ EventExist="%OPRWEB06.12.843";
       <img src=../images/TimeLookup.gif class=Icon
        onclick="TimeLookupFrame(UpdateForm.opard116);"></td>
 </tr>
+</table>
 
+<table border="0" cellpadding="1" cellspacing="0" width="100%" align=center>
 <tr><td width=2%><img src="../images/HelpIcon.gif" class=Icon
+     onmouseover='showPopUp(SurgicalTimeOutInfo);'></td>
+    <td width=11% class=DataLabel>Surgical Time Out</td>
+    <td width=11% class=DataField><input type=text name=opard029 id=opard029 size=8
+       maxlength=8 title="Surgical Time Out" value="%OPRWEB06.12.529"
+       tabindex=8
+       onchange="checkTime(this,this.title);checkTOA();checkPOOT();">
+      <img src="../images/DateTimeStamp.gif" class=Icon
+       onclick="SetCurrentDateTime(null,opard029);checkTOA();checkPOOT();">
+      <img src=../images/TimeLookup.gif class=Icon
+       onclick="TimeLookupFrame(opard029);"></td>
+    <td width=2%><img src="../images/HelpIcon.gif" class=Icon
      onmouseover='showPopUp(AnaestheticTimeOutInfo);'></td>
-    <td class=DataLabel>Anaesthetic Time Out</td>
-    <td class=DataField><input type=text name=opard061 id=opard061
-       size=8 maxlength=8 title="Anaesthetic Time Out" 
+    <td width=120px class=DataLabel>Anaesthetic Time Out</td>
+    <td width=140px class=DataField><input type=text name=opard061 id=opard061
+       size=8 maxlength=8 title="Anaesthetic Time Out"
        value="%OPRWEB06.12.561" tabindex=9
-       onchange="checkTime(this,this.title);ChkDelayAnaes();">
-      <img src="../images/DateTimeStamp.gif" class=Icon 
-       onclick="SetCurrentDateTime(null,opard061,ChkDelayAnaes);">
-      <img src=../images/TimeLookup.gif class=Icon 
+       onchange="checkTime(this,this.title);ChkDelayAnaes();checkTimeArrival();">
+      <img src="../images/DateTimeStamp.gif" class=Icon
+       onclick="SetCurrentDateTime(null,opard061,ChkDelayAnaes);
+                checkTimeArrival();">
+      <img src=../images/TimeLookup.gif class=Icon
        onclick="TimeLookupFrame(opard061);"></td>
-    <td class=DataLabel>&nbsp;</td>
-    <td class=DataField>&nbsp;</td>
-    <td class=DataLabel>&nbsp;</td>
+    <td width=70px class=DataLabel>Not applicable</td>
+    <td><input type=checkbox name="d_opard026" id="d_opard026"
+         title="Anaesthetic Time Out Not Applicable"
+         value="" onclick="chkAnaesTimeOutNotApplicable();"
+         tabindex=9></td>
     <td class=DataField>&nbsp;</td>
     <td class=DataLabel>&nbsp;</td>
     <td class=DataField>&nbsp;</td>
 </tr>
+</table>
 
+<table border="0" cellpadding="1" cellspacing="0" width="100%" align=center>
 <tr><td width=2%><img src="../images/HelpIcon.gif" class=Icon
      onmouseover='showPopUp(AnaestheticAdministrationInfo);'></td>
-    <td class=DataLabel>Anaesthetic Administration</td>
-    <td class=DataField>
+    <td width=11% class=DataLabel>Anaesthetic Started</td>
+    <td width=11% class=DataField>
       <input type=text name=opard042 id=opard042 size=8 maxlength=8
-       title="Anaesthetic Administration" value="%OPRWEB06.12.542" tabindex=10
+       title="Anaesthetic Started" value="%OPRWEB06.12.542" tabindex=10
        onchange="checkTime(this,this.title);validateAnesAdmin();">
       <img src="../images/DateTimeStamp.gif" class=Icon 
        onclick="SetCurrentDateTime(null,opard042,validateAnesAdmin);">
       <img src=../images/TimeLookup.gif class=Icon 
        onclick="TimeLookupFrame(opard042);"></td>
-    <td><div id="AnaestheticDelayReasonTitleDIV"></div></td>
-    <td><div id="AnaestheticDelayReasonFieldDIV"></div></td>
-    <td class=DataLabel>Anaesthetic</td>
-    <td class=DataField>
+    <td width=11% class=DataLabel><div id="AnaestheticDelayReasonTitleDIV"></div></td>
+    <td width=18% class=DataField><div id="AnaestheticDelayReasonFieldDIV"></div></td>
+    <td width=9% class=DataLabel>Anaesthetic</td>
+    <td width=15% class=DataField>
       <select name=opdea003 title="Anaesthetic" tabindex=12>
         <option></option>
          %OPRWEB06.12.113.2
@@ -1217,50 +1394,11 @@ EventExist="%OPRWEB06.12.843";
       </select></td></tr>
 
 <tr><td width=2%><img src="../images/HelpIcon.gif" class=Icon
-     onmouseover='showPopUp(WheelsInTimeInfo);'></td>
-    <td class=DataLabel>Wheels In</td>
-    <td class=DataField><input type=text name=opsrg080 id=opsrg080 size=8
-       maxlength=8 title="Wheels In Time" value="%OPRWEB06.12.680"
-       tabindex=14
-       onchange="checkTime(this,this.title);
-                 chkArrivalTimeWheelsInTime();">
-      <img src="../images/DateTimeStamp.gif" class=Icon
-       onclick="SetCurrentDateTime(null,UpdateForm.opsrg080,chkArrivalTimeWheelsInTime);">
-      <img src=../images/TimeLookup.gif class=Icon
-       onclick="TimeLookupFrame(UpdateForm.opsrg080);"></td>
-    <td class=DataLabel>&nbsp;</td>
-    <td class=DataField>&nbsp;</td>
-    <td class=DataLabel>&nbsp;</td>
-    <td class=DataField>&nbsp;</td>
-    <td class=DataLabel>&nbsp;</td>
-    <td class=DataField>&nbsp;</td>
-</tr>
-
-<tr><td width=2%><img src="../images/HelpIcon.gif" class=Icon
-     onmouseover='showPopUp(SurgicalTimeOutInfo);'></td>
-    <td class=DataLabel>Surgical Time Out</td>
-    <td class=DataField><input type=text name=opard029 id=opard029 size=8 
-       maxlength=8 title="Surgical Time Out" value="%OPRWEB06.12.529" 
-       tabindex=15
-       onchange="checkTime(this,this.title);">
-      <img src="../images/DateTimeStamp.gif" class=Icon 
-       onclick="SetCurrentDateTime(null,opard029);">
-      <img src=../images/TimeLookup.gif class=Icon 
-       onclick="TimeLookupFrame(opard029);"></td>
-    <td class=DataLabel>&nbsp;</td>
-    <td class=DataField>&nbsp;</td>
-    <td class=DataLabel>&nbsp;</td>
-    <td class=DataField>&nbsp;</td>
-    <td class=DataLabel>&nbsp;</td>
-    <td class=DataField>&nbsp;</td>
-</tr>
-
-<tr><td width=2%><img src="../images/HelpIcon.gif" class=Icon
      onmouseover='showPopUp(SurgeryStartInfo);'></td>
-    <td class=DataLabel>Surgery Start</td>
+    <td class=DataLabel>Surgery Started</td>
     <td class=DataField>
       <input type=text name=opsrg005 id=opsrg005 size=8 maxlength=8
-       title="Surgery Start Time" value="%OPRWEB06.12.337" tabindex=16
+       title="Surgery Started" value="%OPRWEB06.12.337" tabindex=16
        onchange="checkTime(this,this.title);validateSurgStart();">
       <img src="../images/DateTimeStamp.gif" class=Icon 
        onclick="SetCurrentDateTime(null,opsrg005,validateSurgStart);">
@@ -1276,17 +1414,17 @@ EventExist="%OPRWEB06.12.843";
 
 <tr><td width=2%><img src="../images/HelpIcon.gif" class=Icon
      onmouseover='showPopUp(SurgeryEndInfo);'></td>
-    <td class=DataLabel>Surgery End</td>
+    <td class=DataLabel>Surgery Completed</td>
     <td class=DataField>
       <input type=text name=opsrg006 id=opsrg006 size=8 maxlength=8
-       title="Surgery End Time" value="%OPRWEB06.12.338" tabindex=18
+       title="Surgery Completed" value="%OPRWEB06.12.338" tabindex=18
        onchange="checkTime(this,this.title);validateSurgEnd();">
       <img src="../images/DateTimeStamp.gif" class=Icon 
        onclick="SetCurrentDateTime(null,opsrg006,validateSurgEnd);">
       <img src=../images/TimeLookup.gif class=Icon 
        onclick="TimeLookupFrame(opsrg006);"></td>
-    <td></td>
-    <td></td>
+    <td class=DataLabel>&nbsp;</td>
+    <td class=DataField>&nbsp;</td>
     <td class=DataLabel>Overnight Indicator</td>
     <td><input type=checkbox name=ovrnight id=ovrnight 
          title="Overninght Indicator"
@@ -1301,14 +1439,16 @@ EventExist="%OPRWEB06.12.843";
 <table border="0" cellpadding="1" cellspacing="0" width="100%" align=center>
 <tr><td width=2%><img src="../images/HelpIcon.gif" class=Icon
      onmouseover='showPopUp(WheelsOutTimeInfo);'></td>
-    <td class=DataLabel width=11%>Wheels Out</td>
+    <td class=DataLabel width=11%>Patient Out of Theatre</td>
     <td class=DataField><input type=text name=opsrg081 id=opsrg081 size=8
-       maxlength=8 title="Wheels Out Time" value="%OPRWEB06.12.681"
+       maxlength=8 title="Patient Out of Theatre" value="%OPRWEB06.12.681"
        tabindex=22
        onchange="checkTime(this,this.title);
-                 chkWheelsOutTimeInRecoverySurgeryEnd();">
+                 chkWheelsOutTimeInRecoverySurgeryEnd();
+                 checkSTO();checkATO();">
       <img src="../images/DateTimeStamp.gif" class=Icon
-       onclick="SetCurrentDateTime(null,UpdateForm.opsrg081,chkWheelsOutTimeInRecoverySurgeryEnd);">
+       onclick="SetCurrentDateTime(null,UpdateForm.opsrg081,chkWheelsOutTimeInRecoverySurgeryEnd);
+                checkSTO();checkATO();">
       <img src=../images/TimeLookup.gif class=Icon
        onclick="TimeLookupFrame(UpdateForm.opsrg081);"></td>
     <td class=DataLabel>&nbsp;</td>
@@ -1321,10 +1461,10 @@ EventExist="%OPRWEB06.12.843";
 
 <tr><td width=2%><img src="../images/HelpIcon.gif" class=Icon
      onmouseover='showPopUp(TimeInRecoveryDayInfo);'></td>
-    <td class=DataLabel width=11%>Time in Recovery-Day Procedure</td>
+    <td class=DataLabel width=11%>Time in PACU</td>
     <td class=DataField width=11%>
       <input type=text name=opard077 id=opard077 size=8 maxlength=8 tabindex=23
-       title="Time in Recovery - Day Procedure" value="%OPRWEB06.12.577"
+       title="Time in PACU" value="%OPRWEB06.12.577"
        onchange="checkTime(this,this.title);validateTIRDP();">
       <img src="../images/DateTimeStamp.gif" class=Icon
        onclick="SetCurrentDateTime(null,opard077,validateTIRDP);">
@@ -1400,10 +1540,29 @@ EventExist="%OPRWEB06.12.843";
   <td><input type=hidden name=opsrg072 value=" ">
       <input type=checkbox name=d_opsrg072 value="1" tabindex=32></td></tr>
 
-<tr><td width=2%><img src="../images/HelpIcon.gif" class=Icon
+<tr><td class=DataLabel>&nbsp;</td>
+    <td class=DataLabel>&nbsp;</td>
+    <td class=DataLabel>&nbsp;</td>
+    <td class=DataLabel>&nbsp;</td>
+    <td class=DataLabel>&nbsp;</td>
+    <td class=DataLabel>&nbsp;</td></tr>
+
+<tr><td colspan="3" class="DataLabel AddInfoTit AddInfoTop AddInfoLeft 
+     AddInfoRight"><b>Additional Information (if applicable)</b></td>
+    <td class=DataField>&nbsp;</td>
+    <td class=DataField>&nbsp;</td>
+    <td class="DataLabel">Blood Loss (mml)</td>
+    <td><input type=text size=6 name=opard034 maxlength=6
+         min=0 max=999999 tabindex=34
+         class="Number" title="Blood Loss (mml)" value="%OPRWEB06.12.534"></td>
+    <td>Admit Post Procedure</td>
+    <td><input type=hidden name=opsrg073 value=" ">
+        <input type=checkbox name=d_opsrg073 value="1" tabindex=35></td></tr>
+
+<tr><td width=2% class="AddInfoLeft"><img src="../images/HelpIcon.gif" class=Icon
      onmouseover='showPopUp(TimeToICUInfo);'></td>
-    <td class=DataLabel>Time to ICU</td>
-    <td class=DataField>
+    <td class="DataLabel">Time to ICU</td>
+    <td class="DataField AddInfoRight">
       <input type=text name=opard083 id=opard083 size=8 maxlength=8
        title="Time to ICU" value="%OPRWEB06.12.583" tabindex=33
        onchange="checkTime(this,this.title);chkTime(this);setETTime(this);
@@ -1414,25 +1573,6 @@ EventExist="%OPRWEB06.12.843";
        onclick="TimeLookupFrame(opard083);checkTimeToICUExist();"></td>
     <td></td>
     <td></td>
-    <td class="DataLabel">Blood Loss (mml)</td>
-    <td><input type=text size=6 name=opard034 maxlength=6 
-         min=0 max=999999 tabindex=34
-         class="Number" title="Blood Loss (mml)" value="%OPRWEB06.12.534"></td>
-    <td>Admit Post Procedure</td>
-    <td><input type=hidden name=opsrg073 value=" ">
-        <input type=checkbox name=d_opsrg073 value="1" tabindex=35></td></tr>
-
-<tr><td width=2%><img src="../images/HelpIcon.gif" class=Icon
-     onmouseover='showPopUp(TimePatientDiedInfo);'></td>
-    <td class=DataLabel>Time Patient Died</td>
-    <td class=DataField>
-      <input type=text name=opard082 id=opard082 size=8 maxlength=8
-       title="Time Patient Died" value="%OPRWEB06.12.582" tabindex=36
-       onchange="checkTime(this,this.title);">
-      <img src=../images/TimeLookup.gif class=Icon
-       onclick="TimeLookupFrame(opard082);"></td>
-    <td></td>
-    <td></td>
     <td class=DataLabel>Birth in Theatre</td>
     <td class=DataField><input type=checkbox name=theabrth tabindex=37
         title="Birth in Theatre"></td>
@@ -1440,6 +1580,41 @@ EventExist="%OPRWEB06.12.843";
     <td><input type=hidden name=opsrg076 value=" ">
         <input type=checkbox name=d_opsrg076 value="1" tabindex=38></td></tr>
 
+<tr><td width=2% class="AddInfoLeft"><img src="../images/HelpIcon.gif" class=Icon
+     onmouseover='showPopUp(TimePatientDiedInfo);'></td>
+    <td class="DataLabel">Time Patient Deceased</td>
+    <td class="DataField AddInfoRight">
+      <input type=text name=opard082 id=opard082 size=8 maxlength=8
+       title="Time Patient Deceased" value="%OPRWEB06.12.582" tabindex=36
+       onchange="checkTime(this,this.title);">
+      <img src=../images/TimeLookup.gif class=Icon
+       onclick="TimeLookupFrame(opard082);"></td>
+    <td></td>
+    <td></td>
+    <td class=DataLabel>&nbsp;</td>
+    <td class=DataField>&nbsp;</td>
+    <td class=DataLabel>&nbsp;</td>
+    <td class=DataField>&nbsp;</td></tr>
+
+<tr><td width=2% class="AddInfoLeft AddInfoBottom"><img src="../images/HelpIcon.gif" class=Icon
+     onmouseover='showPopUp(TimePatientDiedInfo);'></td>
+    <td class="DataLabel AddInfoBottom">Case Abandoned</td>
+    <td class="AddInfoRight AddInfoBottom"><input type=checkbox name=d_opsrg074 
+        title="Case Abandoned" value="1" onclick="ToggleCA()" tabindex=39></td>
+    <td class=DataLabel>&nbsp;</td>
+    <td class=DataField>&nbsp;</td>
+    <td class=DataLabel>&nbsp;</td>
+    <td class=DataField>&nbsp;</td>
+    <td class=DataLabel>&nbsp;</td>
+    <td class=DataField>&nbsp;</td>
+</tr>
+
+<tr><td class=DataLabel>&nbsp;</td>
+    <td class=DataLabel>&nbsp;</td>
+    <td class=DataLabel>&nbsp;</td>
+    <td class=DataLabel>&nbsp;</td>
+    <td class=DataLabel>&nbsp;</td>
+    <td class=DataLabel>&nbsp;</td></tr>
 </table>
 
 <table border="0" cellpadding="1" cellspacing="0" width="100%" align=center>
@@ -1469,12 +1644,6 @@ EventExist="%OPRWEB06.12.843";
          name="Implantbutton" tabindex=43 id="Implantbutton"
          onclick="tempDisable(this);goToImplant();"></td></tr>
 
-<tr><td class=DataLabel>Case Abandoned</td>
-    <td><input type=checkbox name=d_opsrg074 title="Case Abandoned" 
-         value="1" onclick="ToggleCA()" tabindex=44></td>
-    <td class=DataLabel>&nbsp;</td>
-    <td class=DataField>&nbsp;</td>
-</tr>
 </table>
 
 <table border="0" cellpadding="1" cellspacing="0" width="100%" align=center>
@@ -1633,7 +1802,7 @@ ArrvTime=ArrvTime.substr(0,4)
 TimeCald=TimeCald - 0;
 ArrvTime=ArrvTime - 0;
 if(TimeCald>ArrvTime) {
-  if (confirm("Time Called for cannot be after the Arrival Time." +
+  if (confirm("Time Sent For cannot be after the Arrival Time." +
      "\n Do you want to override?")) {
 
       ArrvTime = ArrvTime + 2400;
@@ -1676,7 +1845,7 @@ AnaeAdm=AnaeAdm.substr(0,4)
 TimeOut=TimeOut - 0;
 AnaeAdm=AnaeAdm - 0;
 if(TimeOut>AnaeAdm) {
-  if (confirm("Anaesthetic Time Out cannot be after Anaesthetic Administration." +
+  if (confirm("Anaesthetic Time Out cannot be after Anaesthetic Started." +
      "\n Do you want to override?")) {
 
       AnaeAdm = AnaeAdm + 2400;
@@ -1722,7 +1891,7 @@ SurgStr=SurgStr.substr(0,4)
 AnaeAdm=AnaeAdm - 0;
 SurgStr=SurgStr - 0;
 if(AnaeAdm>SurgStr) {
-  if (confirm("Anaesthetic Administration cannot be after Surgery Start." +
+  if (confirm("Anaesthetic Started cannot be after Surgery Started." +
      "\n Do you want to override?")) {
 
       SurgStr = SurgStr + 2400;
@@ -1760,7 +1929,7 @@ function checkReadyForRec(RFRfield) {
 
   if (!isWhitespace(document.UpdateForm.opsrg006.value)) {
     if (RFRfield.value < document.UpdateForm.opsrg006.value) { 
-      alert("Ready for Recovery cannot be before Surgery End.");
+      alert("Ready for Recovery cannot be before Surgery Completed.");
       RFRfield.value = "";
       RFRfield.focus();
       return;
@@ -1769,7 +1938,7 @@ function checkReadyForRec(RFRfield) {
 
   if (!isWhitespace(document.UpdateForm.opard077.value)) {
     if (RFRfield.value > document.UpdateForm.opard077.value) {
-      alert("Ready for Recovery cannot be after Time in Recovery - Day Procedure");
+      alert("Ready for Recovery cannot be after Time in PACU");
       RFRfield.value = "";
       RFRfield.focus();
       return;
@@ -1793,7 +1962,7 @@ TimInRc=TimInRc.substr(0,4)
 SurgEnd=SurgEnd - 0;
 TimInRc=TimInRc - 0;
 if(SurgEnd>TimInRc && (UpdateForm.ovrnight.checked != true)) {
-  if (confirm("Surgery End cannot be after Time In Recovery - Day Procedure." +
+  if (confirm("Surgery Completed cannot be after Time In PACU." +
      "\n Do you want to override?")) {
       TimInRc = TimInRc + 2400;
       UpdateForm.ovrnight.checked = true;
@@ -2207,3 +2376,14 @@ Reason for Overnight
         </select></td></tr>
 </table>
 </div>
+
+<script type="text/javascript">
+if("%OPRWEB06.12.526"=="Yes") {
+  document.UpdateForm.opard026.value="1"
+  document.UpdateForm.d_opard026.checked=true;
+} 
+if("%OPRWEB06.12.526"=="No") {
+  document.UpdateForm.opard026.value="0"
+  document.UpdateForm.d_opard026.checked=false;
+}
+</script>

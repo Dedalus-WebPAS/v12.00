@@ -5,6 +5,8 @@
 .
 . Modifications :
 .-----------------------------------------------------------------------
+.V12.00.04  30/09/2025  Thanh T        TSK 0937505
+.           Recompiled for PATINVHL changes
 .V12.00.03  08/09/2025  Thanh T          TSK 0949457
 .           Recompiled for PATSHT6 changes
 .V12.00.02  03/06/2025  J.Tan          TSK 0955096
@@ -807,7 +809,7 @@ TABOCTAL  INIT      011                * TAB character (Octal form)
 .
 .------------------------------------------------------------------------------
 PRGID     INIT      "PATWEB72"
-VERSION   INIT      "V12.00.03"
+VERSION   INIT      "V12.00.04"
 PRGNAM    INIT      "Patient Identification Sheet Print Server"
 .------------------------------------------------------------------------------
 .

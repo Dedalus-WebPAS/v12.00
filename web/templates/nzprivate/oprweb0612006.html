@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.01">
+<meta name="TemplateVersion" content="V12.00.02">
 <meta name="TemplateHome" content="nzprivate">
 <meta name="CrossBrowser" content="true">
 <meta name="HelpFileName" content="NoContextSet.html">
@@ -426,6 +426,7 @@ function valPrepDress() {
     if(!confirm("Warning: The Overnight Indicator is set - Time difference " +
        "between\nSurgery Start time and Surgery End time is greater than " +
        "24 hours!")) {
+      UpdateForm.ovrnight.checked = false;
       UpdateForm.ovrnight.focus();
       return;
     }

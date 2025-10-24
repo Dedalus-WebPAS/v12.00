@@ -1,0 +1,210 @@
+<meta name="TemplateVersion" content="V12.00.01">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript">
+function CheckStatisticalDischarge()
+{
+ if(trim(document.UpdateForm.statvisn.value)==""){
+   document.getElementById('DischargeDetail').innerHTML="";  
+   document.getElementById('DischargeDest').innerHTML="";  
+   document.getElementById('LinkedVisNo').innerHTML="";  
+   document.getElementById('LinkedVisitNo').innerHTML="";  
+   document.getElementById('NewAdmissSrcField').innerHTML="";  
+   document.getElementById('NewAdmissClassField').innerHTML="";  
+ }
+ else{
+    filterCatCodeList(UpdateForm.ptmis009,"3","2","5");  //CatS exclude ind3=2
+    filterCatCodeList(UpdateForm.ptmis011,"10","S","5"); //CatP exclude ind 10=S
+
+    var separationmode=document.UpdateForm.ptcndrsm.value;
+
+    var curDDest = document.getElementById('DischargeDest');
+    var curDDisDes = document.getElementById('CurDischargeDestFieldD');
+    var curDDDisDes = document.getElementById('CurDischargeDestFieldDD');
+
+    var destField = document.getElementById("DischDestField");
+    var destDField = document.getElementById("DischargeDestFieldD");
+    var destDDField = document.getElementById("DischargeDestFieldDD");
+
+    if (separationmode == "1")
+    {
+     var newDDest = document.getElementById('dschstat');
+     newDDest.options[0].selected = true;
+     destField.innerHTML = destDField.innerHTML;
+     curDDest.innerHTML  = curDDisDes.innerHTML; 
+
+    filterCatCodeList(UpdateForm.dschstat,"7","E","5");  //CatDD exclude ind 7=E
+    filterCatCodeList(UpdateForm.dschstat,"7","O","5");  //CatDD exclude ind 7=O
+    filterCatCodeList(UpdateForm.dschstat,"7","S","5");  //CatDD exclude ind 7=S
+    }
+    else{
+      var newDDest = document.getElementById('dschdest');
+      newDDest.options[0].selected = true;
+      destField.innerHTML = destDDField.innerHTML;
+      curDDest.innerHTML  = curDDDisDes.innerHTML;
+      
+    filterCatCodeList(UpdateForm.dschdest,"7","E","5");  //CatDD exclude ind 7=E
+    filterCatCodeList(UpdateForm.dschdest,"7","O","5");  //CatDD exclude ind 7=O
+    filterCatCodeList(UpdateForm.dschdest,"7","S","5");  //CatDD exclude ind 7=S
+    }
+ }
+}
+</script>
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);CheckStatisticalDischarge();">
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon" 
+ src="../images/ExitIcon.gif" onclick="DFrameExit();">
+Statistical Discharge Supervisor - Visit %PATWEB98.01.081 
+</span>
+<div id=PageBodySection>
+
+<form name=UpdateForm action="patweb96.pbl" method=post style="margin:0">
+<input type=hidden name=reportno value=15>
+<input type=hidden name=template value=116>
+<input type=hidden name=nextpage value="0">
+<input type=hidden name=updatety value="1">
+<input type=hidden name=statvisn value="%PATWEB98.01.230">
+<input type=hidden name=redirect value="%PATWEB98.01.001.patweb98.01.116">
+<input type=hidden name=urnumber value="%PATWEB98.01.003">
+<input type=hidden name=admissno value="%PATWEB98.01.081">
+<input type=hidden name=ptcndrsm value="%STANDARD.01.025.021.045.1.1" />
+<input type=hidden name=formatcn value="1"> 
+
+<table align=center cellspacing=0 cellpadding=5 border=0 width=95%>
+<tr><td class=DataField>Discharge Details</td></tr>
+<tr><td class=DataLabel>Current Discharge Visit Number</td>
+    <td class=DataField id=DischargeDetail>
+    %PATWEB98.01.081 <span style="margin-left: 15px;"> Discharged </span>
+     %PATWEB98.01.899.022 %PATWEB98.01.202
+    </td>
+</tr>
+
+<tr><td class=DataLabel>Current Discharge Destination </td>
+    <td class=DataField id="DischargeDest">%PATWEB98.01.204
+    </td>
+</tr>
+
+<tr>
+    <td class=DataLabel>New Discharge Destination</td>
+    <td class="DataField" id="DischDestField">
+    </td>
+</tr>
+
+<tr><td class=DataLabel>Linked Admission Number</td>
+    <td class=DataField id=LinkedVisitNo>
+    %PATWEB98.01.230 <span style="margin-left: 15px;"> Admitted </span>
+    %PATWEB98.01.899.023 %PATWEB98.01.899.024
+    </td>
+</tr>
+
+<tr><td colspan=5><hr width=100%></td></tr>
+
+<tr><td class=DataField>Linked Admission Number Details</td></tr>
+
+<tr><td class=DataLabel>Linked Admission Number</td>
+    <td class=DataField id="LinkedVisNo">
+    %PATWEB98.01.230 <span style="margin-left: 15px;"> Admitted </span>
+    %PATWEB98.01.899.023 %PATWEB98.01.899.024
+    </td>
+</tr>
+
+<tr> <td class=DataLabel>Linked Admission Source </td>
+    <td class=DataField> %PATWEB98.01.899.025
+    </td>
+</tr>
+
+<tr>
+    <td class=DataLabel>New Admission Source </td>
+    <td class="DataField" id="NewAdmissSrcField">
+      <select name=ptmis009 id=ptmis009 title="New Admission Source"
+       class="SelectBig Mandatory" >
+      <option></option>
+         <!--PATWEB98.01.112.2    -->
+         %STANDARD.01.007.S </select>
+    </td>
+</tr>
+
+<tr> <td class=DataLabel>Linked Admission Class </td>
+    <td class=DataField> %PATWEB98.01.899.026
+    </td>
+</tr>
+
+<tr>
+    <td class=DataLabel>New Admission Class </td>
+    <td class="DataField" id="NewAdmissClassField">
+      <select name=ptmis011 id=ptmis011 title="New Admission Class"
+       class="SelectBig Mandatory" >
+      <option></option>
+      <!--   PATWEB98.01.112.2 -->
+       %STANDARD.01.007.P </select>
+    </td>
+</tr>
+
+<tr><td class=DataLabel>Clear Link</td>
+     <td class="DataField">
+     <input type=checkbox value="1" id=trncancp name=trncancp>
+     </td>
+</tr>
+
+
+<tr>
+ <td colspan=5 align=center>
+  <input type=button Value="Update" class="button" name="updatebutt"
+   style="cursor:pointer"
+   onclick='ChangeStatDisSuper();'>
+  <input type="button" value="Close" class="button" name="closbutt"
+  onclick="DFrameExit();">
+  <div id=ADDProgramField></div>
+ </td>
+</tr>
+
+</table>
+</form>
+
+<span id=DischargeDestFieldD style="display:none">
+    <select name=dschstat id=dschstat
+     class="Mandatory SelectBig" title="New Discharge Destination">
+    <option></option>
+    %PATWEB98.01.203.2
+    </select>
+</span>
+
+<span id=DischargeDestFieldDD style="display:none">
+    <select name=dschdest id=dschdest
+     class="Mandatory SelectBig" title="New Discharge Destination">
+    <option></option>
+    %PATWEB98.01.204.2
+    </select>
+</span>
+
+<span id=CurDischargeDestFieldD style="display:none">
+%PATWEB98.01.203
+</span>
+
+<span id=CurDischargeDestFieldDD style="display:none">
+%PATWEB98.01.204
+</span>
+
+</div>
+
+<script type="text/javascript">
+
+function ChangeStatDisSuper()
+{
+  if(validateMandatory(UpdateForm)){
+    if (document.UpdateForm.trncancp.checked==true){
+      if(trim(document.UpdateForm.statvisn.value)!==""){
+        UpdateForm.submit();
+     }
+     else{ DFrameExit(); }
+    }
+    else{
+      DFrameExit();
+
+    }
+  }
+}
+</script>

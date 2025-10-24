@@ -3,7 +3,8 @@
 <head>
   <link rel="icon" type="image/png" href="../../images/wp.png" />
   <link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon" />
- 
+  <link rel="stylesheet" href="../../html/logintimeout.css" type="text/css">
+
   <title>webPAS</title>
   
 <style type="text/css">
@@ -71,6 +72,8 @@ a { text-decoration: none; color: #4f4f4f;}
 .mainLogo img { vertical-align: middle; margin-right:12px; margin:0; padding: 0; }
 .mainLogo span{ display: inline; font-size: 12px; font-weight: lighter; color: #747678; }
 </style>
+
+<script type="text/javascript" src="../../js/logintimeout.js"></script>
 
 <script type="text/javascript">
 function login(target)
@@ -155,5 +158,11 @@ function GetCookieData(fieldName)
   </div>
 </div><!-- end div menu -->
 
+<div name="PopUpScreen" id="PopUpScreen" style="display: none;">
+<iframe scrolling="no" width="100%" height="100%" name="PopUpFrame"
+ id="PopUpFrame"></iframe>
+<iframe scrolling="no" style="display: none;" name="PopUpFrame1"
+ id="PopUpFrame1"></iframe>
+</div>
 </body>
 </html>

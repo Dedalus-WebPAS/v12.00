@@ -5,6 +5,8 @@
 .
 . Modifications  :
 .----------------------------------------------------------------------
+. V12.00.02 30/09/2025  Thanh T         TSK 0937505
+.           Recompiled for PATINVHL changes
 . V12.00.01 21/05/2025 Bella Turco      TSK 0955096
 .           Alphanumeric changes                                 
 . V11.05.02 15/04/2024 J.Tan            TSK 0959080
@@ -923,7 +925,7 @@ ZERO8     INIT      "0000    "
 .
 .----------------------------------------------------------------------
 PRGID     INIT      "EMRWEB04"
-VERSION   INIT      "V12.00.01"
+VERSION   INIT      "V12.00.02"
 PRGNAM    INIT      "Print EMR Invoices"
 .----------------------------------------------------------------------
 .

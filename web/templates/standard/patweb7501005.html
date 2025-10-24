@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="standard">
 <meta name="HelpFileName"    content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -59,7 +59,7 @@ function updateParent(effadate) {
       var savsess=parent.document.AddForm.elements[i+5].value;
       if ((savdate==parent.idate.value) && (savsess==parent.session.value) &&
           (!isWhitespace(itemno))) {
-        parent.document.AddForm.elements[i-2].value=effadate.value;     
+        parent.document.AddForm.elements[i-3].value=effadate.value;     
 //        alert(parent.document.AddForm.elements[i-2].name); 
       } 
     }

@@ -1,9 +1,15 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="hea">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
 <script type="text/javascript" src="../js/TheatreScreensHoverInfo.js"> </script>
-</head>
+<style>
+.AddInfoTop { border-top: 1px solid black; }
+.AddInfoBottom { border-bottom: 1px solid black; }
+.AddInfoLeft { border-left: 1px solid black; }
+.AddInfoRight { border-right: 1px solid black; }
+.AddInfoTit { text-align: center; }
+</style>
 %START.OF.PAGE
 <body onload="PageLoad(event);displayPACU();displayComments();">
 <div id=PatientHeading></div>
@@ -120,31 +126,38 @@ InsertPatientHeader()
 </table>
 
 <table border="0" cellpadding="2" cellspacing="0" width="100%" >
-<tr><td class=DataLabel width=15%>Time Called For</td>
+<tr><td class=DataLabel width=15%></td>
+    <td class=DataField width=15%></td>
+    <td class=DataLabel width=15%></td>
+    <td class=DataField width=15%></td>
+    <td colspan=2>
+    <img src="../images/HelpIcon.gif" style="vertical-align:middle;"
+     onmouseover='showPopUp(UnderstandingTheatreTimesInfo);'>
+     &nbsp;&nbsp; Understanding Theatre Times
+    </td></tr>
+
+<tr><td class=DataLabel width=15%>Time Sent For</td>
     <td class=DataField width=15%>%OPRWEB01.04.439</td>
-<!--<td class=DataLabel>Recovery Front</td>
-    <td class=DataField>%OPRWEB01.04.471</td>-->
-<tr><td class=DataLAbel>Time of Arrival</td>
+    <td class=DataLabel width=15%>Anaesthetic Time Out</td>
+    <td class=DataField id=AnaesTO width=15%></td>
+    <td class=DataLabel>Admitting Nurse</td>
+    <td class=DataField>%OPRWEB01.04.403.0</td>
+<tr><td class=DataLabel>Time of Arrival</td>
     <td class=DataField><font color=green>%OPRWEB01.04.402</td>
     <td class=DataLabel width=15%>%STANDARD.01.035.Os</td>
     <td class=DataField width=15%>%OPRWEB01.04.404.0</td>
-    <td colspan=2>
-    <img src="../images/HelpIcon.gif"
-     onmouseover='showPopUp(UnderstandingTheatreTimesInfo);'>
-     &nbsp;&nbsp; Understanding Theatre Times
-    </td>
+    <td class=DataLabel>Start Time</td>
+    <td class=DataField>%OPRWEB01.04.499.015</td>
+    <td class=DataLabel>End Time</td>
+    <td class=DataField>%OPRWEB01.04.499.016</td>
 </tr>
 
-<tr><td class=DataLabel width=15%>Anaesthetic Cannulation</td>
-    <td class=DataField width=15%>%OPRWEB01.04.441</td>
+<tr><td class=DataLabel width=15%>Patient Into Theatre</td>
+    <td class=DataField width=15%>%OPRWEB01.04.780 </td>
 </tr>
 
-<tr><td class=DataLabel width=15%>Anaesthetic Timeout</td>
-    <td class=DataField width=15%>%OPRWEB01.04.461</td>
-</tr>
-
-<tr><td class=DataLAbel>Anaesthetic Administration</td>
-    <td class=DataField><font color=green>%OPRWEB01.04.442</td>
+<tr><td class=DataLabel>Surgical Time Out</td>
+    <td class=DataField>%OPRWEB01.04.429 </td>
     <td class=DataLAbel>%STANDARD.01.035.ol</td>
     <td class=DataField>%OPRWEB01.04.446.0</td>
     <td class=DataLAbel>Anaesthetic</td>
@@ -153,17 +166,17 @@ InsertPatientHeader()
     <td class=DataField>%OPRWEB01.04.445.0</td>
 </tr>
 
-<tr><td class=DataLabel>Surgical Time Out</td>
-    <td class=DataField>%OPRWEB01.04.429 </td>
+<tr><td class=DataLAbel>Anaesthetic Started</td>
+    <td class=DataField><font color=green>%OPRWEB01.04.442</td>
 </tr>
 
-<tr><tr><td class=DataLabel>Surgery Start Time</td>
+<tr><tr><td class=DataLabel>Surgery Started</td>
     <td class=DataField><font color=green>%OPRWEB01.04.705 </td>
     <td class=DataLabel>%STANDARD.01.035.TV </td>
     <td class=DataField>%OPRWEB01.04.707.0</td>
 </tr>
 
-<tr><td class=DataLabel>Surgery End Time  </td>
+<tr><td class=DataLabel>Surgery Completed </td>
     <td class=DataField>%OPRWEB01.04.706 </td>
     <td></td>
     <td></td> 
@@ -171,6 +184,10 @@ InsertPatientHeader()
     <td class=DataField>%OPRWEB01.04.771 </td>
     <td class=DataLabel>Reason for Overnight</td>
     <td class=DataField>%OPRWEB01.04.486.0 </td>
+</tr>
+
+<tr><td class=DataLabel>Patient Out of Theatre </td>
+    <td class=DataField>%OPRWEB01.04.781 </td>
 </tr>
 
 <tr><td class=DataLabel><div id="rfrDIVtitle">Ready for Recovery</div></td>
@@ -183,15 +200,7 @@ InsertPatientHeader()
     </td>
 </tr>
 
-<tr>
-<td class=DataLabel>Time in Recovery - Front</td>
-    <td class=DataField>%OPRWEB01.04.471</td>
-</tr>
-
-<tr><td class=DataLabel>Time in Recovery - Back</td>
-    <td class=DataField><font color=green>%OPRWEB01.04.474</td></tr>
-
-<tr><td class=DataLabel>Time in Recovery - Day</td>
+<tr><td class=DataLabel>Time in PACU</td>
     <td class=DataField>%OPRWEB01.04.477</td>
     <td class=DataLabel>%STANDARD.01.035.Ou </td>
     <td class=DataField>%OPRWEB01.04.484.0</td>
@@ -223,8 +232,17 @@ InsertPatientHeader()
     <td class=DataField>%OPRWEB01.04.772</td>
 </tr>
 
-<tr><td class=DataLabel>Time to ICU</td>
-    <td class=DataField><font color=green>%OPRWEB01.04.483</td>
+<tr><td class=DataLabel>&nbsp;</td>
+    <td class=DataField>&nbsp;</td>
+</tr>
+
+<tr><td colspan="2" class="DataLabel AddInfoTit AddInfoTop AddInfoLeft
+     AddInfoRight"><b>Additional Information (if applicable)</b></td>
+    <td class=DataLabel></td>
+    <td class=DataField></td>
+</tr>
+<tr><td class="DataLabel AddInfoLeft">Time to ICU</td>
+    <td class="DataField AddInfoRight"><font color=green>%OPRWEB01.04.483</td>
     <td></td>
     <td></td>
     <td class=DataLabel>Blood Loss (mml)</td>
@@ -233,8 +251,8 @@ InsertPatientHeader()
     <td class=DataField>%OPRWEB01.04.773</td>
 </tr>
 
-<tr><td class=DataLabel>Time Patient Died</td>
-    <td class=DataField>%OPRWEB01.04.482</td>
+<tr><td class="DataLabel AddInfoLeft">Time Patient Deceased</td>
+    <td class="DataField AddInfoRight">%OPRWEB01.04.482</td>
     <td></td>
     <td></td>
     <td class=DataLabel>Birth in Theatre</td>
@@ -249,6 +267,10 @@ InsertPatientHeader()
     </td>
     <td class=DataLabel>No Recovery</td>
     <td class=DataField>%OPRWEB01.04.776</td> 
+</tr>
+
+<tr><td class="DataLabel AddInfoLeft AddInfoBottom" width=15%>Case Abandoned</td>
+    <td class="DataField AddInfoRight AddInfoBottom" width=15%>%OPRWEB01.04.774</td>
 </tr>
 
 </table>
@@ -266,8 +288,8 @@ InsertPatientHeader()
 
 <table border="0" cellpadding="2" cellspacing="0" width="100%" >
 
-<tr><td class=DataLabel width=15%>Case Abandoned</td>
-    <td class=DataField width=15%>%OPRWEB01.04.774</td>
+<tr><td width=15%></td>
+    <td width=15%></td>
     <td width=15%></td>
     <td width=15%></td>
     <td width=15%></td>
@@ -351,3 +373,12 @@ InsertPatientHeader()
 <span id=BookCom style="display:none">
 %OPRWEB01.04.143.009
 </span>
+
+<script type=text/javascript>
+if("%OPRWEB01.04.426"=="Yes") {
+  document.getElementById("AnaesTO").innerHTML="Not applicable"; 
+} 
+if(!isWhitespace("%OPRWEB01.04.461")) {
+  document.getElementById("AnaesTO").innerHTML="%OPRWEB01.04.461";
+}
+</script>

@@ -12,6 +12,10 @@
 .*                                                                            *
 .*      MODIFICATIONS:                                                        *
 .******************************************************************************
+.*        V12.00.03 02/10/2025  J.Tan         TSK 0967602                     *
+.*                  Fixed F*I Format error - HF membership number             *
+.*        V12.00.02 29/09/2025  J.Tan         TSK 0967602                     *
+.*                  Fixed F*I Format error                                    *
 .*        V12.00.01 19/05/2025  J.Tan          TSK 0955096                    *
 .*                  Added alpanumeric visit number generation                 *
 .*        V11.04.01 06.02.2024  DA Sarkies    TSK 0936282                     *
@@ -214,15 +218,13 @@
 .
 .                WORK AREA
 .
-SORTSTR   DIM       25
+SORTSTR   DIM       40
 TEMPFILE  IFILE     SQL, FIXED=297, KEY=SORTSTR
 PSTROL    FILE      ASCII, FIXED=256
 TEMPSEQ   FILE      SQL, FIXED=297
-.SORT1     INIT      "U1-17,71-79"
-SORT1     INIT      "U1-25,71-79"
-.SORT2     INIT      "U1-9,26-79,18-25"
-SORT2     INIT      "U1-9,26-70,18-25,71-79"
-SORT3     INIT      "U1-9,18-25,71-79"
+SORT1     INIT      "U1-3,4-9,10-17,18-25,71-71,72-79"
+SORT2     INIT      "U1-9,26-45,46-70,18-25,71-71,72-79"
+SORT3     INIT      "U1-9,18-25,71-71,72-79"
 .
 .         Temporary file for detailed Aged Trial Balance
 .
@@ -238,28 +240,30 @@ SORT3     INIT      "U1-9,18-25,71-79"
 .XUNIQUE  DIM        8        8       72
 .PTITL    DIM        4        4       80
 .PTELEP   DIM        12       12      84
-.PINVAMT  FORM      12.2      8       96
-.TINVNO   DIM        8        8      104
-.XDAY     DIM        2        2      112
-.XMON     DIM        2        2      114
-.XYEAR    DIM        2        2      116
-.XCENT    DIM        2        2      118
-XTINVAMT  FORM      12.2      8      120
-.AFUNDH   DIM        6        6      128
-.AFNDTB   DIM        8        8      134
-.AFNDMM   DIM        10       10     142
-.PTELEB   DIM        12       12     152
-.DDDAY    FORM       2        2      164
-.DDMON    FORM       2        2      166
-.DDYER    FORM       2        2      168
-.DDCEN    FORM       2        2      170
-CMNTLINE  DIM        70       70     172
-.REMLSTL  DIM        3        3      242
-.LSTLDAT  DIM        8        8      245
-.SPINVTYP FORM       1        2      253
-.SPINVSYS FORM       1        2      255
-TEMP40    DIM        40       40     257
+WPINVAMT  DIM        15       15      96
+.TINVNO   DIM        8        8      111
+.XDAY     DIM        2        2      119
+.XMON     DIM        2        2      121
+.XYEAR    DIM        2        2      124
+.XCENT    DIM        2        2      125
+WTINVAMT  DIM       15        15     127
+.AFUNDH   DIM        6        6      142
+.AFNDTB   DIM        8        8      148
+.AFNDMM   DIM        19       19     156
+.PTELEB   DIM        12       12     175
+WDDAY     DIM        2        2      187
+WDMON     DIM        2        2      189
+WDYER     DIM        2        2      191
+WDCEN     DIM        2        2      194
+CMNTLINE  DIM        70       70     195
+.REMLSTL  DIM        3        3      265
+.LSTLDAT  DIM        8        8      268
+WPINVTYP  DIM        1        1      276
+WPINVSYS  DIM        1        1      277
+TEMP19    DIM        19       19     278
 .                             EOR    297
+.
+XTINVAMT  FORM      12.2
 .
 .          Temporary file for full Aged Trial Balance
 .
@@ -273,10 +277,10 @@ TEMP40    DIM        40       40     257
 .PGNAME   DIM        25       25      46
 .SORTDIM  DIM        1        1       71
 .XUNIQUE  DIM        8        8       72
-.DDDAY    FORM       2        2       80
-.DDMON    FORM       2        2       82
-.DDYER    FORM       2        2       84
-.DDCEN    FORM       2        2       86
+.WDDAY    DIM        2        2       80
+.WDMON    DIM        2        2       82
+.WDYER    DIM        2        2       84
+.WDCEN    DIM        2        2       86
 XTOTPAID  FORM      12.2      8       88
 XTOTCURR  FORM      12.2      8       96
 XTOT30    FORM      12.2      8      104
@@ -628,7 +632,7 @@ Z30       INIT      "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
 .-----------------------------------------------------------------------
 PRGID     INIT      "NZPBIL23"
 PRGNAM    INIT      "Aged Trial Balance"
-VERSION   INIT      "V12.00.01"
+VERSION   INIT      "V12.00.03"
 .-----------------------------------------------------------------------
 +
 .         START OF PROGRAM
@@ -1162,7 +1166,7 @@ CHKCNT  PACK            FROMDATE,CCENT,CYEAR,CMON,CDAY
         MOVE            ZERO TO XTPAT120
         MOVE            ZERO TO XTSUBREB
         MOVE            ZERO TO XTSUBPAT
-        MOVE            SP70,TEMP40
+        MOVE            SP70,TEMP19
 .
         CLOCK           TIME,CTIMEIS
 .
@@ -1580,12 +1584,21 @@ WRTT     MOVE        UNIQUE,XUNIQUE
          MOVE        AADMNO,XAADMNO
          MOVE        PTELEP,D12PTELP     * since PTELEP/b = 20 chars (new file)
          MOVE        PTELEB,D12PTELB
+         MOVE        XTINVAMT,WTINVAMT
+         MOVE        PINVAMT,WPINVAMT
+         MOVE        SPINVTYP,WPINVTYP
+         MOVE        SPINVSYS,WPINVSYS
+         MOVE        DDDAY,WDDAY
+         MOVE        DDMON,WDMON
+         MOVE        DDYER,WDYER
+         MOVE        DDCEN,WDCEN
+.
          WRITE       TEMPSEQ,SEQ;ACLAIM,HFUND,XAURNO,XAADMNO,PSNAME,PGNAME:
                                  SORTDIM,XUNIQUE,PTITL,D12PTELP:
-                                 PINVAMT,TINVNO,XDAY,XMON,XYEAR,XCENT,XTINVAMT:
+                                 WPINVAMT,TINVNO,XDAY,XMON,XYEAR,XCENT,WTINVAMT:
                                  AFUNDH,AFNDTB,AFNDMM:
-                                 D12PTELB,DDDAY,DDMON,DDYER,DDCEN,CMNTLINE:
-                                 REMLSTL,LSTLDAT,SPINVTYP,SPINVSYS,TEMP40
+                                 D12PTELB,WDDAY,WDMON,WDYER,WDCEN,CMNTLINE:
+                                 REMLSTL,LSTLDAT,WPINVTYP,WPINVSYS,TEMP19
 .
         RETURN
 .
@@ -2092,9 +2105,14 @@ WRTFT   MOVE        XTREBCUR,XTSUBREB
         MOVE        UNIQUE,XUNIQUE
         MOVE        AURNO,XAURNO
         MOVE        AADMNO,XAADMNO
+        MOVE        DDDAY,WDDAY
+        MOVE        DDMON,WDMON
+        MOVE        DDYER,WDYER
+        MOVE        DDCEN,WDCEN
+.
         WRITE       TEMPSEQ,SEQ;ACLAIM,HFUND,XAURNO,XAADMNO,PSNAME,PGNAME:
                                 SORTDIM,XUNIQUE:
-                                DDDAY,DDMON,DDYER,DDCEN,XTOTPAID:
+                                WDDAY,WDMON,WDYER,WDCEN,XTOTPAID:
                                 XTOTCURR,XTOT30,XTOT60,XTOT90:
                                 XTOT120,XTOT1YR,XTOT2YR:
                                 ATYPE,ADDAY,ADMON,ADYER,ADCEN:
@@ -2178,12 +2196,21 @@ WRTTDY   MOVE        UNIQUE,XUNIQUE
          MOVE        AADMNO,XAADMNO
          MOVE        PTELEP,D12PTELP     * since PTELEP/b = 20 chars (new file)
          MOVE        PTELEB,D12PTELB
+         MOVE        XTINVAMT,WTINVAMT
+         MOVE        PINVAMT,WPINVAMT
+         MOVE        SPINVTYP,WPINVTYP
+         MOVE        SPINVSYS,WPINVSYS
+         MOVE        DDDAY,WDDAY
+         MOVE        DDMON,WDMON
+         MOVE        DDYER,WDYER
+         MOVE        DDCEN,WDCEN
+.
          WRITE       TEMPSEQ,SEQ;ACLAIM,HFUND,XAURNO,XAADMNO,PSNAME,PGNAME:
                                 SORTDIM,XUNIQUE,PTITL,D12PTELP:
-                                PINVAMT,TINVNO,XDAY,XMON,XYEAR,XCENT,XTINVAMT:
+                                WPINVAMT,TINVNO,XDAY,XMON,XYEAR,XCENT,WTINVAMT:
                                 AFUNDH,AFNDTB,AFNDMM:
-                                D12PTELB,DDDAY,DDMON,DDYER,DDCEN,CMNTLINE:
-                                REMLSTL,LSTLDAT,SPINVTYP,SPINVSYS,TEMP40
+                                D12PTELB,WDDAY,WDMON,WDYER,WDCEN,CMNTLINE:
+                                REMLSTL,LSTLDAT,WPINVTYP,WPINVSYS,TEMP19
 .
         ADD         XTINVAMT TO TOTDAYS
         MOVE        ZERO TO XTOTPAID
@@ -2337,7 +2364,7 @@ SORTFI
 .
 FULLREP READKS        TEMPFILE;ACLAIM,HFUND,XAURNO,XAADMNO,PSNAME,PGNAME:
                                SORTDIM,XUNIQUE:
-                               DDDAY,DDMON,DDYER,DDCEN,XTOTPAID:
+                               WDDAY,WDMON,WDYER,WDCEN,XTOTPAID:
                                XTOTCURR,XTOT30,XTOT60,XTOT90:
                                XTOT120,XTOT1YR,XTOT2YR:
                                ATYPE,ADDAY,ADMON,ADYER,ADCEN:
@@ -2346,6 +2373,11 @@ FULLREP READKS        TEMPFILE;ACLAIM,HFUND,XAURNO,XAADMNO,PSNAME,PGNAME:
                                XTREB120,XTPAT120,XTSUBREB,XTSUBPAT:
                                SHFUND,SACLM,KEY2
         GOTO          FULLEND IF OVER
+.
+        MOVE          WDDAY,DDDAY
+        MOVE          WDMON,DDMON
+        MOVE          WDYER,DDYER
+        MOVE          WDCEN,DDCEN
 .
 .       Check for health fund range
 .
@@ -2457,13 +2489,23 @@ FEND4   PRINT       *N,*N,*N:
 DAYREP  MOVE          ZEROVISN TO AADMNO
         READKS        TEMPFILE;ACLAIM,HFUND,XAURNO,XAADMNO,PSNAME,PGNAME:
                                SORTDIM,XUNIQUE,PTITL,D12PTELP:
-                               PINVAMT:
+                               WPINVAMT:
                                TINVNO,XDAY,XMON,XYEAR,XCENT:
-                               XTINVAMT:
+                               WTINVAMT:
                                AFUNDH,AFNDTB,AFNDMM:
-                               D12PTELB,DDDAY,DDMON,DDYER,DDCEN,CMNTLINE:
-                               REMLSTL,LSTLDAT,SPINVTYP,SPINVSYS,TEMP40
+                               D12PTELB,WDDAY,WDMON,WDYER,WDCEN,CMNTLINE:
+                               REMLSTL,LSTLDAT,WPINVTYP,WPINVSYS,TEMP19
         GOTO          DAYEND IF OVER
+.
+        MOVE          WDDAY,DDDAY
+        MOVE          WDMON,DDMON
+        MOVE          WDYER,DDYER
+        MOVE          WDCEN,DDCEN
+.
+        MOVE          WTINVAMT,XTINVAMT
+        MOVE          WPINVAMT,PINVAMT
+        MOVE          WPINVTYP,SPINVTYP
+        MOVE          WPINVSYS,SPINVSYS
         MOVE          D12PTELP,PTELEP
         MOVE          D12PTELB,PTELEB
         MOVE          SPINVTYP,PINVTYP
@@ -2960,7 +3002,7 @@ PRTCONTE  MATCH     SP30,STARTNM
           ADD       THREE,CLNO
 .
 PRTCONTF  PRINT    *N,*3,"U/R",*12,"Adm.",*32,"Dischrge":
-                   *48,DIM9,*56,"Tel.",*65,"Invoice":
+                   *48,DIM9,*57,"Tel.",*65,"Invoice":
                    *73,"Invoice":
                    *89,"Invoice",*98,"Membership Details":
                    *121,"Last Letter",*N:
@@ -2971,7 +3013,7 @@ PRTCONTF  PRINT    *N,*3,"U/R",*12,"Adm.",*32,"Dischrge":
                    *110,"Mem.No.",*121,"Code Sent",*N:
                    *1,"-------- --------",*19,"------------":
                    *32,"--------":
-                   *44,"--------------",*56,"--------",*65,"-------":
+                   *44,"-----------",*56,"--------",*65,"-------":
                    *73,"--------":
                    *85,"------------",*98,"----  -----":
                    *110,"-------",*121,"------------"

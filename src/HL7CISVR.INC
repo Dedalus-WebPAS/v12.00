@@ -3,6 +3,10 @@
 .*    HL7 Variables for HL7CISIN & HL7CISRC                                  *
 .*                                                                           *
 .*    Mods:                                                                  *
+.*        21/10/2025  Bella Turco      TSK 0960178                           *
+.*                    Added ZXP077                                           *
+.*        16/10/2025  J.Tan            TSK 0967027                           *
+.*                    Added COMPTABL and IBAPTABL                            *
 .*        11/09/2025  Davin            TSK 0949457                           *
 .*                    Added ZXP076                                           *
 .*        29/04/2025  Davin            TSK 0947378                           *
@@ -454,6 +458,7 @@ BEDSTRNG  DIM       10
 BLANKSTR  INIT      "#"#""
 BSLASEQN  INIT      "\E\"
 .
+COMPTABL  FORM      1             * common parameter table exists(1=no/0=yes)
 CARDHDPD  DIM       4             * concession card hdp default
 CARDTYPE  FORM      1             * concession card type
 .                                    2 = Safety Net
@@ -665,6 +670,7 @@ GT1055    DIM       80
 HEROTABL  FORM      1             * hero location table exists (1=no/0=yes)
 HEXDASH   INIT      0X96
 .
+IBAPTABL  FORM      1             * 2nd index Pooling table exists(1=no/0=yes)
 ICDVERSN  DIM       8
 IN1001    DIM       4
 IN1002    DIM       60
@@ -1321,6 +1327,7 @@ ZXP073    DIM       100
 ZXP074    DIM       100
 ZXP075    DIM       100
 ZXP076    DIM       1
+ZXP077    DIM       1
 .
 ZXV001    DIM       1
 ZXV002    DIM       100

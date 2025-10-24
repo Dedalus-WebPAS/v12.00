@@ -10,6 +10,8 @@
 .
 .        VERSION :
 .------------------------------------------------------------------------------
+.         V12.00.03 06/10/2025  J.Tan          TSK 0966784
+.                   Fixed printing ICD10 on multi page of invoice
 .         V12.00.02 15/07/2025  J.Tan          TSK 0961277
 .                   Mod Print Patient invoice NOT to display zero patient amt
 .         V12.00.01 23/05/2025  J.Tan          TSK 0955096
@@ -4917,12 +4919,11 @@ PENDI000  COMPARE   "22",PTCNINVL
           ENDIF
 .
           LOAD      ACLAIM,PVITYPE,EMVICOMP,OBACOMP
-          MOVE      SP70,ANS
           CALL      CLAIM000                * Print Claim Details
 .
-          MATCH     "W",ANS                 * WC
+          MATCH     "W",RECCD               * WC
           GOTO      PENDI100 IF EQUAL
-          MATCH     "M",ANS                 * TAC ?
+          MATCH     "M",RECCD               * TAC ?
           GOTO      PENDI120 IF NOT EQUAL
 .
 PENDI100  PROC      PRNTICDC                 * Print ICD10 Codes
@@ -4996,6 +4997,8 @@ PRAD9999  RETURN
 CLAIM000  OPEN      CONTROLF,"controlf"
           READ      CONTROLF,HUND05;*189,PTCNPRCL    * print claim code 
 .
+          MOVE      SP70,ANS
+          MOVE      SP70,RECCD
           UNPACK    SP5 WITH TCINDC1,TCINDC2,TCINDC3,TCINDC4,TCINDC5
           MOVE      "CL",TCODE
           PACK      KEY5 WITH TCODE,ACLAIM
@@ -5012,6 +5015,7 @@ CLAIM100  ADD       ONE,FORM2
           MATCH     "W",ANS
           GOTO      CLAIM200 IF NOT EQUAL
 .
+          MOVE      ANS,RECCD                  * WC
           IF        PTCNPRCL=1
             CALL      WCOMP000
           ENDIF
@@ -5020,6 +5024,7 @@ CLAIM100  ADD       ONE,FORM2
 CLAIM200  MATCH     "M",ANS
           GOTO      CLAIM300 IF NOT EQUAL
 .
+          MOVE      ANS,RECCD                  * TAC
           IF        PTCNPRCL=1
             CALL      MTACC000
           ENDIF
@@ -5028,6 +5033,7 @@ CLAIM200  MATCH     "M",ANS
 CLAIM300  MATCH     "V",ANS
           GOTO      CLAIM400 IF NOT EQUAL
 .
+          MOVE      ANS,RECCD                  * Veteran
           IF        PTCNPRCL=1
             CALL      VTAFF000
           ENDIF
@@ -5035,6 +5041,7 @@ CLAIM300  MATCH     "V",ANS
 CLAIM400  MATCH     "D",ANS
           GOTO      CLAIM100 IF NOT EQUAL
 .
+          MOVE      ANS,RECCD                  * Defence force
           IF        PTCNPRCL=1
             CALL      DFORC000                 * Defence force
           ENDIF

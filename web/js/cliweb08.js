@@ -1,4 +1,4 @@
-//jsVersion  : V12.00.00
+//jsVersion  : V12.00.01
 //========================================================================
 // Program   : cliweb08.js
 //
@@ -7,21 +7,6 @@
 // Function  : Standard Functions Used in cliweb08 templates
 //
 // Version   : 
-//             V10.05.01 14/10/2014 Peter Vela      CAR 301518
-//                   Increased ViewDoc() Dframe size 
-//             V10.00.01 19/05/2010 Jill Parkinson  CAR 207094
-//                   Added ShowSummary()
-//             V9.11.01 13/08/2009 Peter McMullen   174998
-//                   Remove redundant hidden window from SubmitForm01 
-//           : V9.04.02 07/06/2005 Ebon Clements CAR 62018
-//                   Reversed changes from V9.04.01           
-//             V9.04.01 01/04/2005 Ebon Clements CAR 58772
-//                   CD diffs - ViewDoc DFrame size change
-//             V9.02.00 11/09/2001 Ebon Clements 
-//                   Fixed error in heading causing an error on page
-//             V5.08 08.06.2000 B.G.Ackland
-//                   Moved FldNoSearch from Standard.js
-//             V0.00 15.02.2000 Pat Dirito 
 //
 //========================================================================
 //------------------------------------------------------------
@@ -70,8 +55,13 @@ else {
 document.UpdateForm.updttype.value=type;
 if (type=="U") { document.UpdateForm.submit(); }
 if (type=="D") {
-   ans=confirm("Are you sure you want to Delete ?")
-   if (ans) { document.UpdateForm.submit() }
+   if ((document.UpdateForm.lnkalert != undefined) && (document.UpdateForm.lnkalert.value == "1")) {
+     ans=confirm("This document is linked to an Alert - the document will be removed from the Alert also. Are you sure you want to Delete ? ")
+     if (ans) { document.UpdateForm.submit() }
+     return;
+   }
+    ans=confirm("Are you sure you want to Delete ?")
+    if (ans) { document.UpdateForm.submit() }
    }
 }
 }

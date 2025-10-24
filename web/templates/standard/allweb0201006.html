@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="standard">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -68,9 +68,11 @@ function InitTable(TableView) {
   if(document.Filter.alcndtrg.value=="1") {
     TableOutput(9,0);    // Order Column,Asc Dsc
     TableSort(8);
+    HideWaitScreen();
   } else {
     TableOutput(8,0);    // Order Column,Asc Dsc
     TableSort(7);
+    HideWaitScreen();
   }
 }
 //
@@ -142,10 +144,17 @@ function TriageFilter() {
 %START.OF.PAGE
 <body onload="PageLoad(event);HospitalFilter();TriageFilter();InitTable(0);
               setTimeout('SetClinicTypeList();',100);">
+<span id=WaitBoxDisplay class=WaitBox style="display:none">
+<img class=WaitImage src="../images/wait.gif">
+<p>Please Wait ...</p>
+</span>
+<div id=PageLayer class=DimmedLayer style="display:none"></div>
+<script type="text/javascript">
+ShowWaitScreen();
+</script>
 <div id="HeadingSection">
 
 <div id="PHeadingSection">
-
 <form name=PatientLinks action=allweb02.pbl method=get style="margin:0">
 <input type=hidden name=reportno value=2>
 <input type=hidden name=template value=2>

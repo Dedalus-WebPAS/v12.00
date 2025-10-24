@@ -5,6 +5,9 @@
 .
 . Modifications : 
 .----------------------------------------------------------------------
+. V12.00.04 25/09/2025  Nikitha B      TSK 0966680
+.           Added RA read RAPMNPL1 at WPMNPL00 before WRPMNPL1.
+.           Added a new label WPMNPL10.
 . V12.00.03 06/06/2025  J.Tan          TSK 0961638
 .           Mod Public Hospital to setup fields for Billing/3B Cert.Calculations
 . V12.00.02 22/05/2025  J.Tan          TSK 0955096
@@ -1046,7 +1049,7 @@ ISERASE   INIT      "iserase "
 .
 .----------------------------------------------------------------------
 PRGID     INIT      "PATWEB07"
-VERSION   INIT      "V12.00.03"
+VERSION   INIT      "V12.00.04"
 PRGNAM    INIT      "Alternate ID Maintenance"
 .----------------------------------------------------------------------
 .
@@ -3091,7 +3094,7 @@ WPMNPL00  MATCH     "3",PTCNUNET
 .
           MOVE      IREQTYPE,PMNPRTYP
           MOVE      URNUMBER,PMNPURNO
-          CALL      IBACLOCK
+WPMNPL10  CALL      IBACLOCK
           PACK      PMNPRDAT,CCC,CYY,CMM,CDD
           REP       " 0",PMNPRDAT
           CLOCK     TIME,CTIMEIS
@@ -3116,6 +3119,11 @@ WPMNPL00  MATCH     "3",PTCNUNET
           MOVE      PMNPRDAT,PMNPCDAT
           MOVE      PMNPRTIM,PMNPCTIM
           MOVE      PMNPRUID,PMNPCUID
+.
+          PACK      KEY28,PMNPURNO,PMNPRDAT,PMNPRTIM,PMNPCNTR,SP70
+          CALL      RAPMNPL1
+          COMPARE   ZERO,OVRCD
+          GOTO      WPMNPL10 IF EQUAL
 .
           CALL      WRPMNPL1
 .

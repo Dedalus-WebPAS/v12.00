@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="nz">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -16,6 +16,8 @@
   <input type=hidden name=template value="7">
   <input type=hidden name=detailky value="%CLIWEB08.01.125">
   <input type=hidden name=updateky value="%CLIWEB08.01.124">
+  <input type=hidden name=d_type value="%CLIWEB08.01.107.3">
+  <input type=hidden name=usersecu value="%STANDARD.01.042.CLIWEB08">
 <!--
 <tr><td colspan=2 class=HeadingCell align=center>
   Patient : CLIWEB08.01.002
@@ -73,14 +75,21 @@
 
 <script type="text/javascript">
   function chkReadOnly() {
+    var docSL=parseInt(document.UpdateForm.d_type.value.substring(22,28),10);
+    var userSL=parseInt(document.UpdateForm.usersecu.value,10);
     var stloca="%CLIWEB08.01.133"
     var rdonly="%CLIWEB08.01.134"
     var curloc="%CLIWEB08.01.135"
+
+    if (docSL > userSL) {
+      alert("Security Level Inadequate");
+      return;
+    }
+
     if (stloca!=curloc && rdonly=="1") {
        alert("Location " + stloca +  "is Read Only- Can't Update");
        return; }
-    else {
-        document.UpdateForm.submit();
-        }
+
+    document.UpdateForm.submit();    
   }
 </script>

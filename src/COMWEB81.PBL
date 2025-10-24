@@ -5,6 +5,8 @@
 .
 . Modifications : 
 .------------------------------------------------------------------------------
+.V12.00.02  21/10/2025  Thanh T        TSK 0963147
+.           Added option 75 (MAIN8500) to return patdo1af details
 .V12.00.01  23.06.2025  DA Sarkies     TSK 0947257
 .           Added repote script to set MVA indicator blanck if MVA cancelled
 .V11.05.06  23.06.2025  DA Sarkies     TSK 0947257
@@ -727,7 +729,7 @@ LOADFILE  FILE      ASCII,FIXED=200
 TEMP1     FILE      ASCII,FIXED=660
 .------------------------------------------------------------
 PRGID     INIT      "COMWEB81"
-VERSION   INIT      "V12.00.01"
+VERSION   INIT      "V12.00.02"
 PRGNAM    INIT      "Common XML Remote Code Validation Service"
 .------------------------------------------------------------
 .
@@ -756,7 +758,7 @@ MAIN1020  BRANCH    REPORTNO,MAIN1100,MAIN1200,MAIN1300,MAIN1400,MAIN1500:
                              MAIN6600,MAIN6700,MAIN6800,MAIN6900,MAIN7000: *60 
                              MAIN7100,MAIN7200,MAIN7300,MAIN7400,MAIN7500:
                              MAIN7600,MAIN7700,MAIN7800,MAIN7900,MAIN8000: *70
-                             MAIN8100,MAIN8200,MAIN8300,MAIN8400
+                             MAIN8100,MAIN8200,MAIN8300,MAIN8400,MAIN8500
 .
           PACK      WEBTITLE,PRGID,SP1,VERSION,SP1,PRGNAM,SP70
           MOVE      "INVALID OPTION",WEBTITLE
@@ -995,6 +997,9 @@ MAIN8300  CALL      OWTPRO00      * Output watproaf details
           GOTO      MAIN1000
 .
 MAIN8400  CALL      CANMVA00      * Cancell ICWA MVA
+          GOTO      MAIN1000
+.
+MAIN8500  CALL      OPTDOC00           * Output patdo1af for a doctor codes
           GOTO      MAIN1000
 .
 .-------------------------------------------------------------------------------
@@ -6415,6 +6420,119 @@ CANMVA90  WRITE     HTMLFILE;"<RETURN_VALUE TYPE=SIMPLE>";
           CALL      XMLEND00
 .
 CANMVA99  RETURN
+.
+.------------------------------------------------------------
+. Output all fields from pardo1af for a doctor code
+.------------------------------------------------------------
+OPTDOC00  CALL      XMLHED00
+          BRANCH    EXIT,OPTDOC99
+.
+          WRITE     HTMLFILE;"<RETURN_VALUE TYPE=SIMPLE>";
+.
+OPTDOC10  PACK      VALDCODE,VALDCODE,SP70
+.
+          PACK      KEY6,VALDCODE,SP70
+OPTDOC20  CALL      RDDOCT1
+          BRANCH    OVRCD,OPTDOC90
+.
+          MOVE      DTITL,FMTTITLE
+          MOVE      DGNAME,FMTGNAME
+          MOVE      DSNAME,FMTSNAME
+          STRIP     FMTTITLE
+          STRIP     FMTGNAME
+          STRIP     FMTSNAME
+          CALL      DOCNM000
+.
+          WRITE     HTMLFILE;DCODE,"|":             *  0
+                             DTITL,"|":             *  1
+                             DGNAME,"|":            *  2
+                             DSNAME,"|":            *  3
+                             DRTYPE,"|":            *  4
+                             DRNAME,"|":            *  5
+                             DSADD1,"|":            *  6
+                             DSADD2,"|":            *  7
+                             DSADD3,"|":            *  8
+                             DSADD4,"|":            *  9
+                             DSPOST,"|":            *  10
+                             PTDOSEML,"|":          *  11
+                             DTELES,"|":            *  12
+                             DTELEP,"|":            *  13
+                             DPAGER,"|":            *  14
+                             DASSOC1,"|":           *  15
+                             DASSOC2,"|":           *  16
+                             DASSOC3,"|":           *  17
+                             DASSOC4,"|":           *  18
+                             DASSOC5,"|":           *  19
+                             DPROV,"|":             *  20
+                             DTELEH,"|":            *  21
+                             DHADD1,"|":            *  22
+                             DHADD2,"|":            *  23
+                             DHADD3,"|":            *  24
+                             DHADD4,"|":            *  25
+                             DHPOST,"|":            *  26
+                             PTDOHEML,"|":          *  27
+                             DAFIRST,"|":           *  28
+                             DALAST,"|":            *  29
+                             DAYEARS,"|":           *  30
+                             DACCRED,"|":           *  31
+                             DRTYPE2,"|":           *  32
+                             DRTYPE3,"|":           *  33
+                             DRTYPE4,"|":           *  34
+                             DRTYPE5,"|":           *  35
+                             DFSPARE,"|":           *  36
+                             DBIRTH,"|":            *  37
+                             DHCSCOD,"|":           *  38
+                             DALEVEL,"|":           *  39
+                             DRSTAT,"|":            *  40
+                             PTDOFAXN,"|":          *  41
+                             PTDOHFAX,"|":          *  42
+                             PTDOMOBL,"|":          *  43
+                             PTDOGLCC,"|":          *  44
+                             PTDOWHDP,"|":          *  45
+                             PTDOMREG,"|":          *  46
+                             PTDONHSN,"|":          *  47
+                             DLUPDDTE,"|":          *  48
+                             DLUPDTME,"|":          *  49
+                             PTDOUDF1,"|":          *  50
+                             PTDOUDF2,"|":          *  51
+                             PTDOUDF3,"|":          *  52
+                             PTDOUDF4,"|":          *  53
+                             PTDOUDF5,"|":          *  54
+                             PTDOINSC,"|":          *  55
+                             PTDOINSN,"|":          *  56
+                             PTDOINSF,"|":          *  57
+                             PTDOINST,"|":          *  58
+                             PTDOREGN,"|":          *  59
+                             PTDOREGF,"|":          *  60
+                             PTDOREGT,"|":          *  61
+                             PTDOVISA,"|":          *  62
+                             PTDOCOMT,"|":          *  63
+                             PTDOPREF,"|":          *  64
+                             PTDOABNN,"|":          *  65
+                             PTDODINA,"|":          *  66
+                             PTDODACT,"|":          *  67
+                             PTDODACO,"|":          *  68
+                             PTDOPRO2,"|":          *  69
+                             PTDOPRO3,"|":          *  70
+                             PTDOPRO4,"|":          *  71
+                             PTDOPRO5,"|":          *  72
+                             PTDOSDAT,"|":          *  73
+                             PTDOEDAT,"|":          *  74
+                             PTDOAUPD,"|":          *  75
+                             PTDOHOSS,"|":          *  76
+                             PTDOEXML,"|":          *  77
+                             PTDODEAC,"|":          *  78
+                             PTDOAHC1,"|":          *  79
+                             PTDOAHC2,"|":          *  80
+                             PTDOAHC3,"|":          *  81
+.
+                             DOCFNAME,"|"           *  82
+.
+OPTDOC90  WRITE     HTMLFILE;"</RETURN_VALUE>"
+          CALL      XMLEND00
+.
+OPTDOC99  RETURN
+
 +
 *******************************************************************************
 .

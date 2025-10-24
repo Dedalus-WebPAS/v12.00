@@ -1,7 +1,7 @@
-<meta name="TemplateVersion" content="V12.00.00">
-<meta name="TemplateHome" content="hea">
-<meta name="HelpFileName" content="NoContextSet.html">
-<meta name="CrossBrowser" content="true">
+<meta name="TemplateVersion" content="V12.00.01">
+<meta name="TemplateHome"    content="hea">
+<meta name="HelpFileName"    content="NoContextSet.html">
+<meta name="CrossBrowser"    content="true">
 <script type="text/javascript" src="../js/emrweb0201101.js"></script>
 <script type="text/javascript" src="../js/EmergencyPrimaryDiagSearch.js"></script>
 <script type="text/javascript">
@@ -785,7 +785,7 @@ InsertEmergencyHeader()
     </tr>
 <tr><td class=DataLabel width=15%>Primary Diagnosis Free Format Desc</td>
     <td><input type=text name=d_emvcd033 
-         title="Primary Diagnosis Free Format Desc"
+         title="Primary Diagnosis Free Format Description"
          size=72 value="%EMRWEB02.01.195" class=ReadOnly readonly>
     </tr>
 </table>
@@ -793,7 +793,7 @@ InsertEmergencyHeader()
 
 <span id=DiagnosisSearch style="display:none;">
 <table width=100% border=0 cellspacing=0 cellpadding=2>
-<tr><td class=DataLabel width=15%>Primary Diagnosis Search</td>
+<tr><td class=DataLabel width=15%>Primary Diagnosis Search (Key Word)</td>
     <td><input type=hidden name=emvcd001 value="%EMRWEB02.01.081">
         <input type=hidden name=emvcd002 value="005">
         <input type=hidden name=emvcd003 value="%EMRWEB02.01.197">
@@ -801,15 +801,17 @@ InsertEmergencyHeader()
         <input type=hidden name=emvcd006 value="   ">
         <input type=hidden name=emvcd031 value="1">
         <input type=hidden name=heaindic value="1">
-        <input type=text   name=diagnosisSearch class=SelectBig
+        <input type=text   name=diagnosisSearch id=diagnosisSearch
+         class=SelectBig title="Enter Key Word to search..."
          onKeyUp='getDiagnosis(this,UpdateForm.emvcd005,UpdateForm.emvcd033);'>
-    <select name=emvcd005 class=SelectXlrg
+    <select name=emvcd005 id=emvcd005 class=SelectXlrg title="Diagnosis"
      onchange="document.UpdateForm.emvcd033.value=trim(this.value.substring(9,80))+' ';">
     </select>
     </td></tr>
 <tr>
   <td class=DataLabel width=15%>Primary Diagnosis Free Format Desc</td>
-  <td><input type=text name=emvcd033 maxlength=100 size=100>
+  <td><input type=text name=emvcd033 maxlength=100 size=100
+       title="Diagnosis Free Format Description">
 </tr>
 </table>
 </span>

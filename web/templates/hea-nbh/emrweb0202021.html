@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.01">
+<meta name="TemplateVersion" content="V12.00.03">
 <meta name="TemplateHome" content="hea-nbh">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -10,7 +10,7 @@ function PatientSearchNBH() {
   redirect = "emrweb02.pbl?reportno=02&template=021";
   SetCookie('PatSearchRedirectCookie',redirect);
 
-  url= "patweb90.pbl?reportno=01&template=060"
+  url= "patweb90.pbl?reportno=01&template=060&autosrch=Y"
   DFrameLink(url,0,0,1008,521);
 }
 function CancelLink() {
@@ -251,7 +251,12 @@ Register Expected Emergency Patient Visit
     <img notab src="../images/TimeLookup.gif" class="Icon"
      alt="Time Select" time="UpdateForm.emvis002">
   </td>
-  <td>&nbsp;</td>
+  <td>
+   <textarea hidden name=prcom001 wrap=hard tabindex=8
+     onkeydown="LimitText(this,6,300);"
+     cols=50 rows=2 onblur="TextareaBlurHandler(this);Validateprecom001();">
+    </textarea>
+  </td>
   <td>&nbsp;</td>
   <td>&nbsp;</td>
   <td>&nbsp;</td>
@@ -300,5 +305,17 @@ function init(){
       f.emexp004.selectedIndex = i;
     }
   }
+  var str1= trim("%EMRWEB02.02.417");
+    if(!isWhitespace(str1)) { str1+="\n"}
+  var str2= trim("%EMRWEB02.02.418");
+    if(!isWhitespace(str2)) { str2+="\n"}
+  var str3= trim("%EMRWEB02.02.419");
+    if(!isWhitespace(str3)) { str3+="\n"}
+  var str4= trim("%EMRWEB02.02.420");
+    if(!isWhitespace(str4)) { str4+="\n"}
+  var str5= trim("%EMRWEB02.02.421");
+    if(!isWhitespace(str5)) { str5+="\n"}
+  var str6= trim("%EMRWEB02.02.422");
+  f.prcom001.value=str1+str2+str3+str4+str5+str6
 }
 </script>

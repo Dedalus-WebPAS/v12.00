@@ -5,6 +5,9 @@
 .
 . Modifications :
 .---------------------------------------------------------------------------
+. V12.00.02 29/09/2025  Bella Turco     TSK 0966242
+.           New tags OMAX0150/OMAX0160 to turn Labels & Letters and Slot
+.           Template buttons red if any data exists
 . V12.00.01 23/05/2025  Ebon Clements   TSK 0955096
 .           Alphanueric visit number changes
 . V11.05.02 20.12.2024 DA Sarkies      TSK 0954547
@@ -931,7 +934,7 @@ CURDUM6   FORM      3
 LABELOUT  INIT      "LABELOUT"
 .----------------------------------------------------------------------
 PRGID     INIT      "OUTWEB05"
-VERSION   INIT      "V12.00.01"
+VERSION   INIT      "V12.00.02"
 PRGNAM    INIT      "Outpatient Maintenance"
 .----------------------------------------------------------------------
           CALL      WEBINT00       * Initialise Fifo Etc.
@@ -7599,7 +7602,8 @@ OMAS9999  RETURN
 .------------------------------------------------------------
 OMAX0000  BRANCH    FLDITMNO,OMAX0010,OMAX0020,OMAX0030,OMAX0040,OMAX0050:
                              OMAX0060,OMAX0070,OMAX0080,OMAX0090,OMAX0100: 
-                             OMAX0110,OMAX0120,OMAX0130,OMAX0140
+                             OMAX0110,OMAX0120,OMAX0130,OMAX0140,OMAX0150:
+                             OMAX0160
 .
 OMAX0010  WRITE     HTMLFILE;FILTACTV;
           GOTO      OMAX9999
@@ -7672,6 +7676,61 @@ OMAX0140  UNPACK    DIM127,D1,KEY1,DIM127
             ENDIF
           ENDIF
           GOTO      OMAX9999 
+.
+OMAX0150  COMPARE   ZERO,OTMALPTR
+          GOTO      OMAX0155 IF NOT EQUAL
+          COMPARE   ZERO,OTMALGPD
+          GOTO      OMAX0155 IF NOT EQUAL 
+          COMPARE   ZERO,OTMALPTD
+          GOTO      OMAX0155 IF NOT EQUAL
+          COMPARE   ZERO,OTMABKLT
+          GOTO      OMAX0155 IF NOT EQUAL
+          COMPARE   ZERO,OTMARALT
+          GOTO      OMAX0155 IF NOT EQUAL
+          COMPARE   ZERO,OTMARSLT
+          GOTO      OMAX0155 IF NOT EQUAL
+          COMPARE   ZERO,OTMALPPC
+          GOTO      OMAX0155 IF NOT EQUAL
+          COMPARE   ZERO,OTMASRLH
+          GOTO      OMAX0155 IF NOT EQUAL
+          MATCH     SP70,OTMALSER
+          GOTO      OMAX0155 IF NOT EQUAL
+          MATCH     SP70,OTMALDNA
+          GOTO      OMAX0155 IF NOT EQUAL
+          MATCH     SP70,OTMASBKL
+          GOTO      OMAX0155 IF NOT EQUAL
+          MATCH     SP70,OTMASAPL
+          GOTO      OMAX0155 IF NOT EQUAL
+          MATCH     SP70,OTMASPMM
+          GOTO      OMAX0155 IF NOT EQUAL
+          MATCH     SP70,OTMASGPM
+          GOTO      OMAX0155 IF NOT EQUAL
+.
+          WRITE     HTMLFILE;ZERO;
+          GOTO      OMAX9999
+.
+OMAX0155  WRITE     HTMLFILE;ONE;                 * Labels & Letters exists 
+          GOTO      OMAX9999
+.
+OMAX0160  PACK      KEY28,WBSESIT,OTCLI001,OTMAS001,OTMAS002,SP70
+          CALL      RSOTHED1
+OMAX0161  CALL      RKOTHED1
+          BRANCH    OVRCD,OMAX0162
+.
+          MATCH     WBSESIT,OTHESITE
+          GOTO      OMAX0162 IF NOT EQUAL
+          MATCH     OTCLI001,OTHECLIN
+          GOTO      OMAX0162 IF NOT EQUAL
+          MATCH     OTMAS001,OTHEWDAY
+          GOTO      OMAX0162 IF NOT EQUAL
+          MATCH     OTMAS002,OTHESTRT
+          GOTO      OMAX0162 IF NOT EQUAL
+.
+          WRITE     HTMLFILE;ONE;                 * Slot Templates exist
+          GOTO      OMAX9999
+.
+OMAX0162  WRITE     HTMLFILE;ZERO;              
+          GOTO      OMAX9999
 .
 OMAX9999  RETURN
 .

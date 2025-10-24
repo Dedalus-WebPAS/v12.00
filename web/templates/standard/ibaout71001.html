@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="standard">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -351,13 +351,13 @@ function ShowHospital() {
 
 <span id=GeneralLetter style="display:none">
 <table width=80% align=center border=0 cellspacing=2 cellpadding=1>
-<tr><td class=DataLabel width=25%>Booking Type</td>
+<tr><td class=DataLabel width=25%>Booking Status</td>
     <td><input type=hidden name=keystr04 id=keystr04 value="2">
-        <select name=keystr05 id=keystr05 title="Booking Type">
+        <select name=keystr05 id=keystr05 title="Booking Status">
         <option value=" ">ALL</option>
         <option value="B">Booked</option>
-        <option value="A">Attendees</option>
-        <option value="N">Non-Attendees</option>
+        <option value="A">Attended</option>
+        <option value="N">Non-Attended</option>
         <option value="R">Rescheduled</option>
         <option value="C">Cancelled Bookings</option>
         </select></td></tr>
@@ -519,7 +519,9 @@ function ShowHospital() {
     <input type=hidden name=keystr35 id=keystr35 value="P" >
 
 <tr><td class=DataLabel width=25%>Letter to Print</td>
-    <td><select name=keystr36 id=keystr36 title="Letter to Print">
+    <td><select name=keystr36 id=keystr36 title="Letter to Print"
+          class=Mandatory>
+        <option value=" "> </option>
            %RSHWEB02.01.128
         </select></td></tr>
 

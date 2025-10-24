@@ -95,6 +95,11 @@
 .***************************************************************************
 .*  Mod's     :                                                            *
 .***************************************************************************
+.*        V12.00.07 16/10/2025  Davin          TSK 0968448                 *
+.*                  Call CZXV0000 from CPV10000 to clear ZXV fields        *
+.*                  15/10/2025  Davin          TSK 0968385                 *
+.*                  Call CONV0000 from RZTR0000 to convert escape sequences*
+.*                  for fields ZTR.2-ZTR.7                                 *
 .*        V12.00.06 17/09/2025  Davin          TSK 0967016                 *
 .*                  Check diag code doesn't already exist on emrvcd before *
 .*                  writing new record (PDG10085)                          *
@@ -5707,7 +5712,7 @@ DEC       INIT      "December"
 .-----------------------------------------------------------------------
 PRGID     INIT      "HL7RECVR"
 PRGNAM    INIT      "HL7 General Receiving Server"
-VERSION   INIT      "V12.00.06"
+VERSION   INIT      "V12.00.07"
 .-----------------------------------------------------------------------
 +
 .*************************************************************************
@@ -22755,6 +22760,11 @@ CPV10000  PACK      PV100101,SP100,SP100,SP100,SP100,SP100
           CLEAR     PV105213
           CLEAR     PV105214
           CLEAR     PV105215
+.
+.         Also clear ZXV fields here as the ZXV segment is not mandatory.
+.         Otherwise the ZXV data may carry over from a previous message.
+.
+CPV19000  CALL      CZXV0000                     * clear ZXV fields (0968448)
 .
 CPV19999  RETURN
 +
@@ -41445,6 +41455,9 @@ RZTR0106  RESET     ZTR00106                     * name of alt. cod. system (ST)
 RZTR0200  BRANCH    COMPCNT,RZTR0201
 .
 RZTR0201  RESET     ZTR00201
+          MOVE      ZTR00201,OLDSTRNG
+          CALL      CONV0000                     * convert any escape sequences
+          MOVE      NEWSTRNG,ZTR00201
           GOTO      RZTR9999
 .
 .         ZTR.3  Presenting Complaint Line 2 (ST)
@@ -41452,6 +41465,9 @@ RZTR0201  RESET     ZTR00201
 RZTR0300  BRANCH    COMPCNT,RZTR0301
 .
 RZTR0301  RESET     ZTR00301
+          MOVE      ZTR00301,OLDSTRNG
+          CALL      CONV0000                     * convert any escape sequences
+          MOVE      NEWSTRNG,ZTR00301
           GOTO      RZTR9999
 .
 .         ZTR.4  Presenting Complaint Line 3 (ST)
@@ -41459,6 +41475,9 @@ RZTR0301  RESET     ZTR00301
 RZTR0400  BRANCH    COMPCNT,RZTR0401
 .
 RZTR0401  RESET     ZTR00401
+          MOVE      ZTR00401,OLDSTRNG
+          CALL      CONV0000                     * convert any escape sequences
+          MOVE      NEWSTRNG,ZTR00401
           GOTO      RZTR9999
 .
 .         ZTR.5  Presenting Complaint Line 4 (ST)
@@ -41466,6 +41485,9 @@ RZTR0401  RESET     ZTR00401
 RZTR0500  BRANCH    COMPCNT,RZTR0501
 .
 RZTR0501  RESET     ZTR00501
+          MOVE      ZTR00501,OLDSTRNG
+          CALL      CONV0000                     * convert any escape sequences
+          MOVE      NEWSTRNG,ZTR00501
           GOTO      RZTR9999
 .
 .         ZTR.6  Presenting Complaint Line 5 (ST)
@@ -41473,6 +41495,9 @@ RZTR0501  RESET     ZTR00501
 RZTR0600  BRANCH    COMPCNT,RZTR0601
 .
 RZTR0601  RESET     ZTR00601
+          MOVE      ZTR00601,OLDSTRNG
+          CALL      CONV0000                     * convert any escape sequences
+          MOVE      NEWSTRNG,ZTR00601
           GOTO      RZTR9999
 .
 .         ZTR.7  Presenting Complaint Line 6 (ST)
@@ -41480,6 +41505,9 @@ RZTR0601  RESET     ZTR00601
 RZTR0700  BRANCH    COMPCNT,RZTR0701
 .
 RZTR0701  RESET     ZTR00701
+          MOVE      ZTR00701,OLDSTRNG
+          CALL      CONV0000                     * convert any escape sequences
+          MOVE      NEWSTRNG,ZTR00701
           GOTO      RZTR9999
 .
 .         ZTR.8  Location (emrlocaf code) (CE)

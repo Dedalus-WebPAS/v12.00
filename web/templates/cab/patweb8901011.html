@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.04">
+<meta name="TemplateVersion" content="V12.00.05">
 <meta name="TemplateHome" content="cab">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -1918,6 +1918,11 @@ Contract Role
          document.UpdateForm.ptvis135.selectedIndex=i;
       }
   }
+
+if (VariableNameExists('MoveMedRec') && MoveMedRec){
+  document.UpdateForm.mvmedre1.checked = true;
+}
+
 </script>
 
 <span id=preexisthdr style="display:none">

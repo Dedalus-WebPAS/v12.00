@@ -1,7 +1,12 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.03">
 <meta name="TemplateHome"    content="kids">
 <meta name="HelpFileName"    content="NoContextSet.html">
 <meta name="CrossBrowser"    content="true"> 
+<style type=text/css>
+ pre {
+ font-family: arial;
+ }
+</style>
 <script type="text/javascript" src="../js/TableSort.js"> </script>
 <script type="text/javascript">
 function LinkedReferral() {
@@ -129,7 +134,7 @@ InsertPatientHeader()
     <option value="outweb02.pbl|03|009|1|920|900">Update</option>
     <option value="outweb02.pbl|03|003|1|920|900">Attendance</option>
     <option value="outweb02.pbl|03|004|1|920|900">Follow Up Appointment</option>
-    <option value="outweb02.pbl|03|005|1|750|475">Re-schedule</option>
+    <option value="outweb02.pbl|03|005|1|750|475">Reschedule</option>
     <option value="outweb02.pbl|03|006|1|920|450">Discharge</option>
     <option value="outweb02.pbl|03|013|1|700|400">Labels & Forms</option>
     <option value="outweb02.pbl|03|002|1|800|450">Non-Attendance</option>
@@ -189,9 +194,9 @@ InsertPatientHeader()
 <tr><td class=DataLabel>Outcome                      </td>
     <td class=DataField>%OUTWEB02.03.354.0 </td>
     <td class=DataLabel>Referring GP/HCP             </td>
-    <td class=DataField>%OUTWEB02.03.348.003 %OUTWEB02.03.348.004 
-                        %OUTWEB02.03.348.005    </td></tr>
-
+    <td class=DataField>
+      <a href='javascript:HCPViewFrame("%OUTWEB02.03.348.001","%OUTWEB02.03.349","%OUTWEB02.03.356")'>
+      %OUTWEB02.03.348.081</a></td>
 <tr><td class=DataLabel>Booked By</td>
     <td class=DataField>%OUTWEB02.03.870.1</td>
     <td class=DataLabel>Date</td>

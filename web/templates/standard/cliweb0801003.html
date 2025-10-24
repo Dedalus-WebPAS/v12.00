@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.03">
+<meta name="TemplateVersion" content="V12.00.04">
 <meta name="TemplateHome" content="standard">
 <meta name="CrossBrowser" content="true">
 <meta name="HelpFileName"    content="NoContextSet.html">
@@ -26,6 +26,7 @@
   <input type=hidden name=corsp002 value="%STANDARD.01.015">
   <input type=hidden name=corsp004 value="%STANDARD.01.016">
   <input type=hidden name=redirect value="%CLIWEB08.01.001.comweb06.06.001">
+  <input type=hidden name=usersecu value="%STANDARD.01.042.CLIWEB08">
 <table align=center width=95% border=0 cellspacing=1 cellpadding=2>
 <!--
 <tr><td colspan=2 class=HeadingCell align=center>
@@ -64,7 +65,7 @@
 </td></tr>
 <tr><td colspan=2 align=center>
     <span id=InsertUpdateButton>
-    <input type=submit value="Update" class="button">
+    <input type=button value="Update" class="button" onclick="updateButton();">
     </span>
     <input type=button value="Close" class="button" onclick="DFrameExit()">
     <span id=InsertMyHRNIHCButton>
@@ -132,6 +133,16 @@ if ("%STANDARD.01.025.120.158.0.1" != "3") {
   authHCPText.innerHTML="";
 }
 
+function updateButton() {
+  var docSL=parseInt(document.UpdateForm.d_type.value.substring(22,28),10);
+  var userSL=parseInt(document.UpdateForm.usersecu.value,10);
+  if (docSL > userSL) {
+    alert("Security Level Inadequate");
+    return;
+  }
+  document.UpdateForm.submit();
+}
+
 function uploadMyHRNIHC() {
 
   if (!confirm('By selecting OK, the user confirms ' +
@@ -162,9 +173,7 @@ function uploadMyHRNIHC() {
   }
 
   SetCookie("NIHCIHIMyHRUploadCOOKIE",'1');
-  UpdateForm.submit();
-
-  
+  UpdateForm.submit();  
 
 }
 </script>

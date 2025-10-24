@@ -5,6 +5,8 @@
 .
 . Modifications : 
 .----------------------------------------------------------------------
+. V12.00.03 30/09/2025  Thanh T        TSK 0937505
+.           Recompiled for PATINVHL changes
 . V12.00.02 30/06/2025  Peter Vela       TSK 0939466
 .           Fixed Eclipse Webservieces DVAW validations D1217000
 .           and D1216S00
@@ -719,7 +721,7 @@ XXNAM     DIM       22
 .
 .----------------------------------------------------------------------
 PRGID     INIT      "OUTWEB07"
-VERSION   INIT      "V12.00.02"
+VERSION   INIT      "V12.00.03"
 PRGNAM    INIT      "Outpatient Invoice Web Server"
 .----------------------------------------------------------------------
 .

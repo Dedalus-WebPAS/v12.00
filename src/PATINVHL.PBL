@@ -6,6 +6,9 @@
 .*                                                                            *
 .* Modifications  :                                                           *
 .*----------------------------------------------------------------------------*
+.* V12.00.02 30/09/2025  Thanh T           TSK 0937505                        *
+.*           Added PRPH2550-PRPH2590 for Extended procedure Description line  *
+.*           1 to 50                                                          *
 .  V12.00.01 22/05/2025  J.Tan          TSK 0955096
 .            Added Alphanumeric visit number changes
 .* V11.04.02 30/04/2024  J.Tan             TSK 0945175                        *
@@ -456,7 +459,8 @@ PRIHL400  MOVE      IBDTTXFL,DIM5            * Data number 1st 3 chars of field
                           PRIH2679,PRIH2680,PRIH2681,PRIH2682,PRIH2683:  240 
                           PRIH2684,PRIH2685,PRIH2686,PRIH2687,PRIH2688:
                           PRIH2689,PRIH2690,PRIH2691,PRIH2692,PRIH2693:  250
-                          PRIH2694,PRIH2695,PRIH2696,PRIH2697
+                          PRIH2694,PRIH2695,PRIH2696,PRIH2697,PRPH2550:
+                          PRPH2560,PRPH2570,PRPH2580,PRPH2590
 .
 PRIHL410  MOVE      AADMNO,VARIABLE          * Admission number
           MOVE      EIGHT,PRNTSTRT
@@ -2316,6 +2320,32 @@ PRIH2696  PACK      VARIABLE,CAPPRVNO,SP70   * Hospital Provider Approval Number
 PRIH2697  PACK      VARIABLE,PTCNHABN,SP70   * Hospital ABN Number
           GOTO      PRIH5000
 .
+PRPH2550  MOVE      1,FORM3
+          MOVE      10,FORM3B
+          PROC      EXPRCDSC
+          GOTO      PRIHL100
+.
+PRPH2560  MOVE      11,FORM3
+          MOVE      20,FORM3B
+          PROC      EXPRCDSC
+          GOTO      PRIHL100
+.
+PRPH2570  MOVE      21,FORM3
+          MOVE      30,FORM3B
+          PROC      EXPRCDSC
+          GOTO      PRIHL100
+.
+PRPH2580  MOVE      31,FORM3
+          MOVE      40,FORM3B
+          PROC      EXPRCDSC
+          GOTO      PRIHL100
+.
+PRPH2590  MOVE      41,FORM3
+          MOVE      50,FORM3B
+          PROC      EXPRCDSC
+          GOTO      PRIHL100
+.
+.
 . ------- Format the variable -------
 .
 PRIH5000  RESET     VARIABLE,IBDTPLEN
@@ -3242,4 +3272,81 @@ TDAT9999  GOTO      BTODAT99
           INC       IBAOVRIO/INC
 .
 BTODAT99  ENDPROC
++
+.-----------------------------------------------------------------------------
+. Procedure to print out the group of oprdedaf.PDDDATA lines.
+. Input: DPVIBILL
+.        FORM3  - the starting line number that will be including in print
+.        FORM3B - the ending line number that will be including in print
+.-----------------------------------------------------------------------------
+          DEFPROC   EXPRCDSC
+.
+COUNT     FORM      3
+LENGTH    FORM      3
+.
+          INC       OPRDEAFD/INC
+          INC       OPRDEDFD/INC
+.
+EXPRDS00  OPEN      OPRDEDA1,"oprdedaf"
+          OPEN      OPRDETA2,"oprdetaf"
+          MOVE      ZERO,COUNT
+.
+          PACK      KEY31,PINVADM,SP70
+          CALL      RSOPDEA2
+EXPRDS20  CALL      RKOPDEA2
+          BRANCH    OVRCD,EXPRDS99
+.
+          MATCH     DPVIBILL,OPDAADMN
+          GOTO      EXPRDS99 IF NOT EQUAL
+.
+          COMPARE   THREE,OPDASTAT
+          GOTO      EXPRDS20 IF EQUAL
+.
+          MOVE      "024",D3
+          MOVE      FORM3,DIM3
+          PACK      KEY16,OPDAUNIQ,D3,DIM3,SP70
+          CALL      RDOPDED1
+          BRANCH    OVRCD,EXPRDS99
+.
+          GOTO      EXPRDS40
+.
+EXPRDS30  CALL      RKOPDED1
+          BRANCH    OVRCD,EXPRDS99
+.
+          MATCH     OPDAUNIQ,OPDDUNIQ
+          GOTO      EXPRDS99 IF NOT EQUAL
+.
+          MATCH     D3,OPDDTYPE
+          GOTO      EXPRDS99 IF NOT EQUAL
+.
+          MOVE      OPDDLINE,F3
+          COMPARE   F3,FORM3B
+          GOTO      EXPRDS99 IF LESS
+.
+EXPRDS40  ADD       ONE,COUNT
+          STRIP     OPDDDATA
+          MOVELPTR  OPDDDATA,LENGTH
+          SFORMAT   VARIABLE,LENGTH
+          MOVE      OPDDDATA,VARIABLE
+.
+. ------- Format the variable -------
+.
+EXPRDS50  IF        COUNT > 1
+            ADD       ONE,CURRROW
+            ADD       ONE,IBDTROW
+          ENDIF
+          RESET     VARIABLE,IBDTPLEN
+          LENSET    VARIABLE
+          RESET     VARIABLE
+          PRINT     *IBDTCOL,*+,VARIABLE;
+.
+          GOTO      EXPRDS30
+.
+          INC       OPRDEAIO/INC
+          INC       OPRDEDIO/INC
+          INC       IBAOVRIO/INC
+.
+EXPRDS99  CLOSE     OPRDEDA1
+          CLOSE     OPRDETA2
+          ENDPROC
 +

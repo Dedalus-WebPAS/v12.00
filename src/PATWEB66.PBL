@@ -5,6 +5,10 @@
 .
 . Modifications :
 .
+.     V12.00.01   03.10.2025  DA Sarkies      TSK 0966285
+.                 Added dummy DB read to prevent losing SMSes in RESP0000
+.     V11.05.01   03.10.2025  DA Sarkies      TSK 0966285
+.                 Added dummy DB read to prevent losing SMSes in RESP0000
 .     V11.04.01   06/12/2023  Ebon Clements   TSK 0936255
 .                 Improved response mapping file reads - PROCRM00
 .     V10.13.01   31/10/2018  Ebon Clements   TSK 0850893
@@ -66,7 +70,7 @@ RECVADMN  DIM       8
 .
 .----------------------------------------------------------------------
 PRGID     INIT      "PATWEB66"
-VERSION   INIT      "V12.00.00"
+VERSION   INIT      "V12.00.01"
 PRGNAM    INIT      "SMS Response Polling Server"
 .----------------------------------------------------------------------
 .
@@ -110,7 +114,10 @@ INIT9999  RETURN
 .------------------------------------------------------------
 . Check for any sms resposes
 .------------------------------------------------------------
-RESP0000  MOVE      ZERO,OVRCD
+RESP0000  PACK      KEY16,SP70
+          CALL      RDPMSMH1                * Dummy call to test DB active
+.
+          MOVE      ZERO,OVRCD
           TRAP      OVERCOND IF IO
           OPEN      SMSRESP1,"smsresp1"     * See if old response text
           TRAPCLR   IO                      * file exists

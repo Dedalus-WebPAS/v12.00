@@ -1,4 +1,4 @@
-//jsVersion  : V12.00.02
+//jsVersion  : V12.00.03
 //========================================================================
 // Program   : patweb99.js
 //
@@ -1176,16 +1176,19 @@ function SetStateField(stateValue) {
   }
 }
 function ValDoctor(doctor,description) {
-  if (isWhitespace(doctor.value)) { return;;}
-  var serverURL   = "../cgi-bin/patweb80.pbl?reportno=3" +
-                    "&valdcode=" + doctor.value.replace(/ /g,"+")
+  description.value="";
+  if (isWhitespace(doctor.value)) { return; }
+
+  var serverURL = "../cgi-bin/comweb81.pbl?reportno=75" +
+                  "&valdcode=" + doctor.value.replace(/ /g,"+")
+
   var returnValue = RSExecute(serverURL);
-  if (returnValue.status != 0) {
-    doctor.value="";
-    description.value="";
-    doctor.focus();
-    return;
+  if (returnValue.status==0) {
+    ReturnValue=returnValue.return_value.split("|")
+    description.value=trim(ReturnValue[82])
+    return true;
   }
-  ReturnValue = returnValue.return_value.split("|");
-  description.value = ReturnValue[0];
+  else {
+    return false;
+  }
 }

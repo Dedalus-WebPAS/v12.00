@@ -31,6 +31,8 @@
 .
 .        VERSION  :
 . 
+.         V12.00.05 10/10/2025  J.Tan          TSK 0946593
+.                   Mod CP zero thea.fee to sort using perdiem fees (SORTDONE)
 .         V12.00.04 17/07/2025  J.Tan          TSK 0961277
 .                   Checking if Accom.has been included in Pat.inv. (COMFLAG)
 .         V12.00.03 01/07/2025  J.Tan          TSK 0960457
@@ -914,6 +916,7 @@ CALCTBI   MOVE      ZERO,HFACCM              * Total rebate for Accommodation
           MOVE      SP70,CMXCONTR
           MOVE      SP70,SAVBTYP
           MOVE      SP70,ACCMDESC
+          MOVE      ZERO,SORTDONE
 .
           MOVE      ZERO,STEPNO
           MOVE      ZERO,SAVETRN
@@ -5759,6 +5762,7 @@ SITM2350 LOAD      NUMINVS,TNINVS,NUMINVS,TWO                          *C-90226
          MOVE      SP70,PTITIWRN
 .
          IF        TRECTYPE=2
+           MOVE      ZERO,SORTDONE     * flag for Creating sort file
            MOVE      ONE,CBFLAG
            CALL      GETIT00           * re-calculate theatre fees
            MOVE      ZERO,CBFLAG
@@ -10770,9 +10774,28 @@ GETIT20  IF        IBCNMHOS=1
          GOTO      GETIT99                * get next item
 .
 GETIT22  MOVE      PMMITDAT,TSRVDATE        * Service date
+.
+.        for Casepayment - if Casemix Theatre Fees is not setup or zero amount
+.           Check per diem theatre fee before MBS item amt to Sort MBS items
+.
+         ADD       ONE,COPTION
+         IF        CMXFLAG=1 & SORTDONE=1
+           MOVE      COPTION,FORM2          * set item sequence
+           CALL      CMXT0000               * get theatre casemix funding
+           BRANCH    EXIT,GETIT24           * Check per diem theatre fee
+.
+           CALL      CIPAT000               * Set No of Inv. from Contract
+           IF        TREBATE=0
+             MOVE      ZERO,PITMCHRG        * Included in Patient Payable
+             IF        TPATAMTP=0
+               GOTO      GETIT24
+             ENDIF
+           ENDIF
+           GOTO      GETIT80                * get next item
+         ENDIF
+.
          IF        CMXFLAG = 1
-           ADD       ONE,COPTION
-           MOVE      COPTION,FORM2            * set item sequence
+           MOVE      COPTION,FORM2          * set item sequence
            CALL      CMXT0000               * get theatre casemix funding
            BRANCH    EXIT,GETIT90
            CALL      CIPAT000               * Set No of Inv. from Contract
@@ -10782,11 +10805,10 @@ GETIT22  MOVE      PMMITDAT,TSRVDATE        * Service date
            GOTO      GETIT80                * get next item
          ENDIF
 .
-         CALL      GTHR0000                 * get normal theatre charge
+GETIT24  CALL      GTHR0000                 * get normal theatre charge
          BRANCH    EXIT OF GETIT90
          CALL      CIPAT000                 * Set No of Inv. from Contract
 .
-         ADD       ONE,COPTION
          OPEN      PATITEM1,"patitemn"
          PACK      KEY17 WITH TITEMNO,OPRDATE,SP70
          CALL      PATITMRD
@@ -11390,9 +11412,11 @@ CTMP3000  MOVE      "99999999",FORM8A      * default for misc.amount   *C-90226
           IF        TRECTYPE=2
             MOVE      ZERO,COPTION
             MOVE      SP20,CURSESS
+            MOVE      ONE,SORTDONE        * flag for Creating sort file
             MOVE      ONE,CBFLAG
             CALL      GETIT00             * get first sequence of theatre fees
             MOVE      ZERO,CBFLAG
+            MOVE      ZERO,SORTDONE
 .
             OPEN      PATFX1A1,"patfx1af"
             PACK      KEY6,AFUNDH,SP70

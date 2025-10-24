@@ -1,8 +1,8 @@
-<meta name="TemplateVersion" content="V12.00.01">
-<meta name="TemplateHome" content="standard">
-<meta name="HelpFileName" content="NoContextSet.html">
-<meta name="CrossBrowser" content="true">
-<script type="text/javascript" src=../js/EmergencyCodingTable.js> </script>
+<meta name="TemplateVersion" content="V12.00.02">
+<meta name="TemplateHome"    content="standard">
+<meta name="HelpFileName"    content="NoContextSet.html">
+<meta name="CrossBrowser"    content="true">
+<script type="text/javascript" src="../js/EmergencyCodingTable.js"></script>
 <script type="text/javascript">
 function newDiagnosis() {
   if (isWhitespace(document.Dummy.diagselt.value)) {
@@ -104,19 +104,19 @@ InsertPatientHeader()
 <tr><td class=HeadingCell width=20% align=left>Diagnosis Summary</td>
     <td class=HeadingCell align=right>  
     Search
-    <input type=text onKeyUp='getDiagnosis(this,Dummy.diagselt,Dummy.d_emvcd033);'
-     class=SelectBig tabindex=1 name=srchField id=srchField>
+    <input type=text class=SelectBig tabindex=1 name=srchField id=srchField
+     title="Enter Key Word to search..."
+     onkeyup='getDiagnosis(this,Dummy.diagselt,Dummy.d_emvcd033);'>
     </td>
     <td class=HeadingCell>
-    <select name=diagselt class=SelectXlrg tabindex=2 id=diagselt 
+    <select name=diagselt id=diagselt class=SelectXlrg tabindex=2 title="Diagnosis"
      onchange="document.Dummy.d_emvcd033.value=trim(this.value.substring(9,80))+' ';">
     </select>
     <input type=button class="button" value="Add"
      onclick='newDiagnosis();' tabindex=3>
-    <img src=../images/SelectLink.gif border=0 style="cursor:pointer"
-      title="Diagnosis Lookup" 
-      onclick="LookupPage(Dummy.srchField,Dummy.diagselt,
-              'Lookup_DIAG0000_000');">
+    <img src="../images/SelectLink.gif" border=0 style="cursor:pointer"
+     title="Diagnosis Lookup" 
+    onclick="LookupPage(Dummy.srchField,Dummy.diagselt,'Lookup_DIAG0000_000');">
     </td></tr>
 <tr>
     <td class=HeadingCell width=20% align=left>
@@ -124,7 +124,7 @@ InsertPatientHeader()
     <td class=HeadingCell></td>
     <td class=HeadingCell>
       <input type=text maxlength=100 size=91 tabindex=3 name="d_emvcd033"
-       id="d_emvcd033">
+       id="d_emvcd033" title="Diagnosis Free Format Description">
     </td>
 </tr>
 </table>

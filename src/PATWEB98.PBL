@@ -5,6 +5,14 @@
 .
 . Modifications :
 .---------------------------------------------------------------------
+. V12.00.11  15/10/2025  Alina Bhari    TSK 0947952
+.            Formatted discharge date and admission date of linked visit in
+.            DD/MM/YYYY and time - FHIR2200,FHIR2300,FHIR2400
+.            Displayed the admission source class of linked visit
+.            - FHIR2500,FHIR2600
+. V12.00.10  25/09/2025  Jacob Jackson  TSK 0965749
+.            On supervisor 'Change Claim' screen, disable ability to change
+.            ICWA claim types. Throw error if it has been submitted.
 . V12.00.09  16/09/2025  J.Tan          TSK 0965020
 .            Mod to update Date record last changed fields in pattranf,patchcof
 . V12.00.08  04/08/2025  Ebon Clements  TSK 0964910
@@ -3256,6 +3264,7 @@ CASTDESC  DIM       40            * Case Team description
 .
 CFPAYCOD  DIM       3        * 3M Codefinder PAY Code
 MRFDDATE  DIM       8
+WAMCLDIS  FORM      1
 .
 .
 .-------------------------------------------------
@@ -3511,7 +3520,7 @@ NORETURN  DIM       1      * No return (button) flag
 .
 .------------------------------------------------------------------------
 PRGID     INIT      "PATWEB98"
-VERSION   INIT      "V12.00.09"
+VERSION   INIT      "V12.00.11"
 PRGNAM    INIT      "Patient Enquiries Template Server"
 .------------------------------------------------------------------------
           CALL      WEBINT00       * Initialise Fifo Etc.
@@ -10520,8 +10529,8 @@ FHIR0000  UNPACK    DIM127,DIM1,KEY3,DIM127
                              FHIR0600,FHIR0700,FHIR0800,FHIR0900,FHIR1000:
                              FHIR1100,FHIR1200,FHIR1300,FHIR1400,FHIR1500:
                              FHIR1600,FHIR1700,FHIR1800,FHIR1900,FHIR2000:
-                             FHIR2100
-
+                             FHIR2100,FHIR2200,FHIR2300,FHIR2400,FHIR2500:
+                             FHIR2600
           WRITE     HTMLFILE;"Invalid Tag";
           GOTO      FHIR9999
 .
@@ -10928,6 +10937,102 @@ FHIR2100  COMPARE   THREE,ASTAT             * Discharged status?
           WRITE     HTMLFILE;WBSENAM;
           GOTO      FHIR9999
 .
+.         This label is not related to FHIR
+FHIR2200  MATCH     SP70,DDATE
+          IF        @EQUAL
+            WRITE     HTMLFILE;SP70;
+          ELSE
+            UNPACK    DDATE,CCENT,CYEAR,CMON,CDAY
+            WRITE     HTMLFILE;CDAY,SLASH,CMON,SLASH,CCENT,CYEAR;
+          ENDIF
+          GOTO      FHIR9999
+.
+.         This label is not related to FHIR
+FHIR2300  MATCH     SP70,PTDSLSDN
+          IF        @EQUAL
+            WRITE     HTMLFILE;SP70;
+            GOTO      FHIR9999
+          ENDIF
+.         For Statistical discharged visit
+.         Display the admission date of the linked visit
+          MOVE      ADMISSNO,DIM8
+          PACK      KEY8,PTDSLSDN,SP70
+          CALL      RDMISS1
+          IF        OVRCD=1
+            WRITE     HTMLFILE;SP70;
+          ELSE
+            UNPACK    ADATE,CCENT,CYEAR,CMON,CDAY
+            WRITE     HTMLFILE;CDAY,SLASH,CMON,SLASH,CCENT,CYEAR;
+          ENDIF
+.
+          MOVE      DIM8,ADMISSNO
+          GOTO      FHIR9999
+.
+.         This label is not related to FHIR
+FHIR2400  MATCH     SP70,PTDSLSDN
+          IF        @EQUAL
+            WRITE     HTMLFILE;SP70;
+            GOTO      FHIR9999
+          ENDIF
+.         For Statistical discharged visit
+.         Display the admission time of the linked visit
+          MOVE      ADMISSNO,DIM8
+          PACK      KEY8,PTDSLSDN,SP70
+          CALL      RDMISS1
+          IF        OVRCD=1
+            WRITE     HTMLFILE;SP70;
+          ELSE
+            WRITE     HTMLFILE;ATIME;
+          ENDIF
+.
+          MOVE      DIM8,ADMISSNO
+          GOTO      FHIR9999
+.
+.         This label is not related to FHIR
+FHIR2500  MATCH     SP70,PTDSLSDN
+          IF        @EQUAL
+            WRITE     HTMLFILE;SP70;
+            GOTO      FHIR9999
+          ENDIF
+.         For Statistical discharged visit
+.         Display the admission Source of the linked visit
+          MOVE      ADMISSNO,DIM8
+          PACK      KEY8,PTDSLSDN,SP70
+          CALL      RDMISS1
+          IF        OVRCD=1
+            WRITE     HTMLFILE;SP70;
+          ELSE
+            MOVE      "S ",CATEGORY
+            MOVE      ASRCE,CODE
+            CALL      GETCOD00
+            WRITE     HTMLFILE;TDESC;
+          ENDIF
+.
+          MOVE      DIM8,ADMISSNO
+          GOTO      FHIR9999
+.
+.        This label is not related to FHIR
+FHIR2600  MATCH     SP70,PTDSLSDN
+          IF        @EQUAL
+            WRITE     HTMLFILE;SP70;
+            GOTO      FHIR9999
+          ENDIF
+.         For Statistical discharged visit
+.         Display the admission Class of the linked visit
+          MOVE      ADMISSNO,DIM8
+          PACK      KEY8,PTDSLSDN,SP70
+          CALL      RDMISS1
+          IF        OVRCD=1
+            WRITE     HTMLFILE;SP70;
+          ELSE
+            MOVE      "P ",CATEGORY
+            MOVE      ACLSS,CODE
+            CALL      GETCOD00
+            WRITE     HTMLFILE;TDESC;
+          ENDIF
+.
+          MOVE      DIM8,ADMISSNO
+          GOTO      FHIR9999
 FHIR9999  RETURN
 +
 .------------------------------------------------------------------------------
@@ -20161,7 +20266,32 @@ TRNSUP10  CALL      RDPTRAN2
             MOVE      ONE,F1                * show checkbox for discharges
           ENDIF
 .
-          CLEAR     HTMLLINK
+          MOVE      ZERO,WAMCLDIS
+.
+          PACK      KEY5,ANSC,ANSL,PTTRCLTY
+          CALL      RDCODE1
+          BRANCH    OVRCD,TRNSUP12
+.
+          MATCH     ANSM,TCINDC1
+          GOTO      TRNSUP11 IF EQUAL
+.
+          MATCH     ANSM,TCINDC2
+          GOTO      TRNSUP11 IF EQUAL
+.
+          MATCH     ANSM,TCINDC3
+          GOTO      TRNSUP11 IF EQUAL
+.
+          MATCH     ANSM,TCINDC4
+          GOTO      TRNSUP11 IF EQUAL
+.
+          MATCH     ANSM,TCINDC5
+          GOTO      TRNSUP11 IF EQUAL
+.
+          GOTO      TRNSUP12
+.
+TRNSUP11  MOVE      ONE,WAMCLDIS
+.
+TRNSUP12  CLEAR     HTMLLINK
           MATCH     ANSA,TMOVE
           IF        @EQUAL
             APPEND    "javascript:DispAdmError()",HTMLLINK
@@ -20237,14 +20367,27 @@ TRNSUP15  RESET     HTMLLINK
           IF        TRNSUPTY=2
             IF        RECCNT<>1 | F1=1
               IF        F1=1
-                WRITE     HTMLFILE;"<input type=checkbox name=uptrn",DRECCNT:
-                          " onClick=showFundingSrc(this.checked);":
-                          "UpdateArray(this.value);":
-                          " value='",BEDTRKEY,"'>";
+                IF        WAMCLDIS=1
+                  WRITE     HTMLFILE;"<input type=checkbox name=uptrn",DRECCNT:
+                            " onClick=showFundingSrc(this.checked);":
+                            "UpdateArray(this.value);":
+                            " value='",BEDTRKEY,"' disabled>";
+                ELSE
+                  WRITE     HTMLFILE;"<input type=checkbox name=uptrn",DRECCNT:
+                            " onClick=showFundingSrc(this.checked);":
+                            "UpdateArray(this.value);":
+                            " value='",BEDTRKEY,"'>";
+                ENDIF
               ELSE
-                WRITE     HTMLFILE;"<input type=checkbox name=uptrn",DRECCNT:
-                          " onClick=UpdateArray(this.value);":
-                          " value='",BEDTRKEY,"'>";
+                IF        WAMCLDIS=1
+                  WRITE     HTMLFILE;"<input type=checkbox name=uptrn",DRECCNT:
+                            " onClick=UpdateArray(this.value);":
+                            " value='",BEDTRKEY,"' disabled>";
+                ELSE
+                  WRITE     HTMLFILE;"<input type=checkbox name=uptrn",DRECCNT:
+                            " onClick=UpdateArray(this.value);":
+                            " value='",BEDTRKEY,"'>";
+                ENDIF
               ENDIF
             ENDIF
           ENDIF
@@ -28997,7 +29140,26 @@ UPDTRN55  MATCH     SP70,TRNRECKY[TRNCOUNT]    * Any more records to update
           CALL      RDTRAN2
           BRANCH    OVRCD,UPDTRN80
 .
-          MATCH     Z70,TRNTOWRD               * update ward/bed
+          PACK      KEY5,ANSC,ANSL,PTTRCLTY
+          CALL      RDCODE1
+          BRANCH    OVRCD,UPDTRN57
+.
+          MATCH     "M",TCINDC1
+          GOTO      UPDTRN88 IF EQUAL
+.
+          MATCH     "M",TCINDC2
+          GOTO      UPDTRN88 IF EQUAL
+.
+          MATCH     "M",TCINDC3
+          GOTO      UPDTRN88 IF EQUAL
+.
+          MATCH     "M",TCINDC4
+          GOTO      UPDTRN88 IF EQUAL
+.
+          MATCH     "M",TCINDC5
+          GOTO      UPDTRN88 IF EQUAL
+.
+UPDTRN57  MATCH     Z70,TRNTOWRD               * update ward/bed
           IF        !@EQUAL
             PACK      PMCHOVAL,TWARD,TBED,SP70,SP70          * old value
             PACK      TWARD,TRNTOWRD,SP70
@@ -29166,6 +29328,12 @@ UPDTRN71  MATCH     Z70,TRNTORES               * update resident
 .
 UPDTRN80  ADD       ONE,TRNCOUNT
           GOTO      UPDTRN55
+.
+UPDTRN88  CLEAR     WEBTITLE
+          APPEND    "This visit has been confirmed by ICWA and the ",WEBTITLE
+          APPEND    "Claim Type cannot be updated.",WEBTITLE
+          CALL      WEBERR00
+          GOTO      UPDTRN98
 .
 UPDTRN89  MOVE     "Transfer record already exists for this date/time.",WEBTITLE
           CALL      WEBERR00

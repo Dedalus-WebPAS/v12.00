@@ -1,4 +1,4 @@
-//jsVersion  : V12.00.00
+//jsVersion  : V12.00.01
 //--------------------------------------------------------------------------
 // Compare function used for our sort in getDiagnosis()
 function compare(a,b) {
@@ -37,7 +37,7 @@ function getDiagnosis(SearchField,ReturnSelect,DescField) {
   }
 
   var serverURL   = "../cgi-bin/emrweb08.pbl?reportno=1" +
-                    "&valdcode=" + SearchField.value.replace(/ /g,"+");
+                    "&valdcode=" + encodeURIComponent(SearchField.value.replace(/ /g,"+"));
 
   var ReturnValue = null;
 

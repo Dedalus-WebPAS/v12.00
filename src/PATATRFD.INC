@@ -1,22 +1,23 @@
+. v12.00.01 29/09/2025 IT C-0955574 Added PTARTYPE 030 - Nursing Pre-assessment 
 . V11.05.01 13/02/2025 IT C-0946534 Added PTARTYPE 029 - Casemix Code Verificati
 . V11.04.01 22/03/2024 TT C-0940239 Added PTARTYPE 028 - WA Health Discharge Det
-. V11.03.01 16/02/2023 TT C-0914049 Added PTARTYPE 026 & PTARTYPE 027           
-. V11.02.01 30/05/2022 TT C-0893159 Added PTARTYPE 025                          
-. V11.01.01 22/09/2021 TT C-0903847 Added PTARTYPE 023 & PTARTYPE 024           
-. V11.00.03 09/11/2020 TT C-0878747 Added PTARTYPE 022                          
-. V11.00.02 27/08/2020 TT C-0881752 Added PTARTYPE 109                          
-. V11.00.01 24/03/2020 TN C-0887397 Added PTARTYPE 021                          
-. V10.15.01 18/12/2019 EC C-0879283 Added PTARTYPE 020                          
-. V10.14.02 02/06/2019 jp C-0873054 Added index 4 and MH type                   
-. V10.14.01 03/04/2019 TN C-0871443 Added PTARTYPE values 017 and 018           
-. V10.10.01 15/03/2017 TN C-0833454 Added values 014 to 016 for PTARTYPE        
-. V10.08.03 18/04/2016 DN C-0316489 Added Index 3                               
-. V10.08.02 31/03/2016 SA C-0321157 Added PTARTYPE values 011, 012 & 013        
-. V10.08.01 30/03/2016 SA C-0316489 Added values 002 to 010 for PTARTYPE        
-. V10.07.01 05/11/2015 SA C-323325 Added PTARFDTE, PTARFTME & PTARFUSR          
-. V10.04.02 24/01/2014 PV C-286158 Added TYPE to both index                     
-. V10.04.01 24/01/2014 PV C-286158 Changed 1st index and Added 2nd index        
-. V10.03.01 03/12/2013 PV C-286158 Created FD Patient Attributes Table          
+. V11.03.01 16/02/2023 TT C-0914049 Added PTARTYPE 026 & PTARTYPE 027
+. V11.02.01 30/05/2022 TT C-0893159 Added PTARTYPE 025
+. V11.01.01 22/09/2021 TT C-0903847 Added PTARTYPE 023 & PTARTYPE 024
+. V11.00.03 09/11/2020 TT C-0878747 Added PTARTYPE 022
+. V11.00.02 27/08/2020 TT C-0881752 Added PTARTYPE 109
+. V11.00.01 24/03/2020 TN C-0887397 Added PTARTYPE 021
+. V10.15.01 18/12/2019 EC C-0879283 Added PTARTYPE 020
+. V10.14.02 02/06/2019 jp C-0873054 Added index 4 and MH type
+. V10.14.01 03/04/2019 TN C-0871443 Added PTARTYPE values 017 and 018
+. V10.10.01 15/03/2017 TN C-0833454 Added values 014 to 016 for PTARTYPE
+. V10.08.03 18/04/2016 DN C-0316489 Added Index 3
+. V10.08.02 31/03/2016 SA C-0321157 Added PTARTYPE values 011, 012 & 013
+. V10.08.01 30/03/2016 SA C-0316489 Added values 002 to 010 for PTARTYPE
+. V10.07.01 05/11/2015 SA C-323325 Added PTARFDTE, PTARFTME & PTARFUSR
+. V10.04.02 24/01/2014 PV C-286158 Added TYPE to both index
+. V10.04.01 24/01/2014 PV C-286158 Changed 1st index and Added 2nd index
+. V10.03.01 03/12/2013 PV C-286158 Created FD Patient Attributes Table
 . *----------------------------------------------------------------------
 . * Include Name  :   PATATRFD.INC
 . *
@@ -92,6 +93,7 @@ PTARTYPE  DIM       3      3        33    Type of Attribute
 .                                         028 - WA Health Discharge Details    
 .                                         029 - Casemix Code Verification (cat 
 .                                         RV)                                  
+.                                         030 - Nursing Pre-assessment         
 .                                         109 - Clinical Notes - Nursing Diag  
 PTARVAL1  DIM       6      6        36    Value 1                            
 PTARVAL2  DIM       6      6        42    Value 2                            

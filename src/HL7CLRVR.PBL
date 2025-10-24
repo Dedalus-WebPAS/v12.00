@@ -4,6 +4,10 @@
 .*         Used by the HL7 PAS-CIS Interface.                                *
 .*                                                                           *
 .* Modifications:                                                            *
+.*        21/10/2025  Bella Turco      TSK 0960178                           *
+.*                    Added ZXP077                                           *
+.*        07/10/2025  Davin            TSK 0946211 (unrelated issue)         *
+.*                    Added clears for ZSD segment variables (CLZSD000)      *
 .*        11/09/2025  Davin            TSK 0949457                           *
 .*                    Added ZXP076                                           *
 .*        29/04/2025  Davin            TSK 0947378                           *
@@ -1441,6 +1445,7 @@ CLZXP000  MOVE      SP100,ZXP001
           MOVE      SP100,ZXP074
           MOVE      SP100,ZXP075
           MOVE      SP100,ZXP076
+          MOVE      SP100,ZXP077
 
 .
 .         Set the LL and FP to zero so that each character received for
@@ -1522,6 +1527,7 @@ CLZXP000  MOVE      SP100,ZXP001
           CLEAR     ZXP074
           CLEAR     ZXP075
           CLEAR     ZXP076
+          CLEAR     ZXP077
 .
 CLZXP999  RETURN
 +
@@ -2007,6 +2013,18 @@ CLZSD000  MOVE      SP100,ZSD001
           MOVE      SP100,ZSD002
           PACK      ZSD003,SP100,SP100,SP100,SP100,SP100,SP100,SP100,SP100:
                            SP100,SP100
+          PACK      ZSD004,SP100,SP100,SP100,SP100,SP100,SP100,SP100,SP100:
+                           SP100,SP100
+          PACK      ZSD005,SP100,SP100,SP100,SP100,SP100,SP100,SP100,SP100:
+                           SP100,SP100
+          PACK      ZSD006,SP100,SP100,SP100,SP100,SP100,SP100,SP100,SP100:
+                           SP100,SP100
+          PACK      ZSD007,SP100,SP100,SP100,SP100,SP100,SP100,SP100,SP100:
+                           SP100,SP100
+          PACK      ZSD008,SP100,SP100,SP100,SP100,SP100,SP100,SP100,SP100:
+                           SP100,SP100
+          PACK      ZSD009,SP100,SP100,SP100,SP100,SP100,SP100,SP100,SP100:
+                           SP100,SP100
 .
 .         Set the LL and FP to zero so that each character received for
 .         the field can be APPENDed.
@@ -2014,6 +2032,12 @@ CLZSD000  MOVE      SP100,ZSD001
           CLEAR     ZSD001
           CLEAR     ZSD002
           CLEAR     ZSD003
+          CLEAR     ZSD004
+          CLEAR     ZSD005
+          CLEAR     ZSD006
+          CLEAR     ZSD007
+          CLEAR     ZSD008
+          CLEAR     ZSD009
 .
 CLZSD999  RETURN
 +

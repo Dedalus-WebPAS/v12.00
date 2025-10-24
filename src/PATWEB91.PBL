@@ -7,6 +7,8 @@
 .
 . Modifications :
 .-------------------------------------------------------------------------------
+. V11.05.02 08/10/2025 PJ Le Febour    TSK 0967900a 
+.           PSHED000 - amended spelling of Post Code to Postcode           
 . V11.05.01 20/03/2025 Nikitha B       TSK 0956697  
 .           Removed "Max Bookings" COL8HEAD for catcode "BK". Defaulted to 
 .           "Associated No" at CDHED000 
@@ -513,7 +515,7 @@ CHRCOUNT  FORM      2
 .
 .-----------------------------------------------------------
 PRGID     INIT      "PATWEB91" 
-VERSION   INIT      "V12.00.00"
+VERSION   INIT      "V12.00.01"
 PRGNAM    INIT      "Code Search Server"
 .-----------------------------------------------------------
 .
@@ -6189,7 +6191,7 @@ POSTS999  RETURN
 .------------------------------------------------------------
 PSHED000  WRITE     HTMLFILE;"<tr>":
                                "<td class=HeadingCell width=20%>":
-                               "<b>Post Code</b></td>":
+                               "<b>Postcode</b></td>":
                                "<td class=HeadingCell width=30%>":
                                "<b>Suburb</b></td>":
                                "<td class=HeadingCell width=20%>":

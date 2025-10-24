@@ -8,11 +8,23 @@
 .* Function       :  Load eAccreditation Doctor Details from CSV file          *
 .* Modifications  :                                                            *
 .*******************************************************************************
+.* V12.00.04   14.10.2025 DA Sarkies             TSK 0948995                   *
+.*                        Cleared hospital flag PTDOHOSS if update flag        *
+.*                        PTCNUPEA is set at PROC5200                          *
+.* V12.00.03   10.10.2025 DA Sarkies             TSK 0948995                   *
+.*                        Cleared hospital flag PMHCHOSS if update flag        *
+.*                        PTCNUPEA is set at PROC5200                          *
 .* V12.00.02   22.09.2025 DA Sarkies             TSK 0948995                   *
 .*                        Added 'Valid for all Hospitals' if blank             *
 .* V12.00.01   18/09/2025 DA Sarkies             TSK 0948995                   *
 .*                        Added check to skip error if hospital code blank     *
 .*                        in PURPST00                                          *
+.* V11.05.04   14.10.2025 DA Sarkies             TSK 0948995                   *
+.*                        Cleared hospital flag PTDOHOSS if update flag        *
+.*                        PTCNUPEA is set at PROC5200                          *
+.* V11.05.03   10.10.2025 DA Sarkies             TSK 0948995                   *
+.*                        Cleared hospital flag PMHCHOSS if update flag        *
+.*                        PTCNUPEA is set at PROC5200                          *
 .* V11.05.02   22.09.2025 DA Sarkies             TSK 0948995                   *
 .*                        Added 'Valid for all Hospitals' if blank             *
 .* V11.05.01   18/09/2025 DA Sarkies             TSK 0948995                   *
@@ -544,7 +556,7 @@ EXCEP020  INIT      "Last Accreditation Date is invalid "
 PRGID     INIT      "IBAHMS40"
 .                   ****************** NB Spaces at end of PRGNAM are deliberate
 PRGNAM    INIT      "Load eAccreditation Doctor Details   "
-VERSION   INIT      "V12.00.02"
+VERSION   INIT      "V12.00.04"
 +
 .******************************************************************************
 .*                                  MAIN0000                                  *
@@ -932,7 +944,14 @@ PROC5100  PACK      KEY10,EACRHCPC,SP70
           ENDIF
 .
 PROC5200  MATCH     "1",PTCNUPEA                 * Update fields (not rewrite)
-          GOTO      PROC5300 IF EQUAL
+          IF        @EQUAL
+            MATCH     "A",UPDTTYPE
+            IF        @EQUAL
+              PACK      PMHCHOSS,SP70              * Clears Hospital Flag
+              PACK      PTDOHOSS,SP70              * Clears Hospital Flag
+            ENDIF
+            GOTO      PROC5300
+          ENDIF
 .
           CALL      CLPATDOC                     * Clear all Doctor fields
           CALL      CLPMSHCP                     * Clear all HCP fields

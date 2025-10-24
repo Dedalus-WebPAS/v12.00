@@ -6,6 +6,12 @@
 . Modifications :
 .
 .------------------------------------------------------------------------------
+. V12.00.08 10/10/2025  J.Tan          TSK 0946593
+.           Recompiled for PATCATBI - Sort Casepayment Theatre fee items
+. V12.00.07 06/10/2025  J.Tan          TSK 0966784
+.           Recompiled for PATCATAI - Fixed printing ICD10 on reprint
+. V12.00.06 30/09/2025  Thanh T        TSK 0937505
+.           Recompiled for PATINVHL changes
 . V12.00.05 27/08/2025  Alina Bhari      TSK 0954453
 .           Recompiled for PRIINVHL - Added Patient Name
 . V12.00.04 17/07/2025  J.Tan          TSK 0961277
@@ -1210,7 +1216,7 @@ OBB       INIT      "("
 .
 .----------------------------------------------------------------------
 PRGID     INIT      "COMWEB70"
-VERSION   INIT      "V12.00.05"
+VERSION   INIT      "V12.00.08"
 PRGNAM    INIT      "Patient Polling Server         "
 .----------------------------------------------------------------------
 .

@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="kids">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -345,9 +345,11 @@ function pressUpdate() {
      onclick="tempDisable(this);pressUpdate();">
     <input type=button value="Delete" class="button"  tabindex=34 
      onclick=checkSubmit('D');>
-    <input type=button value="Labels & Letters" class="button" tabindex=35
+    <input type=button value="Labels & Letters" id=lablet class="button" 
+     tabindex=35
      onclick='LabelLet04("%OUTWEB05.04.001","%OUTWEB05.04.012.1");'>
-    <input type=button value="Slot Template" class="button"  tabindex=36
+    <input type=button value="Slot Template" id=slottemp class="button"  
+     tabindex=36
      onclick='Template04("%OUTWEB05.04.001","%OUTWEB05.04.012.1");'>
     <input type=button value="Copy" class="button" tabindex=37
      onclick='CopyClnt04("%OUTWEB05.04.001","%OUTWEB05.04.012.1");'>
@@ -446,4 +448,13 @@ Medical Practice
 </span>
 
 <span id=blanklabel style="display:none">&nbsp;</span>
+
+<script type=text/javascript>
+  if("%OUTWEB05.04.199.015"=="1"){
+    document.getElementById("lablet").className="RedButton";
+  }
+  if("%OUTWEB05.04.199.016"=="1"){
+    document.getElementById("slottemp").className="RedButton";
+  }
+</script>
 

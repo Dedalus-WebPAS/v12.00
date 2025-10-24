@@ -5,6 +5,9 @@
 .
 . Modifications  : 
 .-------------------------------------------------------------------------------
+. V12.00.04 25/09/2025  Bella Turco    TSK 0956710
+.           New remote script POTPRV00 - Get Patient Out of Theatre of Previous
+.           Patient
 . V12.00.03 23/09/2025  Thanh T        TSK 0937505
 .           Added GTEXDS00, AUEXDS00 and CLEXDS00 for extended procedure
 .           description
@@ -2337,7 +2340,7 @@ ISERASE   INIT      "iserase "
 .
 .******************************************************************************
 PRGID     INIT      "OPRWEB06"                                                *
-VERSION   INIT      "V12.00.03"
+VERSION   INIT      "V12.00.04"
 PRGNAM    INIT      "Theatre Information Server"                              *
 .******************************************************************************
           CALL      WEBINT00                * Initialise FIFO Etc.
@@ -2706,6 +2709,7 @@ INIT0000  CALL      INTMAS00
           OPEN      OPRDETA1,"oprdetaf"
           OPEN      OPRDETA2,"oprdetaf"
           OPEN      OPRDETA3,"oprdetaf"
+          OPEN      OPRDETA5,"oprdetaf"
           OPEN      OPRADTA1,"opradtaf"
           OPEN      OPRADTA2,"opradtaf"
           OPEN      OPRDPHA1,"oprdphaf"
@@ -21614,6 +21618,9 @@ REMOTE00  CALL      XMLHED00
           MATCH     "R",UPDATETY
           GOTO      REMOTE70 IF EQUAL
 .
+          MATCH     "T",UPDATETY
+          GOTO      REMOTE80 IF EQUAL
+.
           WRITE     HTMLFILE;"<RETURN_VALUE TYPE=ERROR>":
                     " INVALID UPDATE TYPE ":
                     "</RETURN_VALUE>"
@@ -21640,6 +21647,9 @@ REMOTE60  CALL      UPTIDP00       * Update Ready to Depart time   *T0869563
           GOTO      REMOTE90
 .
 REMOTE70  CALL      PRTREQ00       * Update Ready to Depart time   *T0869563
+          GOTO      REMOTE90
+.
+REMOTE80  CALL      POTPRV00       * Get Patient Out of Theatre of Prev Patient
           GOTO      REMOTE90
 .
 REMOTE90  CALL      XMLEND00
@@ -27489,6 +27499,50 @@ RELOAD00  CALL      OPENHTML
 RELOAD90  DISPLAY   "*** Fifo Not Found ***"
 .
 RELOAD99  RETURN
++
+.******************************************************************************
+. Get Patient Out of Theatre of Previous Patient Remote Script
+.******************************************************************************
+POTPRV00  PACK      KEY10,UNIQUEKY,SP70
+          CALL      RDOPDEA3
+          BRANCH    OVRCD,POTPRV91
+          PACK      SESSKEYS,OPDAHOSP,OPDADATE,OPDATIME,OPDACLIN,SP70
+.
+          PACK      KEY26,SESSKEYS,OPDACASE,DOPDASTA,SP70
+          CALL      RDOPDEA5
+          BRANCH    OVRCD,POTPRV91
+.
+POTPRV10  CALL      RPOPDEA5
+          BRANCH    OVRCD,POTPRV99
+          PACK      KEY22,OPDAHOSP,OPDADATE,OPDATIME,OPDACLIN,SP70
+.
+          MATCH     SESSKEYS,KEY22
+          GOTO      POTPRV99 IF NOT EQUAL
+.
+          MATCH     "3",DOPDASTA              * skip if Cancelled booking
+          GOTO      POTPRV10 IF EQUAL
+.
+          PACK      KEY11,OPDAUNIQ,TEAMNUMB,SP70
+          CALL      RDOPSRG1
+          BRANCH    OVRCD,POTPRV91
+.
+          MATCH     SP70,OPDADATE
+          GOTO      POTPRV99 IF EQUAL
+          MATCH     SP70,OPSGUT02
+          GOTO      POTPRV99 IF EQUAL
+          MATCH     SP70,OPDAADMN
+          GOTO      POTPRV99 IF EQUAL
+.
+          WRITE     HTMLFILE;"<RETURN_VALUE TYPE=SIMPLE>",OPDADATE,OPSGUT02:
+                             OPDAADMN,"</RETURN_VALUE>"
+          GOTO      POTPRV99
+.
+POTPRV91  WRITE     HTMLFILE;"<RETURN_VALUE TYPE=ERROR>":
+                             "Invalid Theatre Case":
+                             "</RETURN_VALUE>"
+          GOTO      POTPRV99
+.
+POTPRV99  RETURN
 +
 .******************************************************************************
 . Print Requisitions Remote Script

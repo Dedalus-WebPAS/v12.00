@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.01">
+<meta name="TemplateVersion" content="V12.00.02">
 <meta name="TemplateHome"    content="hea-nbh">
 <meta name="HelpFileName"    content="NoContextSet.html">
 <meta name="CrossBrowser"    content="true">
@@ -134,6 +134,7 @@ Emergency Registration Patient Search
 <input type=hidden name=ptcnuepm value="%STANDARD.01.025.125.155.0.1">
 <input type=hidden name=showblhd value="%PATWEB90.01.036">
 <input type=hidden name=nodetail value="%PATWEB90.01.022">
+<input type=hidden name=autosrch value="%PATWEB90.01.040">
 
 <table align="center" width=100% border=1 cellspacing=0 
  cellpadding=0 bgcolor=#CCCCCC>
@@ -250,6 +251,8 @@ Emergency Registration Patient Search
 
 <script type="text/javascript">
 function setDefault() {
+  f = document.search;
+  
   if (document.all.BodyDivision!=undefined) {
      BodyDivision.style.height=document.body.clientHeight - 86 -
                                BodyDivision.offsetTop
@@ -283,36 +286,53 @@ function setDefault() {
     }
   }
 
-   if (isWhitespace(document.search.srchsnam.value)){
-     document.search.srchsnam.value=trim(parent.UpdateForm.emexp002.value)
-   }
-   document.search.srchgnam.value="%PATWEB90.01.004";
-   if (isWhitespace(document.search.srchgnam.value)){
-     document.search.srchgnam.value=trim(parent.UpdateForm.emexp003.value)
-   }
-   document.search.srchpage.value="%PATWEB90.01.006";
-   document.search.srchpdob.value="%PATWEB90.01.007";
+  if (isWhitespace(document.search.srchsnam.value)){
+    document.search.srchsnam.value=trim(parent.UpdateForm.emexp002.value)
+  }
+  document.search.srchgnam.value="%PATWEB90.01.004";
+  if (isWhitespace(document.search.srchgnam.value)){
+    document.search.srchgnam.value=trim(parent.UpdateForm.emexp003.value)
+  }
+  document.search.srchpage.value="%PATWEB90.01.006";
+  document.search.srchpdob.value="%PATWEB90.01.007";
 //
-   if (isWhitespace(document.search.srchpdob.value)){
-     document.search.srchpdob.value=trim(parent.UpdateForm.emexp005.value)
-   }
+  if (isWhitespace(document.search.srchpdob.value)){
+    document.search.srchpdob.value=trim(parent.UpdateForm.emexp005.value)
+  }
 //
-   for (var i =0 ; i < document.search.srcharan.length; i++) {
-     if (document.search.srcharan.options[i].value==trim("%PATWEB90.01.008")) {
-         document.search.srcharan.selectedIndex=i } };
+  for (var i =0 ; i < document.search.srcharan.length; i++) {
+    if (document.search.srcharan.options[i].value==trim("%PATWEB90.01.008")) {
+      document.search.srcharan.selectedIndex=i } };
 
-   for (var i =0 ; i < document.search.srchtype.length; i++) {
-     if (document.search.srchtype.options[i].value=="%PATWEB90.01.009.2") {
-         document.search.srchtype.selectedIndex=i; 
-         checkType(); }
-   }
-
-   for (var i =0 ; i < document.search.srchpsex.length; i++) {
-     if (document.search.srchpsex[i].value=="%PATWEB90.01.005") {
-       document.search.srchpsex[i].checked="1";
-     }
-   }
+  for (var i =0 ; i < document.search.srchtype.length; i++) {
+    if (document.search.srchtype.options[i].value=="%PATWEB90.01.009.2") {
+      document.search.srchtype.selectedIndex=i; 
+      checkType(); }
+  }
   
+  if (f.autosrch.value == "Y") {
+    if (parent.UpdateForm.emexp004 != undefined) {
+      gender = parent.UpdateForm.emexp004.value.substr(0,1);
+      for (var i =0 ; i < document.search.srchpsex.length; i++) {
+        if (f.srchpsex[i].value == gender) {
+          document.search.srchpsex[i].checked="1";
+        }
+      }
+    }
+  }
+  else {
+    for (var i =0 ; i < document.search.srchpsex.length; i++) {
+      if (document.search.srchpsex[i].value=="%PATWEB90.01.005") {
+        document.search.srchpsex[i].checked="1";
+      }
+    } 
+  }
+  
+  if (f.autosrch.value == "Y") {
+    f.autosrch.value = "";
+    btnSearchClicked();
+  }
+
 }
 function setDefaultNotFirstTime() {
   if (document.search.ptcnuepm.value == "1") {
@@ -334,21 +354,21 @@ function setDefaultNotFirstTime() {
     }
   }
 
-   for (var i =0 ; i < document.search.srcharan.length; i++) {
-     if (document.search.srcharan.options[i].value==trim("%PATWEB90.01.008")) {
-         document.search.srcharan.selectedIndex=i } };
+  for (var i =0 ; i < document.search.srcharan.length; i++) {
+    if (document.search.srcharan.options[i].value==trim("%PATWEB90.01.008")) {
+      document.search.srcharan.selectedIndex=i } };
 
-   for (var i =0 ; i < document.search.srchtype.length; i++) {
-     if (document.search.srchtype.options[i].value=="%PATWEB90.01.009.2") {
-         document.search.srchtype.selectedIndex=i;
-         checkType(); }
-   }
+  for (var i =0 ; i < document.search.srchtype.length; i++) {
+    if (document.search.srchtype.options[i].value=="%PATWEB90.01.009.2") {
+      document.search.srchtype.selectedIndex=i;
+      checkType(); }
+  }
 
-   for (var i =0 ; i < document.search.srchpsex.length; i++) {
-     if (document.search.srchpsex[i].value=="%PATWEB90.01.005") {
-       document.search.srchpsex[i].checked="1";
-     }
-   }
+  for (var i =0 ; i < document.search.srchpsex.length; i++) {
+    if (document.search.srchpsex[i].value=="%PATWEB90.01.005") {
+      document.search.srchpsex[i].checked="1";
+    }
+  }
 }
 </script>
 <form name=PatientLinks method=get>

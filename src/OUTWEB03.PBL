@@ -5,6 +5,8 @@
 .
 . Modifications : 
 .----------------------------------------------------------------------
+. V12.00.03 30/09/2025  Thanh T        TSK 0937505
+.           Recompiled for PATINVHL changes
 . V12.00.02 05/09/2025  Thanh T          TSK 0949457
 .           Recompiled for OUTLVLET/OUTPLTCD changes
 . V12.00.01 30/05/2025  Don Nguyen     TSK 0955096
@@ -1427,7 +1429,7 @@ ZEIGHT    INIT      "00000000"
 .
 .---------------------------------------------------------------------------
 PRGID     INIT      "OUTWEB03"
-VERSION   INIT      "V12.00.02"
+VERSION   INIT      "V12.00.03"
 PRGNAM    INIT      "Print Outpatient Forms"
 .---------------------------------------------------------------------------
 .

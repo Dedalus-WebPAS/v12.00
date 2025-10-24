@@ -1,4 +1,4 @@
-//jsVersion  : V12.00.01
+//jsVersion  : V12.00.02
 //========================================================================
 // Program   : WardMap.js
 //  
@@ -470,9 +470,15 @@ function smPatientCell(i) {
       ' onclick=\'PatientNotes("'+obj.patients[i][2]+'","'+obj.patients[i][3]+'");\'></span>'+
       '<span class=DocumentIcon'+ obj.patients[i][27].substr(3,1) +
       ' title="Clinical Documents"' +
-      ' onclick=\'PatientDocuments("'+obj.patients[i][2]+'","'+obj.patients[i][3]+'");\'></span>'+
-      '<span>'+obj.patients[i][21]+obj.patients[i][2] +'</span></div>'+
-      '<//div>'+
+      ' onclick=\'PatientDocuments("'+obj.patients[i][2]+'","'+obj.patients[i][3]+'");\'></span>'
+
+      if (isWhitespace(obj.patients[i][102])) {
+        OS+='<span>'+obj.patients[i][21]+obj.patients[i][2] +'</span></div>';
+      } else {
+        OS+='<span>'+obj.patients[i][21]+obj.patients[i][102] +'</span></div>';
+      }
+
+  OS+='<//div>'+
       '<div class=row5 onclick=\'UpdateCondition("'+obj.patients[i][2]+'","'+obj.patients[i][3]+'");\'>' +
       '<span class=cell><span class=ConditionIcon'+obj.patients[i][18]+
       ' title="Update Condition"></span>'+
@@ -616,8 +622,12 @@ function PatientCell(i) {
   if(obj.patients[i][89] == "1") {
     OS+='<span class=TheatreToday' + obj.patients[i][89] + ' ></span>';
   }
- 
-  OS+='<span>'+obj.patients[i][21]+obj.patients[i][2] +'</span></div>'
+
+  if (isWhitespace(obj.patients[i][102])) {
+    OS+='<span>'+obj.patients[i][21]+obj.patients[i][2] +'</span></div>';
+  } else {
+    OS+='<span>'+obj.patients[i][21]+obj.patients[i][102] +'</span></div>';
+  }
 
   // Display MV icon ?
   if (obj.patients[i][90] == "1") {
@@ -1269,9 +1279,15 @@ function PatientCellClinical(i) {
       ' onclick=\'PatientNotes("'+obj.patients[i][2]+'","'+obj.patients[i][3]+'");\'></span>'+
       '<span class=DocumentIcon'+ obj.patients[i][27].substr(3,1) +
       ' title="Clinical Documents"' +
-      ' onclick=\'PatientDocuments("'+obj.patients[i][2]+'","'+obj.patients[i][3]+'");\'></span>'+
-      '<span>'+obj.patients[i][21]+obj.patients[i][2] +'</span></div>'+
-      '<div class=row3 onclick=\'UpdateCondition("'+obj.patients[i][2]+'","'+obj.patients[i][3]+'");\'>' +
+      ' onclick=\'PatientDocuments("'+obj.patients[i][2]+'","'+obj.patients[i][3]+'");\'></span>'
+
+      if (isWhitespace(obj.patients[i][102])) {
+        OS+='<span>'+obj.patients[i][21]+obj.patients[i][2] +'</span></div>';
+      } else {
+        OS+='<span>'+obj.patients[i][21]+obj.patients[i][102] +'</span></div>';
+      }
+
+  OS+='<div class=row3 onclick=\'UpdateCondition("'+obj.patients[i][2]+'","'+obj.patients[i][3]+'");\'>' +
       '<span class=cell><span class=ConditionIcon'+obj.patients[i][18]+
       ' title="Update Condition"></span>'+
       obj.patients[i][17] + ShortDateTime(obj.patients[i][19]) + 

@@ -1,4 +1,4 @@
-//jsVersion  : V12.00.04
+//jsVersion  : V12.00.05
 //========================================================================
 // Program   : preadmission.js
 //
@@ -695,6 +695,9 @@ function VerifyMRReqLocED(RetFuncTrue,RetFuncFalse) {
 
 function setRedirectXCom() {
   checkComp=document.UpdateForm.ptmis027.value.substr(3,1);
+  if (checkComp.length == 0){
+    checkComp = "+";
+  }
    if ((typeof document.UpdateForm.pmext049 !== "undefined" &&
                document.UpdateForm.pmext049.value == "1") || checkComp=="M"
                || (typeof document.UpdateForm.mvithmva !== "undefined" &&

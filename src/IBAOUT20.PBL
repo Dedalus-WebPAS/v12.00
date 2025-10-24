@@ -13,6 +13,8 @@
 .*                                                                            *
 .*     MODIFICATIONS:                                                         *
 .*----------------------------------------------------------------------------*
+.* V12.00.04 30/09/2025  Thanh T        TSK 0937505                           *
+.*           Recompiled for PATINVHL changes                                  *
 .* V12.00.03 13/06/2025  J.Tan          TSK 0961623                           *
 .*           Fixed keyin Alphanumeric Visit number                            *
 .* V12.00.02 02/06/2025  Don Nguyen     TSK 0955096                           *
@@ -883,7 +885,7 @@ Z20       INIT      "ZZZZZZZZZZZZZZZZZZZZ"
 .----------------------------------------------------------------------
 PRGID     INIT      "IBAOUT20"
 PRGNAM    INIT      "Print Outpatient Invoices"
-VERSION   INIT      "V12.00.03"
+VERSION   INIT      "V12.00.04"
 .----------------------------------------------------------------------
 +
 .         DISPLAY SCREEN HEADER AND OPEN FILES

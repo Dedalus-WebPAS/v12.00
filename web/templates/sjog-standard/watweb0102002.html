@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="sjog-standard">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -484,14 +484,18 @@ InsertPatientHeader();
 
 <tr valign=top><td class=DataLabel>Comments</td>
     <td class=DataField colspan=3> 
-    <textarea wrap=hard name=wattrcom onkeydown="LimitText(this,99,6930);"
-     cols=50 rows=3 tabindex=24>
-    </textarea></td></tr>
+      <textarea name=wattrcom id=wattrcom title="Comments"
+       cols=50 rows=3 wrap=hard tabindex=24
+       onkeydown="ValidateKeyInput(this,99,6930);"
+       onblur="TextareaBlurHandler(this);ValidateTextLimits(this,99,6930);">
+      </textarea></td></tr>
 
 <tr valign=top><td class=DataLabel>Preadmission Notes</td>
     <td class=DataField colspan=3>
-    <textarea wrap=hard name=wtpccomm onkeydown="LimitText(this,99,6930);"
-      cols=50 rows=3 tabindex=25>
+    <textarea name=wtpccomm id=wtpccomm title="Preadmission Notes"
+     cols=50 rows=3 wrap=hard tabindex=25
+     onkeydown="ValidateKeyInput(this,99,6930);"
+     onblur="TextareaBlurHandler(this);ValidateTextLimits(this,99,6930);">
     </textarea></td></tr>
 
 <tr><td class=DataLabel>Preadmission Status </td>

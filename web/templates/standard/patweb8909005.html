@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="standard">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -323,6 +323,16 @@ name="d_nzspr016">
 </tr>
 
 <tr><td>&nbsp;</td></tr>
+<tr><td class=DataLabel>Extended Procedure Description</td>
+    <td colspan=3>
+       <textarea wrap=hard cols=70 rows=6 id=extprcmt name=extprcmt
+              title="Extended Procedure Description"
+              onkeydown="LimitText(this,999,69930);"
+              tabindex=22>%PATWEB89.09.799.139.024</textarea>
+    </td>
+</tr>
+
+<tr><td>&nbsp;</td></tr>
 <tr><td colspan=2 align=center>
     <input type=button class="button" value="Add" name=AddButton
      id="pat89sub" onclick='tempDisable(this);RefreshSubmit();'>
@@ -360,7 +370,7 @@ function init() {
      class=Mandatory onchange='checkCntrMandatory();InsuranceUpd();'>
     <option></option>
     %PATWEB89.09.202.2
-    </select></td></tr>
+    </select></td>
 </span>
 <span id=contracthd style="display:none">
 Contract
@@ -377,8 +387,8 @@ Contract
                                                dummy,dummy);">
         <img src="../images/erase.gif"  class=Icon
          onclick="clrFields(nzspr006,funddesc,dummy,dummy);">
-    </td></tr>
 </span>
+
 <span id=claimcodeblank style="display:none">
    <input type=hidden name=nzspr002 value="%PATWEB89.09.202.1">
 </span>

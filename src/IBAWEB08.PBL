@@ -12,6 +12,8 @@
 .*                                                                            *
 .* Modifications  :                                                           *
 .******************************************************************************
+.* V12.00.02 02/10/2025  Peter Vela         0939466                           *
+.*           Added accountReferenceNumber                                     *
 .* V12.00.01 22/05/2025 Thanh T         TSK 0955096                           *
 .*           Changed for alphanumeric visit number                            *
 .******************************************************************************
@@ -381,6 +383,8 @@ SRVFACIL  DIM       8
 SRVSEG20  DIM       3		* distanceKilometres
 SRVARR20  DIM       3[80][20]
 .
+SRVSEG21  DIM       8           * accountReferenceNumber
+SRVARR21  DIM       8[80][20]
 . 
 .
 . webServices PRODA Variables
@@ -987,6 +991,13 @@ DVWVAL04  DIM     1
 .
 RCBRAC    INIT    "}"
 .
+.QUOTE     INIT      "#""
+DVWLAB60  INIT    "accountReferenceNumber"
+.QUOTE     INIT      "#""
+.COLON     INIT    ":"
+.QUOTE     INIT      "#""
+DVWVAL60  DIM     8
+.QUOTE     INIT      "#""
 .
 ERRORIND  DIM       1
 ERRORDSC  DIM       500
@@ -994,7 +1005,7 @@ ERRORDSC  DIM       500
 .
 PRGID     INIT      "IBAWEB08"
 PRGNAM    INIT      "WebServices DVAW Claims Extract"
-VERSION   INIT      "V12.00.01"
+VERSION   INIT      "V12.00.02"
 +
 .******************************************************************************
 .*                                   MAIN0000                                 *
@@ -4540,6 +4551,7 @@ WSRV0500  MOVE      SP70,SRVSEG01                * Initialise all segment fields
           MOVE      SP70,SRVSEG19
           MOVE      SP70,SRVFACIL
           MOVE      SP70,SRVSEG20
+          MOVE      SP70,SRVSEG21
 .
 .
 .         Load AccessionDateTime (SRVSEG01)
@@ -5199,6 +5211,10 @@ WSRV9000  MATCH     "2",WBDWMODL                 * PRI record ?
             MOVE      OTDTDSKM,SRVSEG20
           ENDIF
 .
+          MOVE      WBDWINVN,SRVSEG21
+          SQUEEZE   SRVSEG21
+          PACK      SRVSEG21,SRVSEG21,SP70
+.
           BRANCH    VALDFLG,WSRV9999             * validation only
 .
 .         WRITE     EXTFILE1,SEQ;TILDA01,ANSS,ANSR,ANSV:
@@ -5227,6 +5243,7 @@ WSRV9000  MATCH     "2",WBDWMODL                 * PRI record ?
           MOVE      SRVSEG18,SRVARR18[VCHARRCN][SRVARRCN]
           MOVE      SRVSEG19,SRVARR19[VCHARRCN][SRVARRCN]
           MOVE      SRVSEG20,SRVARR20[VCHARRCN][SRVARRCN]
+          MOVE      SRVSEG21,SRVARR21[VCHARRCN][SRVARRCN]
 .
 WSRV9999  RETURN
 +
@@ -5623,6 +5640,7 @@ CLARY000    MOVE      ZERO,FORM2
                 MOVE      SP70,SRVARR18[FORM2][FORM2A]
                 MOVE      SP70,SRVARR19[FORM2][FORM2A]
                 MOVE      SP70,SRVARR20[FORM2][FORM2A]
+                MOVE      SP70,SRVARR21[FORM2][FORM2A]
               DO
             DO
 .
@@ -5763,6 +5781,7 @@ CLJSON00
           MOVE      SP70,DVWVAL57
           MOVE      SP70,DVWVAL58
           MOVE      SP70,DVWVAL59
+          MOVE      SP70,DVWVAL60
 .
 CLJSON99  RETURN
 +
@@ -5990,6 +6009,8 @@ MVSRV000  MOVE      SP70,DVWVAL33
           MOVE      SRVARR19[COUNTER][COUNTER2],DVWVAL49
 .
           MOVE      SRVARR20[COUNTER][COUNTER2],DVWVAL59
+.
+          MOVE      SRVARR21[COUNTER][COUNTER2],DVWVAL60
 .
 .         MOVE      COUNTER2,DVWVAL32
 .         RJUSTIFY  DVWVAL32
@@ -6375,6 +6396,31 @@ JSON0000  PACK      PROPFLNM,WBDWTRID,PROPLITR,SP70
                             APPEND    COMMA,DIM100
                             RESET     DIM100
                             WRITE     DVAWFILE,SEQ;DIM100
+.
+.                           **** claim/medicalEvent/service/accountReferenceNumber ****
+.
+.                           WRITE     DVAWFILE,SEQ;SP12,QUOTE,DVWLAB60,QUOTE:
+.                                                                      COLON:
+.                                                  QUOTE,DVWVAL60,QUOTE,COMMA
+.
+                            MATCH     SP70,DVWVAL60
+                            IF        !@EQUAL
+                              CLEAR     DIM100
+                              APPEND    SP12,DIM100
+                              APPEND    QUOTE,DIM100
+                              APPEND    DVWLAB60,DIM100
+                              APPEND    QUOTE,DIM100
+                              APPEND    COLON,DIM100
+                              APPEND    QUOTE,DIM100
+                              APPEND    DVWVAL60,DIM100
+                              RESET     DIM100
+                              STRIP     DIM100
+                              ENDSET    DIM100
+                              APPEND    QUOTE,DIM100
+                              APPEND    COMMA,DIM100
+                              RESET     DIM100
+                              WRITE     DVAWFILE,SEQ;DIM100
+                            ENDIF
 .
 .                           **** claim/medicalEvent/service
 .                                                  /aftercareOverrideInd ****

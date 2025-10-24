@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="socq">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -106,14 +106,13 @@ InsertPatientHeader()
 </script>
 <div id=PatientMenu></div>
 <div id=PageBodySection>
-<table border=1 colspan=1 width=100% cellspacing=1 cellpadding=1 >
-<form name=linkForm action=patweb89.pbl method=post>
+<form name=linkForm action=patweb89.pbl method=post style=margin:0>
 <input type=hidden name=reportno value=1>
 <input type=hidden name=template value=1>
 <input type=hidden name=urnumber value="%PATWEB89.01.003">
 <input type=hidden name=admissno value="%PATWEB89.01.101">
 </form>
-<form name=UpdateForm method=post action=patweb89.pbl>
+<form name=UpdateForm method=post action=patweb89.pbl style=margin:0>
 <input type=hidden name=reportno value="2">
 <input type=hidden name=template value="032">
 <input type=hidden name=urnumber value="%PATWEB89.01.003">
@@ -158,6 +157,7 @@ InsertPatientHeader()
 <input type="hidden" name="ptpra010" value="%PATWEB89.01.199.012"
                                      title="PRFA Mobile" />
 <input type="hidden" name=ptcnelos value="%STANDARD.01.025.124.144.0.1">
+<table border=1 colspan=1 width=100% cellspacing=1 cellpadding=1 >
 
 <tr><td class=HeadingCell align=center>
     Update Admission Details</tr>

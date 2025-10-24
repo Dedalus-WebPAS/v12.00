@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="cac">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -161,7 +161,7 @@ function validateLocation(SearchField,SearchName) {
   }
 }
 function UsingNewContRedirect() {
-  if (document.getElementById('ptcnnewc').value=='0') {
+  if (document.getElementById('ptcnnewc').value=='1') {
       document.UpdateForm.redirect.value="patweb07.pbl?reportno=6&template=004"
        + "&urnumber=" + document.UpdateForm.urnumber.value
        + "&admissno=" + document.UpdateForm.admissno.value;

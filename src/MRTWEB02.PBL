@@ -5,6 +5,8 @@
 .
 . Modifications  :
 .------------------------------------------------------------------------------
+. V12.00.10 25/09/2025  Nikitha B     TSK 0966964
+.           Recomplied for WEBGROUP - Format error message at LODENC93.
 . V12.00.09 24/09/2025  Thanh T       TSK 0965186
 .           Changed GOPDET00 to exit (GOPDET99) the loop when OPDAADMN is
 .           different from ADMISSNO instead of GOPDET20
@@ -2533,7 +2535,7 @@ CCFLAG02  INIT      "AB - Care provided by hospital A and hospital"
 .
 .---------------------------------------------------------------------------
 PRGID     INIT      "MRTWEB02"
-VERSION   INIT      "V12.00.09"
+VERSION   INIT      "V12.00.10"
 PRGNAM    INIT      "Medical Record Coding"
 .---------------------------------------------------------------------------
           CALL      WEBINT00       * Initialise Fifo Etc.

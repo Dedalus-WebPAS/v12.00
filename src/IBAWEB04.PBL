@@ -24,6 +24,10 @@
 .*                                                                            *
 .* Modifications  :                                                           *
 .*                                                                            *
+.*        V12.00.06 21/10/2025  Nikitha Bhaskar  TSK 0955891                  *
+.*                  Modiefied CATOT at LACC2100. Read CAT BT at LACC2500.     *
+.*        V12.00.05 13/10/2025  Peter Vela       TSK 0966932                  *
+.*                  Fixed match of ACDCCG15 and DIM at LACC7010               *
 .*        V12.00.04 09/09/2025  Peter Vela       TSK 0966812                  *
 .*                  Fixed EPDSEG09 validation in WTFR0000/SDTR0000            *
 .*                  Linked to task 0959673                                    *
@@ -4072,7 +4076,7 @@ NEWSTRNG  DIM       500
 .-----------------------------------------------------------------------
 PRGID     INIT      "IBAWEB04"
 PRGNAM    INIT      "WebServices In Hospital Claims Extract"
-VERSION   INIT      "V12.00.04"
+VERSION   INIT      "V12.00.06"
 .-----------------------------------------------------------------------
 +
 .******************************************************************************
@@ -9539,7 +9543,7 @@ LACC2000  BRANCH    CCAREFLG,LACC3200            * critical care accommodation
 .         Check if this is a Psychiatric or Rehabilitation patient.
 .
           IF        SAVASSC1 <> 10 & SAVASSC1 <> 11
-            GOTO      LACC2500                   * not psych or rehab
+            GOTO      LACC2100                   * not psych or rehab
           ENDIF
 .
           MOVE      ADMINO,KEY8
@@ -9552,46 +9556,63 @@ LACC2000  BRANCH    CCAREFLG,LACC3200            * critical care accommodation
           CALL      PADO0000                     * pad out program code
           BRANCH    EXIT,LACC2300                * invalid program code
 .
-          PACK      KEY5,ANSC,ANSC,ACARE,SP70
+          IF        SAVASSC1 = 10
+            MOVE      CATPS,ACDCCG12             * load program code prefix
+          ELSE
+            MOVE      CATRE,ACDCCG12
+          ENDIF
+.
+          GOTO      LACC2250
+.
+. Palliate Care Section for ProgramCode
+.
+LACC2100  PACK      KEY5,ANSC,ANSC,ACARE,SP70
           CALL      RDCODE1
-          BRANCH    OVRCD,LACC2200
+          BRANCH    OVRCD,LACC2500
 .
           MATCH      "1",TCINDC18
-          GOTO       LACC2200 IF NOT EQUAL
+          GOTO       LACC2500 IF NOT EQUAL
+.
+          MOVE      ADMINO,KEY8
+          CALL      RDVISA1                      * visit record on file ?
+          BRANCH    OVRCD,LACC2300               * no
 .
           MATCH     SP8,PMVXPRGM                 * program code blank ?
-          GOTO      LACC2200 IF EQUAL
+          GOTO      LACC2300 IF EQUAL            * yes
+.
+          CALL      PADO0000                     * pad out program code
+          BRANCH    EXIT,LACC2300                * invalid program code
 .
           PACK      KEY14,AFUNDH,AFNDTB,SP70
           CALL      RDFUND1
-          BRANCH    OVRCD,LACC2200
+          BRANCH    OVRCD,LACC2300
 .
           PACK      KEY23,ATYPE,SP3,AFUNDH,PTHFBCAT,ADATE,Z70
           CALL      RSPMHPG1
 LACC2190  CALL      RPPMHPG1
-          BRANCH    OVRCD,LACC2200
+          BRANCH    OVRCD,LACC2300
 .
           MATCH     ATYPE,PMHPATYP
-          GOTO      LACC2200 IF NOT EQUAL
+          GOTO      LACC2300 IF NOT EQUAL
 .
           MATCH     SP3,PMHPCLAM
-          GOTO      LACC2200 IF NOT EQUAL
+          GOTO      LACC2300 IF NOT EQUAL
 .
           MATCH     AFUNDH,PMHPFUND
-          GOTO      LACC2200 IF NOT EQUAL
+          GOTO      LACC2300 IF NOT EQUAL
 .
           MATCH     PTHFBCAT,PMHPTABT
-          GOTO      LACC2200 IF NOT EQUAL
+          GOTO      LACC2300 IF NOT EQUAL
 .
           MATCH     PMHPEDAT,ADATE
           GOTO      LACC2190 IF LESS
 .
           MATCH     ADMINO,PMVXVISN
-          GOTO      LACC2200 IF NOT EQUAL
+          GOTO      LACC2300 IF NOT EQUAL
 .
           PACK      KEY8,PMVXPRGM,SP8
           CALL      RDPMPRG1
-          BRANCH    OVRCD,LACC2200
+          BRANCH    OVRCD,LACC2300
 .
           MATCH     PMVXPRGM,PMPGCODE
           IF        @EQUAL
@@ -9599,14 +9620,12 @@ LACC2190  CALL      RPPMHPG1
             IF        !@EQUAL
               MOVE      CATOT,ACDCCG12
               GOTO      LACC2250
+            ELSE
+              GOTO      LACC2300
             ENDIF
           ENDIF
 .
-LACC2200  IF        SAVASSC1 = 10
-            MOVE      CATPS,ACDCCG12             * load program code prefix
-          ELSE
-            MOVE      CATRE,ACDCCG12
-          ENDIF
+. End Palliate Care Section for ProgramCode
 .
 LACC2250  ENDSET    ACDCCG12
           APPEND    "00",ACDCCG12
@@ -9634,7 +9653,19 @@ LACC2300  MOVE      "ACD.01-Warning: Program Code not found",ERRMSG
 .         Load BedLevelCode
 .         First check if this is an Outreach patient using Cat BT TRBTYP
 .
-LACC2500  MATCH     "4",THCSCOD                  * hospital in the home ?
+LACC2500  PACK      KEY5,ANSB,ANST,TRBTYP    * re-read Cat BT because we read CC
+          CALL      RDCODE1                  * code on file ?
+          IF        OVRCD = 1
+            MOVE      "ACC.66-Transfer Bed Type (",ERRMSG
+            ENDSET    ERRMSG
+            APPEND    TRBTYP,ERRMSG
+            APPEND    " - Cat BT) not found",ERRMSG
+            RESET     ERRMSG
+            CALL      PERR0000
+            GOTO      LACC3500
+          ENDIF
+.
+          MATCH     "4",THCSCOD                  * hospital in the home ?
           IF        @EQUAL
             PACK      ACDCCG04,ANSO,SP2          * yes
             GOTO      LACC3500
@@ -9915,7 +9946,8 @@ LACC7010  CALL      RDKDTRN1                     * read next record
           PACK      DIM8,TTCENT,TTYEAR,TTMONTH,TTDAY
           REP       " 0",DIM8
           MATCH     ACDCCG15,DIM8
-          GOTO      LACC7100 IF LESS
+.          GOTO      LACC7100 IF LESS
+          GOTO      LACC7010 IF LESS
 .
           MOVE      SVBSEG05,ACDCCG13
           MOVE      SVBSEG06,ACDCCG14

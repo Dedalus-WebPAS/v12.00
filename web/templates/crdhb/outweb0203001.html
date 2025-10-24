@@ -1,6 +1,11 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.03">
 <meta name="TemplateHome" content="crdhb">
 <meta name="HelpFileName" content="NoContextSet.html">
+<style type=text/css>
+ pre {
+ font-family: arial;
+ }
+</style>
 <script type="text/javascript" src="../js/UltraGenda.js"> </script>
 <script type="text/javascript" src="../js/TableSort.js"></script>
 <script type="text/javascript">
@@ -257,7 +262,7 @@ InsertPatientHeader()
     <option value="outweb02.pbl|03|009|1|900|900">Update</option>
     <option value="AttendScreen()|||7||">Attendance</option>
     <option value="CheckRefStat()|||7||">Follow Up Appointment</option>
-    <option value="outweb02.pbl|03|005|1|750|475">Re-schedule</option>
+    <option value="outweb02.pbl|03|005|1|750|475">Reschedule</option>
 	<!-- 03 : WP2-539 Remove discharge from actions menu													
     <option value="outweb02.pbl|03|006|1|800|650">Discharge</option> -->
     <option value="outweb02.pbl|03|013|1|700|400">Labels & Forms</option>
@@ -339,7 +344,9 @@ InsertPatientHeader()
     <td class=DataField>%OUTWEB02.03.367</td></tr>
 
 <tr><td class=DataLabel>Referring GP		     </td>
-    <td class=DataField>%OUTWEB02.03.348.003 %OUTWEB02.03.348.004 %OUTWEB02.03.348.005</td>
+    <td class=DataField>
+      <a href='javascript:HCPViewFrame("%OUTWEB02.03.348.001","%OUTWEB02.03.349","%OUTWEB02.03.356")'>
+      %OUTWEB02.03.348.081</a></td>
     <td class=DataLabel>%STANDARD.01.017.sd</td>
     <td class=DataField>%OUTWEB02.03.327.006.9.3</td></tr>
 

@@ -5,6 +5,17 @@
 .
 . Modifications :
 .------------------------------------------------------------------------
+. V12.00.22 14/10/2025 J.Tan             TSK 0968040
+.           Mod ACAT0000 check template 032(Chg Pre-adm) to display Active code
+. V12.00.21 09/10/2025 Nikitha Bhaskar   TSK 0966963
+.           Modified error message at OUADMF93.
+. V12.00.20 02/10/2025 Nikitha Bhaskar   TSK 0962784
+.           Added and called new routines WRHIS000, CHAUD000.
+. V12.00.19 02.10.2025 DA Sarkies        TSK 0967778
+.           Added second key in WPMNPL00 to account for an increased counter
+. V12.00.18 29/09/2025 Thanh T           TSK 0937505
+.           Added OPDECO00, OPDECA00, GTEXDS00, AUEXDS00 and CLEXDS00 for
+.           extended procedure description
 . V12.00.17 15.09.2025 Ebon Clements     TSK 0966920
 .           Use ADMISSNO for visit pmsextaf read - SFA12500
 . V12.00.16 08.09.2025 DA Sarkies        TSK 0965997
@@ -54,6 +65,13 @@
 .           secondary insurer
 .           28/05/2025  Nikitha        TSK 0955096
 .           Alphanumeric changes.
+. V11.05.32 02.10.2025 DA Sarkies        TSK 0967778
+.           Added second key in WPMNPL00 to account for an increased counter
+. V11.05.31 19/09/2025 Thanh T           TSK 0937505
+.           Added OPDECO00, OPDECA00, GTEXDS00, AUEXDS00 and CLEXDS00 for
+.           extended procedure description
+. V11.05.30 15.09.2025 Ebon Clements     TSK 0966920
+.           Use ADMISSNO for visit pmsextaf read - SFA12500
 . V11.05.29 08.09.2025 DA Sarkies        TSK 0965997
 .           Added variable to set a rebook if required by appointment WPMNPL10
 .           variable - RETDFRAE & SCRNAME
@@ -3734,6 +3752,7 @@
           INC       EMRVISFD/INC
           INC       EMRVCDFD/INC
           INC       EMRICDFD/INC
+          INC       EMRCHAFD/INC
           INC       EOCLNKFD/INC
           INC       IBAALVFD/INC
           INC       IBAPOLFD/INC
@@ -4061,6 +4080,7 @@ CNTRFLAG  FORM      1
 CNTITEM   FORM      3
 CALCTOTD  FORM      4
 CCCNSVHM  FORM      1                       * Using SHVM Transition II
+CHNDVALU  DIM       80
 CMDLINE   DIM       200                     *I-250985
 CODERROR  DIM       10
 CONFDEMO  DIM       1
@@ -4097,6 +4117,7 @@ DDIND9    DIM       1
 DD3BDY    DIM       4
 DEADFLAG  FORM      1
 DEFSTATD  FORM      1                                      *T0874934
+DA08FLAG  FORM      1                       * A08 Discharge msg to be broadcast
 GELNFLAG  FORM      1
 GELWFLAG  FORM      1
 GELMFLAG  FORM      1
@@ -4130,6 +4151,15 @@ DREASLD1  DIM       50
 DREASLD2  DIM       50
 DCRTUSRN  DIM       30
 DDELUSRN  DIM       30
+.
+EXPCMTFI  FILE      ASCII,FIXED=128
+EXPCMTNM  DIM       8
+EXPCMTFL  FORM      1
+.
+OPCOMCNT  FORM      3
+OPCOMLIN  DIM       70
+OPCOMTYP  DIM       3
+ORGLVALU  DIM       80
 .
 MVITTYPE  DIM       1
 MVITSTAT  DIM       1
@@ -4175,6 +4205,7 @@ EXTRPRV2  DIM       9
 EXTRPRV3  DIM       9
 EXTRPRV4  DIM       9
 EXTRPRV5  DIM       9
+HOUR      DIM       2
 PREVDETA  DIM       1                 * preadmit from previous detail
 PRIMARY   DIM       3
 PYAA      INIT      "PYAA"
@@ -5123,7 +5154,7 @@ AUTOMVMR  DIM       1        * Auto move (track) MR to Admitting Ward
 .
 .---------------------------------------------------------------------------
 PRGID     INIT      "PATWEB89"
-VERSION   INIT      "V12.00.17"
+VERSION   INIT      "V12.00.22"
 PRGNAM    INIT      "Admissions Web Server"
 .---------------------------------------------------------------------------
 .
@@ -5847,6 +5878,9 @@ INIT0000  CALL      INTMAS00
           MOVE      TFILNAME,COMSGTNM
           CALL      TFILENAM
           MOVE      TFILNAME,CFNAMEDP
+.
+          CALL      TFILENAM
+          MOVE      TFILNAME,EXPCMTNM
 .
           OPEN      PMSVSTA1,"pmsvstaf"
           OPEN      PMSVSCA1,"pmsvscaf"
@@ -6895,6 +6929,8 @@ CLRPAR00  READ      CONTROLF,TEN;*196,CGENRUR
             MOVE      SP70,STATNARR[F2]
             ADD       ONE,F2
           DO
+.
+          MOVE      ZERO,EXPCMTFL
 .
 CLRPAR99  RETURN
 +
@@ -8740,6 +8776,12 @@ SETPAT50    MOVE      QRYDATA,FORM1
             GOTO      SETPAR99
           ENDIF
 .
+          MATCH     "extprcmt",QRYNAME
+          IF        @EQUAL
+            CALL      GTEXDS00
+            GOTO      SETPAR99
+          ENDIF
+.
 SETPAR99  RETURN
 +
 .------------------------------------------------------------
@@ -9037,7 +9079,7 @@ PROFLD78  CALL      MISX0000                * miscellaneous extra tags
           GOTO      PROFLD99
 .
 PROFLD90  BRANCH    FLDSETNO,PROFLD91,PROFLD92,PROFLD93,PROFLD94,PROFLD95:
-                             PROFLD96,PROFLD97
+                             PROFLD96,PROFLD97,PROFLD98
           GOTO      PROFLD99
 .
 PROFLD91  CALL      MASF0000
@@ -9059,6 +9101,9 @@ PROFLD96  CALL      OPAR0000
           GOTO      PROFLD99
 .
 PROFLD97  CALL      SFAX0000
+          GOTO      PROFLD99
+.
+PROFLD98  CALL      SFAL0000                * Special Funding Arrangement
           GOTO      PROFLD99
 .
 PROFL100  BRANCH    FLDSETNO,PROFL101
@@ -9902,7 +9947,7 @@ OUADMF92  MOVE      "Can't Find Master Details",WEBTITLE
           MOVE      ONE,EXIT
           GOTO      OUADMF99
 .
-OUADMF93  MOVE      "Patient is not admitted",WEBTITLE
+OUADMF93  MOVE      "Current Visit is not a Pre-admission",WEBTITLE
           CALL      ADMERR00
           GOTO      OUADMF98
 .
@@ -9928,6 +9973,9 @@ ACAT0000  COMPARE   FOUR,REPORTNO           * All report 4 admission pages
 .
           COMPARE   ONE,REPORTNO
           GOTO      ACAT9999 IF NOT EQUAL
+.
+          MATCH     "032",TEMPLATE           * Change Pre Adm details
+          GOTO      ACAT9000 IF EQUAL
 .
           MATCH     "11",TEMPLATE            * Pre Adm Prev IP details
           GOTO      ACAT9000 IF EQUAL
@@ -13512,15 +13560,29 @@ EMER0000  MATCH     SP70,EMADMISS
             MOVE      PTMIS076,EMVIEBED
           ENDIF
 .
+          MOVE      ZERO,DA08FLAG           * Set 'No' to call A08 Discharge msg
           BRANCH    IPADMDAT,EMER0500       * No IP ADM Date default
 .
-          COMPARE   ZERO,EMVIYN02     * Check to see if this a c-type
+          COMPARE   ZERO,EMVIYN02           * Check to see if this a c-type
           IF        @EQUAL
+            PACK      ORGLVALU,EMVIDDAT,EMVIDTIM,SP70
             MOVE      PTMIS001,EMVIDDAT       * Discharge Date in EMR
             MOVE      PTMIS002,EMVIDTIM       * Discharge Time in EMR
+            PACK      CHNDVALU,EMVIDDAT,EMVIDTIM,SP70
+            COMPARE   THREE,EMVISTAT          * check if Discharged
+            IF        @EQUAL
+              MOVE      ONE,DA08FLAG          * Set 'Yes' to call A08 Dishg msg
+              CALL      WRHIS000              * Write History Audit table
+              CALL      CHAUD000              * Write Change Aufit table
+            ENDIF
           ENDIF
 .
 EMER0500  CALL      UPEMVIS1
+.
+          IF        DA08FLAG = ONE
+            CALL      EDMESS00         * Call A08 Discharge msg to be broadcast
+            MOVE      ZERO,DA08FLAG    * Set 'No' to call A08 Discharge msg
+          ENDIF
 .
           CALL      EMRINP00           * Create the same data for INP and EMR
 .
@@ -27957,7 +28019,7 @@ SFAX0000  BRANCH    FLDITMNO,SFAX0100,SFAX0200,SFAX0300,SFAX0400,SFAX0500:
                              SFA12100,SFA12200,SFA12300,SFA12400,SFA12500:
                              SFA12600,SFA12700,SFA12800,SFA12900,SFA13000: *130
                              SFA13100,SFA13200,SFA13300,SFA13400,SFA13500:
-                             SFA13600,SFA13700
+                             SFA13600,SFA13700,SFA13800,SFA13900
 .
 SFAX0100  WRITE     HTMLFILE;CPMISKEY;
           GOTO      SFAX9999
@@ -29293,7 +29355,87 @@ SFA13600  WRITE     HTMLFILE;CHCKCOMP;
 SFA13700  WRITE     HTMLFILE;SCRNAME;
           GOTO      SFAX9999
 .
+SFA13800  CALL      OPDECO00
+          GOTO      SFAX9999
+.
+SFA13900  CALL      OPDECA00
+          GOTO      SFAX9999
+.
 SFAX9999  RETURN
+.
+.-----------------------------------------------------------------------------
+. Retrieve Extended Procedure Description - Update procedure
+.-----------------------------------------------------------------------------
+OPDECO00  UNPACK    DIM127,ANS,DIM3,DIM127
+.
+          MATCH     SP70,OPARUNID
+          GOTO      OPDECM99 IF EQUAL
+.
+          CLOSE     PRSPMIA1
+          OPEN      OPRDEDA1,"oprdedaf"
+.
+          PACK      KEY16,OPARUNID,DIM3,SP70
+          CALL      RSOPDED1
+OPDECO10  CALL      RKOPDED1
+          BRANCH    OVRCD,OPDECO98
+.
+          MATCH     OPARUNID,OPDDUNIQ
+          GOTO      OPDECO98 IF NOT EQUAL
+.
+          MATCH     DIM3,OPDDTYPE
+          GOTO      OPDECO98 IF NOT EQUAL
+.
+          STRIP     OPDDDATA
+          MOVELPTR  OPDDDATA,LENGTH
+          SFORMAT   VAR,LENGTH
+          MOVE      OPDDDATA,VAR
+.
+          WRITE     HTMLFILE;VAR
+          SFORMAT   VAR,127
+.
+          GOTO      OPDECO10
+.
+OPDECO98  CLOSE     OPRDEDA1
+          OPEN      PRSPMIA1,"prspmiaf"
+.
+OPDECO99  RETURN
+.
+.-----------------------------------------------------------------------------
+. Retrieve Extended Procedure Description - Add Procedure
+.-----------------------------------------------------------------------------
+OPDECA00  UNPACK    DIM127,ANS,DIM3,DIM127
+.
+          MATCH     SP70,UNIQUEKY
+          GOTO      OPDECM99 IF EQUAL
+.
+          CLOSE     PRSPMIA1
+          OPEN      OPRDEDA1,"oprdedaf"
+.
+          PACK      KEY16,UNIQUEKY,DIM3,SP70
+          CALL      RSOPDED1
+OPDECM10  CALL      RKOPDED1
+          BRANCH    OVRCD,OPDECM98
+.
+          MATCH     UNIQUEKY,OPDDUNIQ
+          GOTO      OPDECM98 IF NOT EQUAL
+.
+          MATCH     DIM3,OPDDTYPE
+          GOTO      OPDECM98 IF NOT EQUAL
+.
+          STRIP     OPDDDATA
+          MOVELPTR  OPDDDATA,LENGTH
+          SFORMAT   VAR,LENGTH
+          MOVE      OPDDDATA,VAR
+.
+          WRITE     HTMLFILE;VAR
+          SFORMAT   VAR,127
+.
+          GOTO      OPDECM10
+.
+OPDECM98  CLOSE     OPRDEDA1
+          OPEN      PRSPMIA1,"prspmiaf"
+.
+OPDECM99  RETURN
 +
 .--------------------------------------------------------------------
 .         Get the ACC45 Claim API Response Message (from .resp file)
@@ -35429,6 +35571,10 @@ ADDSPR50  CALL      RKNZSPR1
 .
 ADDSPR60  CALL      UFCN0000            * Update Funder Contribution
           MOVE      ZERO,EXIT
+.
+          MOVE      OPDAUNIQ,DIM10
+          CALL      AUEXDS00            * Add/Update extended Proc Desc
+.
           GOTO      ADDSPR99
 .
 ADDSPR90  MOVE      "No matrix record found",WEBTITLE
@@ -35439,7 +35585,8 @@ ADDSPR92  MOVE      "Error: No Primary Procedure for this admission",WEBTITLE
           CALL      WEBERR00
           MOVE      ONE,EXIT
 .
-ADDSPR99  RETURN
+ADDSPR99  CLOSE     EXPCMTFI,DELETE
+          RETURN
 +
 .------------------------------------------------------------
 . Update NZ Private procedure/funder details
@@ -35496,13 +35643,18 @@ UPDSPR50  CALL      RKNZSPR1
 .
 UPDSPR60  CALL      UFCN0000            * Update Funder Contribution
           MOVE      ZERO,EXIT
+.
+          MOVE      UNIQUEKY,DIM10
+          CALL      AUEXDS00            * Add/Update extended Proc Desc
+.
           GOTO      UPDSPR99
 .
 UPDSPR90  MOVE      "Record does not exist",WEBTITLE
           CALL      WEBERR00
           MOVE      ONE,EXIT
 .
-UPDSPR99  RETURN
+UPDSPR99  CLOSE     EXPCMTFI,DELETE
+          RETURN
 +
 .------------------------------------------------------------
 .         Update oprdetaf after procedure being unperformed
@@ -47320,7 +47472,7 @@ WPMNPL00  MATCH     "3",PTCNUNET
           ADD       ONE,CNTPMSNP
           MOVE      CNTPMSNP,PMNPCNTR
           RJUSTIFY  PMNPCNTR
-          PACK      KEY28,PMNPURNO,PMNPRDAT,PMNPRTIM,PMNPCNTR
+          PACK      KEY28,PMNPURNO,PMNPRDAT,PMNPRTIM,PMNPCNTR,SP70
 .
           IF        IBCNMHOS=ONE
             MOVE      WBSEHOSP,PMNPHOSP
@@ -47346,6 +47498,7 @@ WPMNPL10  CALL      RAPMNPL1
             ADD       ONE,CNTPMSNP
             MOVE      CNTPMSNP,PMNPCNTR
             RJUSTIFY  PMNPCNTR
+            PACK      KEY28,PMNPURNO,PMNPRDAT,PMNPRTIM,PMNPCNTR,SP70
             GOTO      WPMNPL10
           ENDIF
 .
@@ -47802,6 +47955,186 @@ DFGEN000  MATCH     SP70,PSEX
 .
 DFGEN999  RETURN
 .
+.-----------------------------------------------------------------------------
+. Get Comments from input comment TextArea and write them to the temporary
+. file for updating to the database
+.-----------------------------------------------------------------------------
+GTEXDS00  COMPARE   ZERO,EXPCMTFL
+          IF        @EQUAL
+            PREP      EXPCMTFI,EXPCMTNM
+            MOVE      ONE,EXPCMTFL
+          ENDIF
+.
+          MOVE      "024",DIM3
+          WRITE     EXPCMTFI,SEQ;"%START:",DIM3
+.
+          PACK      QRYDATA,QRYDATA,SP70,SP70
+          WRITE     EXPCMTFI,SEQ;QRYDATA
+.
+GTEXDS10  READ      CONFFILE,SEQ;QRYNAME,QRYDATA * Read file sequentially
+          GOTO      GTEXDS99 IF OVER             * If end of file
+.
+          MATCH     SP70,QRYNAME                 * If next CGI parameter
+          GOTO      GTEXDS80 IF NOT EQUAL
+.
+          MATCH     SP70,QRYDATA
+          GOTO      GTEXDS10 IF EQUAL            * Do not save blank lines
+          GOTO      GTEXDS10 IF EOS              * Do not save blank lines
+.
+          PACK      QRYDATA,QRYDATA,SP70,SP70
+          WRITE     EXPCMTFI,SEQ;QRYDATA
+          GOTO      GTEXDS10
+.
+GTEXDS80  MOVE      ONE,TEXTAREA                 * Flag for Next CGI Parameter
+.
+GTEXDS99  RETURN
+.
+.----------------------------------------------------------------------------
+. Update Extend Procedure Descriptions. First delete all existing old data
+. and then add the new data
+.----------------------------------------------------------------------------
+AUEXDS00  COMPARE   ONE,EXPCMTFL
+          GOTO      AUEXDS99 IF NOT EQUAL
+.
+          MATCH     SP70,DIM10
+          GOTO      AUEXDS99 IF EQUAL
+.
+          CLOSE     PRSPMIA1
+          OPEN      OPRDEDA1,"oprdedaf"
+.
+          MOVE      ZERO,OVRCD
+          TRAP      OVERCOND IF IO
+          OPEN      EXPCMTFI,EXPCMTNM
+          TRAPCLR   IO
+          BRANCH    OVRCD,AUEXDS98
+.
+AUEXDS10  READ      EXPCMTFI,SEQ;OPCOMLIN
+          GOTO      AUEXDS98 IF OVER
+.
+          MATCH     "%START:",OPCOMLIN
+          GOTO      AUEXDS30 IF NOT EQUAL
+.
+          UNPACK    OPCOMLIN,D7,OPCOMTYP
+          CALL      CLEXDS00
+.
+          MOVE      ZERO,OPCOMCNT
+          GOTO      AUEXDS10
+.
+AUEXDS30  MATCH     SP70,OPDDDATA
+          GOTO      AUEXDS10 IF EQUAL       * Do not save blank lines
+          GOTO      AUEXDS10 IF EOS         * Do not save blank lines
+.
+          ADD       ONE,OPCOMCNT
+.
+          MOVE      DIM10,OPDDUNIQ
+          MOVE      OPCOMTYP,OPDDTYPE
+          MOVE      OPCOMCNT,OPDDLINE
+          MOVE      OPCOMLIN,OPDDDATA
+          MOVE      SP70,OPDDSPA
+.
+          CALL      WROPDED1
+.
+          GOTO      AUEXDS10
+.
+AUEXDS98  CLOSE     OPRDEDA1
+          OPEN      PRSPMIA1,"prspmiaf"
+.
+AUEXDS99  RETURN
+.
+.----------------------------------------------------------------------------
+. Clear oprdedaf Comments
+.----------------------------------------------------------------------------
+CLEXDS00  PACK      KEY16,DIM10,OPCOMTYP,SP70
+.
+          CALL      RSOPDED1
+CLEXDS10  CALL      RKOPDED1
+          BRANCH    OVRCD,CLEXDS99
+.
+          MATCH     DIM10,OPDDUNIQ
+          GOTO      CLEXDS99 IF NOT EQUAL
+.
+          MATCH     OPCOMTYP,OPDDTYPE
+          GOTO      CLEXDS99 IF NOT EQUAL
+.
+          PACK      KEY16,OPDDUNIQ,OPDDTYPE,OPDDLINE,SP70
+          CALL      DEOPDED1
+.
+          CALL      RSOPDED1
+          GOTO      CLEXDS10
+.
+CLEXDS99  RETURN
+.
+.-----------------------------------------------------------
+. WRHIS000 -  Write to Emergency History Audit Table
+.----------------------------------------------------------------------------
+WRHIS000  PACK      KEY22,EMVIADMN,Z70
+          CALL      RSEMHIS1
+          CALL      RPEMHIS1
+          BRANCH    OVRCD,WRHIS999
+.
+          MOVE      EMVIADMN,DIM8
+          MATCH     DIM8,EMHIVIS             * Same Visit Number
+
+          GOTO      WRHIS999 IF NOT EQUAL
+.
+          CALL      IBACLOCK
+          PACK      EMHIDAT,CCC,CYY,CMM,CDD
+          REP       " 0",EMHIDAT                 * Current Date
+.
+          UNPACK    CTIMEIS,HOUR,D1,MIN,D1,SEC   * Current time
+          PACK      EMHITIM,HOUR,MIN,SEC,SP70    * Time in hhmmss
+.
+          MOVE      "UPDIS",EMHIUPT              * Update Discharge Update Type
+.
+          MOVE      USERID,EMHIEUS               * Web User Id Created
+          PACK      EMHICDAT,CCC,CYY,CMM,CDD     * Date Created
+          REP       " 0",EMHICDAT
+          CLOCK     TIME,EMHICTIM                * Time Created
+          MOVE      USERID,EMHICUID              * Web User Id Created
+          MOVE      SP70,EMHIUDAT                * Date Updated
+          MOVE      SP70,EMHIUTIM                * Time Update
+          MOVE      SP70,EMHIUUID                * Web User Id Updated
+          MOVE      SP70,EMHISPA
+.
+          PACK      KEY22,EMHIVIS,EMHIDAT,EMHITIM,SP70
+          CALL      RAEMHIS1
+          IF        OVRCD=1
+            CALL      WREMHIS1                 * write New History record exists
+          ENDIF
+.
+WRHIS999  RETURN
+.----------------------------------------------------------------------------
+. CHAUD000 -  Write to Emergency Field Change Audit Table
+.----------------------------------------------------------------------------
+CHAUD000  CLOSE     PRSPMIA1                     * Free up some open files
+          CLOSE     PMSIPLA1
+.
+          OPEN      EMRCHAA1,"emrchaaf"         * Open EMR Field Change Audit
+.
+          PACK      EMCHVISN,EMVIADMN,SP70     * Visit number
+.
+          CALL      IBACLOCK
+          PACK      EMCHDATE,CCC,CYY,CMM,CDD   * Curremt Date
+          REPLACE   " 0",EMCHDATE
+          CLOCK     TIME,EMCHTIME              * Current Time
+          MOVE      "07",EMCHUPTY              * Update Type - 07
+          MOVE      SP70,EMCHREAS              * Reason for Change
+          MOVE      USERID,EMCHUSID            * User Id
+          MOVE      ORGLVALU,EMCHOVAL          * Original Value
+          MOVE      CHNDVALU,EMCHCVAL          * Changed Value
+.
+          PACK      KEY24,EMCHVISN,EMCHDATE,EMCHTIME,SP70
+          CALL      RAEMCHA1
+          IF        OVRCD=1
+            CALL      WREMCHA1
+          ENDIF
+.
+CHAUD990  CLOSE     EMRCHAA1                   * Close EMR Field Change Audit
+.
+          OPEN      PRSPMIA1,"prspmiaf"        * Re open original files
+          OPEN      PMSIPLA1,"pmsiplaf"
+.
+CHAUD999  RETURN
 .-----------------------------------------------------------
           INC       ADMAUDIT
           INC       ACCEXTRA                                          *I-153670
@@ -48020,6 +48353,7 @@ DFGEN999  RETURN
           INC       EMRVISIO/INC
           INC       EMRVCDIO/INC
           INC       EMRICDIO/INC
+          INC       EMRCHAIO/INC
           INC       IBAPOLIO/INC
           INC       IBAPOSIO/INC
           INC       IBAALVIO/INC

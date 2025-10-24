@@ -1,7 +1,12 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.03">
 <meta name="TemplateHome"    content="hea">
 <meta name="HelpFileName"    content="NoContextSet.html">
 <meta name="CrossBrowser"    content="true"> 
+<style type=text/css>
+ pre {
+ font-family: arial;
+ }
+</style>
 <script type="text/javascript" src="../js/TableSort.js"> </script>
 <script type="text/javascript">
 function AppointLink(CaseKeys){
@@ -174,7 +179,7 @@ InsertPatientHeader()
     <option value="outweb02.pbl|03|009|1|920|900">Update</option>
     <option value="outweb02.pbl|03|003|1|920|900">Attendance</option>
     <option value="outweb02.pbl|03|004|1|920|900">Follow Up Appointment</option>
-    <option value="outweb02.pbl|03|005|1|750|475">Re-schedule</option>
+    <option value="outweb02.pbl|03|005|1|750|475">Reschedule</option>
     <option value="outweb02.pbl|03|006|1|920|450">Discharge</option>
     <option value="outweb02.pbl|03|013|1|700|400">Labels & Forms</option>
     <option value="outweb02.pbl|03|002|1|800|450">Non-Attendance</option>
@@ -226,7 +231,9 @@ InsertPatientHeader()
 </tr>
 
 <tr><td class=DataLabel>Referring GP		     </td>
-    <td class=DataField>%OUTWEB02.03.348.003 %OUTWEB02.03.348.004 %OUTWEB02.03.348.005    </td>
+    <td class=DataField>
+      <a href='javascript:HCPViewFrame("%OUTWEB02.03.348.001","%OUTWEB02.03.349","%OUTWEB02.03.356")'>
+      %OUTWEB02.03.348.081</a></td>
     <td class=DataLabel>Source of Referral</td>
     <td class=DataField>%OUTWEB02.03.337.0   &nbsp;</td>
     </tr>

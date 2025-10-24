@@ -1,4 +1,4 @@
-//jsVersion  : V12.00.00
+//jsVersion  : V12.00.01
 //==============================================================================
 // Program   : DedalusDocumentTemplates.js
 //==============================================================================
@@ -71,13 +71,13 @@ function setDocumentType() {
       setSendTo("PRACTICE","");
       setFrom(documentType);
       setSubjectTo("TEXT","Inpatient Discharge Summary");
-      addDocumentTemplate("IP Discharge Summary","cliweb06.pbl?reportno=09&template=304","","Discharge Summary");
+      addDocumentTemplate("IP Discharge Summary","cliweb06.pbl?reportno=09&template=304","DSSUM","Discharge Summary");
       loadTemplate();
     } else if (document.UpdateForm.ptvistyp.value = "1"){
       setSendTo("HCP","");
       setSubjectTo("TEXT","Emergency Discharge Summary");
       setFrom(documentType);
-      addDocumentTemplate("ED Discharge Summary","emrweb02.pbl?reportno=01&template=304","","Emergency Discharge Summary");
+      addDocumentTemplate("ED Discharge Summary","emrweb02.pbl?reportno=01&template=304","EDDIS","Emergency Discharge Summary");
       loadTemplate();
     } else {
       errcode = 1; 

@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.02">
+<meta name="TemplateVersion" content="V12.00.03">
 <meta name="TemplateHome" content="bhs">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -541,9 +541,11 @@ function pressUpdate() {
      onclick="tempDisable(this);pressUpdate();">
     <input type=button value="Delete" class="button"  tabindex=35
      onclick="checkSubmit('D');">
-    <input type=button value="Labels & Letters" class="button" tabindex=36
+    <input type=button value="Labels & Letters" id=lablet class="button" 
+     tabindex=36
      onclick='LabelLet04("%OUTWEB05.04.001","%OUTWEB05.04.012.1");'>
-    <input type=button value="Slot Template" class="button"  tabindex=37
+    <input type=button value="Slot Template" id=slottemp class="button"  
+     tabindex=37
      onclick='Template04("%OUTWEB05.04.001","%OUTWEB05.04.012.1");'>
     <input type=button value="Copy" class="button" tabindex=38
      onclick='CopyClnt04("%OUTWEB05.04.001","%OUTWEB05.04.012.1");'>
@@ -757,4 +759,11 @@ function initCheck() {
    document.getElementById("HEROCampField").innerHTML=
    document.getElementById("DisplayHEROCampField").innerHTML;
  }
+
+  if("%OUTWEB05.04.199.015"=="1"){
+    document.getElementById("lablet").className="RedButton";
+  }
+  if("%OUTWEB05.04.199.016"=="1"){
+    document.getElementById("slottemp").className="RedButton";
+  }
 </script>

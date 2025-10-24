@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="standard">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -484,6 +484,16 @@ function Anaesthetic() {
   } else {
     PatientPayable.innerHTML="<font color=red>" + document.ItemForm.pbalance.value + "</font>";
   }
+
+Anastype="%STANDARD.01.025. 15.189.1.1";
+Ecliindc="%PATWEB71.01.377";
+AnasCode="%PATWEB71.01.756";
+   if(Anastype=="0" &&
+      Ecliindc=="1") {
+     if(!isWhitespace(AnasCode)) {
+       document.UpdateForm.anatybut.className="RedButton";
+     }
+   }
 
   var CmntIndic = "%PATWEB71.01.803";
   if ( CmntIndic =="1" ) {

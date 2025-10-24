@@ -5,6 +5,8 @@
 .
 . Modifications :
 .----------------------------------------------------------------------
+. V12.00.02 09/10/2025 Alina Bhari            TSK 0967846
+.            Added menuflag functionality - LNKPRO00
 . V12.00.01 07/07/2025 Alina Bhari            TSK 0961176
 .            Added check in deactivating HCP practice to ensure all the linked
 .            HCP's are inactive  - CHKHCG10,CHKHCG95
@@ -1145,7 +1147,7 @@ ZERO6     INIT      "000000"
 .
 .---------------------------------------------------------------------
 PRGID     INIT      "PATWEB99"
-VERSION   INIT      "V12.00.01"
+VERSION   INIT      "V12.00.02"
 PRGNAM    INIT      "Doctor Enquiries Template Server"
 .---------------------------------------------------------------------
           CALL      WEBINT00       * Initialise Fifo Etc.
@@ -6041,6 +6043,11 @@ LNKPRO00  UNPACK    DIM127,D1,KEY8,DIM127
                                    "&pmhcl001=",GENPCODE:
                                    "&pmhcp001=",GENPCODE:
                                    "&startkey=",STARTKEY;
+.
+          MATCH     "1",MENUFLAG
+          IF        @EQUAL
+            WRITE     HTMLFILE;"&menuflag=1";
+          ENDIF
 .
           REP       "+ ",STARTKEY
           REP       "+ ",GENPCODE

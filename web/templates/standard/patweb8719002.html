@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="standard">
 <meta name="HelpFileName"    content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -10,7 +10,7 @@
 <span class=DFrameTitleBar>
 <img align="right" alt="Exit" class="MenuIcon" 
  src="../images/ExitIcon.gif" onclick="DFrameExit();">
-Print Adhoc Letters - %PATWEB87.19.001 - %PATWEB87.19.002
+Print Ad Hoc Letters - %PATWEB87.19.001 - %PATWEB87.19.002
 </span>
 <form name=ReportForm method=post action=rshweb02.pbl style="margin:0">
 <input type=hidden name=reportno value=4>
@@ -19,7 +19,7 @@ Print Adhoc Letters - %PATWEB87.19.001 - %PATWEB87.19.002
 <input type=hidden name=setdfprg value="IBAOUT71">
 <input type=hidden name=setdfrep value="01">
 <input type=hidden name=schdpgid value="IBAOUT71">
-<input type=hidden name=schddesc value="Print Adhoc Letters">
+<input type=hidden name=schddesc value="Print Ad Hoc Letters">
 <input type=hidden name=keystr01 value=4>
 <input type=hidden name=keystr02 value="%PATWEB87.19.001">
 <input type=hidden name=keystr03 value="%STANDARD.01.008">
@@ -56,17 +56,17 @@ Print Adhoc Letters - %PATWEB87.19.001 - %PATWEB87.19.002
         </select>
     </td></tr>
 
-<tr><td class=DataLabel>Re-schedule Type</td>
+<tr><td class=DataLabel>Reschedule Type</td>
     <td class=DataLabel colspan=3>
     <select name=schdrdat id="schdrdat" title="Schedule Type" 
     onchange="SetReportDates();">
     <option></option>
     </select>
     </td></tr>
-<tr><td class=DataLabel>Re-schedule Until Date</td>
+<tr><td class=DataLabel>Reschedule Until Date</td>
     <td class=DataLabel colspan=3>
     <input type=text name=schdrend id="schdrend" size=12
-     onblur="checkDate(this,'Re-schedule Until Date');">
+     onblur="checkDate(this,'Reschedule Until Date');">
     <img notab src="../images/DateTimeStamp.gif" class="Icon"
      alt="Current" date="ReportForm.schdrend">
     <img notab src="../images/DateLookup.gif" class="Icon"

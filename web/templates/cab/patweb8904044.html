@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="cab">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -2163,6 +2163,11 @@ if (UpdateForm.ptmis012.value.substr(162,10).trim() == "11") {
 //Checks if cab setting set, and displays the specific admission fields if so.
 if (cabFieldDisplay == "1") {
   displayCabAdmissionFields(false);
+}
+
+//Checks if MoveMedRec is checked
+if (VariableNameExists('MoveMedRec') && MoveMedRec){
+  document.UpdateForm.mvmedre1.checked = true;
 }
 
 </script>

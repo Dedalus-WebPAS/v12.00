@@ -40,6 +40,8 @@
 .***************************************************************************
 .*  Mod's     :                                                            *
 .***************************************************************************
+.*       V12.00.02 15/10/2025  J.Tan            TSK 0967027                *
+.*                 Recompiled for HL7COMN - Check Pooling file for Type=018*
 .*       V12.00.01 30/05/2025  Don Nguyen       TSK 0955096                *
 .*                 Alphanumeric visit number changes                       *
 .***************************************************************************
@@ -246,6 +248,8 @@
           INC       PATATRTD/INC
           INC       TFILEVAR/INC
           INC       VISXDCFD/INC
+          INC       COMPARFD/INC
+          INC       IBAPOLFD/INC
 .
 LISSOCKT  SOCKET    ASCII,FIXED=1   * socket on which to listen for connections
 .
@@ -489,7 +493,7 @@ TIMECAPT  INIT      "Message received at: "
 .-----------------------------------------------------------------------
 PRGID     INIT      "HL7QUERY"
 PRGNAM    INIT      "HL7 Query Message Receiving Server"
-VERSION   INIT      "V12.00.01"
+VERSION   INIT      "V12.00.02"
 .-----------------------------------------------------------------------
 +
 .*************************************************************************
@@ -835,6 +839,26 @@ INIT0600  MOVE      ZERO,HEROTABL
           TRAPCLR   IO
           IF        OVRCD=1
             MOVE      ONE,HEROTABL          * not using HERO Location table
+          ENDIF
+.
+          MOVE      ZERO,COMPTABL
+          MOVE      ZERO,OVRCD              * Trap to check if comparaf exists
+          TRAP      OVERCOND IF IO
+          DISPLAY   *P64:24,"comparaf";
+          OPEN      COMPARA1,"comparaf"
+          TRAPCLR   IO
+          IF        OVRCD=1
+            MOVE      ONE,COMPTABL          * not using common system parameter
+          ENDIF
+.
+          MOVE      ZERO,IBAPTABL
+          MOVE      ZERO,OVRCD              * Trap to check if 2nd index exists
+          TRAP      OVERCOND IF IO
+          DISPLAY   *P64:24,"ibapolaf";
+          OPEN      IBAPOLA2,"ibapolaf"      * open Patient Pooling table
+          TRAPCLR   IO
+          IF        OVRCD=1
+            MOVE      ONE,IBAPTABL          * not using common system parameter
           ENDIF
 .
 .         Get the first directory in the DPATH (cd directory) as this will
@@ -5268,6 +5292,8 @@ LOGM0000  RETURN
           INC       PMSWX1IO/INC
           INC       VISCMTIO/INC
           INC       VISXDCIO/INC
+          INC       COMPARIO/INC
+          INC       IBAPOLIO/INC
           INC       WATOPAIO/INC
           INC       WATOPSIO/INC
           INC       WATTR1IO/INC

@@ -1,20 +1,4 @@
-//jsVersion  : V12.00.00
-//========================================================================
-// Program   : cliweb0801030.js
-//
-// Written   : 13.02.2013 B.G.Ackland
-//
-// Version   :
-//
-// V10.05.01 14.10.2014  Peter Vela  CAR 301518
-//           Added viewCliDoc() remote script view Clinical Documents
-//           Increased EditDocument() DFrame size
-// V10.03.02 03.07.2013  B.G.Ackland CAR 286985
-//           Use doclink1 as URL and doclink2 as Physical consistent with iPad Views
-// V10.03.01 18/06/2013  Jill Parkinson CAR 286985
-//           Totranned again
-// V10.03.00 13/02/2013  Ebon Clements  CAR 281233
-//           V10.03 CD Diff - Created include           
+//jsVersion  : V12.00.01
 //========================================================================
 var showAllDocuments = false;
 function init() {
@@ -70,7 +54,7 @@ function DocumentInitTable() {
      if (t.rows[i][0].match(/\.doc/i)) DocType="OFF";
      if (t.rows[i][0].match(/\.xls/i)) DocType="OFF";
      OS += "<li class='ItemNote docMarkedAs"+t.rows[i][16]+
-           "'><span onclick=\"LinkDoc('"+t.rows[i][0]+"','"+t.rows[i][1]+"','"+t.rows[i][16]+"','"+t.rows[i][2]+"');\">" +
+           "'><span onclick=\"LinkDoc('"+t.rows[i][0]+"','"+t.rows[i][1]+"','"+t.rows[i][16]+"','"+t.rows[i][2]+"','"+t.rows[i][17]+"');\">" +
            "<span class='showDocumentIcon"+DocType +
            "' style='float:left;' ></span>"+ t.rows[i][11]
      if (t.rows[i][16] == markAsCurrentDraft) OS += "  (Current Draft)"
@@ -204,13 +188,20 @@ function EditDocument(detailky) {
   DFrameLink(linkurl,0,Left,480,500)
 }
 
-function LinkDoc(linkurl1,linkurl2,docStatus,detailky) {
+function LinkDoc(linkurl1,linkurl2,docStatus,detailky,isMyHR) {
   viewCliDoc(detailky);
   if (docStatus == '3') {
+    if (isMyHR == 'Y') {
+      SetCookie('DischargeDocument',detailky);
+      linkurl="patweb98.pbl?reportno=1&template=322"+
+              "&urnumber=" + document.PatientLinks.urnumber.value.replace(/ /g,"+") +
+              "&admissno=" + document.PatientLinks.admissno.value.replace(/ /g,"+")
+  } else {
     SetCookie('ClinicalDocument',detailky);
     linkurl="patweb98.pbl?reportno=1&template=320"+
             "&urnumber=" + document.PatientLinks.urnumber.value.replace(/ /g,"+") +
             "&admissno=" + document.PatientLinks.admissno.value.replace(/ /g,"+") 
+    }
     location.href=linkurl;
   }
   else {

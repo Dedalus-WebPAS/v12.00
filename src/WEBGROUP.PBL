@@ -10,6 +10,8 @@
 .*                  Grouper, PC Grouper (CME) and TurboGrouper.               *
 .* Modifications  :                                                           *
 .*----------------------------------------------------------------------------*
+.*        V12.00.04 25/09/2025  Nikitha B        TSK 0966964                  *
+.*                  Formatted error at LODENC93.                              *
 .*        V12.00.03 10/09/2025  Ebon Clements    TSK 0961623                  *
 .*                  Format visit number when returned form codefinder to      *
 .*                  remove the leading zero - LODEPID                         *
@@ -4599,7 +4601,10 @@ LODENC92  CALL      GETERR00
           MOVE      ONE,EXIT
           GOTO      LODENC99
 .
-LODENC93  MOVE      "Error: Patient returned from C'finder different.",WEBTITLE
+LODENC93  CLEAR     WEBTITLE
+          APPEND    "Error: Patient returned from ",WEBTITLE
+          APPEND    "Codefinder different.",WEBTITLE
+          RESET     WEBTITLE 
           CALL      WINRLD00
           MOVE      ONE,EXIT
           GOTO      LODENC99

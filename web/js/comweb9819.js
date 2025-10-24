@@ -1,4 +1,4 @@
-//jsVersion  : V12.00.00
+//jsVersion  : V12.00.01
 //========================================================================
 // Hospital level parameter options 
 // Usage:                               
@@ -86,5 +86,9 @@ function AddParameters(ListItem) {
   ListItem.options[ListItem.options.length]=
   new Option("Calculate Invoice Pending Amount on Discharge (for A03 HL7)",
       "PTCNCIPA|5|Calculate Invoice Pending Amount on Discharge (for A03 HL7) - PTCNCIPA||0|");
+
+ ListItem.options[ListItem.options.length]=
+  new Option("Sending Estimated DOB Flag in ZXP.77",
+      "PTCNEDOB|5|Sending Estimated DOB Flag in ZXP.77 - PTCNEDOB||0|");
 
 }

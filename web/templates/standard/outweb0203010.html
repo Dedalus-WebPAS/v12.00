@@ -1,8 +1,34 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="standard">
 <meta name="HelpFileName"    content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
-</head>
+<script type="text/javascript">
+function checkVisitType(admissno,ReturnName) {
+  if ((PrintLabel.admissno.value =="       0") ||
+         (isWhitespace(PrintLabel.admissno.value))) {
+      return;
+  }
+  ReturnFunction="" ;
+  ReturnName.value="";
+
+  var serverURL = "../cgi-bin/comweb80.pbl?reportno=58" +
+                  "&valdcode="+admissno.replace(/ /g,"+")
+  var returnValue = RSExecute(serverURL);
+  if (returnValue.status==0) {
+    ReturnValue=returnValue.return_value.split("|")
+    ReturnName.value=trim(ReturnValue[0]);
+  }
+  getOptionIndex();
+}
+function init(){
+  if (isWhitespace(document.PrintLabel.admissno.value)) {
+      document.PrintLabel.admissno.value="       0";
+      getOptionIndex();
+      return;
+  }
+  checkVisitType(PrintLabel.admissno.value,PrintLabel.visttype);
+}
+</script>
 %START.OF.PAGE
 <body  onload="PageLoad(event);self.focus();
  document.PrintLabel.schdprnt.focus();">
@@ -22,6 +48,7 @@ Print Outpatient Labels
 <input type=hidden name=casekeys value="%OUTWEB02.03.366">
 <input type=hidden name=setdfprg value="PATWEB70">
 <input type=hidden name=setdfrep value="02">
+<input type=hidden name=visttype id=visttype value="">
 
 <table cellspacing=0 cellpadding=3 border=0 width=95% align=center >
 <tr><td class=DataLabel>Printer</td> 
@@ -30,7 +57,7 @@ Print Outpatient Labels
     </select></td></tr>
 
 <tr><td class=DataLabel>Type of Label</td>
-    <td><select name=labeltyp >
+    <td><select name=labeltyp id=labeltyp>
            %STANDARD.01.019.LABEL___.2
     </select></td></tr>
 
@@ -50,19 +77,19 @@ Print Outpatient Labels
 </table>
 </form>
 <script type="text/javascript">
-function init(){
-//
-// Outpatient and pmi only
-  if ((pat98ppl.visittyp.value =="2"||pat98ppl.visittyp.value=="0")) {
-    var x=document.getElementById("labeltyp")
-        for (var i=0;i<pat98ppl.labeltyp.length;i++) {
-             var V1=x.options[i].value;
-             if ((V1.substr(5,3)=="INP") ||
-               (V1.substr(5,3)=="AAE") || (V1.substr(5,3)=="ALL") ||
-               (V1.substr(5,3)=="REF")) {
-               x.remove(i);
-               i--;
-             }
-        }
-  }
+function getOptionIndex() {
+   //outpatient and pmi only
+   var x=document.getElementById("labeltyp")
+   for (var i=0;i<document.PrintLabel.labeltyp.length;i++) {
+       var V1=x.options[i].value;
+       if ((V1.substr(5,3)=="INP") || (V1.substr(5,3)=="EMR") ||
+          (V1.substr(5,3)=="AAE") || (V1.substr(5,3)=="ALL") ||
+          (V1.substr(5,3)=="BOK") || (V1.substr(5,3)=="DOC") ||
+          (V1.substr(5,3)=="CAR") ||
+          (V1.substr(5,3)=="REF") || (V1.substr(5,3)=="WAT")) {
+           x.remove(i);
+           i--;
+       }
+   }
 }
+</script>

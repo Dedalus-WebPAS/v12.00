@@ -1,0 +1,140 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" src="../js/ReportStandard.js"></script>
+<script type="text/javascript">
+function selectView(viewTypeValue) {
+  document.SelectView.viewtype.value=viewTypeValue
+  document.SelectView.submit();
+}
+//
+function SelectView2(ViewType) {
+  document.SelectPeriod.viewtype.value=ViewType
+  if (document.SelectPeriod.lastdate!=undefined) {
+    document.SelectPeriod.lastdate.value="" }
+  if (document.SelectPeriod.vyearmth!=undefined) {
+    document.SelectPeriod.vyearmth.value="" }
+  document.SelectPeriod.submit();
+}
+//
+function SubmitSelection() {
+  document.SelectPeriod.submit();
+}
+//
+function DispMapping() {
+  LinkUrl="patweb92.pbl?reportno=4&template=3"
+  Left=(((document.body.clientWidth-400)/2)+ document.body.scrollLeft)
+  DFrameLink(LinkUrl,0,Left,400,250)
+}
+function bulkPrint() {
+  f = document.ProcessForm;
+
+  var num_patients = 0
+  for(var e = 0; e < ProcessForm.elements.length; e++) {
+    var el=ProcessForm.elements[e] ;
+    if(el.name.match(/admissno/) && el.checked==true) {
+      num_patients++
+    }
+  }
+  if(num_patients == 0) {
+     alert("No Print Label (Patient) checkboxes selected!");
+     return;
+  }
+
+  if(!validateMandatory(ProcessForm)) {
+    return;
+  }
+  linkurl="patweb98.pbl?reportno=01&template=452&nourselc=1";
+  Left=(document.body.clientWidth-390)/2;
+  DFrameLink(linkurl,100,Left,390,140);
+}
+</script>
+</head>
+<body onload="PageLoad(event);">
+%START.OF.PAGE
+<form name=SelectPeriod action=patweb92.pbl method=get style="margin:0">
+ <input type=hidden name=reportno value=6>
+ <input type=hidden name=template value=20>
+ <input type=hidden name=viewtype value="%PATWEB92.06.011">
+ <input type=hidden name=ptcnhdps value="%STANDARD.01.025.080.250.1.1">
+
+ <table cellpadding=3 bgcolor=#CCCCCC border=0 width=100%>
+  <tr><td class=DataLabel>Ward</td>
+      <td><select name=wardcode class=SelectMed
+                  onChange="SubmitSelection();">
+            <option value="  ">ALL</option>
+             %PATWEB92.06.012.2
+           </select></td>
+      <td align=right>
+          <input type=button value="<<" class=SmallButton
+                 onClick='location.href="%PATWEB92.06.002"'>
+          %PATWEB92.06.007
+          <input type=button value=">>" class=SmallButton
+                 onClick='location.href="%PATWEB92.06.001"'>
+          <a href='javascript:SelectDateFrame();'>
+             <img src="../images/DateLookup.gif" border=0 hspace=1 align=absmiddle
+                  alt="Select Date"></a>
+          <a href='javascript:SelectView2("0");'>
+             <img src=../images/DayIcon.gif border=0 hspace=1 align=absmiddle
+                  alt="View Today"></a>
+          <a href='javascript:SelectView2("1");'>
+             <img src=../images/WeekIcon.gif border=0 hspace=1 align=absmiddle
+                  alt="View This Week"></a>
+          <a href='javascript:SelectView2("2");'>
+             <img src=../images/MonthIcon.gif border=0 hspace=1 align=absmiddle 
+                  alt="View This Month"></a></td>
+      <td class="DataLabel" align="right">Legend
+          <img src="../images/Help16.gif" border="0" hspace=2 align=absmiddle
+               onClick="DispMapping();" /></td></tr>
+ </table>
+</form>
+
+<form name=ProcessForm method=post action=rshweb02.pbl style="margin:0">
+ <input type=hidden name=reportno value=2>
+ <input type=hidden name=updttype value="L">
+ <input type=hidden name=redirect
+  value="patweb92.pbl?reportno=6&template=020&viewtype=%PATWEB92.06.011">
+ <input type=hidden name=nextpage value="5">
+
+ <table cellspacing=0 border=1 width=100%>
+  <tr><td class=HeadingCell align=center colspan=6>Bulk Print List</td></tr>
+ </table>
+
+ <table id=tblPatients cellspacing=0 border=1 width=100%>
+  <tr id=spnAus><td class=HeadingCell><b>Visit No.</b></td>
+      <td class=HeadingCell><b>Patient Name</b></td>
+      <td class=HeadingCell><b>Status</b></td>
+      <td class=HeadingCell><b>Expected Ward</b></td>
+      <td class=HeadingCell><b>Expected Date</b></td>
+      <td class=HeadingCell><b>Print</b></td></tr>
+  <tr id=spnNz><td class=HeadingCell><b>Visit No.</b></td>
+      <td class=HeadingCell><b>Patient Name</b></td>
+      <td class=HeadingCell><b>Full Procedure Description</b></td>
+      <td class=HeadingCell><b>Status</b></td>
+      <td class=HeadingCell><b>Expected Ward</b></td>
+      <td class=HeadingCell><b>Expected Date</b></td>
+      <td class=HeadingCell><b>Print</b></td></tr>
+  %PATWEB92.06.015
+ </table>
+
+ <table cellspacing=0 border=0 width=100%>
+  <tr><td align=center colspan=6>
+          <input type=button class="button" id="prntbttn"
+           Value="Print A4 Labels" onclick="bulkPrint();">
+          </td></tr>
+ </table>
+</form>
+
+<script type="text/javascript">
+//
+ ptcnhdps="%STANDARD.01.025.080.250.1.1";
+ if (ptcnhdps==1) {
+   document.getElementById('spnNz').style.display = "";
+   document.getElementById('spnAus').style.display = "none";
+ }
+ else {
+   document.getElementById('spnNz').style.display = "none";
+   document.getElementById('spnAus').style.display = "";
+ }    
+</script>

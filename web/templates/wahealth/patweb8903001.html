@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.01">
+<meta name="TemplateVersion" content="V12.00.02">
 <meta name="TemplateHome" content="wahealth">
 <!-- $Id: patweb8903001.html 4223 2018-11-20 08:10:33Z  $ -->
 <!-- $URL: http://lxfm700sub/svn/webpas/trunk/web/custom/patweb8903001.html $ -->
@@ -152,12 +152,16 @@ function SubmitAdm() {
       }
     }
   if (MandatoryOk) {
+    chckcomp = document.UpdateForm.ptmis027.value.substr(3,1);
+    if (chckcomp.length == 0){
+      chckcomp = "+";
+    }
     setRedirect();
     if(p.prevhosp.checked==true){
       document.UpdateForm.redirect.value="patweb07.pbl?reportno=15&template=001"
       if(document.UpdateForm.pmext049.value == "1") {
         document.UpdateForm.redirect.value+= "&mvithmva=1"+
-        "&chckcomp="+document.UpdateForm.ptmis027.value.substr(3,1);
+        "&chckcomp="+chckcomp+"P";
       }
       document.UpdateForm.redirect.value +=
       "&urnumber=" + document.UpdateForm.urnumber.value

@@ -5,6 +5,8 @@
 .
 . Modifications  :
 .------------------------------------------------------------------------------
+. V12.00.07 16/10/2025  Zumin Yu       TSK 0964943a
+.           Formatting DNA patient warning message in CHKDNA10
 . V12.00.06 17/09/2025  Ebon Clements  TSK 0965123
 .           Recompiled for WRITBOOK - Set SAVBCOMP for pmsextaf read
 . V12.00.05 18/08/2025  Zumin Yu       TSK 0964943
@@ -3494,7 +3496,7 @@ ATTEXT    INIT      "at"
 .
 .*******************************************************************************
 PRGID     INIT      "OUTWEB02"
-VERSION   INIT      "V12.00.06"
+VERSION   INIT      "V12.00.07"
 PRGNAM    INIT      "Outpatient Processing"
 .*******************************************************************************
 .
@@ -6569,10 +6571,10 @@ CHKDNA10  CALL      RDKBOKA3
               MOVE      ONE,WARNINGF
               WRITE     HTMLFILE;"<RETURN_VALUE TYPE=WARNING>";
             ENDIF
-            WRITE     HTMLFILE;"Patient did not attend the following appointments:",012:
+            WRITE     HTMLFILE;"Patient did not attend the following:",012:
                                "Date / Time":
-                               SP9,011,"Clinic":
-                               SP25,"    ",011,"Reason",012;
+                               011,"Clinic":
+                               011,011,011,"Reason",012;
           ENDIF
 .
           MOVE      OBAOUTNO,KEY8

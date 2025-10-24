@@ -1,3 +1,4 @@
+. V12.00.01 15/10/2025 JT C-0967027 Added index 2 for HL7 Type 018              
 . V11.05.01 26/11/2024 JT C-0946342 Added IBPLTYPE 018                          
 . V11.03.01 29/03/2023 JT C-0847250 Added IBPLTYPE 017                          
 . V10.02.01 27/01/2022 EC C-0888071 Added IBPLTYPE 016                          
@@ -21,13 +22,14 @@
 . *
 . * File Name     :   ibapolaf.dat
 . *
-. * Index Values  :   KEY10                                                  
+. * Index Values  :   KEY10   KEY21                                          
 . *
 . *----------------------------------------------------------------------
 .
 .Data File Definition
 .--------------------
 IBAPOLA1   IFILE    SQL, FIXED=124, KEY="U1-10"
+IBAPOLA2   IFILE    SQL, FIXED=124, KEY="U11-13,22-29,1-10"
 .
 .Name     Type      Length Physical Start Description
 .----     ----      ------ -------- ----- -----------

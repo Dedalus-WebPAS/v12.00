@@ -1,0 +1,41 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName"    content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+</head>
+%START.OF.PAGE
+<body onload="PageLoad(event);">
+<span class=DFrameTitleBar>
+<img align="right" alt="Exit" class="MenuIcon"
+ src="../images/ExitIcon.gif" onclick="DFrameExitRefresh();">
+Pre-assessment History - %PATWEB92.21.002 (UR %PATWEB92.21.003 Visit %PATWEB92.21.081)  
+</span>
+<div id=PageBodySection >
+<table border=1 width="100%" cellspacing="0" cellpadding="2">
+<tr><td class=HeadingCell width=120px>Date/Time</td>
+    <td class=HeadingCell width=100px>%STANDARD.01.035.BG</td>
+    <td class=HeadingCell>Comments</td>
+    <td class=HeadingCell width=120px>Record Created By</td>
+    <td class=HeadingCell width=120px>Date/Time Record Created</td>
+    <td class=HeadingCell width=120px>Record Updated By</td>
+    <td class=HeadingCell width=120px>Date/Time Record Updated</td></tr>
+%PATWEB92.21.102
+</table>
+<div align=center style="padding-top:20px">
+<input type=button value="Close" class="button"
+     onclick="DFrameExitRefresh();">
+</div>
+</div>
+
+<form name=PatientLinks method=get>
+<input type=hidden name=reportno value=21>
+<input type=hidden name=template value=002>
+<input type=hidden name=nextpage value="2">
+<input type=hidden name=redirect value="">
+<input type=hidden name=urnumber value="%PATWEB92.21.003">
+<input type=hidden name=admissno value="%PATWEB92.21.081">
+<input type=hidden name=MenuType value="%PATWEB92.21.088">
+<input type=hidden name=trandate>
+<input type=hidden name=trantime>
+</form>
+

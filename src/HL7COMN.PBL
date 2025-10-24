@@ -2,6 +2,13 @@
 .*                              HL7COMN.PBL                                  *
 .*        Contains common HL7 routines used by both HL7CISIN and HL7QUERY    *
 .* Mods:                                                                     *
+.*        V12.00.09 21/10/2025  Bella Turco      TSK 0960178                 *
+.*                  Added ZXP.77: Sending Estimated DOB Flag                 *
+.*                  (WRZXP000/PMPXEDOB)                                      *
+.*        V12.00.08 15/10/2025  J.Tan            TSK 0967027                 *
+.*                  Added CPOL0000 - checking pooling table for Type 018     *
+.*        V12.00.07 07/10/2025  Davin            TSK 0946211                 *
+.*                  Default PID.25 to "" to signify no multiple birth order  *
 .*        V12.00.06 11/09/2025  Davin            TSK 0949457                 *
 .*                  Added ZXP.76: Email Validation Flag (WRZXP000/PMPXSN21)  *
 .*        V12.00.05 02/07/2025  Davin            TSK 0954308                 *
@@ -2120,9 +2127,10 @@ WRPID999  RETURN
 . Input : PURNO    - UR Number
 . Output: PID024   - Flag Y/N to indicate if multiple Birth details exist
 .         PID025   - Multiple birth order
-.         MULTBTYP - Multiple birth Type of Birth
+.         MULTBTYP - Multiple birth Type of Birth (for ZXP.69)
 .---------------------------------------------------------------------------
-MLTBIR00  MOVE      "N",PID024
+MLTBIR00  MOVE      "N",PID024                   * default to 'N'
+          MOVE      BLANKSTR,PID025              * default to '""'
           PACK      DIM8,SP7,ZERO
           MOVE      SP3,MULTBTYP
 .
@@ -11832,9 +11840,40 @@ WRZXP765  APPEND    CARET,ZXP075
 .         Email Validation Flag (ZXP.76)
 .
 WRZXP770  MATCH     SP1,PMPXSN21                 * field populated ?
-          GOTO      WRZXP800 IF EQUAL            * no
+          GOTO      WRZXP775 IF EQUAL            * no
 .
           MOVE      PMPXSN21,ZXP076              * send value
+.
+.         Estimated DOB Flag (ZXP.77)
+.
+WRZXP775  MOVE      "PTCNEDOB",D8           * hospital parameter
+          COMPARE   ZERO,IBCNMHOS
+          GOTO      WRZXP776 IF EQUAL
+.
+          PACK      KEY11,PMVXMHOS,D8,SP70
+          CALL      RDCMPAR1                * Read system parameter
+          BRANCH    OVRCD,WRZXP776
+.
+          MATCH     "0",CMPAACTV
+          GOTO      WRZXP777 IF EQUAL       * found active data
+.
+.         Check parameter with blank hospital
+.
+WRZXP776  PACK      KEY11,SP3,D8,SP70
+          CALL      RDCMPAR1                * Read default system parameter
+          BRANCH    OVRCD,WRZXP800
+.
+          MATCH     "0",CMPAACTV
+          GOTO      WRZXP800 IF NOT EQUAL   * found active data
+.
+WRZXP777  MATCH     "1",CMPAVALU                 * Estimated DOB Flag Parameter
+          GOTO      WRZXP800 IF NOT EQUAL
+.
+          MOVE      "N",ZXP077
+          MATCH     "1",PMPXEDOB
+          IF        @EQUAL
+            MOVE      "Y",ZXP077
+          ENDIF
 .
 WRZXP800
 .
@@ -11857,7 +11896,8 @@ WRZXP900  PACK      SEGSTRNG,ANSZ,ANSX,ANSP,PIPE:
                              ZXP061,PIPE,ZXP062,PIPE,ZXP063,PIPE,ZXP064,PIPE:
                              ZXP065,PIPE,ZXP066,PIPE,ZXP067,PIPE,ZXP068,PIPE:
                              ZXP069,PIPE,ZXP070,PIPE,ZXP071,PIPE,ZXP072,PIPE:
-                             ZXP073,PIPE,ZXP074,PIPE,ZXP075,PIPE,ZXP076,CRETURN
+                             ZXP073,PIPE,ZXP074,PIPE,ZXP075,PIPE,ZXP076,PIPE:
+                             ZXP077,CRETURN
 .
           CALL      SENDM000                     * send message
           BRANCH    EXIT,WRZXP910:               * connection lost
@@ -13923,6 +13963,7 @@ IPZXV104
 .
 .         Invoice Pending (ZXV.105)
 .
+          MOVE      ZERO,F1
 IPZXV105  MOVE      BLANKSTR,ZXV105              * set default value
 .
           PACK      KEY11,AADMNO,ZERO,ZERO,THREE,SP70
@@ -13932,6 +13973,13 @@ IPZXV105  MOVE      BLANKSTR,ZXV105              * set default value
             IF        !@EQUAL
               MOVE      VSXDVAL1,ZXV105          * Amount to be Invoiced
               SQUEEZE   ZXV105
+            ENDIF
+          ELSE
+            ADD       ONE,F1
+            IF        F1<5
+              CALL      CPOL0000                    * Check pooling table
+              COMPARE   ZERO,OVRCD
+              GOTO      IPZXV105 IF EQUAL
             ENDIF
           ENDIF
 .
@@ -14046,6 +14094,54 @@ IPZXV580  IF        MESSNUMB = 8
           CALL      GDISCH00
 .
 IPZXV999  RETURN
++
+.---------------------------------------------------------------------------
+.         Check if the Admission number in Pooling table 
+.         ie. still in in the Queue for process to calculate invoice pending
+.---------------------------------------------------------------------------
+CPOL0000  BRANCH    COMPTABL,CPOL9000       * comparaf file doesn't exist
+          BRANCH    IBAPTABL,CPOL9000       * 2nd index ibapolaf doesn't exist
+.
+          MOVE      "PTCNCIPA",D8           * hospital parameter
+          COMPARE   ZERO,IBCNMHOS
+          GOTO      CPOL1000 IF EQUAL
+.
+          PACK      KEY11,PMVXMHOS,D8,SP70
+          CALL      RDCMPAR1                * Read system parameter
+          BRANCH    OVRCD,CPOL1000
+.
+          MATCH     "0",CMPAACTV
+          GOTO      CPOL2000 IF EQUAL       * found active data
+.
+.         Check parameter with blank hospital
+.
+CPOL1000  PACK      KEY11,SP3,D8,SP70
+          CALL      RDCMPAR1                * Read default system parameter
+          BRANCH    OVRCD,CPOL9000
+.
+          MATCH     "0",CMPAACTV
+          GOTO      CPOL9000 IF NOT EQUAL   * found active data
+.
+.         Check if record in ibapolaf file waiting for process
+.
+CPOL2000  MOVE      "018",KEY3
+          PACK      KEY21,KEY3,AADMNO,SP70
+          CALL      RSIBPOL2
+          CALL      RKIBPOL2
+          BRANCH    OVRCD,CPOL9999
+.
+          MATCH     KEY3,IBPLTYPE            * Same type ?
+          GOTO      CPOL9000 IF NOT EQUAL
+.
+          MATCH     AADMNO,IBPLVISN          * Same visit number ?
+          GOTO      CPOL9000 IF NOT EQUAL
+.
+          DISPLAY   *W                       * wait 1 second
+          MOVE      ZERO,OVRCD
+          GOTO      CPOL9999
+.
+CPOL9000  MOVE      ONE,OVRCD
+CPOL9999  RETURN
 +
 .---------------------------------------------------------------------------
 . Get current Discharge (Delay) details from patatraf with type 028

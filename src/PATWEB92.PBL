@@ -8,6 +8,12 @@
 . Modifications :
 .
 .------------------------------------------------------------------------
+. V12.00.03 20/10/2025  Bella Turco    TSK 0955574
+.           Added changes to Nursing Pre-assessment ASSCON00 UPPREA00
+.           New report no 21 for Pre-assessment History
+. V12.00.02 09/10/2025  Ebon Clements  TSK 0968096
+.           Added custom print-key attribute for bulk A4 labels sheet
+.           printing - BPEA0000
 . V12.00.01 26/05/2025  Bella Turco    TSK 0955096
 .           Alphanumeric changes                                  
 . V11.05.03 07.01.2025 DA Sarkies      TSK 0954547
@@ -1211,6 +1217,7 @@
           INC       PATLOCFD/INC 
           INC       PATMA1FD/INC
           INC       PATMI1FD/INC
+          INC       PATMISTD/INC
           INC       PATNIDFD/INC
           INC       PATONLFD/INC
           INC       PATPR1FD/INC
@@ -1318,6 +1325,7 @@ ADMSOURC  DIM       3
 ALTIDFLG  FORM      1                                                 *I-174484
 APOIDESC  DIM       20
 ATYPDESC  DIM       20
+ATYPE030  INIT      "030"
 ASRCDESC  DIM       20
 ACLSDESC  DIM       20
 .
@@ -1362,6 +1370,7 @@ CARETYPE  DIM       25
 CALDAYS   FORM      4
 CATBW     INIT      "BW"
 CATTC     INIT      "tc"
+CATPN     INIT      "Pn"
 CASEKEYS  DIM       19                      * Used for waiting list bookings
 CATASSGN  FORM      5
 CATCHGFL  FORM      1
@@ -1379,6 +1388,8 @@ CLILDESC  DIM       25                      * for clinic location outpatient
 CLINID    DIM       30                      * Clinic ID                *I-46977
 CLURCTDT  DIM       8
 CMMFILNM  DIM       8
+CMNTSFLG  DIM       1
+HISTRECV  DIM       1
 CNLVDAYS  FORM      4
 CNLVDATE  DIM       8
 COLDAT02  DIM       43
@@ -1417,6 +1428,7 @@ DFLTLOCN  DIM       4                                                 *I-240724
 DIETDESC  DIM       100
 DIAGDES1  DIM       50
 DIAGDES2  DIM       50
+NBSP8     INIT      "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 DIM2A     DIM       2
 DIM2B     DIM       2
 DIM2C     DIM       2
@@ -1426,8 +1438,14 @@ DIM3A     DIM       3
 DIM4      DIM       4
 DIM5      DIM       5
 DIM8      DIM       8
+DIM11     DIM       11
+D11       DIM       11
 DIM15     DIM       15
+DIM20A    DIM       20
+DIM20B    DIM       20
 DIM25     DIM       25
+DIM320    DIM       320
+SP320     DIM       320
 ENDDTE    DIM       8
 EXTVSTID  DIM      632          * Vist No + External Visit No + Html Character
 SAVDATA1  DIM       200
@@ -1435,6 +1453,7 @@ SAVINDC3  DIM       1
 SP80      DIM       80
 SUPERLEV  DIM       1
 SHOWFLAG  FORM      1
+PHISFLAG  DIM       1
 DIM100A   DIM       100
 DIM100B   DIM       100
 DIM200C   DIM       200
@@ -1608,6 +1627,7 @@ NEWTITLE  DIM       30
 NEXTPAGE  FORM      1
 NMPNUMB   DIM       20
 NOLEAVRG  FORM      1
+NOPATATR  DIM       1
 NOTIFIED  DIM       3
 NUTRLINK  DIM       127
 NRFCDAYS  FORM      5
@@ -1629,6 +1649,8 @@ PRIFC     DIM       1[999]
 PATAPT01  DIM       3
 PATFRM01  DIM       3
 PATLINK   DIM       127                     * Link to the next patient info
+HISTLINK  DIM       127
+COMMLINK  DIM       127
 PATPRC01  DIM       9
 PATPST01  DIM       3
 PATRFG01  FORM      1
@@ -1881,6 +1903,7 @@ CODEDZ    INIT      "DZ"
 CODEMU    INIT      "mu"
 CODEVI    INIT      "VI"
 CODEVH    INIT      "Vh"
+CODEWI    INIT      "wi"
 LOWVD     INIT      "vd"
 LOWVE     INIT      "ve"
 CODSAC    INIT      "ac"
@@ -1915,6 +1938,7 @@ TITLE08   INIT      "On-Leave Patients"
 TITLE09   INIT      "Pre-Assesments"
 TITLE10   INIT      "Leave Register Management List"
 TITLE11   INIT      "Leave Register History List"
+TITLE12   INIT      "Pre-assessment History"
 TWOEONE   INIT      "218"
 SP100     INIT      "                                   ":
                     "                                   ":
@@ -1950,7 +1974,7 @@ ATTEXT    INIT      "at"
 .
 .-----------------------------------------------------------
 PRGID     INIT      "PATWEB92" 
-VERSION   INIT      "V12.00.01"
+VERSION   INIT      "V12.00.03"
 PRGNAM    INIT      "Hospital List Server"
 .-----------------------------------------------------------
 .
@@ -1968,7 +1992,8 @@ MAIN1000  CALL      WEBRED00       * Read Fifo WEBPID and USERID
           BRANCH    REPORTNO,MAIN1100,MAIN1200,MAIN1300,MAIN1400,MAIN1500:
                              MAIN1600,MAIN1700,MAIN1800,MAIN1900,MAIN2000:
                              MAIN2100,MAIN2200,MAIN2300,MAIN2400,MAIN2500:
-                             MAIN2600,MAIN2700,MAIN2800,MAIN2900,MAIN3000
+                             MAIN2600,MAIN2700,MAIN2800,MAIN2900,MAIN3000:
+                             MAIN3100
 .
           PACK      WEBTITLE,PRGID,SP1,VERSION,SP1,PRGNAM,SP70
           MOVE      "INVALID OPTION",WEBTITLE
@@ -2048,6 +2073,9 @@ MAIN2900  CALL      BOEREQ00                * Bulk Online Eligibility Request
 MAIN3000  CALL      ACCLST00                * ACC Lists
           GOTO      MAIN1000
 .
+MAIN3100  CALL      PREHIS00                * Pre-assessment History
+          GOTO      MAIN1000
+.
 MAIN9999  MOVE      "SERVER SHUTDOWN COMPLETE",WEBTITLE
           CALL      WEBERR00
           STOP
@@ -2068,6 +2096,7 @@ INIT0000  OPEN      ACCCMTA1,"acccmtaf"
           OPEN      PATWC1A1,"patwc1af"
           OPEN      PATWC1A2,"patwc1af"
           OPEN      PATWC1A3,"patwc1af"
+          OPEN      OBSPCOA1,"obspcoaf"
           OPEN      PATBMDA2,"patbmdaf"
           OPEN      PATMA1A1,"patma1af"
           OPEN      PMSBRQA1,"pmsbrqaf"
@@ -2524,6 +2553,7 @@ CLRPAR00  MOVE      ZERO,REPORTNO
           MOVE      SP70,HEALTHFN
           MOVE      SP70,WLCATEGY
           MOVE      SP70,PACAFLAG
+          MOVE      SP70,PHISFLAG
           MOVE      SP70,OVERDATE
           MOVE      SP70,WLWMPTY
           MOVE      SP70,WLRFCDAY
@@ -2557,6 +2587,11 @@ CLRPAR00  MOVE      ZERO,REPORTNO
           MOVE      SP70,ADPOINTS 
 .
           CALL      CPBKRX00
+          CALL      CLRATR00
+          CALL      CLPATMAS
+          CALL      CLPMSPX2
+          CALL      CLPATMIS
+          CALL      CLPATATR
 .
           CALL      CPMORG00
 .
@@ -2588,6 +2623,12 @@ CLRPAR99  RETURN
 SETPAR00  MATCH     "pacaflag=",QRYNAME
           IF        @EQUAL
             MOVE      QRYDATA,PACAFLAG
+            GOTO      SETPAR99
+          ENDIF
+.
+          MATCH     "phisflag=",QRYNAME
+          IF        @EQUAL
+            MOVE      QRYDATA,PHISFLAG
             GOTO      SETPAR99
           ENDIF
 .
@@ -3149,6 +3190,12 @@ SETPAR00  MATCH     "pacaflag=",QRYNAME
           MATCH     "bokrx",QRYNAME
           IF        @EQUAL
             CALL      SPBKRX00
+            GOTO      SETPAR99
+          ENDIF
+.
+          MATCH     "ptatr",QRYNAME
+          IF        @EQUAL
+            CALL      SPTATR00
             GOTO      SETPAR99
           ENDIF
 .
@@ -4345,7 +4392,8 @@ GETCOM99  RETURN
 PROFLD00  BRANCH    REPORTNO,PROFLD10,PROFLD20,PROFLD30,PROFLD40,PROFLD50:
                              PROFLD60,PROFLD70,PROFLD80,PROFLD90,PROFL100:
                              PROFL110,PROFL120,PROFL130,PROFL140,PROFL150:
-                             PROFL160,PROFL170,PROFL180,PROFL190,PROFL200
+                             PROFL160,PROFL170,PROFL180,PROFL190,PROFL200:
+                             PROFL210
 .
 . Current Admissions
 .--------------------
@@ -4489,13 +4537,19 @@ PROFL150  BRANCH    FLDSETNO,PROFL151
 PROFL151  CALL      INEL0000                * incomplete eligibility
           GOTO      PROFLD99
 .
-PROFL160  BRANCH    FLDSETNO,PROFL161,PROFL162
+PROFL160  BRANCH    FLDSETNO,PROFL161,PROFL162,PROFL163,PROFL164
           GOTO      PROFLD99
 .
 PROFL161  CALL      BREC0000                * booking details
           GOTO      PROFLD99
 .
 PROFL162  CALL      BKRX0000                * booking extension
+          GOTO      PROFLD99
+.
+PROFL163  CALL      LDET0000
+          GOTO      PROFLD99
+.
+PROFL164  CALL      MASF0000
           GOTO      PROFLD99
 .
 PROFL170  BRANCH    FLDSETNO,PROFL171
@@ -4529,6 +4583,15 @@ PROFL201  CALL      ACCT0000                * ACC List tags
           GOTO      PROFLD99
 .
 PROFL202  CALL      MASF0000 
+          GOTO      PROFLD99
+.
+PROFL210  BRANCH    FLDSETNO,PROFL211,PROFL212
+          GOTO      PROFLD99
+.
+PROFL211  CALL      MASF0000
+          GOTO      PROFLD99
+.
+PROFL212  CALL      PHIS0000                * Pre-assessment History
           GOTO      PROFLD99
 .
 PROFLD99  RETURN
@@ -4811,7 +4874,10 @@ IDET9999  RETURN
 LDET0000  BRANCH    FLDITMNO,LDET0100,LDET0200,LDET0300,LDET0400,LDET0500:
                              LDET0600,LDET0700,LDET0800,LDET0900,LDET1000:
                              LDET1100,LDET1200,LDET1300,LDET1400,LDET1500:
-                             LDET1600,LDET1700,LDET1800,LDET1900
+                             LDET1600,LDET1700,LDET1800,LDET1900,LDET2000:
+                             LDET2100,LDET2200,LDET2300,LDET2400,LDET2500:
+                             LDET2600,LDET2700,LDET2800,LDET2900,LDET3000:
+                             LDET3100,LDET3200,LDET3300,LDET3400
 .
           GOTO      LDET9999
 .
@@ -4897,6 +4963,127 @@ LDET1900  MOVE      NO,YESNO
             MOVE      YES,YESNO
           ENDIF
           WRITE     HTMLFILE;YESNO;
+          GOTO      LDET9999
+.
+LDET2000  MATCH     SP70,ADIAG1
+          IF        !@EQUAL
+            WRITE     HTMLFILE;ADIAG1;     * Reason for Admission
+          ENDIF
+          GOTO      LDET9999
+.
+LDET2100  MATCH     SP70,PTELEP
+          IF        !@EQUAL
+            WRITE     HTMLFILE;PTELEP;     * Home phone
+          ENDIF
+          GOTO      LDET9999
+.
+LDET2200  MATCH     SP70,PTELEB
+          IF        !@EQUAL
+            WRITE     HTMLFILE;PTELEB;     * Work phone
+          ENDIF
+          GOTO      LDET9999
+.
+LDET2300  MATCH     SP70,PTMXCELL
+          IF        !@EQUAL
+            WRITE     HTMLFILE;PTMXCELL    * Mobile phone
+          ENDIF
+          GOTO      LDET9999
+.
+LDET2400  MATCH     SP70,BKREEDAT
+          IF        !@EQUAL
+            UNPACK    BKREEDAT,CCENT,CYEAR,CMON,CDAY
+            MOVE      CMON,F2
+            LOAD      MTHNAM3,F2,JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC
+            WRITE     HTMLFILE;CDAY,SP1,MTHNAM3,SP1,CCENT,CYEAR,SP1,ATTEXT,SP1:
+                      BKREATIM;
+          ENDIF
+          GOTO      LDET9999
+.
+LDET2500  MATCH     SP70,ASRCE
+          IF        !@EQUAL
+            PACK      KEY5,ANSS,SP1,ASRCE,SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              WRITE     HTMLFILE;TDESC;      * Admission Source
+            ENDIF
+          ENDIF
+          GOTO      LDET9999
+.
+LDET2600  MATCH     SP70,PMPXPMCN
+          IF        !@EQUAL
+            PACK      KEY5,CATPN,PMPXPMCN,SP70
+            CALL      RDCODE1
+            IF        OVRCD=0
+              WRITE     HTMLFILE;TCINDC1;      * Preferred method contact
+            ENDIF
+          ENDIF
+          GOTO      LDET9999
+.
+LDET2700  MATCH     SP70,PTARTXT1
+          IF        !@EQUAL
+            WRITE     HTMLFILE;PTARTXT1;
+          ENDIF
+          GOTO      LDET9999
+.
+LDET2800  MATCH     SP70,PTARTXT2
+          IF        !@EQUAL
+            WRITE     HTMLFILE;PTARTXT2;
+          ENDIF
+          GOTO      LDET9999
+.
+LDET2900  MATCH     SP70,PTARTXT3
+          IF        !@EQUAL
+            WRITE     HTMLFILE;PTARTXT3;
+          ENDIF
+          GOTO      LDET9999
+.
+LDET3000  MATCH     SP70,PTARTXT4
+          IF        !@EQUAL
+            WRITE     HTMLFILE;PTARTXT4;
+          ENDIF
+          GOTO      LDET9999
+.
+LDET3100  WRITE     HTMLFILE;PTARDELR;
+          GOTO      LDET9999
+.
+LDET3200  MATCH     "1",PTARDELR
+          IF        @EQUAL
+            MATCH     SP70,PTARDATE
+            GOTO      LDET9999 IF EQUAL
+            UNPACK    PTARDATE,CCENT,CYEAR,CMON,CDAY
+            MOVE      CMON,F2
+            LOAD      MTHNAM3,F2,JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC
+            PACK      KEY11,CDAY,SP1,MTHNAM3,SP1,CCENT,CYEAR,SP70
+            WRITE     HTMLFILE;KEY11;
+          ELSE
+            MATCH     SP70,BKRXUDD1
+            GOTO      LDET9999 IF EQUAL
+            UNPACK    BKRXUDD1,CCENT,CYEAR,CMON,CDAY
+            MOVE      CMON,F2
+            LOAD      MTHNAM3,F2,JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC
+            PACK      KEY11,CDAY,SP1,MTHNAM3,SP1,CCENT,CYEAR,SP70
+            WRITE     HTMLFILE;KEY11;
+          ENDIF
+          GOTO      LDET9999
+.
+LDET3300  MATCH     "1",PTARDELR
+          IF        @EQUAL
+            WRITE     HTMLFILE;PTARTIME;
+          ELSE
+            WRITE     HTMLFILE;BKRXUDT1;
+          ENDIF
+          GOTO      LDET9999
+.
+LDET3400  MATCH     "1",PTARDELR
+          IF        @EQUAL
+            MOVE      "BG",CATEGORY
+            MOVE      PTARCOD1,CODE
+            CALL      CODITM00
+          ELSE
+            MOVE      "BG",CATEGORY
+            MOVE       BKRXUDF3,CODE
+            CALL      CODITM00
+          ENDIF
           GOTO      LDET9999
 .
 LDET9999  RETURN
@@ -10647,6 +10834,7 @@ BPEA1500  IF        ASTAT = 1
               WRITE     HTMLFILE;"<td>&nbsp;",WBDESC,"</td>":
                                  "<td>",FBOKDATE,"</td>":
                                  "<td><input type=checkbox":
+                                 " print-key='",URNUMBER,"|",ADMISSNO,"'":
                                  " name=admissno":
                                  " value=#"",ADMISSNO,"#" checked></td></tr>"
               ADD       ONE,ADMICTR1   
@@ -10762,6 +10950,7 @@ BPEA3100      MOVE      SP70,APOIDESC
               WRITE     HTMLFILE;"<td>&nbsp;",WBDESC,"</td>":
                                  "<td>",FBOKDATE,"</td>":
                                  "<td><input type=checkbox":
+                                 " print-key='",AURNO,"|",AADMNO,"'":
                                  " name=admissno":
                                  " value=#"",ADMISSNO,"#" checked></td></tr>"
               ADD       ONE,ADMICTR1
@@ -12624,7 +12813,7 @@ ONLDAY99  RETURN
 PASS0000  BRANCH    FLDITMNO,PASS0100,PASS0200,PASS0300,PASS0400:
                              PASS0500,PASS0600,PASS0700,PASS0800:
                              PASS0900,PASS1000,PASS1100,PASS1200:
-                             PASS1300,PASS1400
+                             PASS1300,PASS1400,PASS1500,PASS1600
 .
 PASS0100  CALL      NEXT0000
           GOTO      PASS9999
@@ -12672,6 +12861,14 @@ PASS1300  MATCH     SP70,FILTHOSP
 PASS1400  WRITE     HTMLFILE;PACAFLAG;
           GOTO      PASS9999
 .
+PASS1500  CALL      TASS0000                * Table of Assessments
+          GOTO      PASS9999
+.
+PASS1600  MOVE      CODEAC,CATEGORY         * unit code
+          MOVE      UNITCODE,CODE
+          CALL      CODSEL00
+          GOTO      PASS9999
+.
 PASS9999  RETURN
 .-----------------------------------------------------------
 . Table of Assessments
@@ -12679,15 +12876,42 @@ PASS9999  RETURN
 TASS0000  CALL       TABHED00
           PACK       KEY24,FRSTDATE,SP70
           CALL       RSBKREC5
-TASS0010  CALL       RKBKREC5
+TASS0010  MOVE       "1",NOPATATR
+          CALL       RKBKREC5
           BRANCH     OVRCD,TASS9999
           PACK       KEY8,DBKREBOO,SP70
           CALL       RDBKRX11
           BRANCH     OVRCD,TASS0010
+          CALL       CLPATATR
+          PACK       KEY35,BKREURNO,DBKREBOO,ATYPE030,BKRXUDD1,BKRXUDT1:
+                     SP70
+          CALL       RDPTATR3
+          IF         OVRCD=1
+            MOVE     "0",NOPATATR
+          ENDIF
+          PACK       KEY8,DBKREBOO,SP70
+          CALL       RDMISS1
 .
           IF         SHOWCANC<>1
             COMPARE    TWO,BKRESTAT               * Cancelled ?
             GOTO       TASS0010 IF EQUAL
+          ENDIF
+.
+          MATCH     SP70,UNITCODE                 * Specialty filter
+          IF        !@EQUAL
+            MOVE      SP70,DIM3
+            MATCH     SP70,ACLSSFT
+            IF        !@EQUAL
+              MOVE      ACLSSFT,DIM3
+            ELSE
+              MATCH     SP70,BKREDEPT
+              IF        !@EQUAL
+                MOVE      BKREDEPT,DIM3
+              ENDIF
+            ENDIF
+.
+            MATCH     UNITCODE,DIM3
+            GOTO      TASS0010 IF NOT EQUAL
           ENDIF
 .
           MATCH      BKREPDAT,LASTDATE
@@ -12751,7 +12975,7 @@ TASS0040  MOVE      BKREADOC,KEY6
 TASS9999  RETURN
 .-----------------------------------------------------------
 . Assesments Contents
-.----------------------------------------------------------- 
+.-----------------------------------------------------------
 ASSCON00  MOVE      BKREURNO,URNUMBER          * URNUMBER used in GETPAT
           MOVE      BKREBOOK,ADMISSNO          * ADMISSNO used in GETPAT
 .
@@ -12763,7 +12987,7 @@ ASSCON00  MOVE      BKREURNO,URNUMBER          * URNUMBER used in GETPAT
 .
           CALL      PATNAM00
           CALL      PATLN000    * format Name with System Parameter
-.          
+.
           MOVE      SP70,DOCFNAME
           MOVE      BKREADOC,KEY6
           CALL      RDDOCT1
@@ -12795,16 +13019,34 @@ ASSCON00  MOVE      BKREURNO,URNUMBER          * URNUMBER used in GETPAT
           APPEND    BKREBOOK,HTMLLINK
           APPEND    "')",HTMLLINK
           RESET     HTMLLINK
+.
+          CLEAR     HISTLINK
+          APPEND    "javascript:historyReceived('",HISTLINK
+          APPEND    BKREURNO,HISTLINK
+          APPEND    "','",HISTLINK
+          APPEND    DBKREBOO,HISTLINK
+          APPEND    "')",HISTLINK
+          RESET     HISTLINK
+.
+          CLEAR     COMMLINK
+          APPEND    "javascript:commentsLink('",COMMLINK
+          APPEND    BKREURNO,COMMLINK
+          APPEND    "','",COMMLINK
+          APPEND    DBKREBOO,COMMLINK
+          APPEND    "')",COMMLINK
+          RESET     COMMLINK
 
           WRITE     HTMLFILE;"t.addRow(#"",FORMATNM,"#",";
 .
           CALL      PATFLD00               *Returns KEY3 for folder colour code
 .
           MOVE      SP70,TDESC
+          MOVE      SP70,DIM20A
           MATCH     SP70,BKRXUDF3
           IF        !@EQUAL
             PACK      KEY5,ANSB,ANSG,BKRXUDF3,SP70
             CALL      RDCODE1
+            MOVE      TDESC,DIM20A
           ENDIF
 .
           IF        BKRESTAT=2
@@ -12813,16 +13055,82 @@ ASSCON00  MOVE      BKREURNO,URNUMBER          * URNUMBER used in GETPAT
             MOVE     SP70,ROWCLASS
           ENDIF
 .
-          WRITE     HTMLFILE;"#"",BKREBOOK,"#",":
-                             "#"",BKREURNO,"#",":
-                             "#"",BKREPDAT,BKREPTIM,"#",":
-                             "#"",PATLINK,"#",":
-                             "#"",DOCFNAME,"#",":
-                             "#"",KEY3,"#",":
-                             "#"",BKRXUDD1,BKRXUDT1,"&nbsp;#",":
-                             "#"",TDESC,"&nbsp;#",":
-                             "#"",HTMLLINK,"#",":
-                             "#"",ROWCLASS,"#",";
+          MOVE      SP70,TDESC
+          MOVE      SP70,DIM20B
+          MATCH     SP70,ACLSSFT
+          IF        !@EQUAL
+            PACK      KEY5,ANSA,ANSC,ACLSSFT,SP70
+            CALL      RDCODE1
+          ELSE
+            MATCH     SP70,BKREDEPT
+            IF        !@EQUAL
+              PACK      KEY5,ANSA,ANSC,BKREDEPT,SP70
+              CALL      RDCODE1
+            ENDIF
+          ENDIF
+          MOVE      TDESC,DIM20B
+.
+          PACK      SP320,SP70,SP70,SP70,SP70,SP70
+          PACK      DIM320,SP70,SP70,SP70,SP70,SP70
+          PACK      DIM320,PTARTXT1,PTARTXT2,PTARTXT3,PTARTXT4
+          MATCH     DIM320,SP320
+          IF        @EQUAL
+            MOVE      "0",CMNTSFLG
+          ELSE
+            MOVE      "1",CMNTSFLG
+          ENDIF
+.
+          MOVE      "0",HISTRECV
+          MOVE      SP70,KEY11
+          PACK      KEY20,URNUMBER,ADMISSNO,Z70
+          CALL      RSOBPC1
+ASSCON50  CALL      RPOBPC1
+          BRANCH    OVRCD,ASSCON55
+.
+          MATCH     URNUMBER,OBPCURNO
+          GOTO      ASSCON55 IF NOT EQUAL
+          MATCH     ADMISSNO,OBPCCVIS
+          GOTO      ASSCON55 IF NOT EQUAL
+.
+          MATCH     SP70,OBPCCTYP
+          IF        !@EQUAL
+            PACK      KEY5,CODEWI,OBPCCTYP,SP70
+            CALL      RDCODE1
+            BRANCH    OVRCD,ASSCON50
+            MATCH     "M",TCINDC2
+            GOTO      ASSCON50 IF NOT EQUAL
+            MOVE      "1",HISTRECV
+.
+            MATCH     SP70,OBPCINDT
+            IF        !@EQUAL
+              UNPACK    OBPCINDT,CCENT,CYEAR,CMON,CDAY
+              MOVE      CMON,F2
+              LOAD      MTHNAM3,F2,JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC
+              PACK      KEY11,CDAY,SP1,MTHNAM3,SP1,CCENT,CYEAR
+            ENDIF
+            GOTO      ASSCON55
+          ENDIF
+          GOTO      ASSCON50
+.
+ASSCON55  MATCH     "0",HISTRECV
+          IF        @EQUAL
+            PACK      HISTLINK,SP70,SP70,SP70,SP70,SP70
+          ENDIF
+          MATCH     "0",NOPATATR
+          IF        @EQUAL
+            PACK      COMMLINK,SP70,SP70,SP70,SP70,SP70
+          ENDIF
+.
+          WRITE     HTMLFILE;"#"",BKREBOOK,"#",":                         * 1
+                             "#"",BKREURNO,"#",":                         * 2
+                             "#"",BKREPDAT,BKREPTIM,"#",":                * 3
+                             "#"",PATLINK,"#",":                          * 4
+                             "#"",DOCFNAME,"#",":                         * 5
+                             "#"",KEY3,"#",":                             * 6
+                             "#"",BKRXUDD1,BKRXUDT1,"&nbsp;#",":          * 7
+                             "#"",DIM20A,"&nbsp;#",":                     * 8
+                             "#"",HTMLLINK,"#",":                         * 9
+                             "#"",ROWCLASS,"#",";                         * 10
 .
           MATCH     SP70,BKREPDAT                * PAC required
           IF        !@EQUAL
@@ -12836,13 +13144,33 @@ ASSCON00  MOVE      BKREURNO,URNUMBER          * URNUMBER used in GETPAT
           MATCH     "1",BKRXPACA                 * PAC attended
           IF        @EQUAL
             WRITE     HTMLFILE;"#"<input type=checkbox name=dummy checked ":
-                               "disabled>";
+                               "disabled>","#",";
           ELSE
             WRITE     HTMLFILE;"#"<input type=checkbox name=dummy ":
-                               "disabled>";
+                               "disabled>","#",";
           ENDIF
 .
-          WRITE     HTMLFILE;"#");"
+          MATCH     "1",CMNTSFLG
+          IF        @EQUAL
+            WRITE     HTMLFILE;"#"",PTARTXT1,"<br>":                      * 13
+                                  PTARTXT2,"<br>":
+                                  PTARTXT3,"<br>":
+                                  PTARTXT4,"<br>","#",";
+          ELSE
+            WRITE    HTMLFILE;"#"","&nbsp;","#",";
+          ENDIF
+.
+          WRITE     HTMLFILE;"#"",NOPATATR,"#",";                         * 14
+.
+          WRITE     HTMLFILE;"#"",DIM20B,"#","                            * 15
+.
+          WRITE     HTMLFILE;"#"",KEY11,"#",";                            * 16
+.
+          WRITE     HTMLFILE;"#"",HISTRECV,"#",";                         * 17
+.
+          WRITE     HTMLFILE;"#"",HISTLINK,"#",";                        * 18
+.
+          WRITE     HTMLFILE;"#"",COMMLINK,"#");";                        * 19
 .
 ASSCON99  RETURN
 .-----------------------------------------------------------
@@ -16331,12 +16659,37 @@ UPPREA00  PACK      KEY8,ADMISSNO,SP70
           CALL      RDBKRX11                * Read booking extn file
           BRANCH    OVRCD,UPPREA90
 .
-          MATCH     SP70,UPDTTYPE
+          PACK      KEY8,BKREURNO,SP70
+          CALL      RDAMAST1
+          BRANCH    OVRCD,UPPREA10
+          CALL      RDMAST1                 * Read Patient Master if exists
+.
+UPPREA10  PACK      KEY8,ADMISSNO,SP70
+          CALL      RDAMISS1
+          BRANCH    OVRCD,UPPREA12
+          CALL      RDMISS1                 * Read Patient Admission if exists
+.
+UPPREA12  PACK      KEY8,BKREURNO,SP70
+          CALL      RAPMPX21
+          BRANCH    OVRCD,UPPREA13
+          CALL      RDPMPX21                * Read PMI Extension if exists
+.
+UPPREA13  MATCH     "1",PHISFLAG
+          IF        @EQUAL
+            PACK      KEY35,BKREURNO,ADMISSNO,ATYPE030,PTATR003,PTATR004:
+                      SP70
+          ELSE
+            PACK      KEY35,BKREURNO,ADMISSNO,ATYPE030,BKRXUDD1,BKRXUDT1:
+                      SP70
+          ENDIF
+          CALL      RDPTATR3
+          BRANCH    OVRCD,UPPREA15
+.
+UPPREA15  MATCH     SP70,UPDTTYPE
           GOTO      UPPREA70 IF EQUAL
 .
           MATCH     ANSU,UPDTTYPE
           GOTO      UPPREA94 IF NOT EQUAL
-.
 .
           MATCH     "1",NOBOKMOD
            IF        @EQUAL
@@ -16345,6 +16698,7 @@ UPPREA00  PACK      KEY8,ADMISSNO,SP70
             PACK      BOKRX030,Z70            * updater
             CALL      MVBKRX00                * Set extension file fields
             CALL      UPBKRX11                * Update booking extn file
+            CALL      PTATTR00                * Write Patient Attribute "030"
             GOTO      UPPREA99
           ENDIF
 .
@@ -16354,6 +16708,7 @@ UPPREA00  PACK      KEY8,ADMISSNO,SP70
           CLOCK     TIME,BKRXLUPT
           MOVE      USERID,BKRXWEBU
           CALL      UPBKRX11                * Update booking extn file
+          CALL      PTATTR00                * Write Patient Attribute "030"
           GOTO      UPPREA99
 .
 UPPREA70  MOVE      "Pre-Assessment Details",WEBTITLE
@@ -17708,6 +18063,32 @@ CACM9000  MATCH     KEY3,SRCHCODE
 CACM9999  RETURN
 +
 .------------------------------------------------------------
+.         Pre-assessment History
+.------------------------------------------------------------
+PREHIS00  PACK      KEY8,URNUMBER,SP70
+          CALL      RDMAST1
+          BRANCH    OVRCD,PREHIS90
+          CALL      RDPMPX21
+.
+          CLEAR     WEBTITLE
+          MOVE      TITLE12,WEBTITLE
+          RESET     WEBTITLE
+          CALL      WEBHED00   * Create Output File and Write HTML Page Header
+          BRANCH    EXIT,PREHIS99
+.
+          CALL      WEBBOD00   * Process Web Body
+          CALL      WEBEND00   * Process End of HTML File
+.
+          GOTO      PREHIS99
+.
+PREHIS90  MOVE      "Invalid UR number",WEBTITLE
+          CALL      WEBERR00
+          MOVE      ONE,EXIT
+          GOTO      PREHIS99
+.
+PREHIS99  RETURN
++
+.------------------------------------------------------------
 .         ACC List
 .------------------------------------------------------------
 ACCLST00  MOVE      "ACC List",WEBTITLE
@@ -17900,6 +18281,222 @@ ACCT1100  WRITE     HTMLFILE;REDIRECT;      * Redirect URL
           GOTO      ACCT9999
 .
 ACCT9999  RETURN
++
+.-------------------------------------------------------------
+.  Report 21 - Pre-assessment History
+.-------------------------------------------------------------
+PHIS0000  BRANCH    FLDITMNO,PHIS0100,PHIS0200
+          GOTO      PHIS9999
+.
+PHIS0100  CALL      PRHIST00                * Pre-assessment History table sort
+          GOTO      PHIS9999
+.
+PHIS0200  CALL      PHLIST00                * Pre-assessment History audit list
+          GOTO      PHIS9999
+.
+PHIS9999  RETURN
++
+.-------------------------------------------------------------
+.  Pre-assessment History audit list
+.-------------------------------------------------------------
+PHLIST00  PACK      KEY35,URNUMBER,ADMISSNO,ATYPE030,Z70
+          CALL      RSPTATR3
+PHLIST10  CALL      RPPTATR3
+          BRANCH    OVRCD,PHLIST99
+.
+          MATCH     URNUMBER,PTARURNO
+          GOTO      PHLIST99 IF NOT EQUAL
+          MATCH     ADMISSNO,PTARVISN
+          GOTO      PHLIST99 IF NOT EQUAL
+          MATCH     ATYPE030,PTARTYPE
+          GOTO      PHLIST99 IF NOT EQUAL
+.
+          MOVE      SP70,KEY11
+          MATCH     SP70,PTARDATE
+          IF        !@EQUAL
+            UNPACK    PTARDATE,CCENT,CYEAR,CMON,CDAY
+            MOVE      CMON,F2
+            LOAD      MTHNAM3,F2,JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC
+            PACK      KEY11,CDAY,SP1,MTHNAM3,SP1,CCENT,CYEAR
+          ENDIF
+.
+          MOVE      SP70,DIM11
+          MATCH     SP70,PTARCDTE
+          IF        !@EQUAL
+            UNPACK    PTARCDTE,CCENT,CYEAR,CMON,CDAY
+            MOVE      CMON,F2
+            LOAD      MTHNAM3,F2,JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC
+            PACK      DIM11,CDAY,SP1,MTHNAM3,SP1,CCENT,CYEAR
+          ENDIF
+.
+          MOVE      SP70,D11
+          MATCH     SP70,PTARUDTE
+          IF        !@EQUAL
+            UNPACK    PTARUDTE,CCENT,CYEAR,CMON,CDAY
+            MOVE      CMON,F2
+            LOAD      MTHNAM3,F2,JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC
+            PACK      D11,CDAY,SP1,MTHNAM3,SP1,CCENT,CYEAR
+          ENDIF
+.
+          MOVE      SP70,TDESC
+          MATCH     SP70,PTARCOD1
+          IF        !@EQUAL
+            PACK      KEY5,ANSB,ANSG,PTARCOD1,SP70
+            CALL      RDCODE1
+          ENDIF
+.
+          MOVE      SP70,KEY30
+          MATCH     SP70,PTARCUSR                 * Web User Created By
+          IF        !@EQUAL
+            PACK      KEY10,PTARCUSR,SP70
+            CALL      RDWBSE1
+            IF        OVRCD<>1
+              MOVE      WBSENAM,KEY30
+            ELSE
+              MOVE      PTARCUSR,KEY30
+            ENDIF
+          ENDIF
+.
+          MOVE      SP70,KEY31
+          MATCH     SP70,PTARUUSR                 * Web User Updated By
+          IF        !@EQUAL
+            PACK      KEY10,PTARUUSR,SP70
+            CALL      RDWBSE1
+            IF        OVRCD<>1
+              MOVE      WBSENAM,KEY31
+            ELSE
+              MOVE      PTARUUSR,KEY31
+            ENDIF
+          ENDIF
+.
+PHLIST80  WRITE     HTMLFILE;"<tr>":
+                    "<td>",KEY11," at ",PTARTIME,"</td>":
+                    "<td>",TDESC,"</td>":
+                    "<td>"
+.
+          PACK      SP80,SP70,SP70
+          MATCH     SP80,PTARTXT1
+          IF        !@EQUAL
+            WRITE     HTMLFILE;PTARTXT1;
+          ENDIF
+          MATCH     SP80,PTARTXT2
+          IF        !@EQUAL
+            WRITE     HTMLFILE;"<br>",PTARTXT2;
+          ENDIF
+          MATCH     SP80,PTARTXT3
+          IF        !@EQUAL
+            WRITE     HTMLFILE;"<br>",PTARTXT3;
+          ENDIF
+          MATCH     SP80,PTARTXT4
+          IF        !@EQUAL
+            WRITE     HTMLFILE;"<br>",PTARTXT4;
+          ENDIF
+.
+          WRITE     HTMLFILE;"</td>":
+                    "<td>",KEY30,"</td>":
+                    "<td>",DIM11," at ",PTARCTME,"</td>":
+                    "<td>",KEY31,"</td>":
+                    "<td>",D11," at ",PTARUTME,"</td>":
+                    "</tr>"
+          GOTO      PHLIST10
+.
+PHLIST99  RETURN
++
+.-------------------------------------------------------------
+.  Pre-assessment History table sort
+.-------------------------------------------------------------
+PRHIST00  CALL      TABHED00
+          PACK      KEY35,URNUMBER,ADMISSNO,ATYPE030,Z70
+          CALL      RSPTATR3
+PRHIST10  CALL      RPPTATR3
+          BRANCH    OVRCD,PRHIST99
+.
+          MATCH     URNUMBER,PTARURNO
+          GOTO      PRHIST99 IF NOT EQUAL
+          MATCH     ADMISSNO,PTARVISN
+          GOTO      PRHIST99 IF NOT EQUAL
+          MATCH     ATYPE030,PTARTYPE
+          GOTO      PRHIST99 IF NOT EQUAL
+.
+          MOVE      SP70,TDESC
+          MATCH     SP70,PTARCOD1
+          IF        !@EQUAL
+            PACK      KEY5,ANSB,ANSG,PTARCOD1,SP70
+            CALL      RDCODE1
+          ENDIF
+.
+          PACK      SP320,SP70,SP70,SP70,SP70,SP70
+          PACK      DIM320,SP70,SP70,SP70,SP70,SP70
+          PACK      DIM320,PTARTXT1,PTARTXT2,PTARTXT3,PTARTXT4
+          MATCH     DIM320,SP320
+          IF        @EQUAL
+            MOVE      "0",CMNTSFLG
+          ELSE
+            MOVE      "1",CMNTSFLG
+          ENDIF
+.
+          MOVE      SP70,KEY30
+          MATCH     SP70,PTARCUSR                 * Web User Created By
+          IF        !@EQUAL
+            PACK      KEY10,PTARCUSR,SP70
+            CALL      RDWBSE1
+            IF        OVRCD<>1
+              MOVE      WBSENAM,KEY30
+            ELSE
+              MOVE      PTARCUSR,KEY30
+            ENDIF
+          ENDIF
+.
+          MOVE      SP70,KEY31
+          MATCH     SP70,PTARUUSR                 * Web User Updated By
+          IF        !@EQUAL
+            PACK      KEY10,PTARUUSR,SP70
+            CALL      RDWBSE1
+            IF        OVRCD<>1
+              MOVE      WBSENAM,KEY31
+            ELSE
+              MOVE      PTARUUSR,KEY31
+            ENDIF
+          ENDIF
+.
+          CLEAR     HTMLLINK
+          APPEND    "javascript:UpdatePreAssessment('",HTMLLINK
+          APPEND    ADMISSNO,HTMLLINK
+          APPEND    "','",HTMLLINK
+          UNPACK    PTARDATE,CCENT,CYEAR,CMON,CDAY
+          MOVE      CMON,F2
+          LOAD      MTHNAM3,F2,JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC
+          PACK      KEY11,CDAY,SP1,MTHNAM3,SP1,CCENT,CYEAR
+          APPEND    KEY11,HTMLLINK
+          APPEND    "','",HTMLLINK
+          APPEND    PTARTIME,HTMLLINK
+          APPEND    "','",HTMLLINK
+          APPEND    PTARDELR,HTMLLINK
+          APPEND    "');",HTMLLINK
+          RESET     HTMLLINK
+.
+          WRITE     HTMLFILE;"t.addRow(#"",FORMATNM,"#",";
+          WRITE     HTMLFILE;"#"",PTARDATE,PTARTIME,"#",";                 * 1
+          WRITE     HTMLFILE;"#"",TDESC,"#",";                             * 2
+.
+          MATCH     "1",CMNTSFLG
+          IF        @EQUAL
+            WRITE     HTMLFILE;"#"",PTARTXT1,"<br>":                       * 3
+                                  PTARTXT2,"<br>":
+                                  PTARTXT3,"<br>":
+                                  PTARTXT4,"<br>","#",";
+          ELSE
+            WRITE    HTMLFILE;"#"","&nbsp;","#",";
+          ENDIF
+.
+          WRITE     HTMLFILE;"#"",KEY30,"#",";                             * 4
+          WRITE     HTMLFILE;"#"",PTARCDTE,PTARCTME,"#",";                 * 5
+          WRITE     HTMLFILE;"#"",KEY31,"#",";                             * 6
+          WRITE     HTMLFILE;"#"",PTARUDTE,PTARUTME,"#",";                 * 7
+          WRITE     HTMLFILE;"#"",HTMLLINK,"#");";                         * 8
+          GOTO      PRHIST10
+.
+PRHIST99  RETURN
 +
 .-------------------------------------------------------------
 .  Parked ACC List      
@@ -23559,6 +24156,74 @@ RESWRD00  STRIP     WBDESC
           RETURN
 +
 .------------------------------------------------------------------------------
+. Write Patient Attribute 030 for Nursing Pre-assessment
+.------------------------------------------------------------------------------
+PTATTR00  CALL      CLPATATR
+.
+          CALL      IBACLOCK
+          PACK      CURRDATE,CCC,CYY,CMM,CDD
+          REP       " 0",CURRDATE
+          CLOCK     TIME,CTIMEIS
+.
+          PACK      KEY35,BKREURNO,ADMISSNO,ATYPE030,Z70
+          CALL      RSPTATR3
+          BRANCH    OVRCD,PTATTR50
+          CALL      RPPTATR3
+.
+          MATCH     BKREURNO,PTARURNO
+          GOTO      PTATTR50 IF NOT EQUAL
+          MATCH     ADMISSNO,PTARVISN
+          GOTO      PTATTR50 IF NOT EQUAL
+          MATCH     "030",PTARTYPE
+          GOTO      PTATTR50 IF NOT EQUAL     * no previous "030" record exists
+.
+          PACK      PTARDELR,ONE,SP70
+          PACK      PTARFDTE,CURRDATE,SP70
+          PACK      PTARFTME,CTIMEIS,SP70
+          PACK      PTARFUSR,USERID,SP70
+.
+          CALL      UPPTATR3                  * Finish previous "030" record
+.
+PTATTR50  CALL      CLPATATR
+.
+          PACK      PTARURNO,BKREURNO,SP70
+          PACK      PTARVISN,ADMISSNO,SP70
+          PACK      PTARDATE,BOKRX012,SP70
+          PACK      PTARTIME,BOKRX036,SP70
+          PACK      PTARTYPE,ATYPE030,SP70
+.
+          PACK      KEY35,PTARURNO,PTARVISN,PTARTYPE,PTARDATE,PTARTIME,SP70
+          CALL      RDPTATR3
+          IF        OVRCD=1
+            PACK      PTARDELR,ZERO,SP70
+            PACK      PTARCOD1,BOKRX009,SP70
+            PACK      PTARUUSR,USERID,SP70
+            PACK      PTARUDTE,CURRDATE,SP70
+            PACK      PTARUTME,CTIMEIS,SP70
+            PACK      PTARTXT1,PTATR014,SP70,SP70
+            PACK      PTARTXT2,PTATR015,SP70,SP70
+            PACK      PTARTXT3,PTATR016,SP70,SP70
+            PACK      PTARTXT4,PTATR017,SP70,SP70
+            PACK      PTARCUSR,USERID,SP70
+            PACK      PTARCDTE,CURRDATE,SP70
+            PACK      PTARCTME,CTIMEIS,SP70
+            CALL      WRPTATR3                  * write "030" record
+          ELSE
+            PACK      PTARDELR,ZERO,SP70
+            PACK      PTARCOD1,BOKRX009,SP70
+            PACK      PTARUUSR,USERID,SP70
+            PACK      PTARUDTE,CURRDATE,SP70
+            PACK      PTARUTME,CTIMEIS,SP70
+            PACK      PTARTXT1,PTATR014,SP70,SP70
+            PACK      PTARTXT2,PTATR015,SP70,SP70
+            PACK      PTARTXT3,PTATR016,SP70,SP70
+            PACK      PTARTXT4,PTATR017,SP70,SP70
+            CALL      UPPTATR3                  * update "030" record
+          ENDIF
+.
+PTATTR99  RETURN
++
+.------------------------------------------------------------------------------
 . FHIR Location Resource for Bed
 .------------------------------------------------------------------------------
 RESBED00  MOVE      "BT",CATEGORY
@@ -23644,6 +24309,7 @@ RESBED00  MOVE      "BT",CATEGORY
           INC       CLOPRDEA
           INC       CLOPRSES
           INC       CLPMSPX2
+          INC       CLPATMAS
           INC       CLPMSOEC
           INC       CLVISIAU
           INC       CLWATOPA

@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="nz">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -463,9 +463,11 @@ InsertPatientHeader();
        onclick="clrFields(wattr041,d_wattr041);">
     </td>
     <td class="DataField" rowspan="3" colspan="2">
-      <textarea wrap="hard" name="wtpccomm" title="Preadmission Notes"
-       onkeydown="LimitText(this,99,6930);"
-       cols="50" rows="6" tabindex="140"></textarea>
+      <textarea name="wtpccomm" id="wtpccomm" title="Preadmission Notes"
+       cols="50" rows="6" wrap="hard" tabindex="140"
+       onkeydown="ValidateKeyInput(this,99,6930);"
+       onblur="TextareaBlurHandler(this);ValidateTextLimits(this,99,6930);">
+      </textarea>
     </td>
 </tr>
 

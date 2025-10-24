@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome"    content="hea">
 <meta name="HelpFileName"    content="NoContextSet.html">
 <meta name="CrossBrowser"    content="true">
@@ -398,12 +398,13 @@ InsertEmergencyHeader()
    </td></tr>
 
 
-<tr><td class=DataLabel>Primary&nbsp;Diagnosis&nbsp;Search</td>
+<tr><td class=DataLabel>Primary Diagnosis Search (Key Word)</td>
     <td colspan=4>
-      <input type=text
+      <input type=text name=diagnosisSearch id=diagnosisSearch class=SelectBig
+       title="Enter Key Word to search..."
        onKeyUp='getDiagnosis(this,UpdateForm.emvcd005,UpdateForm.emvcd033);'
-       onblur='submitPrimaryDiag();' class=SelectBig name=diagnosisSearch id=diagnosisSearch>
-      <select name=emvcd005 id=emvcd005 class=SelectXlrg
+       onblur='submitPrimaryDiag();'>
+      <select name=emvcd005 id=emvcd005 class=SelectXlrg title="Diagnosis"
        onchange="document.UpdateForm.emvcd033.value=trim(this.value.substring(9,80))+' ';submitPrimaryDiag();">
       </select>
       <input type=button class="button" value="Multi Diagnosis"
@@ -412,9 +413,11 @@ InsertEmergencyHeader()
 </tr>
 
 <tr>
-  <td class=DataLabel>Primary Diagnosis&nbsp;Free Format Desc</td>
-  <td colspan=4><input type=text name=emvcd033 id=emvcd033 maxlength=100 size=100 
-                 onblur="submitFreeFormat();">
+  <td class=DataLabel>Primary Diagnosis Free Format Desc</td>
+  <td colspan=4>
+    <input type=text name=emvcd033 id=emvcd033 maxlength=100 size=100 
+     title="Diagnosis Free Format Description" onblur="submitFreeFormat();">
+  </td>
 </tr>
 
 <tr valign=top>

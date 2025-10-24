@@ -5,6 +5,8 @@
 .
 . Modifications  :
 .------------------------------------------------------------------------------
+. V12.00.03 17/10/2025  Don Nguyen     TSK 0963735
+.           Removed code to stop WTPAEND count at 99 in GETCOM00
 . V12.00.02 20/08/2025  Jacob Jackson  TSK 0963735
 .           Stop WTPAEND count at 99 to prevent overflow
 . V12.00.01 19/05/2025  Ebon Clements  TSK 0960463
@@ -2393,7 +2395,7 @@ ZERO20    INIT      "00000000000000000000"
 .
 ................................................................................
 PRGID     INIT      "WATWEB01"
-VERSION   INIT      "V12.00.02"
+VERSION   INIT      "V12.00.03"
 PRGNAM    INIT      "Waiting List Information Server"
 ................................................................................
 .
@@ -4691,12 +4693,8 @@ GETCOM10  READ      CONFFILE,SEQ;QRYNAME,QRYDATA * Read CONFFILE sequentially
           GOTO      GETCOM80 IF OVER             * If end of file
           MATCH     SP70,QRYNAME                 * If next CGI parameter
           GOTO      GETCOM80 IF NOT EQUAL
-          ADD       ONE,WTPAEND                    
+          ADD       ONE,WTPAEND
           WRITE     COMPREAF,SEQ;QRYDATA
-.
-          COMPARE   NINETY9,WTPAEND
-          GOTO      GETCOM80 IF EQUAL
-.
           GOTO      GETCOM10
 .
 GETCOM80  MOVE      ONE,TEXTAREA                 * Flag for Next CGI Parameter

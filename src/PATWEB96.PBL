@@ -5,6 +5,9 @@
 .
 . Modifications :
 .----------------------------------------------------------------------
+. V12.00.11 15/10/2025 Alina Bhari       TSK 0947952
+.           Added Supervisor functionality to unlink and update the statistical
+.           discharge visit - PTMIS009,PTMIS011,MAIN2500,USDV0000
 . V12.00.10 05/09/2025 Ebon Clements     TSK 0961623
 .           Fixed on leave error message format - LEAVE910 and LEAVE920
 . V12.00.09 01/09/2025 J.Tan             TSK 0960675
@@ -2726,6 +2729,8 @@ PTDSC006  DIM       3
 PTMAS029  DIM       1
 PTMIS001  DIM       8
 PTMIS002  DIM       8
+PTMIS009  DIM       3           * Admission source (Cat S)
+PTMIS011  DIM       3           * Admission source (Cat P)
 PTMIS074  DIM       1           * GST Applicable (ptmsgsta)
 PTRGM001  DIM       10
 PTRGM002  DIM       10
@@ -2959,7 +2964,7 @@ CHWCADMN  DIM       8        * Check Admission Number (Workers Compensation)
 .
 .------------------------------------------------------------------------------
 PRGID     INIT      "PATWEB96"
-VERSION   INIT      "V12.00.10"
+VERSION   INIT      "V12.00.11"
 PRGNAM    INIT      "Admission Discharge Transfer Server"
 .------------------------------------------------------------------------------
 .
@@ -2976,7 +2981,7 @@ MAIN1000  CALL      WEBRED00       * Read Fifo WEBPID and USERID
 .
 MAIN1020  BRANCH    REPORTNO,MAIN1100,MAIN1200,MAIN1300,MAIN1400,MAIN1500:
                              MAIN1600,MAIN1700,MAIN1800,MAIN1900,MAIN2000:
-                             MAIN2100,MAIN2200,MAIN2300,MAIN2400
+                             MAIN2100,MAIN2200,MAIN2300,MAIN2400,MAIN2500
 .
           PACK      WEBTITLE,PRGID,SP1,VERSION,SP1,PRGNAM,SP70
           MOVE      "INVALID OPTION",WEBTITLE
@@ -3263,6 +3268,11 @@ MAIN2300  CALL      BDRQ0000                * Bed Request
 MAIN2400  CALL      UPDTRN00                
           BRANCH    EXIT,MAIN1000
           MOVE      "Enquiry Complete",WEBTITLE
+          CALL      NXTPG000
+          GOTO      MAIN1000
+.
+MAIN2500  CALL      USDV0000                * Statistical Discharge Supervisor
+          BRANCH    EXIT,MAIN1000
           CALL      NXTPG000
           GOTO      MAIN1000
 .
@@ -9597,6 +9607,8 @@ CLRPAR00  MOVE      SP70,DELVISIT
 .
           MOVE      SP70,PTMIS001
           MOVE      SP70,PTMIS002
+          MOVE      SP70,PTMIS009
+          MOVE      SP70,PTMIS011
           MOVE      SP70,PTMIS074
           MOVE      Z70,PTVIS041
           MOVE      Z70,PTVIS110
@@ -10533,6 +10545,18 @@ SETPAR00  MATCH     "reportno=",QRYNAME
           MATCH     "ptmis002=",QRYNAME
           IF        @EQUAL
             MOVE      QRYDATA,PTMIS002
+            GOTO      SETPAR99
+          ENDIF
+.
+          MATCH     "ptmis009=",QRYNAME
+          IF        @EQUAL
+            MOVE      QRYDATA,PTMIS009
+            GOTO      SETPAR99
+          ENDIF
+.
+          MATCH     "ptmis011=",QRYNAME
+          IF        @EQUAL
+            MOVE      QRYDATA,PTMIS011
             GOTO      SETPAR99
           ENDIF
 .
@@ -15465,6 +15489,83 @@ RMRCB000  PACK      KEY16,AADMNO,SP70
           GOTO      RMRCB000
 .
 RMRCB999  RETURN
++
+.------------------------------------------------------------
+. Statistical Discharge Supervisor - only for Statistical Discharge Visit
+. Break the link between the statistical discharge and admission
+. Update the detail of the linked admission
+.------------------------------------------------------------
+USDV0000  BRANCH    UPDATETY,USDVL010
+          GOTO      USDVL999
+.
+USDVL010  MATCH     "1",TRNCANCP
+          GOTO      USDVL999 IF NOT EQUAL
+.
+          MATCH     SP70,STATVISN
+          GOTO      USDVL999 IF EQUAL
+.
+.         Check if the statistical linked admission exist
+          PACK      KEY8,STATVISN,SP70
+          CALL      RDMISS1
+          BRANCH    OVRCD,USDVL900
+.
+.         Unlink as not an Statistical Discharge
+          PACK      KEY8,ADMISSNO,SP70
+          CALL      RDMISS1
+          BRANCH    OVRCD,USDVL900
+.
+          MATCH     SP70,PTMILSDN         * Check if statistical discharged
+          GOTO      USDVL999 IF EQUAL
+.
+          MOVE      SP70,PTMILSDN
+          CALL      UPMISS1
+.
+.         Break the link between the statistical discharge and admission
+          PACK      KEY8,ADMISSNO,SP70
+          CALL      RDDSCH1
+          BRANCH    OVRCD,USDVL910
+.
+          MATCH     SP70,PTDSLSDN         * Check if statistical discharged
+          GOTO      USDVL999 IF EQUAL
+.
+.          MATCH     PTDSLSDN,STATVISN     * Check if visitno are same
+.          GOTO      USDVL999 IF NOT EQUAL
+.
+          MATCH     SP70,DSCHSTAT         * Update  Cat D
+          IF        !@EQUAL
+            MOVE      DSCHSTAT,DSTAT
+          ENDIF
+.
+          MATCH     SP70,DSCHDEST         * Update Cat DD
+          IF        !@EQUAL
+            MOVE      DSCHDEST,DDEST
+          ENDIF
+.
+          MOVE      SP70,PTDSLSDN
+          CALL      UPDSCH1                  * Update current discharge record
+.
+.         Update the detail of the linked admission
+          PACK      KEY8,STATVISN,SP70
+          CALL      RDMISS1
+          BRANCH    OVRCD,USDVL999
+.
+          MOVE      PTMIS009,ASRCE
+          MOVE      PTMIS011,ACLSS
+          CALL      UPMISS1
+
+          GOTO      USDVL999
+.
+USDVL900  MOVE      "Invalid Admission Record",WEBTITLE
+          CALL      WEBERR00
+          MOVE      ONE,EXIT
+          GOTO      USDVL999
+.
+USDVL910  MOVE      "Patient isnot discharged yet",WEBTITLE
+          CALL      WEBERR00
+          MOVE      ONE,EXIT
+          GOTO      USDVL999
+.
+USDVL999  RETURN
 +
 .------------------------------------------------------------
 . CHGADM00 - Change Admission Date/Time

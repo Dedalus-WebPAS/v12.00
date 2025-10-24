@@ -1,4 +1,4 @@
-//jsVersion  : V12.00.12
+//jsVersion  : V12.00.13
 //========================================================================
 // Global Variables
 //========================================================================
@@ -859,7 +859,10 @@ function PageLoad(e)
 
   InitialiseForms(setfocus);
   InitialiseHiddenElements();
-  loginCookieCheck();
+  if(document.location.href!=='about:blank')
+  {
+    loginCookieCheck();
+  }
 
   var patMenu = document.getElementById('PatientMenu');
   if (patMenu) 
@@ -9526,6 +9529,7 @@ function AddAlertIcons() {
                       'alt="'+ AlertIconCHoverDescription +
                       '" title="' + AlertIconCHoverDescription +'">'
     }
+
 
   if (PatientALT.substr(23,1) == 2 || PatientALT.substr(23,1) == 0) {
     // Other Alert icons...

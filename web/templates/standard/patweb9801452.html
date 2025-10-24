@@ -1,0 +1,244 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript" charset="UTF-8" 
+ src="../js/JsBarcode/JsBarcode.all.min.js"></script>
+<style type=text/css>
+ body {
+        width: 210mm;
+        margin: 0mm 0mm 0mm 0mm;   /* top right bottom left */
+        }
+ .label{
+       /* LabelMax LM5148 labels - 99.1mm X 38.1mm. 2 Wide 7 rows  */
+       /* Printer using A4 page size.                              */
+     width: 96.1mm;               /* plus left and right padding   */
+     height: 34.1mm;              /* plus top and bottom padding   */
+     padding: 3mm 4.0mm 0mm 2mm;  /* top right bottom left         */
+     margin: 1mm 0mm 1mm 0mm;     /* top right bottom left         */
+     float: left;
+     text-align: center;
+     overflow: hidden;
+ /*  outline: 1px dotted;           outline each label for layout print */
+ }
+ .rhslabel{
+     padding: 3mm 2mm 0mm 4.0mm;  /* top right bottom left */
+ }
+ .page-break  {
+     clear: left;
+     display:block;
+     page-break-after:always;
+ }
+ .MasterTable {                  /* Master label table */
+     table-layout: fixed; 
+     white-space: nowrap;
+     overflow: hidden;
+ }
+ .LineLeft {                     /* Master label row left cell */
+     width: 70%
+ }
+ .LineRight {                    /* Master label row right cell */
+     width: 30%
+ }
+ .LineLeft {                     /* Master label row left barcode cell */
+     width: 55%
+ }
+ .LineRightBC {                  /* Master label row right barcode cell */
+     width: 45%
+ }
+ .AddressLine {                  /* Address line */
+     font-size:7pt;
+ }
+ .NameLine {                     /* Name line */
+     font-size:12pt;
+ }
+ @page{
+ size: A4 portrait;             /* A4 size, portrait orientation */
+ margin: 16mm 0mm 0mm 5mm;     /* top right bottom left  */
+}
+</style>
+%START.OF.PAGE
+<script type="text/javascript">
+var Admissions = [];
+function ShowLabels() {
+  elems = parent.tblPatients.getElementsByTagName('input');
+  for (var i = 0; i < elems.length; i++) {
+    if (elems[i].type == 'checkbox') {
+      if (elems[i].checked == true && elems[i].name=="inplabar") {
+          if(elems[i].getAttribute("print-key")) {
+             Admissions[Admissions.length] = elems[i].getAttribute("print-key");
+          }
+      }
+      if (elems[i].checked == true && elems[i].name=="admissno") {
+          if(elems[i].getAttribute("print-key")) {
+             Admissions[Admissions.length] = elems[i].getAttribute("print-key");
+          }
+      }
+    }
+  }
+ 
+  if(Admissions.length==0) {
+    alert("No visit in context. Please select a visit to proceed.");
+    DFrameExit();  
+  }
+ 
+  for (var A=0; A < Admissions.length; A++) {   // Loop each Adm/UR
+    var UR = Admissions[A].split("|")[0];
+    var ADM = Admissions[A].split("|")[1];
+    if(!CreateMasterLabel(UR,ADM)) {
+      continue;
+    }
+    var master = document.getElementById("Master").innerHTML;
+    for (var LineNo=0; LineNo <=6; LineNo++) { 
+       var left_id = "Page_" + A + "Left_Line_" + LineNo;
+       var Left = document.createElement("div"); 
+                 Left.setAttribute("id",left_id);
+                 Left.setAttribute("class","label");
+       document.body.appendChild(Left);
+       document.getElementById(left_id).innerHTML=master;
+
+       var right_id = "Page_" + A + "Right_Line_" + LineNo;
+       var Right = document.createElement("div"); 
+                   Right.setAttribute("id",right_id);
+                   Right.setAttribute("class","label rhslabel");
+       document.body.appendChild(Right);
+       document.getElementById(right_id).innerHTML=master;
+    }
+    var pb_id="PageBreak" + A;
+    var PageBreak = document.createElement("div"); 
+                    PageBreak.setAttribute("id",pb_id);
+                    PageBreak.setAttribute("class","page-break");
+    document.body.appendChild(PageBreak);
+  }
+  print();
+}
+function CreateMasterLabel(ur,adm) {
+  document.getElementById("urnumber").value=ur;
+  document.getElementById("admissno").value=adm;
+
+  var serverURL = "../cgi-bin/patweb98.pbl?reportno=1&template=453" +
+                   "&urnumber=" + ur.replace(/ /g,"+") +
+                   "&admissno=" + adm.replace(/ /g,"+");
+
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", serverURL, false);
+  try {
+    xhr.send(null); // blocks until the response arrives
+    if (xhr.status >= 200 && xhr.status < 300) {
+      if(xhr.responseText.match(/Can't find patient master details/i)) {
+        return false;
+      }
+      var jsonResponse = xhr.responseText;
+      var jsonParsed= JSON.parse(jsonResponse);
+    } else {
+      return false;
+    }
+  } catch (e) {
+    return false;
+  }
+
+  FMT_surname="<b>" + trim(jsonParsed.surname) + "</b>";
+  FMT_gname="<b>" + trim(jsonParsed.gname) + ", " +
+            trim(jsonParsed.gname_title) + "</b>";
+  if(!isWhitespace(jsonParsed.sexatbirthind.substr(39,6))) {
+     sexatbirth = jsonParsed.sexatbirthind.substr(39,6);
+  }
+  FMT_sexatbirth="&nbsp;<b>SEX: </b>" + jsonParsed.sexatbirth;
+  if(!isWhitespace(jsonParsed.dob_format)) {
+     dob_ccyymmdd=SetDateYYYYMMDD(jsonParsed.dob_format);
+     dob_format=dob_ccyymmdd.substr(6,2) + "/" +
+     dob_ccyymmdd.substr(4,2) + "/" +
+     dob_ccyymmdd.substr(0,4);
+  }
+  FMT_dob="<b>DOB: </b>" + jsonParsed.dob_format + " <b>AGE:</b>" +
+           jsonParsed.age;
+  FMT_urval="<b>UR: " + ur;
+  FMT_address1="<b>ADD: </b>" + jsonParsed.addline1;
+  FMT_address2=trim(jsonParsed.suburb) + ", " + jsonParsed.state +
+               jsonParsed.postcode;
+  if(!isWhitespace(jsonParsed.medicare_exp)) {
+     exp_ccyymmdd=SetDateYYYYMMDD(jsonParsed.medicare_exp);
+     medicare_exp=exp_ccyymmdd.substr(4,2) + "/" +
+                  exp_ccyymmdd.substr(0,4)
+  }
+  FMT_medicare="<b>MCARE: </b>" + jsonParsed.medicare_no + "<b> REF: </b>" +
+               jsonParsed.medicare_ref + " <b>EXP: </b>" +
+               jsonParsed.medicare_exp;
+  FMT_hfund="<b>HEALTH FUND:</b>" + jsonParsed.healthfund;
+  FMT_admdoctor="<b>ADM DR: </b>" + jsonParsed.admdoctor;
+  FMT_provnumb=jsonParsed.provnumb;
+
+  var LabelHTML="<table width=100% border=0 cellspacing=0 cellpadding=0" + 
+                " class=MasterTable>" +
+                "<tr><td class='LineLeft NameLine'>" +
+                FMT_surname +
+                '</td>' +
+                '<td class="LineRight NameLine">' +
+                FMT_urval +
+                '</td></tr>' +
+                '<tr><td colspan=2 class="NameLine">' +
+                FMT_gname +
+                '</tr>' +
+                '<tr><td colspan=2>' +
+                FMT_dob +
+                FMT_sexatbirth +
+                '</tr>' +
+                '<tr><td colspan=2 class=AddressLine>' +
+                FMT_address1 +
+                '</td></tr>' +
+                '<tr><td colspan=2 class=AddressLine>' +
+                FMT_address2 +
+                '</td></tr>' +
+                '<tr><td colspan=2>' +
+                FMT_medicare +
+                '</td></tr>' +
+                '<tr><td colspan=2>' +
+                '<table width=100% border=0 cellspacing=0 cellpadding=0>' +
+                '<tr><td class=LineLeftBC>' +
+                FMT_hfund +
+                '</td>' +
+                '<td class=LineRightBC rowspan=3 valign=top' +
+                ' align=right><svg id="barcodev' + trim(adm) + '"></svg></td>' +
+                '</tr>' +
+                '<tr><td>' +
+                FMT_admdoctor +
+                '</td>' +
+                '<td></td></tr>' +
+                '<tr><td>' +
+                FMT_provnumb +
+                '</td>' +
+                '<td></td></tr>' +
+                '</table></td></tr>' +
+                '</table>';
+  document.getElementById("Master").innerHTML=LabelHTML;
+  VISBarcode();
+  return true;
+}
+function VISBarcode() {
+  vis = document.getElementById("admissno");
+  var adm_no=trim(vis.value);
+  JsBarcode(`#barcodev${adm_no}`, vis.value, {
+  format: "code128",
+  displayValue: true,
+  fontSize: 7,
+  textPosition: "top",
+  textMargin: 1,
+  textAlign: "center",
+  width: 1.4,
+  height: 29,
+  text: "VISIT:" + vis.value,
+  fontOptions: "bold",
+  lineColor: "#000",
+  margin: 1,
+  });
+}
+</script>
+</head>
+<body onload="PageLoad(event);ShowLabels();"
+ onafterprint="DFrameExitRefresh();">
+<input type="hidden" name="urnumber" id="urnumber"
+ value="" />
+<input type="hidden" name="admissno" id="admissno"
+ value="" />
+<div id="Master" class="label" style="display:none"></div>
+<!-- End Master Label -->

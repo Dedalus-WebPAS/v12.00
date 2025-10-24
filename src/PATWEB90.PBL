@@ -5,6 +5,9 @@
 .
 . Modifications :
 .---------------------------------------------------------------------------
+.  V12.00.02 15/10/2025  Thanh T       TSK 0968285 
+.            Added autosrch flag to determine if automatic searching is
+.            required 
 .  V12.00.01 12/06/2025  Don Nguyen    TSK 0961844
 .            Increased size of SRCHCL01 to 127 to cater for Paediatric icon.
 .            Recompiled for PATNAMCD - resized VAR accordingly for Paediatric.
@@ -557,6 +560,7 @@ EXTNSRCH  DIM       1
 NUMLOOP   FORM      3
 NUMTLOOP  FORM      3
 NODETAIL  DIM       1
+AUTOSRCH  DIM       1
 ORACLEDB  FORM      1
 HOUR      DIM       2
 MIN       DIM       2
@@ -752,7 +756,7 @@ SHOWBLHD  DIM       1        * Show LHD Search button
 .
 .-----------------------------------------------------------------------
 PRGID     INIT      "PATWEB90"
-VERSION   INIT      "V12.00.01"
+VERSION   INIT      "V12.00.02"
 PRGNAM    INIT      "Patient Search Server"
 .-----------------------------------------------------------------------
 .
@@ -902,6 +906,7 @@ OPNOUT00  CLOSE     OUTBOKA6
 .------------------------------------------------------------
 CLRPAR00  MOVE      ZERO,REPORTNO
           MOVE      SP70,NODETAIL
+          MOVE      SP70,AUTOSRCH
           MOVE      SP70,TEMPLATE
           MOVE      SP70,SRCHSNAM
           MOVE      SP70,SRCHMEDI
@@ -970,6 +975,12 @@ SETPAR00  MATCH     "reportno=",QRYNAME
           MATCH     "nodetail=",QRYNAME
           IF        @EQUAL
             MOVE      QRYDATA,NODETAIL
+            GOTO      SETPAR99
+          ENDIF
+.
+          MATCH     "autosrch=",QRYNAME
+          IF        @EQUAL
+            MOVE      QRYDATA,AUTOSRCH
             GOTO      SETPAR99
           ENDIF
 .
@@ -1187,7 +1198,7 @@ PATS0000  MOVE      ZERO,STARTFLG    * Flag if Search Output has Started
                              PATS2100,PATS2200,PATS2300,PATS2400,PATS2500:
                              PATS2600,PATS2700,PATS2800,PATS2900,PATS3000:
                              PATS3100,PATS3200,PATS3300,PATS3400,PATS3500:
-                             PATS3600,PATS3700,PATS3800,PATS3900
+                             PATS3600,PATS3700,PATS3800,PATS3900,PATS4000
           GOTO      PATS9999
 .
 PATS0100  CALL      NEXT0000
@@ -1498,6 +1509,9 @@ PATS3800  WRITE     HTMLFILE;NOEDVIST;
           GOTO      PATS9999
 .
 PATS3900  WRITE     HTMLFILE;SCNDTIME;
+          GOTO      PATS9999
+.
+PATS4000  WRITE     HTMLFILE;AUTOSRCH;
           GOTO      PATS9999
 .
 PATS9999  RETURN

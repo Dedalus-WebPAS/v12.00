@@ -1,7 +1,10 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="cab">
 <meta name="CrossBrowser" content="true">
 <meta name="HelpFileName"    content="NoContextSet.html">
+<style>
+.RedText { color: "red" }
+</style>
 <script type="text/javascript">
 function SubmitForm() {
 if(validateMandatory(document.UpdateForm)){
@@ -13,9 +16,9 @@ if(validateMandatory(document.UpdateForm)){
 %START.OF.PAGE
 <body onLoad="PageLoad(event);">
 <span class=DFrameTitleBar>
-<img align="right" alt="Exit" class="MenuIcon" 
+<img align="right" alt="Exit" class="MenuIcon"
  src="../images/ExitIcon.gif" onclick="DFrameExitRefresh();">
-Nursing Pre-Assessment
+Nursing Pre-Assessment - %PATWEB92.16.302 (UR %PATWEB92.16.002 Visit %PATWEB92.16.001)
 </span>
 <form name=UpdateForm method=get action="patweb92.pbl">
 <input type=hidden name=reportno value=16>
@@ -23,35 +26,100 @@ Nursing Pre-Assessment
 <input type=hidden name=updttype value="U">
 <input type=hidden name=nobokmod value="1">
 <input type=hidden name=admissno value="%PATWEB92.16.001">
+<input type=hidden name=prefcont value="%PATWEB92.16.226">
+<input type=hidden name=delrec value="%PATWEB92.16.231">
 <table align=center cellspacing=0 border=0 width=95%>
+  <tr><td class=DataLabel width=20%>Reason for Admission</td>
+      <td class=DataField width=40%>%PATWEB92.16.220 </td>
+      <td class=DataLabel id=homeLabel width=10%>Home</td>
+      <td class=DataField id=homeField>%PATWEB92.16.221 </td></tr>
 
-   <tr><td class=DataLabel>Date</td> 
+  <tr><td class=DataLabel>Exp Admission Date</td>
+      <td class=DataField>%PATWEB92.16.224 </td>
+      <td class=DataLabel id=workLabel>Work</td>
+      <td class=DataField id=workField>%PATWEB92.16.222 </td></tr>
+
+  <tr><td class=DataLabel>%STANDARD.01.017.S </td>
+      <td class=DataField>%PATWEB92.16.225 </td>
+      <td class=DataLabel id=mobLabel>Mobile</td>
+      <td class=DataField id=mobField>%PATWEB92.16.223 </td></tr>
+</table>
+<hr>
+<table align=center cellspacing=0 border=0 width=95%>
+   <tr><td class=DataLabel>Date</td>
        <td><input type=text size=12 name=bokrx012
-           id=bokrx012 class="Date" title="Date" value="%PATWEB92.16.112">
+           id=bokrx012 class="Date" title="Date" value="%PATWEB92.16.232">
          <img notab src=../images/DateLookup.gif class=Icon
           onclick="DateLookupFrame(bokrx012);">
           Time
        <input class=Mandatory type=text name=bokrx036 size=8 tabindex=2
-          id=bokrx036 value="%PATWEB92.16.136" title="Time">
+          id=bokrx036 value="%PATWEB92.16.233" title="Time">
         <img notab src=../images/DateTimeStamp.gif class=Icon
          onclick="SetCurrentDateTime(bokrx012,bokrx036);">
        <img notab src=../images/TimeLookup.gif border=0 hspace=4 align=absmiddle
         onclick="TimeLookupFrame(bokrx036);">
-          </td>
+          </td></tr>
+
   <tr><td class=DataLabel>%STANDARD.01.017.BG</td>
           <td><select name=bokrx009 title="%STANDARD.01.017.BG">
               <option> </option>
-                %PATWEB92.16.109.2
-              </select></td>
+                %PATWEB92.16.234.2
+              </select></td></tr>
+
+<tr><td class=DataLabel>Comments</td>
+    <td><input type=text size=130 maxlength=80 name="ptatr014"
+           id="ptatr014" title="Comment 1" value="%PATWEB92.16.227 "></td></tr>
+<tr><td class=DataLabel></td>
+    <td><input type=text size=130 maxlength=80 name="ptatr015"
+           id="ptatr015" title="Comment 2" value="%PATWEB92.16.228 "></td></tr>
+<tr><td class=DataLabel></td>
+    <td><input type=text size=130 maxlength=80 name="ptatr016"
+           id="ptatr016" title="Comment 3" value="%PATWEB92.16.229 "></td></tr>
+<tr><td class=DataLabel></td>
+    <td><input type=text size=130 maxlength=80 name="ptatr017"
+           id="ptatr017" title="Comment 4" value="%PATWEB92.16.230 "></td></tr>
 
 <tr><td colspan=2 align=center><br>
-    <input type=button class="button" value="Ok" 
+    <input type=button class="button" value="Ok"
      name=OKButton onclick="SubmitForm();">
-    <input type=button Value="Cancel" class="button" 
+    <input type=button Value="Cancel" class="button"
      onclick="DFrameExitRefresh();">
     </td></tr>
 
 </table>
 </form>
 
+<script type=text/javascript>
+f = document.UpdateForm;
 
+if(f.prefcont.value=="H") {
+  document.getElementById("homeLabel").classList.add("RedText");
+  document.getElementById("homeField").classList.add("RedText");
+}
+if(f.prefcont.value=="W") {
+  document.getElementById("workLabel").classList.add("RedText");
+  document.getElementById("workField").classList.add("RedText");
+}
+if(f.prefcont.value=="M") {
+  document.getElementById("mobLabel").classList.add("RedText");
+  document.getElementById("mobField").classList.add("RedText");
+}
+if(f.delrec.value=="1") {
+  f.bokrx012.disabled=true;
+  f.bokrx012.classList.add("Readonly");
+  f.bokrx036.disabled=true;
+  f.bokrx036.classList.add("Readonly");
+  f.bokrx036.classList.remove("Mandatory");
+  f.bokrx009.disabled=true;
+  f.bokrx009.classList.add("Readonly");
+  f.ptatr014.disabled=true;
+  f.ptatr014.classList.add("Readonly");
+  f.ptatr015.disabled=true;
+  f.ptatr015.classList.add("Readonly");
+  f.ptatr016.disabled=true;
+  f.ptatr016.classList.add("Readonly");
+  f.ptatr017.disabled=true;
+  f.ptatr017.classList.add("Readonly");
+  f.OKButton.disabled=true;
+}
+</script>

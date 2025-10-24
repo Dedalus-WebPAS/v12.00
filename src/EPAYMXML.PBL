@@ -10,6 +10,8 @@
 .*                                                                             *
 .* Modification :                                                              *
 .*                                                                             *
+.* V12.00.03  09/10/2025  J.Tan        TSK 0961113                             *
+.*            Mod to use Register hospital id for Receipt hospital fields      *
 .* V12.00.02  11/09/2025  J.Tan        TSK 0966642                             *
 .*            Mod receive payment for Current, Onleave and Discharged patients *
 .*            12/09/2025  J.Tan        TSK 0961113                             *
@@ -103,7 +105,7 @@ DETAILFN  DIM       8     * Detail Temp File Name
 . ------------------------------------------------------------------------------
 PRGID     INIT      "EPAYMXML"
 PRGNAM    INIT      "ePaymentXML load"
-VERSION   INIT      "V12.00.02"
+VERSION   INIT      "V12.00.03"
 +
 .*******************************************************************************
 .*                              MAIN0000                                       *
@@ -530,7 +532,7 @@ WBNK0000  READ      CONTROLF,THIRTY6;*193,HRECPT
           MOVE      RCCICHQA,RCBNCHQA          * Chq Account from Cash drawer
           MATCH     SP70,ERRORARY[1]
           IF        @EQUAL
-            MOVE      XMRCHOSP,RCBNMHOS
+            MOVE      REGHOSP,RCBNMHOS
           ENDIF
 .
           MOVE      "0",RCBNTTYP               * default to 0 = Patient
@@ -581,7 +583,7 @@ WBDT1200  CALL      CLRPBT00              * Clear Real RCPBDT fields first
           MOVE      XMRCAMNT,RCBDPAMT      * Payment amount
           MATCH     SP70,ERRORARY[1]
           IF        @EQUAL
-            MOVE      XMRCHOSP,RCBDMHOS
+            MOVE      REGHOSP,RCBDMHOS
           ENDIF
 .
           MOVE      CURDATE,RCBDCDAT
@@ -654,7 +656,7 @@ WDTE1200  CALL      CLRPDE00              * Clear fields
 .
           MATCH     SP70,ERRORARY[1]
           IF        @EQUAL
-            MOVE      XMRCHOSP,RCDTMHOS
+            MOVE      REGHOSP,RCDTMHOS
           ENDIF
 .
           MOVE      PADD1,RCDTADD1

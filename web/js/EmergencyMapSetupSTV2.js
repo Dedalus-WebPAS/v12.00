@@ -1,4 +1,4 @@
-//jsVersion  : V12.00.00
+//jsVersion  : V12.00.01
 //======================================================================
 // Emergency Department Map Display Script
 //======================================================================
@@ -234,28 +234,30 @@ function ShowMap(immediate,emergency,urgent,semi,non) {
        d.writeln(' ><b>' + obj.patients[i][2].replace(/ /g,"_") + 
                  '</b></td>');
      }
+
+     // Patient Sex/Age & LOS
      if (obj.patients[i][66] == "1") {
        d.writeln('<td width=30 align=center>' + obj.patients[i][6] + 
                  obj.patients[i][7] + '&nbsp;</td>');
        d.writeln('<td width=30 align=center>' +
-                 '<img src=../images/release2.gif class=TinyIcon>'
+                 '<img src="../images/release2.gif" class=TinyIcon>'
                  + '&nbsp;</td>');
      } else if (obj.patients[i][14] == "1") {
        d.writeln('<td width=30 align=center>' + obj.patients[i][6] + 
                  obj.patients[i][7] + '&nbsp;</td>');
-       d.writeln('<td width=30><img src=../images/sadface.gif class=TinyIcon>'
+       d.writeln('<td width=30><img src="../images/sadface.gif" class=TinyIcon>'
                  + '&nbsp;</td>');
      } else if (obj.patients[i][14] == "2"){
       d.writeln('<td width=30 align=center>' + obj.patients[i][6] +
                 obj.patients[i][7] + '&nbsp;</td>');
-      d.writeln('<td width=30><img src=../images/sadfacelos.gif class=TinyIcon>'
-                 + '&nbsp;</td>');
+      d.writeln('<td width=30><img src="../images/sadfacelos.gif" class=TinyIcon>' + '&nbsp;</td>');
      } else {
        d.writeln('<td width=30 align=center>' + obj.patients[i][6] + 
                  '&nbsp;</td>');
-       d.writeln('<td width=35>' + obj.patients[i][7] + '&nbsp;</td>');
+       d.writeln('<td width=30>' + obj.patients[i][7] + '&nbsp;</td>');
      }
 
+     // Arrival Time
      d.writeln('<td width=30>' + obj.patients[i][5].substr(8,5) + '&nbsp;</td>');
      d.writeln('</tr>') ;
 /* 

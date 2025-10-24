@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.01">
+<meta name="TemplateVersion" content="V12.00.02">
 <meta name="TemplateHome" content="hea-nbh">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -10,21 +10,25 @@ function PatientSearchNBH() {
   redirect = "emrweb02.pbl?reportno=02&template=011";
   SetCookie('PatSearchRedirectCookie',redirect);
 
-  url= "patweb90.pbl?reportno=01&template=060"
+  url= "patweb90.pbl?reportno=01&template=060&autosrch=Y"
   DFrameLink(url,0,0,1008,521);
 }
 function setRegistration() {
   f = document.UpdateForm;
-  f.checkTri.value = 1;
-  if (validateMandatory(f)) {
-    f.formactn.value="SP"
-    tmp = f.emexp001.value;
-    f.urnumber.value = "";
-    f.emexp001.value = tmp.replace(/ /g,"+");
-    f.reportno.value = "02";
-    f.template.value = "021";
-    f.submit();
-  }
+  f.checksen.value = 1;
+  if (!validateMandatory(f)) { return;}
+
+  f.formactn.value="AU";
+  f.nextpage.value="2";
+  tmp = f.emexp001.value;
+  f.emexp001.value = tmp.replace(/ /g,"+");
+  redirect = "emrweb02.pbl?reportno=2&template=021"; 
+  redirect += "&checkTri=1";
+  redirect += "&formactn=SP";
+  redirect += "&urnumber=";
+  redirect += "&emexp001=" + f.emexp001.value;
+  f.redirect.value = redirect;
+  f.submit();
 }
 function setDelete() {
  ans=confirm("Are you sure you want to Delete this record ?")

@@ -1,0 +1,181 @@
+<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateHome" content="standard">
+<meta name="HelpFileName" content="NoContextSet.html">
+<meta name="CrossBrowser" content="true">
+<script type="text/javascript">
+function submitPrgplb() {
+  if(!validateMandatory(PrintLabels)) {
+    return ;
+  } 
+  if(!validateSelections()) {
+    return;
+  }
+  linkurl="patweb98.pbl?reportno=01&template=452&nourselc=1";
+  Left=(document.body.clientWidth-390)/2;
+  DFrameLink(linkurl,100,Left,390,140);
+}
+function validateSelections() {
+  var bSelected = false;
+  var elems = null;
+
+  // We'll check all the Print Label checkboxes to see if any are selected
+  var tblPatients = document.getElementById('tblPatients');
+  if (tblPatients == undefined)
+    return false;
+
+  elems = tblPatients.getElementsByTagName('input');
+  for (var i = 0; i < elems.length; i++) {
+    if (elems[i].type == 'checkbox') {
+      if (elems[i].checked == true) {
+        bSelected = true;
+        break;
+      }
+    }
+  }
+
+  if (!bSelected) {
+    alert("No Print Label (Patient) checkboxes selected!");
+    return false;
+  }
+
+  return true;
+}
+function UpdateCondition(urnumber,admissno) {
+  linkurl="patweb93.pbl?reportno=5&template=001" +
+          "&urnumber=" + urnumber + "&admissno=" + admissno
+  DFrameLink(linkurl,50,250,500,300)
+}
+function UpdateDiet(urnumber,admissno) { 
+  linkurl="patweb98.pbl?reportno=4&template=003" +
+          "&urnumber=" + urnumber + "&admissno=" + admissno
+  DFrameLink(linkurl,0,75,300,150)
+}
+function PatientAlerts(urnumber,admissno) { 
+  linkurl="patweb98.pbl?reportno=1&template=003" +
+          "&urnumber=" + urnumber + "&admissno=" + admissno
+  location.href=linkurl
+}
+function MHLegStat(urnumber,admissno) {
+  linkurl="mehweb01.pbl?reportno=9&template=001" +
+          "&urnumber=" + urnumber + "&admissno=" + admissno
+  location.href=linkurl
+}
+function PatientResults(urnumber,admissno) { 
+  linkurl="cliweb03.pbl?reportno=1&template=001" +
+          "&urnumber=" + urnumber + "&admissno=" + admissno
+  location.href=linkurl
+}
+function BedAllocation(urnumber,admissno) {
+  linkurl="patweb96.pbl?reportno=3&template=005" +
+          "&urnumber=" + urnumber + "&admissno=" + admissno
+  DFrameLink(linkurl,50,250,300,120)
+}
+function InitTable(TableView) {
+  ward=document.SelectWard.wardcode.value;
+  bed=document.SelectWard.wbedtype.value;
+  if (TableView==0) {
+      linkurl="patweb93.pbl?reportno=1&template=060" +
+              "&wardcode=" + ward +
+              "&wbedtype=" + bed 
+      }
+  location.href=linkurl;
+}
+function ModBeds() {
+  document.cookie = "WardListPath=" + escape(location.href) + ";";
+  var ward = document.SelectWard.wardcode.value.replace(/ /g,"+");
+  location.href="patweb95.pbl?reportno=5&template=001&wardcode=" + ward;
+}
+</script>
+%START.OF.PAGE
+<body onload="PageLoad(event);SetCount();">
+
+<form name=SelectWard action=patweb93.pbl method=get style="margin:0">
+<input type=hidden name=reportno value="1">
+<input type=hidden name=template value="60">
+
+<table width=100% cellspacing=0 border=0>
+<tr><td class=HeadingCell>
+        <img src="../images/TableViewIcon.gif" class=Icon
+             alt="Default View" border=0 onclick='InitTable(0);'></td>
+    <td class=HeadingCell align=center>
+        Current Admission for %PATWEB93.01.102</td>
+    <td class=HeadingCell width=10%><input type=button value="Mod Avail Beds"
+        class="button" onclick="ModBeds();"></td>
+    </tr>
+</table>
+<table width=100% cellspacing=0 border=0>
+<tr><td class=HeadingCell> Ward
+        <select name=wardcode onchange="SelectWard.submit();" >
+         %PATWEB93.01.001
+        </select></td>
+
+    <td class=HeadingCell> Type of Bed
+        <select name=wbedtype onchange="SelectWard.submit();" >
+                <option value="0">All Beds</option>
+                <option value="1">Open Beds</option>
+                <option value="2">Empty Beds Only</option>
+    </select></td>
+
+    <td class=HeadingCell> Number of Patients 
+        <input type=text readonly name=numofpat size=3></td>
+
+    <td class=HeadingCell>Patients in Un-Allocated Beds
+        <input type=text readonly name=numunbed size=3></td>
+</tr>
+</table>
+</form>
+
+<form name=PrintLabels action=patweb93.pbl method=get style="margin:0">
+ <input type=hidden name=reportno value=12>
+ <input type=hidden name=template value=2>
+ <input type=hidden name=updatety value=1>
+ <input type=hidden name=redirect value="patweb93.pbl?reportno=1&template=060">
+ <input type=hidden name=nextpage value="1">
+
+<table id=tblPatients cellspacing=0 cellpadding=2 border=1 width=100%>
+%PATWEB93.01.009.patweb98.01.001.patweb99.01.001.0.1. . . .1. 
+</table>
+
+<table cellspacing=0 cellpadding=2 border=0 width=100%>
+<tr><td colspan=7>
+    <table border=0 align=center width=100%>
+       <tr align=center height=35>
+           <td width=25%></td>     
+           <td width=10% class=AvailableCell align=center>
+               Available Bed</td>
+           <td width=10% class=ClosedCell align=center bgcolor=gray>
+               Closed Bed</td>
+           <td width=10% class=StandbyCell align=center>
+               Standby Patient</td>
+           <td width=10% class=PastDischDate align=center>
+               Past Date </td>
+           <td width=10% class=CurrDischDate align=center>
+               Current Date </td>
+           <td width=25%></td>
+       </tr>
+    </table>
+    </td>
+</tr>
+</table>
+
+<table cellspacing=0 cellpadding=0 border=0 width=100%>
+<tr><td align=center>
+    <input type=button value="Print A4 Labels" class="button" 
+     onclick="submitPrgplb();">
+    </td></tr>
+</table>
+</form>
+
+<script type="text/javascript">
+function SetCount() {
+  SelectWard.numofpat.value="%PATWEB93.01.012" 
+  SelectWard.numunbed.value="%PATWEB93.01.010" 
+}
+
+BedType="%PATWEB93.01.013"
+for (var i =0 ; i < document.SelectWard.wbedtype.length; i++) {
+  if (document.SelectWard.wbedtype.options[i].value==BedType.substr(0,1)) {
+       document.SelectWard.wbedtype.selectedIndex=i;
+  } 
+};
+</script>

@@ -1,4 +1,4 @@
-//jsVersion  : V12.00.01
+//jsVersion  : V12.00.02
 //========================================================================
 //------------------------------------------------------------
 // Function : Ward List Search Frame
@@ -901,6 +901,7 @@ function EnableAutoOpenClinicsFieldsH() {
      document.getElementById("othed046").disabled=false;
      document.getElementById("othed046").className="SelectBig Mandatory"
      document.getElementById("othed048").readOnly=false;
+     document.getElementById("othed048").tabIndex=0;
      document.getElementById("othed048").className="Integer Mandatory";
   } else {
      document.getElementById("othed046").selectedIndex=0;
@@ -908,6 +909,7 @@ function EnableAutoOpenClinicsFieldsH() {
      document.getElementById("othed046").disabled=true;
      document.getElementById("othed048").value="0";
      document.getElementById("othed048").readOnly=true;
+     document.getElementById("othed048").tabIndex=-1;  
      document.getElementById("othed048").className="Integer Readonly";
   }
   if(document.getElementById("othed046").value=="1" &&

@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.05">
+<meta name="TemplateVersion" content="V12.00.06">
 <meta name="TemplateHome" content="standard">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -124,13 +124,13 @@ function processCompRedirect() {
     } else if (pageType=="O") {
       template="249";
     }
-  }else {
+  } else {
     if (pageType=="O"){
 
-      if(document.UpdateForm.scrname.value="OCR") {
+      if(document.UpdateForm.scrname.value=="OCR") {
         server="outweb02";
         report="03";
-        template="001";
+        template="004";
         document.UpdateForm.retdfrae.value="Y"
       } else if (document.UpdateForm.scrname.value == "OCD"){
         server="outweb02";
@@ -140,7 +140,7 @@ function processCompRedirect() {
       } else {
         server="outweb02";
         report="03";
-        templates="001"
+        template="001";
       }
     } else if (pageType=="P"){
       server="patweb98";
@@ -486,10 +486,10 @@ function SubmitClaim() {
          onclick="SetPrinterAlt();">
     </td>
     <td class=DataLabel>Stationery Code</td>
-    <td> <input type=text name=d_statncod size=30
+    <td><input type=text name=d_statncod size=30
      class=ReadOnly readonly>
-     <input type=hidden name=schform1 value="%PATWEB89.01.999.004.0">
-     <input type=hidden name=sfrmdes1></td>
+    <input type=hidden name=schform1 value="%PATWEB89.01.999.004.0">
+    <input type=hidden name=sfrmdes1></td>
     <td class=DataLabel>Printer</td>
     <td><select name=schdprt1 title="Printer" tabindex=34 disabled>
         <option></option>

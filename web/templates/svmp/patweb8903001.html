@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.01">
+<meta name="TemplateVersion" content="V12.00.02">
 <meta name="TemplateHome" content="svmp">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -492,6 +492,29 @@ function chkeAdmCanceButton() {
     PatientLinkTo('patweb98.pbl',1,1,0);
   }
 }
+// eAdmission change of health fund
+function findHFunddesc() {
+  if (!isWhitespace(document.UpdateForm.admisnid.value)) {
+     if (document.UpdateForm.ptmis013.value !=
+                  document.UpdateForm.d_ptmis013.value ) {
+        if (!isWhitespace(document.UpdateForm.ptmis013.value)) {
+            if (!validateCode(16,document.UpdateForm.ptmis013,document.UpdateForm.funddesc)) {
+                document.UpdateForm.ptmis013.value="";
+                document.UpdateForm.funddesc.value="";
+            }
+            if (!validateHFT(20,UpdateForm.ptmis013,UpdateForm.ptmis014,UpdateForm.funddesc,UpdateForm.tabldesc)) {
+                document.UpdateForm.ptmis014.value="";
+                document.UpdateForm.tabldesc.value="";
+            }
+        } else {
+          document.UpdateForm.ptmis013.value="";
+          document.UpdateForm.funddesc.value="";
+          document.UpdateForm.ptmis014.value="";
+          document.UpdateForm.tabldesc.value="";
+       }
+     }
+  }
+}
 </script>
 </head>
 <body onload="PageLoad(event);DisplayTrnSrc();valClaimCode();
@@ -598,6 +621,7 @@ InsertPatientHeader()
                                      title="PRFA Relationship" />
 <input type=hidden name=ptpra010 value=""
                                      title="PRFA Mobile" />
+<input type=hidden name=d_ptmis013 value="%PATWEB89.03.040.0">
 
 <table border=0 colspan=0 width=100% cellspacing=0 cellpadding=0 >
 <tr><td class=HeadingCell align=center>

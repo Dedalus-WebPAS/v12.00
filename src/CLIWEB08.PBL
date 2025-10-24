@@ -5,9 +5,21 @@
 .
 . Modifications  :
 .-------------------------------------------------------------------------------
+. V12.00.04 20/10/2025  Ebon Clements  TSK 0961623
+.           Added open of OUTBOKA3 and OUTBB1A1 to OPNOUT00
+. V12.00.03 09/10/2025  J.Tan          TSK 0966942
+.           Mod DELCOR00 - to Clear linked document from the Alert
+. V12.00.02 08.10.2025  DA Sarkies     TSK 0964039
+.           Added DocumentType ind6 (OBPCCTYP) to be returned as parameter 17
+.           in SRTROW00
 . V12.00.01 22/05/2025  Alina Bhari    TSK  0955096
 .           Added alpanumeric visit number generation 
 .           -BVISUP00,MRTCOD11,MRTCOD30,MRTCOD40,GETLTR00
+. V11.05.03 08.10.2025  DA Sarkies     TSK 0964039
+.           Added DocumentType ind6 (OBPCCTYP) to be returned as parameter 17
+.           in SRTROW00
+. V11.05.02 02/06/2025  Don Nguyen     TSK 0960938
+.           Recompiled for PATNAMCD
 . V11.05.01 11/04/2025  J.Tan          Task 0945921
 .           Mod to remove Hold invoice for Upload document
 . V11.04.12 26/07/2024  Peter Vela     Task 0949702
@@ -923,7 +935,7 @@ STRETURN  FORM      1
 .
 .------------------------------------------------------------------------------
 PRGID     INIT      "CLIWEB08"
-VERSION   INIT      "V12.00.01"
+VERSION   INIT      "V12.00.04"
 PRGNAM    INIT      "Patient Correspondence Details"
 .------------------------------------------------------------------------------
 .
@@ -2893,6 +2905,7 @@ DELCOR00  PACK      KEY20,DETAILKY
           MOVE      CORSP013,OBPCUYN1  *   User Def Y/N 1                     
           MOVE      CORSP014,OBPCUYN2  *   User Def Y/N 2                     
           MOVE      CORSP015,OBPCUDD1  *   User Def Date 1                    
+          UNPACK    SP70,OBPCACAT,OBPCACOD,OBPCCNTR * Clear linked document
 .
           CALL      UPOBPC1                 * Update the record
 .....     CALL      UUOBPC1                 * Unlock the record -moved- D-90207
@@ -3075,7 +3088,7 @@ CORR0000  BRANCH    FLDITMNO,CORR0100,CORR0200,CORR0300,CORR0400,CORR0500:
                              CORR4600,CORR4700,CORR4800,CORR4900,CORR5000:
 			     CORR5100,CORR5200,CORR5300,CORR5400,CORR5500:
                              CORR5600,CORR5700,CORR5800,CORR5900,CORR6000:
-                             CORR6100
+                             CORR6100,CORR6200
           GOTO      CORR9999      
 .
 CORR0100  CALL      CORPGE00                * Link to Document
@@ -3472,8 +3485,38 @@ CORR6100  MOVE      ZERO,TABCFLAG
           CALL      CLIDOC00                * Table of Patient Correspondence
           GOTO      CORR9999
 .
+CORR6200  CALL      LNKALR00                * Check if document linked to Alert
+          GOTO      CORR9999
+.
 CORR9999  RETURN
 .
+.-------------------------------------------------------------------------------
+.         Check if document linked to an Alert
+.-------------------------------------------------------------------------------
+LNKALR00  MOVE      ZERO,F1
+          PACK      KEY20,DETAILKY,SP70
+          CALL      RDOBPC1
+          BRANCH    OVRCD,LNKALR90
+.
+          PACK      KEY16,OBPCURNO,OBPCACAT,OBPCACOD,SP70
+          CALL      RSPTALR1
+LNKALR10  CALL      RKPTALR1
+          BRANCH    OVRCD,LNKALR90
+.
+          MATCH     OBPCURNO,PTALURNO
+          GOTO      LNKALR90 IF NOT EQUAL
+.
+          MATCH     OBPCACAT,PTALCATG
+          GOTO      LNKALR90 IF NOT EQUAL
+.
+          MATCH     OBPCACOD,PTALCODE
+          GOTO      LNKALR90 IF NOT EQUAL
+.
+          MOVE      ONE,F1
+.
+LNKALR90  WRITE     HTMLFILE;F1;
+LNKALR99  RETURN
++
 .-------------------------------------------------------------------------------
 . MISC0000 - Miscellaneous output
 .-------------------------------------------------------------------------------
@@ -4665,7 +4708,8 @@ SRTROW00  MOVE      SP70,KEY30
                     QUOTE,WBSTLEV,QUOTE,COMMA:
                     QUOTE,TCFORM6,QUOTE,COMMA:
                     QUOTE,TCINDC1,QUOTE,COMMA:
-                    QUOTE,OBPCMDEL,QUOTE,");"
+                    QUOTE,OBPCMDEL,QUOTE,COMMA:
+                    QUOTE,TCINDC6,QUOTE,COMMA,");"
 .
           PACK      KEY10,USERID
           CALL      RDWBSE1
@@ -8043,9 +8087,17 @@ OUTFIL99  RETURN
 .------------------------------------------------------------
 . Open Outpatient Files
 .------------------------------------------------------------
-OPNOUT00  PACK      CFNAME,CFILEPRE,FILBOKA6  * Get the name of the BOKA3 file
+OPNOUT00  PACK      CFNAME,CFILEPRE,FILBOKA3  * Get the name of the BOKA3 file
+          CLOSE     OUTBOKA3
+          OPEN      OUTBOKA3,CFNAME           * Open the file
+.
+          PACK      CFNAME,CFILEPRE,FILBOKA6  * Get the name of the BOKA6 file
           CLOSE     OUTBOKA6
           OPEN      OUTBOKA6,CFNAME           * Open the file
+.
+          PACK      CFNAME,CFILEPRE,FILBB1A1  * Get the name of the BB1A1 file
+          CLOSE     OUTBB1A1
+          OPEN      OUTBB1A1,CFNAME           * Open the file
 .
           PACK      CFNAME,CFILEPRE,FILCTYA1  * Get the name of the CTYA1 file
           CLOSE     OUTCTYA1

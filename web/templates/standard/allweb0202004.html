@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.03">
+<meta name="TemplateVersion" content="V12.00.04">
 <meta name="TemplateHome" content="standard">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -510,8 +510,7 @@ function checkStatusOfReferral() {
   if(!isWhitespace(VINAH_Ref) && (VINAH_Ref == "D" ||
       VINAH_Ref == "E" || VINAH_Ref == "L" || VINAH_Ref == "M") &&
       document.UpdateForm.ptcnhdps.value == "3" &&
-      Status=="Waiting   " && document.UpdateForm.alref083.value!="1" &&
-      document.UpdateForm.reflstat.value!="1"){
+      Status=="Waiting   " && document.UpdateForm.alref083.value!="1"){
        alert("The Referral Status must be 'Active' prior to closing this " +
              "refrerral.\n" +
              "Please update Referral Status.");

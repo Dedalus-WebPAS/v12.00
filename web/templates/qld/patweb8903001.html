@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="qld">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -126,6 +126,29 @@ function chkeAdmCanceButton() {
     PatientLinkTo('patweb98.pbl',1,1,0);
   }
 }
+// eAdmission change of health fund
+function findHFunddesc() {
+  if (!isWhitespace(document.UpdateForm.admisnid.value)) {
+     if (document.UpdateForm.ptmis013.value !=
+                  document.UpdateForm.d_ptmis013.value ) {
+        if (!isWhitespace(document.UpdateForm.ptmis013.value)) {
+            if (!validateCode(16,document.UpdateForm.ptmis013,document.UpdateForm.funddesc)) {
+                document.UpdateForm.ptmis013.value="";
+                document.UpdateForm.funddesc.value="";
+            }
+            if (!validateHFT(20,UpdateForm.ptmis013,UpdateForm.ptmis014,UpdateForm.funddesc,UpdateForm.tabldesc)) {
+                document.UpdateForm.ptmis014.value="";
+                document.UpdateForm.tabldesc.value="";
+            }
+        } else {
+          document.UpdateForm.ptmis013.value="";
+          document.UpdateForm.funddesc.value="";
+          document.UpdateForm.ptmis014.value="";
+          document.UpdateForm.tabldesc.value="";
+       }
+     }
+  }
+}
 </script>
 </head>
 <body onload="PageLoad(event);DisplayTrnSrc();document.UpdateForm.ptmis001.focus();
@@ -213,7 +236,7 @@ function chkeAdmCanceButton() {
                                      title="PRFA Relationship" />
   <input type=hidden name=ptpra010 value=""
                                      title="PRFA Mobile" />
-
+  <input type=hidden name=d_ptmis013 value="%PATWEB89.03.040.0">
   <input type=hidden name=ptcndigp id=ptcndigp
        value="%STANDARD.01.025.124.122.0.1">
   <input type=hidden name=ptcndumh id=ptcndumh
@@ -479,14 +502,14 @@ function chkeAdmCanceButton() {
 
    <tr><td class=DataLabel>Health Fund</td>
            <input type=hidden name="ptmis013" value="%PATWEB89.03.040.0"
-            id=ptmis013>
+            id=ptmis013 title="Health Fund">
        <td colspan="3">
            <input type=text size=64 name="funddesc" maxlength="30"
                   title="Health Fund" value="%PATWEB89.03.040.1" readonly
                   id=funddesc class=readonly tabindex=-1>
            Level
            <input type=hidden name="ptmis014" value="%PATWEB89.03.041.0"
-                  id=ptmis014>
+                  id=ptmis014 title="Level">
            <input type="text" size=20 maxlength=30 name="tabldesc" id=tabldesc
                   value="%PATWEB89.03.041.1" readonly class=readonly tabindex=-1>
              <img src="../images/SearchIcon.gif" class=Icon

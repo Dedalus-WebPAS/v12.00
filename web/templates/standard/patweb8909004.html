@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome" content="standard">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -10,7 +10,7 @@ function addProcedure() {
           "&admissno=" + PatientLinks.admissno.value.replace(/ /g,"+") +
           "&uniqueky=" + PatientLinks.uniqueky.value.replace(/ /g,"+");
   Left=(document.body.clientWidth-1000)/2;
-  DFrameLink(linkurl,50,Left,1000,500); 
+  DFrameLink(linkurl,50,Left,1000,600); 
 }
 function updateProcedure(admissno,uniq,theatreid) {
   linkurl="patweb89.pbl?reportno=09&template=006&urnumber=" +
@@ -21,7 +21,7 @@ function updateProcedure(admissno,uniq,theatreid) {
           "&nzspr025=" + theatreid.replace(/ /g,"+") +
           "&uniqueky=" + PatientLinks.uniqueky.value.replace(/ /g,"+");
   Left=(document.body.clientWidth-1000)/2;
-  DFrameLink(linkurl,50,Left,1000,500); 
+  DFrameLink(linkurl,50,Left,1000,600); 
 }
 //----------------------------------------------------------------------------
 // Create New Table Object

@@ -1,7 +1,7 @@
-<meta name="TemplateVersion" content="V12.00.00">
-<meta name="TemplateHome" content="hea">
-<meta name="HelpFileName" content="NoContextSet.html">
-<meta name="CrossBrowser" content="true">
+<meta name="TemplateVersion" content="V12.00.01">
+<meta name="TemplateHome"    content="hea">
+<meta name="HelpFileName"    content="NoContextSet.html">
+<meta name="CrossBrowser"    content="true">
 <script type="text/javascript" src="../js/emrweb0201004.js"></script>
 <script type="text/javascript" src="../js/EmergencyPrimaryDiagSearch.js"></script>
 <script type="text/javascript">
@@ -1201,12 +1201,12 @@ if(VariableNameExists('ShowSingleClickPatientMenu')) {
     alt="Current" date="UpdateForm.emvis158" time="UpdateForm.emvis159">
     </td></tr>
     
-<tr><td class="DataLabel">Primary Diagnosis Search</td>
+<tr><td class="DataLabel">Primary Diagnosis Search (Key Word)</td>
     <td class="DataField" colspan=5>
-    <input type=text
+    <input type=text title="Enter Key Word to search..."
      onKeyUp='getDiagnosis(this,UpdateForm.emvcd005,UpdateForm.emvcd033);'
      onblur='submitPrimaryDiag();' class=SelectBig name=diagnosisSearch>
-    <select name=emvcd005 class=SelectXlrg
+    <select name=emvcd005 id=emvcd005 class=SelectXlrg title="Diagnosis"
      onchange="document.UpdateForm.emvcd033.value=trim(this.value.substring(9,80))+' ';submitPrimaryDiag();">
     </select>
     <input type=button class="button" value="Multi Diagnosis"
@@ -1222,7 +1222,7 @@ if(VariableNameExists('ShowSingleClickPatientMenu')) {
 <tr><td class="DataLabel">Primary Diagnosis Free Format Desc</td>
     <td class="DataField" colspan=5>
     <input type=text name=emvcd033 maxlength=100 size=100
-    onblur="submitFreeFormat();">
+     title="Diagnosis Free Format Description" onblur="submitFreeFormat();">
     </td></tr>
 
 <tr><td class="DataLabel">Admitting Doctor</td>

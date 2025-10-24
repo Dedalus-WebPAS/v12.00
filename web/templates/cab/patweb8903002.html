@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.00">
+<meta name="TemplateVersion" content="V12.00.01">
 <meta name="TemplateHome"    content="cab">
 <meta name="HelpFileName"    content="NoContextSet.html">
 <meta name="CrossBrowser"    content="true">
@@ -494,6 +494,12 @@ onclick="GPHCPSearchFrame(ptvis028,doctnam1,genpprov,ptvis029,genpprac,ptvis030,
   Day=document.UpdateForm.ptmis001.value.substr(0,2).replace(/ /g,"0")
   Dat=document.UpdateForm.ptmis001.value.substr(2)
   document.UpdateForm.ptmis001.value=Day + Dat
+
+//Checks if MoveMedRec is checked
+if (VariableNameExists('MoveMedRec') && MoveMedRec){
+  document.UpdateForm.mvmedre1.checked = true;
+}
+
 </script>
 <span id=transferhd style="display:none">
 Transfer Source

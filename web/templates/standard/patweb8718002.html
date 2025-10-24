@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.01">
+<meta name="TemplateVersion" content="V12.00.02">
 <meta name="TemplateHome" content="standard">
 <meta name="HelpFileName" content="NoContextSet.html">
 <meta name="CrossBrowser" content="true">
@@ -61,14 +61,14 @@ Insert Ad Hoc Outpatient Letter Selection
     <img notab src=../images/DateLookup.gif class=icon
      alt="Show Calendar" date="AddForm.otal0004">
     </td></tr>
-<tr><td class=DataLabel>Booking Type</td>
-    <td><select name=otal0005 id=otal0005 tabindex=05 title="Booking Type"
+<tr><td class=DataLabel>Booking Status</td>
+    <td><select name=otal0005 id=otal0005 tabindex=05 title="Booking Status"
          class="selectBig">
         <option> </option>
-        <option value="A">Attendee</option>
+        <option value="A">Attended</option>
         <option value="B">Booked</option>
         <option value="C">Cancelled</option>
-        <option value="N">Non Attendee</option>
+        <option value="N">Non Attended</option>
         <option value="R">Rescheduled</option>
         </select>
     </td></tr>
@@ -184,7 +184,9 @@ Insert Ad Hoc Outpatient Letter Selection
     </select>
     </td></tr>
 <tr><td class=DataLabel>Letter to Print</td>
-<td><select name=otal0023 id=otal0023 tabindex=23 title="Letter to Print">
+<td><select name=otal0023 id=otal0023 tabindex=23 title="Letter to Print"
+          class=Mandatory>
+     <option value=" "> </option>
     %PATWEB87.18.024
      </select></td></tr>
 

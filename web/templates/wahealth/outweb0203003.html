@@ -1,4 +1,4 @@
-<meta name="TemplateVersion" content="V12.00.07">
+<meta name="TemplateVersion" content="V12.00.09">
 <meta name="TemplateHome"    content="wahealth">
 <meta name="HelpFileName"    content="NoContextSet.html">
 <meta name="CrossBrowser"    content="true"> 
@@ -63,16 +63,16 @@ if (document.UpdateForm.outbb035.value.substr(3,1)=="2" ||
     }
   }
 
-  if (document.UpdateForm.opwamvny.value == '1' &&
-      document.UpdateForm.deptflag.value != "1") {
+  if (document.UpdateForm.opwamvny.value == '1') {
     var redirectPage = document.getElementById('redirect').value;
-    redirectPage = "patweb89.pbl?reportno=1&template=342" +
+    redirectPage = "patweb89.pbl?reportno=1&template=352" +
          "&urnumber=" + PatientLinks.urnumber.value.replace(/ /g,"+") +
          "&admissno=" + PatientLinks.admissno.value.replace(/ /g,"+") +
          "&casekeys=" + PatientLinks.casekeys.value.replace(/ /g,"+") +
          "&pmext049=" + document.UpdateForm.opwamvny.value + 
          "&chckcomp=" + document.UpdateForm.outbb002.value[3]+"O";
 
+    document.UpdateForm.nextpage.value="1";
 
     var outcome = CheckOutcome();
     if (outcome.length>0){
@@ -81,7 +81,7 @@ if (document.UpdateForm.outbb035.value.substr(3,1)=="2" ||
         SetCookie("AddSlotFollowUp");
       }
     }
-    document.UpdateForm.nextpage.value="6";
+
     document.getElementById('redirect').value = redirectPage;
     if(validateMandatory(UpdateForm)) {
       UpdateForm.submit();

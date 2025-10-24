@@ -1,4 +1,4 @@
-//jsVersion  : V12.00.04
+//jsVersion  : V12.00.05
 //========================================================================
 // Program   : patweb9801322.js
 //
@@ -373,6 +373,9 @@ function CreateDocument(documentStatus) {
     }
     UpdateForm.draftdoc.value="1";
     UpdateForm.sendtype.selectedIndex=0;
+  } else if (documentStatus=="F") {
+    tinyMCE.activeEditor.dom.setHTML('dateSent',document.UpdateForm.corsp002.value);
+    tinyMCE.activeEditor.dom.setHTML('summaryStatus','Final');
   }
 
   var html = tinyMCE.get('documentContent').getContent({format : 'raw'});
@@ -398,13 +401,17 @@ function CreateDocument(documentStatus) {
 
         if (document.getElementById('histflag')!=null &&
             document.getElementById('histflag').value=='1') {
-          history.go(-2); 
+              location.href = "cliweb08.pbl?reportno=01&template=030i"+
+               '&urnumber='+UpdateForm.urnumber.value.replace(/ /g,"+")+
+               '&admissno='+UpdateForm.admissno.value.replace(/ /g,"+")
         } else {
           if (document.getElementById('cretdcck') != null &&
               !isWhitespace(document.getElementById('cretdcck').value)) {
             location.href=document.getElementById('cretdcck').value;
           } else {
-            history.back();
+              location.href = "cliweb08.pbl?reportno=01&template=030i"+
+               '&urnumber='+UpdateForm.urnumber.value.replace(/ /g,"+")+
+               '&admissno='+UpdateForm.admissno.value.replace(/ /g,"+")
           }
         }
       }

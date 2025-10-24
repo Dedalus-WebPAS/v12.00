@@ -5,6 +5,10 @@
 .
 . Modifications : 
 .-------------------------------------------------------------------------------
+. V12.00.02 09/10/2025  J.Tan           TSK 0966942
+.           Removed checking for deleted documents attached to Alert
+. V12.00.01 07/10/2025  J.Tan           TSK 0966942
+.           Mod to check for deleted documents attached to Alert
 . V11.05.03 24/03/2025  Davin           TSK 0956210
 .           Add ICD10 Ed.13 - Go-live Date PTCNGDX3 (Sect.130 Pos.86)
 . V11.05.02 19.12.2024  DA Sarkies     Task 0954547
@@ -439,7 +443,7 @@ CATTC     INIT      "tc"
 .
 .---------------------------------------------------------------------------
 PRGID     INIT      "CLIWEB01"
-VERSION   INIT      "V12.00.00"
+VERSION   INIT      "V12.00.02"
 PRGNAM    INIT      "Patient Alerts"
 .---------------------------------------------------------------------------
           CALL      WEBINT00       * Initialise Fifo Etc.

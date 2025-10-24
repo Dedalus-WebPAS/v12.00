@@ -7,6 +7,11 @@
 . Modifications : 
 .
 .-------------------------------------------------------------------------
+. V12.00.08 07/10/2025  Ebon Clements  TSK 0968096
+.           Added custom print-key attribute for bulk A4 labels sheet
+.           printing - CBEDG300
+. V12.00.07 30/09/2025  Bella Turco    TSK 0955574
+.           Fixed order of WRPTATR3 keypack in DIDEUC50
 . V12.00.06 03/09/2025  Peter Vela     TSK 0947378
 .           Fixed DIDEUC00/PATATRaf processing  for Update Condition DFrame /
 .           Medically Cleared for Discharge workflow
@@ -2497,7 +2502,7 @@ TZFILE    FILE      ASCII, FIXED=256
 .
 .------------------------------------------------------------------------------
 PRGID     INIT      "PATWEB93"
-VERSION   INIT      "V12.00.06"
+VERSION   INIT      "V12.00.08"
 PRGNAM    INIT      "Ward Patient List Server"
 .------------------------------------------------------------------------------
 .
@@ -8350,7 +8355,7 @@ DIDEUC50  CALL      CLPATATR
           MOVE      PTDSC006,PTARCOD2
           MOVE      "0",PTARDELR
 
-          PACK      KEY35,PTARURNO,PTARVISN,PTARDATE,PTARTIME,PTARTYPE
+          PACK      KEY35,PTARURNO,PTARVISN,PTARTYPE,PTARDATE,PTARTIME,SP70
           CALL      WRPTATR3
 
 DIDEUC99  RETURN
@@ -12720,6 +12725,7 @@ CBEDG200  WRITE     HTMLFILE;"<td>&nbsp;</td>";
 CBEDG300  MATCH     "1",PRNTLABL
           IF        @EQUAL
             WRITE     HTMLFILE;"<td><input type=checkbox name=inplabar ":
+                               "print-key='",AURNO,"|",AADMNO,"'":
                                "value='",AADMNO,"' ></td>";
           ENDIF
 .

@@ -6,6 +6,8 @@
 . Modifications : 
 .
 .----------------------------------------------------------------------
+. V12.00.14 06.10.2025 Alina Bhari     TSK 0967329
+.           Modified lastupdateby to return the a value reference field
 . V12.00.13 14.09.2025 DA Sarkies      TSK 0967090
 .           Added check for note time (Referral/Emergecy) to DISS1600
 . V12.00.12 18/07/2025 Nikitha B       TSK 0966342
@@ -1382,7 +1384,7 @@ TZFILE    FILE      ASCII, FIXED=256
 .
 .------------------------------------------------------------
 PRGID     INIT      "CLIWEB06"
-VERSION   INIT      "V12.00.13"
+VERSION   INIT      "V12.00.14"
 PRGNAM    INIT      "Clinical Notes Server"
 .------------------------------------------------------------
 .
@@ -6811,10 +6813,12 @@ RESVSN00  PACK      FHRPATID,URNUMBER,SP70
             MOVE      "entered-in-error",FHRSTAT
           ENDIF
           UNPACK    OBCADTE,CCENT,CYEAR,CMON,CDAY
-          PACK      KEY10,OBCAUID
+.
+.         Get the last updated by user information
+          PACK      KEY10,OBCALID,SP70
           CALL      RDWBSE1
           IF        OVRCD=1
-            PACK      WBSENAM,OBCAUID,SP70
+            PACK      WBSENAM,OBCALID,SP70
           ENDIF
           WRITE     HTMLFILE;*+,"{ #"resourceType#": #"ClinicalImpression#",":
                     " #"id#" : #"VSN-",KEY12,"#",":
@@ -6827,13 +6831,24 @@ RESVSN00  PACK      FHRPATID,URNUMBER,SP70
                         " ,#"valueString#":#"",CCENT,CYEAR,DASH,CMON,DASH,CDAY:
                         "T",OBCATLU,"#"},":
                     " { #"url#":#"%BASEURL/extension/dxc-hc-lastupdateby#"":
-                        " ,#"valueString#":#"",OBCALID,"#"}";
+                        " ,#"valueReference#":":
+                        " { #"reference#" : #"Practitioner/User-",OBCALID,"#",":
+                            " #"display#" : #"",WBSENAM,"#" } }";
+.                    " { #"url#":#"%BASEURL/extension/dxc-hc-lastupdateby#"":
+.                        " ,#"valueString#":#"",OBCALID,"#"}";
 .
 .          MATCH     SP70,OBCAOCG
 .          IF        !@EQUAL & !@EOS
 .            WRITE     HTMLFILE;",{ #"url#":#"%BASEURL/extension/dxc-hc-group#"":
 .                        " ,#"valueString#":#"",OBCAOCG,"#"}";
 .          ENDIF
+.
+.         Get the information of User who has input the clinical note information
+          PACK      KEY10,OBCAUID,SP70
+          CALL      RDWBSE1
+          IF        OVRCD=1
+            PACK      WBSENAM,OBCAUID,SP70
+          ENDIF
 .
           MATCH    SP70,OBCAOCG
           IF       !@EQUAL & !@EOS
